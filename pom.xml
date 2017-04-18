@@ -35,20 +35,20 @@
   <description>Annotation based Thrift implementation</description>
 
   <organization>
-    <name>Facebook, Inc.</name>
+    <name>Airlift</name>
   </organization>
 
   <scm>
-    <connection>scm:git:git://github.com/facebook/swift.git</connection>
-    <developerConnection>scm:git:git@github.com:facebook/swift.git</developerConnection>
-    <url>https://github.com/facebook/swift</url>
+    <connection>scm:git:git://github.com/airlift/drift.git</connection>
+    <developerConnection>scm:git:git@github.com:airlift/drift.git</developerConnection>
+    <url>https://github.com/airlift/drift</url>
     <tag>HEAD</tag>
   </scm>
 
   <distributionManagement>
     <site>
       <id>github-project-site</id>
-      <url>gitsite:git@github.com/facebook/swift.git</url>
+      <url>gitsite:git@github.com/airlift/drift.git</url>
     </site>
   </distributionManagement>
 
