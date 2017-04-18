@@ -27,8 +27,8 @@
     <relativePath />
   </parent>
 
-  <groupId>com.facebook.swift</groupId>
-  <artifactId>swift-root</artifactId>
+  <groupId>io.airlift.drift</groupId>
+  <artifactId>drift-root</artifactId>
   <version>0.23.2-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>${project.artifactId}</name>
@@ -53,8 +53,8 @@
   </distributionManagement>
 
   <modules>
-    <module>swift-annotations</module>
-    <module>swift-codec</module>
+    <module>drift-annotations</module>
+    <module>drift-codec</module>
   </modules>
 
   <inceptionYear>2012</inceptionYear>
@@ -75,14 +75,14 @@
   <dependencyManagement>
     <dependencies>
       <dependency>
-        <groupId>com.facebook.swift</groupId>
-        <artifactId>swift-annotations</artifactId>
+        <groupId>io.airlift.drift</groupId>
+        <artifactId>drift-annotations</artifactId>
         <version>${project.version}</version>
       </dependency>
 
       <dependency>
-        <groupId>com.facebook.swift</groupId>
-        <artifactId>swift-codec</artifactId>
+        <groupId>io.airlift.drift</groupId>
+        <artifactId>drift-codec</artifactId>
         <version>${project.version}</version>
       </dependency>
 

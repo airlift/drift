@@ -1,13 +1,13 @@
-# Swift
+# Drift
 
-Swift is an easy-to-use, annotation-based Java library for creating Thrift
+Drift is an easy-to-use, annotation-based Java library for creating Thrift
 serializable types and services.
 
-# Swift Codec
+# Drift Codec
 
-[Swift Codec](swift-codec) is a simple library specifying how Java
+[Drift Codec](drift-codec) is a simple library specifying how Java
 objects are converted to and from Thrift.  This library is similar to JaxB
-(XML) and Jackson (JSON), but for Thrift.  Swift codec supports field, method,
+(XML) and Jackson (JSON), but for Thrift.  Drift codec supports field, method,
 constructor, and builder injection.  For example:
 
     @ThriftStruct
