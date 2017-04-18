@@ -35,37 +35,3 @@ constructor, and builder injection.  For example:
             return message;
         }
     }
-
-
-# Swift Service
-
-[Swift Service](swift-service) is a simple library annotating
-services to be exported with Thrift.   For example:
-
-    @ThriftService("scribe")
-    public class InMemoryScribe
-    {
-        private final List<LogEntry> messages = new ArrayList<>();
-
-        public List<LogEntry> getMessages()
-        {
-            return messages;
-        }
-
-        @ThriftMethod("Log")
-        public ResultCode log(List<LogEntry> messages)
-        {
-            this.messages.addAll(messages);
-            return ResultCode.OK;
-        }
-    }
-
-# Swift Generator
-
-[Swift Generator](swift-generator) is a library that creates Java code usable with the Swift codec from Thrift IDL files and vice versa.
-
-[Swift Generator CLI](swift-generator-cli) and [Swift2Thrift Generator CLI](swift2thrift-generator-cli) are command-line front-ends to this generator.
-
-# Swift Maven plugin
-
-[Swift Maven plugin](swift-maven-plugin) allows using the code generator from a maven build and generate source code on the fly.
