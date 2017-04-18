@@ -18,207 +18,207 @@
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
-  <modelVersion>4.0.0</modelVersion>
+    <modelVersion>4.0.0</modelVersion>
 
-  <parent>
-    <groupId>io.airlift</groupId>
-    <artifactId>airbase</artifactId>
-    <version>46</version>
-    <relativePath />
-  </parent>
+    <parent>
+        <groupId>io.airlift</groupId>
+        <artifactId>airbase</artifactId>
+        <version>46</version>
+        <relativePath />
+    </parent>
 
-  <groupId>io.airlift.drift</groupId>
-  <artifactId>drift-root</artifactId>
-  <version>1.0-SNAPSHOT</version>
-  <packaging>pom</packaging>
-  <name>${project.artifactId}</name>
-  <description>Annotation based Thrift implementation</description>
+    <groupId>io.airlift.drift</groupId>
+    <artifactId>drift-root</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+    <name>${project.artifactId}</name>
+    <description>Annotation based Thrift implementation</description>
 
-  <organization>
-    <name>Airlift</name>
-  </organization>
+    <organization>
+        <name>Airlift</name>
+    </organization>
 
-  <scm>
-    <connection>scm:git:git://github.com/airlift/drift.git</connection>
-    <developerConnection>scm:git:git@github.com:airlift/drift.git</developerConnection>
-    <url>https://github.com/airlift/drift</url>
-    <tag>HEAD</tag>
-  </scm>
+    <scm>
+        <connection>scm:git:git://github.com/airlift/drift.git</connection>
+        <developerConnection>scm:git:git@github.com:airlift/drift.git</developerConnection>
+        <url>https://github.com/airlift/drift</url>
+        <tag>HEAD</tag>
+    </scm>
 
-  <distributionManagement>
-    <site>
-      <id>github-project-site</id>
-      <url>gitsite:git@github.com/airlift/drift.git</url>
-    </site>
-  </distributionManagement>
+    <distributionManagement>
+        <site>
+            <id>github-project-site</id>
+            <url>gitsite:git@github.com/airlift/drift.git</url>
+        </site>
+    </distributionManagement>
 
-  <modules>
-    <module>drift-annotations</module>
-    <module>drift-codec</module>
-  </modules>
+    <modules>
+        <module>drift-annotations</module>
+        <module>drift-codec</module>
+    </modules>
 
-  <inceptionYear>2012</inceptionYear>
+    <inceptionYear>2012</inceptionYear>
 
-  <developers>
-    <!-- see git log -->
-  </developers>
+    <developers>
+        <!-- see git log -->
+    </developers>
 
-  <properties>
-    <!-- This actually wants to be fixed -->
-    <air.check.skip-findbugs>true</air.check.skip-findbugs>
-    <air.check.skip-pmd>true</air.check.skip-pmd>
-    <air.check.skip-jacoco>true</air.check.skip-jacoco>
+    <properties>
+        <!-- This actually wants to be fixed -->
+        <air.check.skip-findbugs>true</air.check.skip-findbugs>
+        <air.check.skip-pmd>true</air.check.skip-pmd>
+        <air.check.skip-jacoco>true</air.check.skip-jacoco>
 
-    <dep.airlift.version>0.119</dep.airlift.version>
-  </properties>
+        <dep.airlift.version>0.119</dep.airlift.version>
+    </properties>
 
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>io.airlift.drift</groupId>
-        <artifactId>drift-annotations</artifactId>
-        <version>${project.version}</version>
-      </dependency>
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>io.airlift.drift</groupId>
+                <artifactId>drift-annotations</artifactId>
+                <version>${project.version}</version>
+            </dependency>
 
-      <dependency>
-        <groupId>io.airlift.drift</groupId>
-        <artifactId>drift-codec</artifactId>
-        <version>${project.version}</version>
-      </dependency>
+            <dependency>
+                <groupId>io.airlift.drift</groupId>
+                <artifactId>drift-codec</artifactId>
+                <version>${project.version}</version>
+            </dependency>
 
-      <dependency>
-        <groupId>org.apache.thrift</groupId>
-        <artifactId>libthrift</artifactId>
-        <version>0.9.3</version>
-      </dependency>
+            <dependency>
+                <groupId>org.apache.thrift</groupId>
+                <artifactId>libthrift</artifactId>
+                <version>0.9.3</version>
+            </dependency>
 
-      <dependency>
-        <groupId>org.ow2.asm</groupId>
-        <artifactId>asm-all</artifactId>
-        <version>5.0.4</version>
-      </dependency>
+            <dependency>
+                <groupId>org.ow2.asm</groupId>
+                <artifactId>asm-all</artifactId>
+                <version>5.0.4</version>
+            </dependency>
 
-      <dependency>
-        <groupId>com.thoughtworks.paranamer</groupId>
-        <artifactId>paranamer</artifactId>
-        <version>2.8</version>
-      </dependency>
+            <dependency>
+                <groupId>com.thoughtworks.paranamer</groupId>
+                <artifactId>paranamer</artifactId>
+                <version>2.8</version>
+            </dependency>
 
-      <!-- provides helpers for using Guava with Java 8 streams -->
-      <dependency>
-        <groupId>jp.skypencil.guava</groupId>
-        <artifactId>helper</artifactId>
-        <version>1.0.1</version>
-      </dependency>
+            <!-- provides helpers for using Guava with Java 8 streams -->
+            <dependency>
+                <groupId>jp.skypencil.guava</groupId>
+                <artifactId>helper</artifactId>
+                <version>1.0.1</version>
+            </dependency>
 
-      <dependency>
-        <groupId>org.easytesting</groupId>
-        <artifactId>fest-assert</artifactId>
-        <version>1.4</version>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
+            <dependency>
+                <groupId>org.easytesting</groupId>
+                <artifactId>fest-assert</artifactId>
+                <version>1.4</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
-  <build>
-    <pluginManagement>
-      <plugins>
-        <!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
-        <plugin>
-          <groupId>org.eclipse.m2e</groupId>
-          <artifactId>lifecycle-mapping</artifactId>
-          <version>1.0.0</version>
-          <configuration>
-            <lifecycleMappingMetadata>
-              <pluginExecutions>
-                <pluginExecution>
-                  <pluginExecutionFilter>
+    <build>
+        <pluginManagement>
+            <plugins>
+                <!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
+                <plugin>
+                    <groupId>org.eclipse.m2e</groupId>
+                    <artifactId>lifecycle-mapping</artifactId>
+                    <version>1.0.0</version>
+                    <configuration>
+                        <lifecycleMappingMetadata>
+                            <pluginExecutions>
+                                <pluginExecution>
+                                    <pluginExecutionFilter>
+                                        <groupId>org.codehaus.plexus</groupId>
+                                        <artifactId>plexus-maven-plugin</artifactId>
+                                        <versionRange>[0,)</versionRange>
+                                        <goals>
+                                            <goal>descriptor</goal>
+                                        </goals>
+                                    </pluginExecutionFilter>
+                                    <action>
+                                        <ignore />
+                                    </action>
+                                </pluginExecution>
+                            </pluginExecutions>
+                        </lifecycleMappingMetadata>
+                    </configuration>
+                </plugin>
+
+                <plugin>
                     <groupId>org.codehaus.plexus</groupId>
                     <artifactId>plexus-maven-plugin</artifactId>
-                    <versionRange>[0,)</versionRange>
-                    <goals>
-                      <goal>descriptor</goal>
-                    </goals>
-                  </pluginExecutionFilter>
-                  <action>
-                    <ignore />
-                  </action>
-                </pluginExecution>
-              </pluginExecutions>
-            </lifecycleMappingMetadata>
-          </configuration>
-        </plugin>
+                    <version>1.3.8</version>
+                    <executions>
+                        <execution>
+                            <goals>
+                                <goal>descriptor</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
 
-        <plugin>
-          <groupId>org.codehaus.plexus</groupId>
-          <artifactId>plexus-maven-plugin</artifactId>
-          <version>1.3.8</version>
-          <executions>
-            <execution>
-              <goals>
-                <goal>descriptor</goal>
-              </goals>
-            </execution>
-          </executions>
-        </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-plugin-plugin</artifactId>
+                    <version>3.4</version>
+                    <executions>
+                        <execution>
+                            <id>help-mojo</id>
+                            <goals>
+                                <goal>helpmojo</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
 
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-plugin-plugin</artifactId>
-          <version>3.4</version>
-          <executions>
-            <execution>
-              <id>help-mojo</id>
-              <goals>
-                <goal>helpmojo</goal>
-              </goals>
-            </execution>
-          </executions>
-        </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-shade-plugin</artifactId>
+                    <version>2.3</version>
+                    <executions>
+                        <execution>
+                            <phase>package</phase>
+                            <goals>
+                                <goal>shade</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
 
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-shade-plugin</artifactId>
-          <version>2.3</version>
-          <executions>
-            <execution>
-              <phase>package</phase>
-              <goals>
-                <goal>shade</goal>
-              </goals>
-            </execution>
-          </executions>
-        </plugin>
+                <plugin>
+                    <groupId>io.takari.maven.plugins</groupId>
+                    <artifactId>takari-lifecycle-plugin</artifactId>
+                    <version>1.11.3</version>
+                </plugin>
 
-        <plugin>
-          <groupId>io.takari.maven.plugins</groupId>
-          <artifactId>takari-lifecycle-plugin</artifactId>
-          <version>1.11.3</version>
-        </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <configuration>
+                        <redirectTestOutputToFile>true</redirectTestOutputToFile>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
 
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-surefire-plugin</artifactId>
-          <configuration>
-            <redirectTestOutputToFile>true</redirectTestOutputToFile>
-          </configuration>
-        </plugin>
-      </plugins>
-    </pluginManagement>
-
-    <plugins>
-      <plugin>
-        <groupId>com.mycila</groupId>
-        <artifactId>license-maven-plugin</artifactId>
-        <configuration>
-          <properties>
-            <inceptionYear>${project.inceptionYear}</inceptionYear>
-            <year>2013</year>
-          </properties>
-          <excludes combine.children="append">
-            <exclude>**/*.g</exclude>
-          </excludes>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
+        <plugins>
+            <plugin>
+                <groupId>com.mycila</groupId>
+                <artifactId>license-maven-plugin</artifactId>
+                <configuration>
+                    <properties>
+                        <inceptionYear>${project.inceptionYear}</inceptionYear>
+                        <year>2013</year>
+                    </properties>
+                    <excludes combine.children="append">
+                        <exclude>**/*.g</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>
