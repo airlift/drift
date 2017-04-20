@@ -31,14 +31,14 @@ import org.apache.thrift.protocol.TProtocol;
 
 import javax.annotation.concurrent.Immutable;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 
 import static com.google.common.base.Preconditions.checkState;
-import static com.google.common.base.Throwables.throwIfInstanceOf;
-import static com.google.common.base.Throwables.throwIfUnchecked;
 import static com.google.common.collect.Iterables.getOnlyElement;
 import static com.google.common.collect.Maps.uniqueIndex;
+import static io.airlift.drift.codec.internal.reflection.ReflectionThriftStructCodec.invokeConstructor;
+import static io.airlift.drift.codec.internal.reflection.ReflectionThriftStructCodec.invokeMethod;
+import static io.airlift.drift.codec.internal.reflection.ReflectionThriftStructCodec.validateCreatedInstance;
 import static io.airlift.drift.codec.metadata.FieldKind.THRIFT_FIELD;
 import static java.lang.String.format;
 import static java.util.Objects.requireNonNull;
@@ -145,37 +145,15 @@ public class ReflectionThriftUnionCodec<T>
 
         if (data != null) {
             fieldMetadata = metadataMap.get(data.getKey());
-
             if (fieldMetadata != null && fieldMetadata.getConstructorInjection().isPresent()) {
-                ThriftConstructorInjection constructor = fieldMetadata.getConstructorInjection().get();
-
-                Object[] parametersValues = new Object[] {data.getValue()};
-
-                try {
-                    instance = constructor.getConstructor().newInstance(parametersValues);
-                }
-                catch (InvocationTargetException e) {
-                    throwIfUnchecked(e.getCause());
-                    throwIfInstanceOf(e.getCause(), Exception.class);
-
-                    throw e;
-                }
+                instance = invokeConstructor(fieldMetadata.getConstructorInjection().get().getConstructor(), new Object[] {data.getValue()});
             }
         }
 
         if (instance == null && metadata.getConstructorInjection().isPresent()) {
             ThriftConstructorInjection constructor = metadata.getConstructorInjection().get();
             // must be no-args
-            Object[] parametersValues = new Object[0];
-
-            try {
-                instance = constructor.getConstructor().newInstance(parametersValues);
-            }
-            catch (InvocationTargetException e) {
-                throwIfUnchecked(e.getCause());
-                throwIfInstanceOf(e.getCause(), Exception.class);
-                throw e;
-            }
+            instance = invokeConstructor(constructor.getConstructor(), new Object[0]);
         }
 
         if (fieldMetadata != null) {
@@ -189,19 +167,8 @@ public class ReflectionThriftUnionCodec<T>
                 }
             }
 
-            if (fieldMetadata.getMethodInjection().isPresent()) {
-                Object[] parametersValues = new Object[] {data.getValue()};
-
-                if (data.getValue() != null) {
-                    try {
-                        fieldMetadata.getMethodInjection().get().getMethod().invoke(instance, parametersValues);
-                    }
-                    catch (InvocationTargetException e) {
-                        throwIfUnchecked(e.getCause());
-                        throwIfInstanceOf(e.getCause(), Exception.class);
-                        throw e;
-                    }
-                }
+            if (fieldMetadata.getMethodInjection().isPresent() && data.getValue() != null) {
+                invokeMethod(fieldMetadata.getMethodInjection().get().getMethod(), instance, new Object[] {data.getValue()});
             }
         }
 
@@ -217,21 +184,8 @@ public class ReflectionThriftUnionCodec<T>
             // builder method
             if (metadata.getBuilderMethod().isPresent()) {
                 ThriftMethodInjection builderMethod = metadata.getBuilderMethod().get();
-                Object[] parametersValues = new Object[] {data.getValue()};
-
-                try {
-                    instance = builderMethod.getMethod().invoke(instance, parametersValues);
-                    checkState(instance != null, "Builder method returned a null instance");
-                    checkState(metadata.getStructClass().isInstance(instance),
-                            "Builder method returned instance of type %s, but an instance of %s is required",
-                            instance.getClass().getName(),
-                            metadata.getStructClass().getName());
-                }
-                catch (InvocationTargetException e) {
-                    throwIfUnchecked(e.getCause());
-                    throwIfInstanceOf(e.getCause(), Exception.class);
-                    throw e;
-                }
+                instance = invokeMethod(builderMethod.getMethod(), instance, new Object[] {data.getValue()});
+                validateCreatedInstance(metadata.getStructClass(), instance);
             }
         }
 

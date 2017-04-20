@@ -32,14 +32,16 @@ import org.apache.thrift.protocol.TProtocolException;
 
 import javax.annotation.concurrent.Immutable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
 import static com.google.common.base.Throwables.throwIfInstanceOf;
 import static com.google.common.base.Throwables.throwIfUnchecked;
+import static com.google.common.base.Verify.verify;
 import static io.airlift.drift.codec.metadata.FieldKind.THRIFT_FIELD;
-import static java.lang.String.format;
 
 @Immutable
 public class ReflectionThriftStructCodec<T>
@@ -134,14 +136,7 @@ public class ReflectionThriftStructCodec<T>
                 parametersValues[parameter.getParameterIndex()] = value;
             }
 
-            try {
-                instance = constructor.getConstructor().newInstance(parametersValues);
-            }
-            catch (InvocationTargetException e) {
-                throwIfUnchecked(e.getCause());
-                throwIfInstanceOf(e.getCause(), Exception.class);
-                throw e;
-            }
+            instance = invokeConstructor(constructor.getConstructor(), parametersValues);
         }
 
         // inject fields
@@ -170,14 +165,7 @@ public class ReflectionThriftStructCodec<T>
             }
 
             if (shouldInvoke) {
-                try {
-                    methodInjection.getMethod().invoke(instance, parametersValues);
-                }
-                catch (InvocationTargetException e) {
-                    throwIfUnchecked(e.getCause());
-                    throwIfInstanceOf(e.getCause(), Exception.class);
-                    throw e;
-                }
+                invokeMethod(methodInjection.getMethod(), instance, parametersValues);
             }
         }
 
@@ -190,24 +178,46 @@ public class ReflectionThriftStructCodec<T>
                 parametersValues[parameter.getParameterIndex()] = value;
             }
 
-            try {
-                instance = builderMethod.getMethod().invoke(instance, parametersValues);
-                if (instance == null) {
-                    throw new IllegalArgumentException("Builder method returned a null instance");
-                }
-                if (!metadata.getStructClass().isInstance(instance)) {
-                    throw new IllegalArgumentException(format("Builder method returned instance of type %s, but an instance of %s is required",
-                            instance.getClass().getName(),
-                            metadata.getStructClass().getName()));
-                }
-            }
-            catch (InvocationTargetException e) {
-                throwIfUnchecked(e.getCause());
-                throwIfInstanceOf(e.getCause(), Exception.class);
-                throw e;
-            }
+            instance = invokeMethod(builderMethod.getMethod(), instance, parametersValues);
+            validateCreatedInstance(metadata.getStructClass(), instance);
         }
 
         return (T) instance;
+    }
+
+    static void validateCreatedInstance(Class<?> clazz, Object instance)
+    {
+        verify(instance != null, "Builder method returned a null instance");
+
+        verify(clazz.isInstance(instance),
+                "Builder method returned instance of type %s, but an instance of %s is required",
+                instance.getClass().getName(),
+                clazz.getName());
+    }
+
+    static <T> T invokeConstructor(Constructor<T> constructor, Object[] args)
+            throws Exception
+    {
+        try {
+            return constructor.newInstance(args);
+        }
+        catch (InvocationTargetException e) {
+            throwIfUnchecked(e.getCause());
+            throwIfInstanceOf(e.getCause(), Exception.class);
+            throw e;
+        }
+    }
+
+    static Object invokeMethod(Method method, Object instance, Object[] args)
+            throws Exception
+    {
+        try {
+            return method.invoke(instance, args);
+        }
+        catch (InvocationTargetException e) {
+            throwIfUnchecked(e.getCause());
+            throwIfInstanceOf(e.getCause(), Exception.class);
+            throw e;
+        }
     }
 }
