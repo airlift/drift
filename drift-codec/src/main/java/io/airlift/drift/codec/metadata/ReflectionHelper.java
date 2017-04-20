@@ -15,7 +15,6 @@
  */
 package io.airlift.drift.codec.metadata;
 
-import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.reflect.TypeToken;
@@ -69,8 +68,8 @@ public final class ReflectionHelper
             Method futureGetMethod = Future.class.getMethod("get");
             FUTURE_RETURN_TYPE = futureGetMethod.getGenericReturnType();
         }
-        catch (Exception e) {
-            throw Throwables.propagate(e);
+        catch (NoSuchMethodException | SecurityException e) {
+            throw new RuntimeException(e);
         }
     }
 

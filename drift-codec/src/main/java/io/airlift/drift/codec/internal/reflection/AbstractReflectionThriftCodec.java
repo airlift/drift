@@ -15,7 +15,6 @@
  */
 package io.airlift.drift.codec.internal.reflection;
 
-import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableSortedMap;
 import io.airlift.drift.codec.ThriftCodec;
 import io.airlift.drift.codec.ThriftCodecManager;
@@ -29,6 +28,8 @@ import io.airlift.drift.codec.metadata.ThriftType;
 import java.lang.reflect.InvocationTargetException;
 import java.util.SortedMap;
 
+import static com.google.common.base.Throwables.throwIfInstanceOf;
+import static com.google.common.base.Throwables.throwIfUnchecked;
 import static io.airlift.drift.codec.metadata.FieldKind.THRIFT_FIELD;
 
 public abstract class AbstractReflectionThriftCodec<T>
@@ -73,9 +74,8 @@ public abstract class AbstractReflectionThriftCodec<T>
             throw new IllegalAccessException("No extraction present for " + field);
         }
         catch (InvocationTargetException e) {
-            if (e.getTargetException() != null) {
-                Throwables.propagateIfInstanceOf(e.getTargetException(), Exception.class);
-            }
+            throwIfUnchecked(e.getCause());
+            throwIfInstanceOf(e.getCause(), Exception.class);
             throw e;
         }
     }

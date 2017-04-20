@@ -15,7 +15,6 @@
  */
 package io.airlift.drift.codec.internal.reflection;
 
-import com.google.common.base.Throwables;
 import io.airlift.drift.codec.ThriftCodec;
 import io.airlift.drift.codec.ThriftCodecManager;
 import io.airlift.drift.codec.ThriftField;
@@ -37,6 +36,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.google.common.base.Throwables.throwIfInstanceOf;
+import static com.google.common.base.Throwables.throwIfUnchecked;
 import static io.airlift.drift.codec.metadata.FieldKind.THRIFT_FIELD;
 import static java.lang.String.format;
 
@@ -137,9 +138,8 @@ public class ReflectionThriftStructCodec<T>
                 instance = constructor.getConstructor().newInstance(parametersValues);
             }
             catch (InvocationTargetException e) {
-                if (e.getTargetException() != null) {
-                    Throwables.propagateIfInstanceOf(e.getTargetException(), Exception.class);
-                }
+                throwIfUnchecked(e.getCause());
+                throwIfInstanceOf(e.getCause(), Exception.class);
                 throw e;
             }
         }
@@ -174,9 +174,8 @@ public class ReflectionThriftStructCodec<T>
                     methodInjection.getMethod().invoke(instance, parametersValues);
                 }
                 catch (InvocationTargetException e) {
-                    if (e.getTargetException() != null) {
-                        Throwables.propagateIfInstanceOf(e.getTargetException(), Exception.class);
-                    }
+                    throwIfUnchecked(e.getCause());
+                    throwIfInstanceOf(e.getCause(), Exception.class);
                     throw e;
                 }
             }
@@ -203,9 +202,8 @@ public class ReflectionThriftStructCodec<T>
                 }
             }
             catch (InvocationTargetException e) {
-                if (e.getTargetException() != null) {
-                    Throwables.propagateIfInstanceOf(e.getTargetException(), Exception.class);
-                }
+                throwIfUnchecked(e.getCause());
+                throwIfInstanceOf(e.getCause(), Exception.class);
                 throw e;
             }
         }

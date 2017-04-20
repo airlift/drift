@@ -15,6 +15,7 @@
  */
 package io.airlift.drift.codec.internal.compiler;
 
+import com.google.common.base.Function;
 import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.reflect.TypeToken;
@@ -1215,7 +1216,7 @@ public class ThriftCodecByteCodeGenerator<T>
             readBuilder.put(ENUM, TProtocolReader.class.getMethod("readEnumField", ThriftCodec.class));
         }
         catch (NoSuchMethodException e) {
-            throw Throwables.propagate(e);
+            throw new AssertionError(e);
         }
         WRITE_METHODS = writeBuilder.build();
         READ_METHODS = readBuilder.build();
@@ -1242,7 +1243,7 @@ public class ThriftCodecByteCodeGenerator<T>
             arrayReadBuilder.put(byte[].class, TProtocolReader.class.getMethod("readBinaryField"));
         }
         catch (NoSuchMethodException e) {
-            throw Throwables.propagate(e);
+            throw new AssertionError(e);
         }
         ARRAY_WRITE_METHODS = arrayWriteBuilder.build();
         ARRAY_READ_METHODS = arrayReadBuilder.build();

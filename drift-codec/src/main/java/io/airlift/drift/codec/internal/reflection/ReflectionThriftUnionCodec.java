@@ -15,7 +15,6 @@
  */
 package io.airlift.drift.codec.internal.reflection;
 
-import com.google.common.base.Throwables;
 import com.google.common.collect.Maps;
 import io.airlift.drift.codec.ThriftCodec;
 import io.airlift.drift.codec.ThriftCodecManager;
@@ -36,6 +35,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 
 import static com.google.common.base.Preconditions.checkState;
+import static com.google.common.base.Throwables.throwIfInstanceOf;
+import static com.google.common.base.Throwables.throwIfUnchecked;
 import static com.google.common.collect.Iterables.getOnlyElement;
 import static com.google.common.collect.Maps.uniqueIndex;
 import static io.airlift.drift.codec.metadata.FieldKind.THRIFT_FIELD;
@@ -154,9 +155,9 @@ public class ReflectionThriftUnionCodec<T>
                     instance = constructor.getConstructor().newInstance(parametersValues);
                 }
                 catch (InvocationTargetException e) {
-                    if (e.getTargetException() != null) {
-                        Throwables.propagateIfInstanceOf(e.getTargetException(), Exception.class);
-                    }
+                    throwIfUnchecked(e.getCause());
+                    throwIfInstanceOf(e.getCause(), Exception.class);
+
                     throw e;
                 }
             }
@@ -171,9 +172,8 @@ public class ReflectionThriftUnionCodec<T>
                 instance = constructor.getConstructor().newInstance(parametersValues);
             }
             catch (InvocationTargetException e) {
-                if (e.getTargetException() != null) {
-                    Throwables.propagateIfInstanceOf(e.getTargetException(), Exception.class);
-                }
+                throwIfUnchecked(e.getCause());
+                throwIfInstanceOf(e.getCause(), Exception.class);
                 throw e;
             }
         }
@@ -197,9 +197,8 @@ public class ReflectionThriftUnionCodec<T>
                         fieldMetadata.getMethodInjection().get().getMethod().invoke(instance, parametersValues);
                     }
                     catch (InvocationTargetException e) {
-                        if (e.getTargetException() != null) {
-                            Throwables.propagateIfInstanceOf(e.getTargetException(), Exception.class);
-                        }
+                        throwIfUnchecked(e.getCause());
+                        throwIfInstanceOf(e.getCause(), Exception.class);
                         throw e;
                     }
                 }
@@ -229,9 +228,8 @@ public class ReflectionThriftUnionCodec<T>
                             metadata.getStructClass().getName());
                 }
                 catch (InvocationTargetException e) {
-                    if (e.getTargetException() != null) {
-                        Throwables.propagateIfInstanceOf(e.getTargetException(), Exception.class);
-                    }
+                    throwIfUnchecked(e.getCause());
+                    throwIfInstanceOf(e.getCause(), Exception.class);
                     throw e;
                 }
             }

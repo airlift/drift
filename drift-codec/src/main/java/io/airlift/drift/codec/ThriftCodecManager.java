@@ -16,7 +16,6 @@
 package io.airlift.drift.codec;
 
 import com.google.common.base.Preconditions;
-import com.google.common.base.Throwables;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
@@ -63,6 +62,7 @@ import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
 import static com.google.common.base.Preconditions.checkState;
+import static com.google.common.base.Throwables.throwIfUnchecked;
 import static java.util.Objects.requireNonNull;
 
 /**
@@ -244,7 +244,8 @@ public class ThriftCodecManager
             return thriftCodec;
         }
         catch (ExecutionException e) {
-            throw Throwables.propagate(e);
+            throwIfUnchecked(e.getCause());
+            throw new RuntimeException(e.getCause());
         }
     }
 
@@ -323,7 +324,8 @@ public class ThriftCodecManager
             return read(clazz, resultProtocolBuffer);
         }
         catch (Exception e) {
-            throw Throwables.propagate(e);
+            throwIfUnchecked(e);
+            throw new RuntimeException(e);
         }
     }
 
@@ -345,7 +347,8 @@ public class ThriftCodecManager
             write((Class<T>) ttype.getClass(), ttype, resultProtocolBuffer);
         }
         catch (Exception e) {
-            throw Throwables.propagate(e);
+            throwIfUnchecked(e);
+            throw new RuntimeException(e);
         }
     }
 
