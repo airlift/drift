@@ -23,7 +23,7 @@ import org.apache.thrift.protocol.TProtocol;
 
 import javax.annotation.concurrent.Immutable;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import static java.util.Objects.requireNonNull;
 
 @Immutable
 public class ShortArrayThriftCodec
@@ -39,7 +39,7 @@ public class ShortArrayThriftCodec
     public short[] read(TProtocol protocol)
             throws Exception
     {
-        checkNotNull(protocol, "protocol is null");
+        requireNonNull(protocol, "protocol is null");
         return new TProtocolReader(protocol).readI16Array();
     }
 
@@ -47,8 +47,8 @@ public class ShortArrayThriftCodec
     public void write(short[] value, TProtocol protocol)
             throws Exception
     {
-        checkNotNull(value, "value is null");
-        checkNotNull(protocol, "protocol is null");
+        requireNonNull(value, "value is null");
+        requireNonNull(protocol, "protocol is null");
         new TProtocolWriter(protocol).writeI16Array(value);
     }
 }

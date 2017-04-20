@@ -15,11 +15,11 @@
  */
 package io.airlift.drift.codec.metadata;
 
-import com.google.common.base.Preconditions;
-
 import javax.annotation.concurrent.Immutable;
 
 import java.lang.reflect.Method;
+
+import static java.util.Objects.requireNonNull;
 
 @Immutable
 public class TypeCoercion
@@ -30,13 +30,9 @@ public class TypeCoercion
 
     public TypeCoercion(ThriftType thriftType, Method toThrift, Method fromThrift)
     {
-        Preconditions.checkNotNull(thriftType, "thriftType is null");
-        Preconditions.checkNotNull(toThrift, "toThrift is null");
-        Preconditions.checkNotNull(fromThrift, "fromThrift is null");
-
-        this.thriftType = thriftType;
-        this.toThrift = toThrift;
-        this.fromThrift = fromThrift;
+        this.thriftType = requireNonNull(thriftType, "thriftType is null");
+        this.toThrift = requireNonNull(toThrift, "toThrift is null");
+        this.fromThrift = requireNonNull(fromThrift, "fromThrift is null");
     }
 
     public ThriftType getThriftType()

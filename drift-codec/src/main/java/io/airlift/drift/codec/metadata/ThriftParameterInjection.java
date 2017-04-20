@@ -20,7 +20,7 @@ import javax.annotation.concurrent.Immutable;
 import java.lang.reflect.Type;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
+import static java.util.Objects.requireNonNull;
 
 @Immutable
 public class ThriftParameterInjection
@@ -40,8 +40,8 @@ public class ThriftParameterInjection
 
         checkArgument(parameterIndex >= 0, "parameterIndex is negative");
 
-        this.javaType = checkNotNull(javaType, "javaType is null");
-        this.name = checkNotNull(name, "name is null");
+        this.javaType = requireNonNull(javaType, "javaType is null");
+        this.name = requireNonNull(name, "name is null");
 
         this.id = id;
         this.parameterIndex = parameterIndex;

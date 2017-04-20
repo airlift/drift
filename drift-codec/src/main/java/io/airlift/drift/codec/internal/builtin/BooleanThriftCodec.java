@@ -15,12 +15,13 @@
  */
 package io.airlift.drift.codec.internal.builtin;
 
-import com.google.common.base.Preconditions;
 import io.airlift.drift.codec.ThriftCodec;
 import io.airlift.drift.codec.metadata.ThriftType;
 import org.apache.thrift.protocol.TProtocol;
 
 import javax.annotation.concurrent.Immutable;
+
+import static java.util.Objects.requireNonNull;
 
 @Immutable
 public class BooleanThriftCodec
@@ -36,7 +37,7 @@ public class BooleanThriftCodec
     public Boolean read(TProtocol protocol)
             throws Exception
     {
-        Preconditions.checkNotNull(protocol, "protocol is null");
+        requireNonNull(protocol, "protocol is null");
         return protocol.readBool();
     }
 
@@ -44,8 +45,8 @@ public class BooleanThriftCodec
     public void write(Boolean value, TProtocol protocol)
             throws Exception
     {
-        Preconditions.checkNotNull(value, "value is null");
-        Preconditions.checkNotNull(protocol, "protocol is null");
+        requireNonNull(value, "value is null");
+        requireNonNull(protocol, "protocol is null");
         protocol.writeBool(value);
     }
 }

@@ -23,7 +23,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
+import static java.util.Objects.requireNonNull;
 
 @Immutable
 public class ThriftFieldExtractor
@@ -38,10 +38,10 @@ public class ThriftFieldExtractor
     public ThriftFieldExtractor(
             short fieldId, String fieldName, FieldKind fieldKind, Field field, Type fieldType)
     {
-        this.name = checkNotNull(fieldName, "name is null");
-        this.field = checkNotNull(field, "field is null");
-        this.fieldKind = checkNotNull(fieldKind, "type is null");
-        this.type = TypeToken.of(checkNotNull(fieldType, "structType is null")).getRawType();
+        this.name = requireNonNull(fieldName, "name is null");
+        this.field = requireNonNull(field, "field is null");
+        this.fieldKind = requireNonNull(fieldKind, "type is null");
+        this.type = TypeToken.of(requireNonNull(fieldType, "structType is null")).getRawType();
 
         switch (fieldKind) {
             case THRIFT_FIELD:

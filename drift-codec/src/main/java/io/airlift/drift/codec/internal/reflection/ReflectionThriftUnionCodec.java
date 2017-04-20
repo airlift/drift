@@ -35,11 +35,11 @@ import javax.annotation.concurrent.Immutable;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 
-import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 import static com.google.common.collect.Iterables.getOnlyElement;
 import static io.airlift.drift.codec.metadata.FieldKind.THRIFT_FIELD;
 import static java.lang.String.format;
+import static java.util.Objects.requireNonNull;
 
 @Immutable
 public class ReflectionThriftUnionCodec<T>
@@ -55,7 +55,7 @@ public class ReflectionThriftUnionCodec<T>
         ThriftFieldMetadata idField = getOnlyElement(metadata.getFields(FieldKind.THRIFT_UNION_ID));
 
         this.idField = Maps.<ThriftFieldMetadata, ThriftCodec<?>>immutableEntry(idField, manager.getCodec(idField.getThriftType()));
-        checkNotNull(this.idField.getValue(), "No codec for id field %s found", idField);
+        requireNonNull(this.idField.getValue(), () -> "No codec for ID field found: " + idField);
 
         this.metadataMap = Maps.uniqueIndex(metadata.getFields(), ThriftFieldMetadata.getIdGetter());
     }

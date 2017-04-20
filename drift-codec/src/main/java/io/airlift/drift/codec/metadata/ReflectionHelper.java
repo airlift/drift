@@ -46,8 +46,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Future;
 
-import static com.google.common.base.Preconditions.checkNotNull;
 import static java.lang.reflect.Modifier.isStatic;
+import static java.util.Objects.requireNonNull;
 
 public final class ReflectionHelper
 {
@@ -305,13 +305,13 @@ public final class ReflectionHelper
 
     public static String extractFieldName(Method method)
     {
-        checkNotNull(method, "method is null");
+        requireNonNull(method, "method is null");
         return extractFieldName(method.getName());
     }
 
     public static String extractFieldName(String methodName)
     {
-        checkNotNull(methodName, "methodName is null");
+        requireNonNull(methodName, "methodName is null");
         if ((methodName.startsWith("get") || methodName.startsWith("set")) && methodName.length() > 3) {
             String name = Character.toLowerCase(methodName.charAt(3)) + methodName.substring(4);
             return name;

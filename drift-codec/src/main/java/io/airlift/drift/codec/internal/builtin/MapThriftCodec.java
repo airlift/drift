@@ -15,7 +15,6 @@
  */
 package io.airlift.drift.codec.internal.builtin;
 
-import com.google.common.base.Preconditions;
 import io.airlift.drift.codec.ThriftCodec;
 import io.airlift.drift.codec.internal.TProtocolReader;
 import io.airlift.drift.codec.internal.TProtocolWriter;
@@ -25,6 +24,8 @@ import org.apache.thrift.protocol.TProtocol;
 import javax.annotation.concurrent.Immutable;
 
 import java.util.Map;
+
+import static java.util.Objects.requireNonNull;
 
 @Immutable
 public class MapThriftCodec<K, V>
@@ -36,13 +37,9 @@ public class MapThriftCodec<K, V>
 
     public MapThriftCodec(ThriftType type, ThriftCodec<K> keyCodec, ThriftCodec<V> valueCodec)
     {
-        Preconditions.checkNotNull(type, "type is null");
-        Preconditions.checkNotNull(keyCodec, "keyCodec is null");
-        Preconditions.checkNotNull(valueCodec, "valueCodec is null");
-
-        this.thriftType = type;
-        this.keyCodec = keyCodec;
-        this.valueCodec = valueCodec;
+        this.thriftType = requireNonNull(type, "type is null");
+        this.keyCodec = requireNonNull(keyCodec, "keyCodec is null");
+        this.valueCodec = requireNonNull(valueCodec, "valueCodec is null");
     }
 
     @Override
@@ -55,7 +52,7 @@ public class MapThriftCodec<K, V>
     public Map<K, V> read(TProtocol protocol)
             throws Exception
     {
-        Preconditions.checkNotNull(protocol, "protocol is null");
+        requireNonNull(protocol, "protocol is null");
         return new TProtocolReader(protocol).readMap(keyCodec, valueCodec);
     }
 
@@ -63,8 +60,8 @@ public class MapThriftCodec<K, V>
     public void write(Map<K, V> value, TProtocol protocol)
             throws Exception
     {
-        Preconditions.checkNotNull(value, "value is null");
-        Preconditions.checkNotNull(protocol, "protocol is null");
+        requireNonNull(value, "value is null");
+        requireNonNull(protocol, "protocol is null");
         new TProtocolWriter(protocol).writeMap(keyCodec, valueCodec, value);
     }
 }

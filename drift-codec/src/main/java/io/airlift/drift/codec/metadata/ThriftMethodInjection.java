@@ -23,7 +23,7 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import static java.util.Objects.requireNonNull;
 
 @Immutable
 public class ThriftMethodInjection
@@ -38,11 +38,8 @@ public class ThriftMethodInjection
 
     public ThriftMethodInjection(Method method, List<ThriftParameterInjection> parameters)
     {
-        checkNotNull(method, "method is null");
-        checkNotNull(parameters, "parameters is null");
-
-        this.method = method;
-        this.parameters = parameters;
+        this.method = requireNonNull(method, "method is null");
+        this.parameters = requireNonNull(parameters, "parameters is null");
     }
 
     public Method getMethod()

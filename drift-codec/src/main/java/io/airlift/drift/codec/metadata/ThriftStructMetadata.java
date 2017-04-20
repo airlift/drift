@@ -30,9 +30,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
 
-import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.collect.Maps.uniqueIndex;
 import static io.airlift.drift.codec.metadata.ThriftFieldMetadata.isTypePredicate;
+import static java.util.Objects.requireNonNull;
 
 @Immutable
 public class ThriftStructMetadata
@@ -71,14 +71,14 @@ public class ThriftStructMetadata
             List<ThriftMethodInjection> methodInjections)
     {
         this.builderType = builderType;
-        this.builderMethod = checkNotNull(builderMethod, "builderMethod is null");
-        this.structName = checkNotNull(structName, "structName is null");
-        this.idlAnnotations = checkNotNull(idlAnnotations, "idlAnnotations is null");
-        this.metadataType = checkNotNull(metadataType, "metadataType is null");
-        this.structType = checkNotNull(structType, "structType is null");
-        this.constructorInjection = checkNotNull(constructorInjection, "constructorInjection is null");
-        this.documentation = ImmutableList.copyOf(checkNotNull(documentation, "documentation is null"));
-        this.fields = ImmutableSortedMap.copyOf(uniqueIndex(checkNotNull(fields, "fields is null"), new Function<ThriftFieldMetadata, Short>()
+        this.builderMethod = requireNonNull(builderMethod, "builderMethod is null");
+        this.structName = requireNonNull(structName, "structName is null");
+        this.idlAnnotations = requireNonNull(idlAnnotations, "idlAnnotations is null");
+        this.metadataType = requireNonNull(metadataType, "metadataType is null");
+        this.structType = requireNonNull(structType, "structType is null");
+        this.constructorInjection = requireNonNull(constructorInjection, "constructorInjection is null");
+        this.documentation = ImmutableList.copyOf(requireNonNull(documentation, "documentation is null"));
+        this.fields = ImmutableSortedMap.copyOf(uniqueIndex(requireNonNull(fields, "fields is null"), new Function<ThriftFieldMetadata, Short>()
         {
             @Override
             public Short apply(ThriftFieldMetadata input)
@@ -86,7 +86,7 @@ public class ThriftStructMetadata
                 return input.getId();
             }
         }));
-        this.methodInjections = ImmutableList.copyOf(checkNotNull(methodInjections, "methodInjections is null"));
+        this.methodInjections = ImmutableList.copyOf(requireNonNull(methodInjections, "methodInjections is null"));
     }
 
     public String getStructName()

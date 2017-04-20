@@ -63,6 +63,7 @@ import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
 import static com.google.common.base.Preconditions.checkState;
+import static java.util.Objects.requireNonNull;
 
 /**
  * ThriftCodecManager contains an index of all known ThriftCodec and can create codecs for
@@ -125,10 +126,8 @@ public class ThriftCodecManager
     @Inject
     public ThriftCodecManager(final ThriftCodecFactory factory, final ThriftCatalog catalog, @InternalThriftCodec Set<ThriftCodec<?>> codecs)
     {
-        Preconditions.checkNotNull(factory, "factory is null");
-        Preconditions.checkNotNull(catalog, "catalog is null");
-
-        this.catalog = catalog;
+        requireNonNull(factory, "factory is null");
+        this.catalog = requireNonNull(catalog, "catalog is null");
 
         typeCodecs = CacheBuilder.newBuilder().build(new CacheLoader<ThriftType, ThriftCodec<?>>()
         {
@@ -315,8 +314,8 @@ public class ThriftCodecManager
             Class<T> clazz,
             TProtocolFactory protocolFactory)
     {
-        Preconditions.checkNotNull(serializedStruct, "ttype is null");
-        Preconditions.checkNotNull(clazz, "clazz is null");
+        requireNonNull(serializedStruct, "ttype is null");
+        requireNonNull(clazz, "clazz is null");
         try {
             ByteArrayInputStream istream = new ByteArrayInputStream(serializedStruct);
             TIOStreamTransport resultIOStream = new TIOStreamTransport(istream);
@@ -338,8 +337,8 @@ public class ThriftCodecManager
             ByteArrayOutputStream oStream,
             TProtocolFactory protocolFactory)
     {
-        Preconditions.checkNotNull(ttype, "ttype is null");
-        Preconditions.checkNotNull(protocolFactory, "protocolFactory is null");
+        requireNonNull(ttype, "ttype is null");
+        requireNonNull(protocolFactory, "protocolFactory is null");
         try {
             TIOStreamTransport resultIOStream = new TIOStreamTransport(oStream);
             TProtocol resultProtocolBuffer = protocolFactory.getProtocol(resultIOStream);

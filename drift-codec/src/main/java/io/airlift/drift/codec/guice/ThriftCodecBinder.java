@@ -15,7 +15,6 @@
  */
 package io.airlift.drift.codec.guice;
 
-import com.google.common.base.Preconditions;
 import com.google.inject.Binder;
 import com.google.inject.Inject;
 import com.google.inject.Key;
@@ -32,6 +31,7 @@ import java.util.List;
 import java.util.Map;
 
 import static com.google.inject.multibindings.Multibinder.newSetBinder;
+import static java.util.Objects.requireNonNull;
 
 public class ThriftCodecBinder
 {
@@ -49,7 +49,7 @@ public class ThriftCodecBinder
 
     public void bindCustomThriftCodec(ThriftCodec<?> thriftCodec)
     {
-        Preconditions.checkNotNull(thriftCodec, "thriftCodec is null");
+        requireNonNull(thriftCodec, "thriftCodec is null");
 
         // bind the custom codec instance to the internal thrift codec set
         newSetBinder(binder, new TypeLiteral<ThriftCodec<?>>() {}, InternalThriftCodec.class).addBinding().toInstance(thriftCodec);
@@ -61,19 +61,19 @@ public class ThriftCodecBinder
 
     public void bindCustomThriftCodec(Class<? extends ThriftCodec<?>> thriftCodecType)
     {
-        Preconditions.checkNotNull(thriftCodecType, "thriftCodecType is null");
+        requireNonNull(thriftCodecType, "thriftCodecType is null");
         bindCustomThriftCodec(Key.get(thriftCodecType));
     }
 
     public void bindCustomThriftCodec(TypeLiteral<? extends ThriftCodec<?>> thriftCodecType)
     {
-        Preconditions.checkNotNull(thriftCodecType, "thriftCodecType is null");
+        requireNonNull(thriftCodecType, "thriftCodecType is null");
         bindCustomThriftCodec(Key.get(thriftCodecType));
     }
 
     public void bindCustomThriftCodec(Key<? extends ThriftCodec<?>> thriftCodecKey)
     {
-        Preconditions.checkNotNull(thriftCodecKey, "thriftCodecKey is null");
+        requireNonNull(thriftCodecKey, "thriftCodecKey is null");
 
         // bind the custom codec type to the internal thrift codec set
         newSetBinder(binder, new TypeLiteral<ThriftCodec<?>>() {}, InternalThriftCodec.class).addBinding().to(thriftCodecKey);
@@ -84,26 +84,26 @@ public class ThriftCodecBinder
 
     public void bindThriftCodec(Class<?> type)
     {
-        Preconditions.checkNotNull(type, "type is null");
+        requireNonNull(type, "type is null");
         bindThriftCodec(TypeLiteral.get(type));
     }
 
     public void bindThriftCodec(TypeLiteral<?> type)
     {
-        Preconditions.checkNotNull(type, "type is null");
+        requireNonNull(type, "type is null");
         bindThriftCodec(Key.get(type));
     }
 
     public void bindThriftCodec(Key<?> key)
     {
-        Preconditions.checkNotNull(key, "key is null");
+        requireNonNull(key, "key is null");
         Type type = key.getTypeLiteral().getType();
         binder.bind(getThriftCodecKey(type)).toProvider(new ThriftCodecProvider(type)).in(Scopes.SINGLETON);
     }
 
     public void bindListThriftCodec(Class<?> type)
     {
-        Preconditions.checkNotNull(type, "type is null");
+        requireNonNull(type, "type is null");
 
         ParameterizedTypeImpl listType = new ParameterizedTypeImpl(null, List.class, type);
         binder.bind(getThriftCodecKey(listType)).toProvider(new ThriftCodecProvider(listType)).in(Scopes.SINGLETON);
@@ -111,8 +111,8 @@ public class ThriftCodecBinder
 
     public void bindMapThriftCodec(Class<?> keyType, Class<?> valueType)
     {
-        Preconditions.checkNotNull(keyType, "keyType is null");
-        Preconditions.checkNotNull(valueType, "valueType is null");
+        requireNonNull(keyType, "keyType is null");
+        requireNonNull(valueType, "valueType is null");
 
         ParameterizedTypeImpl mapType = new ParameterizedTypeImpl(null, Map.class, keyType, valueType);
         binder.bind(getThriftCodecKey(mapType)).toProvider(new ThriftCodecProvider(mapType)).in(Scopes.SINGLETON);

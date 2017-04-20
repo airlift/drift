@@ -49,7 +49,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Predicates.notNull;
 import static com.google.common.collect.Iterables.filter;
 import static com.google.common.collect.Iterables.transform;
@@ -70,6 +69,7 @@ import static io.airlift.drift.codec.metadata.ReflectionHelper.getAllDeclaredFie
 import static io.airlift.drift.codec.metadata.ReflectionHelper.getAllDeclaredMethods;
 import static io.airlift.drift.codec.metadata.ReflectionHelper.resolveFieldTypes;
 import static java.util.Arrays.asList;
+import static java.util.Objects.requireNonNull;
 import static jp.skypencil.guava.stream.GuavaCollectors.toImmutableSet;
 
 @NotThreadSafe
@@ -96,8 +96,8 @@ public abstract class AbstractThriftMetadataBuilder
 
     protected AbstractThriftMetadataBuilder(ThriftCatalog catalog, Type structType)
     {
-        this.catalog = checkNotNull(catalog, "catalog is null");
-        this.structType = checkNotNull(structType, "structType is null");
+        this.catalog = requireNonNull(catalog, "catalog is null");
+        this.structType = requireNonNull(structType, "structType is null");
         this.metadataErrors = new MetadataErrors(catalog.getMonitor());
 
         // assign the struct name from the annotation or from the Java class

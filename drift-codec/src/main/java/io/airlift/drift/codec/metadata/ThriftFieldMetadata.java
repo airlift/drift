@@ -28,9 +28,9 @@ import java.util.Map;
 import java.util.Objects;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
 import static io.airlift.drift.codec.ThriftField.RECURSIVE_REFERENCE_ANNOTATION_NAME;
 import static io.airlift.drift.codec.ThriftField.Requiredness;
+import static java.util.Objects.requireNonNull;
 
 /**
  * ThriftFieldMetadata defines a single thrift field including the value extraction and injection
@@ -71,15 +71,15 @@ public class ThriftFieldMetadata
     {
         this.isRecursiveReference = isRecursiveReference;
         this.requiredness = requiredness;
-        this.thriftTypeReference = checkNotNull(thriftTypeReference, "thriftType is null");
-        this.fieldKind = checkNotNull(fieldKind, "type is null");
-        this.name = checkNotNull(name, "name is null");
-        this.injections = ImmutableList.copyOf(checkNotNull(injections, "injections is null"));
-        this.constructorInjection = checkNotNull(constructorInjection, "constructorInjection is null");
-        this.methodInjection = checkNotNull(methodInjection, "methodInjection is null");
+        this.thriftTypeReference = requireNonNull(thriftTypeReference, "thriftType is null");
+        this.fieldKind = requireNonNull(fieldKind, "type is null");
+        this.name = requireNonNull(name, "name is null");
+        this.injections = ImmutableList.copyOf(requireNonNull(injections, "injections is null"));
+        this.constructorInjection = requireNonNull(constructorInjection, "constructorInjection is null");
+        this.methodInjection = requireNonNull(methodInjection, "methodInjection is null");
 
-        this.extraction = checkNotNull(extraction, "extraction is null");
-        this.coercion = checkNotNull(coercion, "coercion is null");
+        this.extraction = requireNonNull(extraction, "extraction is null");
+        this.coercion = requireNonNull(coercion, "coercion is null");
 
         switch (fieldKind) {
             case THRIFT_FIELD:

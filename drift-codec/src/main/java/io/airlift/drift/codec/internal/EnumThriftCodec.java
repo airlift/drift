@@ -15,13 +15,14 @@
  */
 package io.airlift.drift.codec.internal;
 
-import com.google.common.base.Preconditions;
 import io.airlift.drift.codec.ThriftCodec;
 import io.airlift.drift.codec.metadata.ThriftEnumMetadata;
 import io.airlift.drift.codec.metadata.ThriftType;
 import org.apache.thrift.protocol.TProtocol;
 
 import javax.annotation.concurrent.Immutable;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * EnumThriftCodec is a codec for Java enum types.  An enum is encoded as an I32 in Thrift, and this
@@ -79,7 +80,7 @@ public class EnumThriftCodec<T extends Enum<T>>
     public void write(T enumConstant, TProtocol protocol)
             throws Exception
     {
-        Preconditions.checkNotNull(enumConstant, "enumConstant is null");
+        requireNonNull(enumConstant, "enumConstant is null");
 
         int enumValue;
         if (enumMetadata.hasExplicitThriftValue()) {

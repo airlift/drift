@@ -27,6 +27,7 @@ import java.lang.reflect.Modifier;
 import java.util.Map;
 
 import static java.lang.String.format;
+import static java.util.Objects.requireNonNull;
 
 @Immutable
 public class ThriftEnumMetadata<T extends Enum<T>>
@@ -43,11 +44,8 @@ public class ThriftEnumMetadata<T extends Enum<T>>
             Class<T> enumClass)
             throws RuntimeException
     {
-        Preconditions.checkNotNull(enumName, "enumName must not be null");
-        Preconditions.checkNotNull(enumClass, "enumClass must not be null");
-
-        this.enumName = enumName;
-        this.enumClass = enumClass;
+        this.enumName = requireNonNull(enumName, "enumName must not be null");
+        this.enumClass = requireNonNull(enumClass, "enumClass must not be null");
 
         Method enumValueMethod = null;
         for (Method method : enumClass.getMethods()) {

@@ -26,9 +26,9 @@ import javax.annotation.Nullable;
 import java.lang.reflect.Type;
 import java.util.Map;
 
-import static com.google.common.base.Preconditions.checkNotNull;
 import static io.airlift.drift.codec.ThriftField.RECURSIVE_REFERENCE_ANNOTATION_NAME;
 import static io.airlift.drift.codec.ThriftField.Requiredness;
+import static java.util.Objects.requireNonNull;
 
 abstract class FieldMetadata
 {
@@ -54,7 +54,7 @@ abstract class FieldMetadata
                     if (!annotation.name().isEmpty()) {
                         name = annotation.name();
                     }
-                    requiredness = checkNotNull(annotation.requiredness());
+                    requiredness = requireNonNull(annotation.requiredness());
 
                     ImmutableMap.Builder<String, String> annotationMapBuilder = ImmutableMap.builder();
                     for (ThriftIdlAnnotation idlAnnotation : annotation.idlAnnotations()) {

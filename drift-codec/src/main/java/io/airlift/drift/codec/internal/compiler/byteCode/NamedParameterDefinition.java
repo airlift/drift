@@ -16,9 +16,10 @@
 package io.airlift.drift.codec.internal.compiler.byteCode;
 
 import com.google.common.base.Function;
-import com.google.common.base.Preconditions;
 
 import javax.annotation.concurrent.Immutable;
+
+import static java.util.Objects.requireNonNull;
 
 @Immutable
 public class NamedParameterDefinition
@@ -80,7 +81,7 @@ public class NamedParameterDefinition
             @Override
             public ParameterizedType apply(NamedParameterDefinition input)
             {
-                Preconditions.checkNotNull(input);
+                requireNonNull(input);
                 return input.getType();
             }
         };

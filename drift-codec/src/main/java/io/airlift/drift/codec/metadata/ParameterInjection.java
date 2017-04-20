@@ -22,6 +22,7 @@ import java.lang.reflect.Type;
 
 import static io.airlift.drift.codec.metadata.FieldKind.THRIFT_FIELD;
 import static io.airlift.drift.codec.metadata.ReflectionHelper.resolveFieldType;
+import static java.util.Objects.requireNonNull;
 
 class ParameterInjection
         extends Injection
@@ -35,7 +36,7 @@ class ParameterInjection
     {
         super(annotation, THRIFT_FIELD);
         this.thriftStructType = thriftStructType;
-        Preconditions.checkNotNull(parameterJavaType, "parameterJavaType is null");
+        requireNonNull(parameterJavaType, "parameterJavaType is null");
 
         this.parameterIndex = parameterIndex;
         this.extractedName = extractedName;

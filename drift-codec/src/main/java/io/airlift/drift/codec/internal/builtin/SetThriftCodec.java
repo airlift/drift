@@ -15,7 +15,6 @@
  */
 package io.airlift.drift.codec.internal.builtin;
 
-import com.google.common.base.Preconditions;
 import io.airlift.drift.codec.ThriftCodec;
 import io.airlift.drift.codec.internal.TProtocolReader;
 import io.airlift.drift.codec.internal.TProtocolWriter;
@@ -26,6 +25,8 @@ import javax.annotation.concurrent.Immutable;
 
 import java.util.Set;
 
+import static java.util.Objects.requireNonNull;
+
 @Immutable
 public class SetThriftCodec<T>
         implements ThriftCodec<Set<T>>
@@ -35,11 +36,8 @@ public class SetThriftCodec<T>
 
     public SetThriftCodec(ThriftType type, ThriftCodec<T> elementCodec)
     {
-        Preconditions.checkNotNull(type, "type is null");
-        Preconditions.checkNotNull(elementCodec, "elementCodec is null");
-
-        this.type = type;
-        this.elementCodec = elementCodec;
+        this.type = requireNonNull(type, "type is null");
+        this.elementCodec = requireNonNull(elementCodec, "elementCodec is null");
     }
 
     @Override
@@ -52,7 +50,7 @@ public class SetThriftCodec<T>
     public Set<T> read(TProtocol protocol)
             throws Exception
     {
-        Preconditions.checkNotNull(protocol, "protocol is null");
+        requireNonNull(protocol, "protocol is null");
         return new TProtocolReader(protocol).readSet(elementCodec);
     }
 
@@ -60,8 +58,8 @@ public class SetThriftCodec<T>
     public void write(Set<T> value, TProtocol protocol)
             throws Exception
     {
-        Preconditions.checkNotNull(value, "value is null");
-        Preconditions.checkNotNull(protocol, "protocol is null");
+        requireNonNull(value, "value is null");
+        requireNonNull(protocol, "protocol is null");
         new TProtocolWriter(protocol).writeSet(elementCodec, value);
     }
 }

@@ -20,7 +20,7 @@ import javax.annotation.concurrent.Immutable;
 import java.lang.reflect.Field;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
+import static java.util.Objects.requireNonNull;
 
 @Immutable
 public class ThriftFieldInjection
@@ -33,9 +33,9 @@ public class ThriftFieldInjection
 
     public ThriftFieldInjection(short id, String name, Field field, FieldKind fieldKind)
     {
-        this.name = checkNotNull(name, "name is null");
-        this.field = checkNotNull(field, "field is null");
-        this.fieldKind = checkNotNull(fieldKind, "fieldKind is null");
+        this.name = requireNonNull(name, "name is null");
+        this.field = requireNonNull(field, "field is null");
+        this.fieldKind = requireNonNull(fieldKind, "fieldKind is null");
 
         switch (fieldKind) {
             case THRIFT_FIELD:

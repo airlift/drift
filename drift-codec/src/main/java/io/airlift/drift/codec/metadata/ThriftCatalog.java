@@ -70,6 +70,7 @@ import static io.airlift.drift.codec.metadata.ThriftType.map;
 import static io.airlift.drift.codec.metadata.ThriftType.set;
 import static io.airlift.drift.codec.metadata.ThriftType.struct;
 import static java.lang.reflect.Modifier.isStatic;
+import static java.util.Objects.requireNonNull;
 
 /**
  * ThriftCatalog contains the metadata for all known structs, enums and type coercions.  Since,
@@ -143,7 +144,7 @@ public class ThriftCatalog
      */
     public void addDefaultCoercions(Class<?> coercionsClass)
     {
-        Preconditions.checkNotNull(coercionsClass, "coercionsClass is null");
+        requireNonNull(coercionsClass, "coercionsClass is null");
         Map<ThriftType, Method> toThriftCoercions = new HashMap<>();
         Map<ThriftType, Method> fromThriftCoercions = new HashMap<>();
         for (Method method : coercionsClass.getDeclaredMethods()) {
@@ -677,7 +678,7 @@ public class ThriftCatalog
 
     private ThriftStructMetadata extractThriftStructMetadata(Type structType)
     {
-        Preconditions.checkNotNull(structType, "structType is null");
+        requireNonNull(structType, "structType is null");
 
         Deque<Type> stack = this.stack.get();
         if (stack.contains(structType)) {
@@ -712,7 +713,7 @@ public class ThriftCatalog
 
     private ThriftStructMetadata extractThriftUnionMetadata(Type unionType)
     {
-        Preconditions.checkNotNull(unionType, "unionType is null");
+        requireNonNull(unionType, "unionType is null");
 
         Deque<Type> stack = this.stack.get();
         if (stack.contains(unionType)) {

@@ -15,7 +15,6 @@
  */
 package io.airlift.drift.codec.guice;
 
-import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.inject.Binder;
@@ -37,6 +36,7 @@ import java.util.List;
 import java.util.Map;
 
 import static io.airlift.drift.codec.guice.ThriftCodecBinder.thriftCodecBinder;
+import static java.util.Objects.requireNonNull;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
 
@@ -122,8 +122,7 @@ public class TestThriftCodecModule
 
         public ValueClass(String value)
         {
-            Preconditions.checkNotNull(value, "value is null");
-            this.value = value;
+            this.value = requireNonNull(value, "value is null");
         }
 
         public String getValue()

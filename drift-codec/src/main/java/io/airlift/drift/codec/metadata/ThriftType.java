@@ -28,10 +28,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 import static io.airlift.drift.codec.ThriftProtocolType.ENUM;
 import static io.airlift.drift.codec.ThriftProtocolType.STRUCT;
+import static java.util.Objects.requireNonNull;
 
 /**
  * ThriftType contains all metadata necessary for converting the java type to and from Thrift.
@@ -66,8 +66,8 @@ public class ThriftType
 
     public static <K, V> ThriftType map(ThriftType keyType, ThriftType valueType)
     {
-        checkNotNull(keyType, "keyType is null");
-        checkNotNull(valueType, "valueType is null");
+        requireNonNull(keyType, "keyType is null");
+        requireNonNull(valueType, "valueType is null");
 
         return map(new DefaultThriftTypeReference(keyType), new DefaultThriftTypeReference(valueType));
     }
@@ -75,8 +75,8 @@ public class ThriftType
     public static <K, V> ThriftType map(ThriftTypeReference keyTypeReference,
             ThriftTypeReference valueTypeReference)
     {
-        checkNotNull(keyTypeReference, "keyTypeReference is null");
-        checkNotNull(valueTypeReference, "valueTypeReference is null");
+        requireNonNull(keyTypeReference, "keyTypeReference is null");
+        requireNonNull(valueTypeReference, "valueTypeReference is null");
 
         @SuppressWarnings("serial")
         Type javaType = new TypeToken<Map<K, V>>() {}
@@ -88,14 +88,14 @@ public class ThriftType
 
     public static <E> ThriftType set(ThriftType valueType)
     {
-        Preconditions.checkNotNull(valueType, "valueType is null");
+        requireNonNull(valueType, "valueType is null");
 
         return set(new DefaultThriftTypeReference(valueType));
     }
 
     public static <E> ThriftType set(ThriftTypeReference valueTypeReference)
     {
-        Preconditions.checkNotNull(valueTypeReference, "valueTypeReference is null");
+        requireNonNull(valueTypeReference, "valueTypeReference is null");
 
         @SuppressWarnings("serial")
         Type javaType = new TypeToken<Set<E>>() {}
@@ -106,14 +106,14 @@ public class ThriftType
 
     public static <E> ThriftType list(ThriftType valueType)
     {
-        checkNotNull(valueType, "valueType is null");
+        requireNonNull(valueType, "valueType is null");
 
         return list(new DefaultThriftTypeReference(valueType));
     }
 
     public static <E> ThriftType list(ThriftTypeReference valueTypeReference)
     {
-        checkNotNull(valueTypeReference, "valueTypeReference is null");
+        requireNonNull(valueTypeReference, "valueTypeReference is null");
 
         @SuppressWarnings("serial")
         Type javaType = new TypeToken<List<E>>() {}
@@ -124,14 +124,14 @@ public class ThriftType
 
     public static ThriftType array(ThriftType valueType)
     {
-        checkNotNull(valueType, "valueType is null");
+        requireNonNull(valueType, "valueType is null");
 
         return array(new DefaultThriftTypeReference(valueType));
     }
 
     public static ThriftType array(ThriftTypeReference valueTypeReference)
     {
-        checkNotNull(valueTypeReference, "valueTypeReference is null");
+        requireNonNull(valueTypeReference, "valueTypeReference is null");
 
         Class<?> javaType = ReflectionHelper.getArrayOfType(valueTypeReference.getJavaType());
         return new ThriftType(ThriftProtocolType.LIST, javaType, null, valueTypeReference);
@@ -139,7 +139,7 @@ public class ThriftType
 
     public static ThriftType enumType(ThriftEnumMetadata<?> enumMetadata)
     {
-        checkNotNull(enumMetadata, "enumMetadata is null");
+        requireNonNull(enumMetadata, "enumMetadata is null");
         return new ThriftType(enumMetadata);
     }
 
@@ -153,8 +153,8 @@ public class ThriftType
 
     private ThriftType(ThriftProtocolType protocolType, Type javaType)
     {
-        Preconditions.checkNotNull(protocolType, "protocolType is null");
-        Preconditions.checkNotNull(javaType, "javaType is null");
+        requireNonNull(protocolType, "protocolType is null");
+        requireNonNull(javaType, "javaType is null");
 
         this.protocolType = protocolType;
         this.javaType = javaType;
@@ -170,9 +170,9 @@ public class ThriftType
             ThriftTypeReference keyTypeReference,
             ThriftTypeReference valueTypeReference)
     {
-        Preconditions.checkNotNull(protocolType, "protocolType is null");
-        Preconditions.checkNotNull(javaType, "javaType is null");
-        Preconditions.checkNotNull(valueTypeReference, "valueTypeReference is null");
+        requireNonNull(protocolType, "protocolType is null");
+        requireNonNull(javaType, "javaType is null");
+        requireNonNull(valueTypeReference, "valueTypeReference is null");
 
         this.protocolType = protocolType;
         this.javaType = javaType;
@@ -185,7 +185,7 @@ public class ThriftType
 
     private ThriftType(ThriftStructMetadata structMetadata)
     {
-        Preconditions.checkNotNull(structMetadata, "structMetadata is null");
+        requireNonNull(structMetadata, "structMetadata is null");
 
         this.protocolType = STRUCT;
         this.javaType = structMetadata.getStructClass();
@@ -198,7 +198,7 @@ public class ThriftType
 
     private ThriftType(ThriftEnumMetadata<?> enumMetadata)
     {
-        Preconditions.checkNotNull(enumMetadata, "enumMetadata is null");
+        requireNonNull(enumMetadata, "enumMetadata is null");
 
         this.protocolType = ENUM;
         this.javaType = enumMetadata.getEnumClass();

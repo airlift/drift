@@ -54,6 +54,7 @@ import static io.airlift.drift.codec.internal.compiler.byteCode.NamedParameterDe
 import static io.airlift.drift.codec.internal.compiler.byteCode.ParameterizedType.getParameterType;
 import static io.airlift.drift.codec.internal.compiler.byteCode.ParameterizedType.toParameterizedType;
 import static io.airlift.drift.codec.internal.compiler.byteCode.ParameterizedType.type;
+import static java.util.Objects.requireNonNull;
 import static org.objectweb.asm.Opcodes.ACONST_NULL;
 import static org.objectweb.asm.Opcodes.ALOAD;
 import static org.objectweb.asm.Opcodes.ARETURN;
@@ -151,7 +152,7 @@ public class MethodDefinition
 
     public LocalVariableDefinition addLocalVariable(ParameterizedType type, String name)
     {
-        Preconditions.checkNotNull(name, "name is null");
+        requireNonNull(name, "name is null");
         checkArgument(!localVariables.containsKey(name), "There is already a local variable named %s", name);
 
         LocalVariableDefinition variable = new LocalVariableDefinition(name, nextSlot, type);

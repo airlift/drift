@@ -23,7 +23,7 @@ import javax.annotation.concurrent.Immutable;
 import java.lang.reflect.Constructor;
 import java.util.List;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import static java.util.Objects.requireNonNull;
 
 @Immutable
 public class ThriftConstructorInjection
@@ -33,14 +33,14 @@ public class ThriftConstructorInjection
 
     public ThriftConstructorInjection(Constructor<?> constructor, ThriftParameterInjection... parameters)
     {
-        this(checkNotNull(constructor, "constructor is null"),
-                ImmutableList.copyOf(checkNotNull(parameters, "parameters is null")));
+        this(requireNonNull(constructor, "constructor is null"),
+                ImmutableList.copyOf(requireNonNull(parameters, "parameters is null")));
     }
 
     public ThriftConstructorInjection(Constructor<?> constructor, List<ThriftParameterInjection> parameters)
     {
-        this.constructor = checkNotNull(constructor, "constructor is null");
-        this.parameters = ImmutableList.copyOf(checkNotNull(parameters, "parameters is null"));
+        this.constructor = requireNonNull(constructor, "constructor is null");
+        this.parameters = ImmutableList.copyOf(requireNonNull(parameters, "parameters is null"));
     }
 
     public Constructor<?> getConstructor()
