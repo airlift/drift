@@ -22,7 +22,8 @@ import java.lang.reflect.Type;
 
 import static io.airlift.drift.codec.metadata.ReflectionHelper.resolveFieldType;
 
-class FieldInjection extends Injection
+class FieldInjection
+        extends Injection
 {
     private final Type thriftStructType;
     private final Field field;

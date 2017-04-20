@@ -190,18 +190,18 @@ public final class ArrayField
     public String toString()
     {
         return MoreObjects.toStringHelper(this)
-                          .add("booleanArray", Arrays.toString(booleanArray))
-                          .add("shortArray", Arrays.toString(shortArray))
-                          .add("intArray", Arrays.toString(intArray))
-                          .add("longArray", Arrays.toString(longArray))
-                          .add("doubleArray", Arrays.toString(doubleArray))
-                          .add("byteArray", Arrays.toString(byteArray))
-                          .add("mapBooleanArray", getMapBooleanList())
-                          .add("mapShortArray", getMapShortList())
-                          .add("mapIntArray", getMapIntegerList())
-                          .add("mapLongArray", getMapLongList())
-                          .add("mapDoubleArray", getMapDoubleList())
-                          .toString();
+                .add("booleanArray", Arrays.toString(booleanArray))
+                .add("shortArray", Arrays.toString(shortArray))
+                .add("intArray", Arrays.toString(intArray))
+                .add("longArray", Arrays.toString(longArray))
+                .add("doubleArray", Arrays.toString(doubleArray))
+                .add("byteArray", Arrays.toString(byteArray))
+                .add("mapBooleanArray", getMapBooleanList())
+                .add("mapShortArray", getMapShortList())
+                .add("mapIntArray", getMapIntegerList())
+                .add("mapLongArray", getMapLongList())
+                .add("mapDoubleArray", getMapDoubleList())
+                .toString();
     }
 
     private static Function<boolean[], List<Boolean>> booleanArrayAsList()

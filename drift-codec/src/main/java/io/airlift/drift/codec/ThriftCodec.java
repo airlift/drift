@@ -21,7 +21,7 @@ import org.apache.thrift.protocol.TProtocol;
 /**
  * <p>A single type codec for reading and writing in Thrift format.  Each codec is symmetric and
  * therefore only supports a single concrete type.</p>
- *
+ * <p>
  * <p>Implementations of this interface are expected to be thread safe.</p>
  *
  * @param <T> the type this codec supports

@@ -25,7 +25,7 @@ import java.util.List;
 /**
  * <p>MetadataErrors collects all known issues with metadata extraction.  This allows all known
  * problems to be reported together instead of one at a time.</p>
- *
+ * <p>
  * <p>This code is heavily based on https://github.com/dain/platform/blob/master/configuration/src/main/java/com/proofpoint/configuration/Problems.java</p>
  */
 @NotThreadSafe
@@ -44,7 +44,8 @@ public class MetadataErrors
 
     public static final NullMonitor NULL_MONITOR = new NullMonitor();
 
-    private static final class NullMonitor implements MetadataErrors.Monitor
+    private static final class NullMonitor
+            implements MetadataErrors.Monitor
     {
         @Override
         public void onError(MetadataErrorException unused)

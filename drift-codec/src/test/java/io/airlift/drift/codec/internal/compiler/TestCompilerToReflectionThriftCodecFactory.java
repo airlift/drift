@@ -21,7 +21,8 @@ import io.airlift.drift.codec.internal.reflection.ReflectionThriftCodecFactory;
 import org.testng.annotations.Test;
 
 @Test
-public class TestCompilerToReflectionThriftCodecFactory extends AbstractThriftCodecManagerTest
+public class TestCompilerToReflectionThriftCodecFactory
+        extends AbstractThriftCodecManagerTest
 {
     @Override
     public ThriftCodecManager createReadCodecManager()

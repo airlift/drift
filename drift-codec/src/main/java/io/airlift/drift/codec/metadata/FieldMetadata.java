@@ -100,7 +100,8 @@ abstract class FieldMetadata
         this.id = id;
     }
 
-    public @Nullable Boolean isLegacyId()
+    public @Nullable
+    Boolean isLegacyId()
     {
         return isLegacyId;
     }
@@ -158,7 +159,7 @@ abstract class FieldMetadata
     /**
      * Returns a Function which gets the `isLegacyId` setting from a FieldMetadata, if present,
      * or {@link Optional#absent()} if not, ish.
-     *
+     * <p>
      * The semantics would ideally want are:
      * <pre>
      *     1   @ThriftField(id=X, isLegacyId=false)   => Optional.of(false)
@@ -167,7 +168,7 @@ abstract class FieldMetadata
      *     4   @ThriftField(isLegacyId=true)          => Optional.of(true)
      *     5   @ThriftField()                         => Optional.absent()
      * </pre>
-     *
+     * <p>
      * Unfortunately, there is no way to tell cases 3 and 5 apart, because isLegacyId
      * defaults to false. (There is no good way around this: making an enum is overkill,
      * using a numeric/character/string/class type is pretty undesirable, and requiring
@@ -175,7 +176,7 @@ abstract class FieldMetadata
      * The best we can do is treat 3 and 5 the same (obviously needing the behavior
      * of 5.) This ends up actually not making much of a difference: it would fail to
      * detect cases like:
-     *
+     * <p>
      * <pre>
      *   @ThriftField(id=-2, isLegacyId=true)
      *   public boolean getBlah() { ... }
@@ -183,7 +184,7 @@ abstract class FieldMetadata
      *   @ThriftField(isLegacyId=false)
      *   public void setBlah(boolean v) { ...}
      * </pre>
-     *
+     * <p>
      * but other than that, ends up working out fine.
      */
     static <T extends FieldMetadata> Function<T, Optional<Boolean>> getThriftFieldIsLegacyId()
@@ -208,7 +209,6 @@ abstract class FieldMetadata
             }
         };
     }
-
 
     static <T extends FieldMetadata> Function<T, String> getThriftFieldName()
     {
@@ -285,7 +285,8 @@ abstract class FieldMetadata
         this.requiredness = requiredness;
     }
 
-    public @Nullable Boolean isRecursiveReference()
+    public @Nullable
+    Boolean isRecursiveReference()
     {
         return isRecursiveReference;
     }

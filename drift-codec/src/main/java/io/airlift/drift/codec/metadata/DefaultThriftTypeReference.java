@@ -20,7 +20,8 @@ import io.airlift.drift.codec.ThriftProtocolType;
 import java.lang.reflect.Type;
 import java.util.Objects;
 
-public class DefaultThriftTypeReference implements ThriftTypeReference
+public class DefaultThriftTypeReference
+        implements ThriftTypeReference
 {
     private final ThriftType thriftType;
 

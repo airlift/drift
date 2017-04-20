@@ -30,7 +30,6 @@ public final class SwiftBytecodeHelper
         }
     }
 
-
     private SwiftBytecodeHelper()
     {
     }

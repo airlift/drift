@@ -23,7 +23,8 @@ import java.lang.reflect.Type;
 import static io.airlift.drift.codec.metadata.FieldKind.THRIFT_FIELD;
 import static io.airlift.drift.codec.metadata.ReflectionHelper.resolveFieldType;
 
-class ParameterInjection extends Injection
+class ParameterInjection
+        extends Injection
 {
     private final int parameterIndex;
     private final String extractedName;

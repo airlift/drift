@@ -27,7 +27,8 @@ import javax.annotation.concurrent.Immutable;
  * the supplied ThriftCoercion.
  */
 @Immutable
-public class CoercionThriftCodec<T> implements ThriftCodec<T>
+public class CoercionThriftCodec<T>
+        implements ThriftCodec<T>
 {
     private final ThriftCodec<Object> codec;
     private final TypeCoercion typeCoercion;

@@ -23,59 +23,69 @@ import java.util.Objects;
 import static com.google.common.base.MoreObjects.toStringHelper;
 
 @ThriftUnion("UnionConstructorDuplicateTypes")
-public class UnionConstructorDuplicateTypes {
+public class UnionConstructorDuplicateTypes
+{
     private Object value;
     private short id = -1;
     private String name;
 
     @ThriftConstructor
-    public UnionConstructorDuplicateTypes() {
+    public UnionConstructorDuplicateTypes()
+    {
     }
 
     @ThriftField
-    public void setFirstIntValue(final int firstIntValue) {
+    public void setFirstIntValue(final int firstIntValue)
+    {
         this.value = firstIntValue;
         this.id = 1;
         this.name = "firstIntValue";
     }
 
     @ThriftField
-    public void setSecondIntValue(final int secondIntValue) {
+    public void setSecondIntValue(final int secondIntValue)
+    {
         this.value = secondIntValue;
         this.id = 2;
         this.name = "secondIntValue";
     }
 
     @ThriftField(value = 1, name = "firstIntValue", requiredness = Requiredness.NONE)
-    public int getFirstIntValue() {
+    public int getFirstIntValue()
+    {
         if (this.id != 1) {
             throw new IllegalStateException("Not a firstIntValue element!");
         }
         return (int) value;
     }
 
-    public boolean isSetFirstIntValue() {
+    public boolean isSetFirstIntValue()
+    {
         return this.id == 1;
     }
 
     @ThriftField(value = 2, name = "secondIntValue", requiredness = Requiredness.NONE)
-    public int getSecondIntValue() {
+    public int getSecondIntValue()
+    {
         if (this.id != 2) {
             throw new IllegalStateException("Not a secondIntValue element!");
         }
         return (int) value;
     }
 
-    public boolean isSetSecondIntValue() {
+    public boolean isSetSecondIntValue()
+    {
         return this.id == 2;
     }
 
     @ThriftUnionId
-    public short getThriftId() {
+    public short getThriftId()
+    {
         return this.id;
     }
 
-    public String getThriftName() {
+    public String getThriftName()
+    {
         return this.name;
     }
 
@@ -90,10 +100,12 @@ public class UnionConstructorDuplicateTypes {
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(Object obj)
+    {
         if (this == obj) {
             return true;
-        } else if (obj == null || getClass() != obj.getClass()) {
+        }
+        else if (obj == null || getClass() != obj.getClass()) {
             return false;
         }
 
@@ -104,7 +116,8 @@ public class UnionConstructorDuplicateTypes {
     }
 
     @Override
-    public String toString() {
+    public String toString()
+    {
         return toStringHelper(this)
                 .add("value", value)
                 .add("id", id)

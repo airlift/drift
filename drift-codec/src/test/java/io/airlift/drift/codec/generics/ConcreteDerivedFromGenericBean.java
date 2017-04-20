@@ -21,7 +21,8 @@ import io.airlift.drift.codec.ThriftStruct;
 import java.util.Objects;
 
 @ThriftStruct
-public final class ConcreteDerivedFromGenericBean extends GenericThriftStructBeanBase<String>
+public final class ConcreteDerivedFromGenericBean
+        extends GenericThriftStructBeanBase<String>
 {
     private String concreteField;
 

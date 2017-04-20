@@ -138,8 +138,6 @@ public final class OneOfEverything
     @ThriftField(64)
     public Map<String, UnionField> aUnionValueMap;
 
-
-
     @ThriftField(100)
     public Set<List<Map<String, BonkField>>> aSetOfListsOfMaps;
     @ThriftField(101)

@@ -27,7 +27,8 @@ import javax.annotation.concurrent.Immutable;
 import java.util.List;
 
 @Immutable
-public class ListThriftCodec<T> implements ThriftCodec<List<T>>
+public class ListThriftCodec<T>
+        implements ThriftCodec<List<T>>
 {
     private final ThriftCodec<T> elementCodec;
     private final ThriftType type;

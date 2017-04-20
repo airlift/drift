@@ -174,7 +174,7 @@ public class TestThriftCodecManager
             throws Exception
     {
         UnionField union = new UnionField();
-        union._id= 1;
+        union._id = 1;
         union.stringValue = "Hello, World";
 
         // no codec for UnionField so this will fail
@@ -240,13 +240,14 @@ public class TestThriftCodecManager
         assertEquals(copy, value);
     }
 
-    public void testWriteToBuffer() {
+    public void testWriteToBuffer()
+    {
         SecureRandom random = new SecureRandom();
         BasicThriftStruct tstruct = new BasicThriftStruct(
-            new BigInteger(130, random).toString(),
-            new BigInteger(130, random).toString(),
-            new BigInteger(130, random).toString(),
-            1337L);
+                new BigInteger(130, random).toString(),
+                new BigInteger(130, random).toString(),
+                new BigInteger(130, random).toString(),
+                1337L);
         TProtocolFactory protocolFactory = new TBinaryProtocol.Factory();
         ByteArrayOutputStream oStream = new ByteArrayOutputStream();
         codecManager.write(BasicThriftStruct.class, oStream, protocolFactory);

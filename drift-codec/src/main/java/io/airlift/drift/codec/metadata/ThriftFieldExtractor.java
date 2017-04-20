@@ -26,7 +26,8 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 @Immutable
-public class ThriftFieldExtractor implements ThriftExtraction
+public class ThriftFieldExtractor
+        implements ThriftExtraction
 {
     private final short id;
     private final String name;
@@ -47,7 +48,7 @@ public class ThriftFieldExtractor implements ThriftExtraction
                 // nothing to check
                 break;
             case THRIFT_UNION_ID:
-                checkArgument (fieldId == Short.MIN_VALUE, "fieldId must be Short.MIN_VALUE for thrift_union_id");
+                checkArgument(fieldId == Short.MIN_VALUE, "fieldId must be Short.MIN_VALUE for thrift_union_id");
                 break;
         }
 

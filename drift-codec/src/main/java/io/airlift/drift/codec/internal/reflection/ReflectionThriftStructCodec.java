@@ -41,7 +41,8 @@ import static io.airlift.drift.codec.metadata.FieldKind.THRIFT_FIELD;
 import static java.lang.String.format;
 
 @Immutable
-public class ReflectionThriftStructCodec<T> extends AbstractReflectionThriftCodec<T>
+public class ReflectionThriftStructCodec<T>
+        extends AbstractReflectionThriftCodec<T>
 {
     public ReflectionThriftStructCodec(ThriftCodecManager manager, ThriftStructMetadata metadata)
     {
@@ -76,11 +77,12 @@ public class ReflectionThriftStructCodec<T> extends AbstractReflectionThriftCode
             // read the value
             Object value = reader.readField(codec);
             if (value == null) {
-              if (field.getRequiredness() == ThriftField.Requiredness.REQUIRED) {
-                throw new TProtocolException("required field was not set");
-              } else {
-                continue;
-              }
+                if (field.getRequiredness() == ThriftField.Requiredness.REQUIRED) {
+                    throw new TProtocolException("required field was not set");
+                }
+                else {
+                    continue;
+                }
             }
 
             data.put(fieldId, value);
@@ -193,7 +195,6 @@ public class ReflectionThriftStructCodec<T> extends AbstractReflectionThriftCode
                 instance = builderMethod.getMethod().invoke(instance, parametersValues);
                 if (instance == null) {
                     throw new IllegalArgumentException("Builder method returned a null instance");
-
                 }
                 if (!metadata.getStructClass().isInstance(instance)) {
                     throw new IllegalArgumentException(format("Builder method returned instance of type %s, but an instance of %s is required",

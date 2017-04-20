@@ -83,9 +83,10 @@ public class ThriftFieldMetadata
 
         switch (fieldKind) {
             case THRIFT_FIELD:
-                if (isLegacyId)  {
+                if (isLegacyId) {
                     checkArgument(id < 0, "isLegacyId should only be specified on fields with negative IDs");
-                } else {
+                }
+                else {
                     checkArgument(id >= 0, "isLegacyId must be specified on fields with negative IDs");
                 }
                 break;
@@ -96,24 +97,26 @@ public class ThriftFieldMetadata
         }
 
         checkArgument(!injections.isEmpty()
-                      || extraction.isPresent()
-                      || constructorInjection.isPresent()
-                      || methodInjection.isPresent(), "A thrift field must have an injection or extraction point");
+                || extraction.isPresent()
+                || constructorInjection.isPresent()
+                || methodInjection.isPresent(), "A thrift field must have an injection or extraction point");
 
         this.id = id;
 
         if (extraction.isPresent()) {
             if (extraction.get() instanceof ThriftFieldExtractor) {
-                ThriftFieldExtractor e = (ThriftFieldExtractor)extraction.get();
+                ThriftFieldExtractor e = (ThriftFieldExtractor) extraction.get();
                 this.documentation = ThriftCatalog.getThriftDocumentation(e.getField());
-            } else if (extraction.get() instanceof ThriftMethodExtractor) {
-                ThriftMethodExtractor e = (ThriftMethodExtractor)extraction.get();
+            }
+            else if (extraction.get() instanceof ThriftMethodExtractor) {
+                ThriftMethodExtractor e = (ThriftMethodExtractor) extraction.get();
                 this.documentation = ThriftCatalog.getThriftDocumentation(e.getMethod());
             }
             else {
                 this.documentation = ImmutableList.of();
             }
-        } else {
+        }
+        else {
             // no extraction = no documentation
             this.documentation = ImmutableList.of();
         }
@@ -258,7 +261,8 @@ public class ThriftFieldMetadata
 
     public static Function<ThriftFieldMetadata, Short> getIdGetter()
     {
-        return new Function<ThriftFieldMetadata, Short>() {
+        return new Function<ThriftFieldMetadata, Short>()
+        {
             @Override
             public Short apply(ThriftFieldMetadata metadata)
             {
@@ -269,7 +273,8 @@ public class ThriftFieldMetadata
 
     public static Predicate<ThriftFieldMetadata> isTypePredicate(final FieldKind type)
     {
-        return new Predicate<ThriftFieldMetadata>() {
+        return new Predicate<ThriftFieldMetadata>()
+        {
             @Override
             public boolean apply(ThriftFieldMetadata fieldMetadata)
             {

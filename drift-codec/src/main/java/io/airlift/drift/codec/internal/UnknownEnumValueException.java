@@ -15,8 +15,11 @@
  */
 package io.airlift.drift.codec.internal;
 
-public class UnknownEnumValueException extends Exception {
-    public UnknownEnumValueException(String message) {
+public class UnknownEnumValueException
+        extends Exception
+{
+    public UnknownEnumValueException(String message)
+    {
         super(message);
     }
 }

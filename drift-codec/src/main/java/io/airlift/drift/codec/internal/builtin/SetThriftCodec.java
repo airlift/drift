@@ -27,7 +27,8 @@ import javax.annotation.concurrent.Immutable;
 import java.util.Set;
 
 @Immutable
-public class SetThriftCodec<T> implements ThriftCodec<Set<T>>
+public class SetThriftCodec<T>
+        implements ThriftCodec<Set<T>>
 {
     private final ThriftCodec<T> elementCodec;
     private final ThriftType type;

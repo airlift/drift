@@ -29,7 +29,8 @@ import io.airlift.drift.codec.metadata.ThriftCatalog;
 
 import static com.google.inject.multibindings.Multibinder.newSetBinder;
 
-public class ThriftCodecModule implements Module
+public class ThriftCodecModule
+        implements Module
 {
     private final ClassLoader parent;
 

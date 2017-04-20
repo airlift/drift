@@ -31,7 +31,8 @@ import java.security.PrivilegedAction;
  * Creates Thrift codecs directly in byte code.
  */
 @Immutable
-public class CompilerThriftCodecFactory implements ThriftCodecFactory
+public class CompilerThriftCodecFactory
+        implements ThriftCodecFactory
 {
     private final boolean debug;
     private final DynamicClassLoader classLoader;
@@ -67,8 +68,10 @@ public class CompilerThriftCodecFactory implements ThriftCodecFactory
 
     private static DynamicClassLoader getPriviledgedClassLoader(final ClassLoader parent)
     {
-        return AccessController.doPrivileged(new PrivilegedAction<DynamicClassLoader>() {
-            public DynamicClassLoader run() {
+        return AccessController.doPrivileged(new PrivilegedAction<DynamicClassLoader>()
+        {
+            public DynamicClassLoader run()
+            {
                 return new DynamicClassLoader(parent);
             }
         });

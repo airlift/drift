@@ -876,8 +876,8 @@ public class ThriftCodecByteCodeGenerator<T>
 
         // protocol.writeStructBegin("bonk");
         write.loadVariable(protocol)
-            .loadConstant(metadata.getStructName())
-            .invokeVirtual(TProtocolWriter.class, "writeStructBegin", void.class, String.class);
+                .loadConstant(metadata.getStructName())
+                .invokeVirtual(TProtocolWriter.class, "writeStructBegin", void.class, String.class);
 
         // find the @ThriftUnionId field
         ThriftFieldMetadata idField = getOnlyElement(metadata.getFields(THRIFT_UNION_ID));
@@ -900,8 +900,8 @@ public class ThriftCodecByteCodeGenerator<T>
         }
 
         write.visitLabel("default-write")
-            .loadVariable(protocol)
-            .invokeVirtual(TProtocolWriter.class, "writeStructEnd", void.class);
+                .loadVariable(protocol)
+                .invokeVirtual(TProtocolWriter.class, "writeStructEnd", void.class);
 
         write.ret();
     }
@@ -986,14 +986,14 @@ public class ThriftCodecByteCodeGenerator<T>
                 ThriftFieldExtractor fieldExtractor = (ThriftFieldExtractor) extraction;
                 write.getField(fieldExtractor.getField());
                 if (fieldExtractor.isGeneric()) {
-                  write.checkCast(type(fieldExtractor.getType()));
+                    write.checkCast(type(fieldExtractor.getType()));
                 }
             }
             else if (extraction instanceof ThriftMethodExtractor) {
                 ThriftMethodExtractor methodExtractor = (ThriftMethodExtractor) extraction;
                 write.invokeVirtual(methodExtractor.getMethod());
                 if (methodExtractor.isGeneric()) {
-                  write.checkCast(type(methodExtractor.getType()));
+                    write.checkCast(type(methodExtractor.getType()));
                 }
             }
         }

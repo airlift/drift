@@ -42,7 +42,8 @@ import static io.airlift.drift.codec.metadata.FieldKind.THRIFT_FIELD;
 import static java.lang.String.format;
 
 @Immutable
-public class ReflectionThriftUnionCodec<T> extends AbstractReflectionThriftCodec<T>
+public class ReflectionThriftUnionCodec<T>
+        extends AbstractReflectionThriftCodec<T>
 {
     private final Map<Short, ThriftFieldMetadata> metadataMap;
     private final Map.Entry<ThriftFieldMetadata, ThriftCodec<?>> idField;
@@ -144,19 +145,19 @@ public class ReflectionThriftUnionCodec<T> extends AbstractReflectionThriftCodec
             fieldMetadata = metadataMap.get(data.getKey());
 
             if (fieldMetadata != null && fieldMetadata.getConstructorInjection().isPresent()) {
-                    ThriftConstructorInjection constructor = fieldMetadata.getConstructorInjection().get();
+                ThriftConstructorInjection constructor = fieldMetadata.getConstructorInjection().get();
 
-                    Object[] parametersValues = new Object[] { data.getValue() };
+                Object[] parametersValues = new Object[] {data.getValue()};
 
-                    try {
-                        instance = constructor.getConstructor().newInstance(parametersValues);
+                try {
+                    instance = constructor.getConstructor().newInstance(parametersValues);
+                }
+                catch (InvocationTargetException e) {
+                    if (e.getTargetException() != null) {
+                        Throwables.propagateIfInstanceOf(e.getTargetException(), Exception.class);
                     }
-                    catch (InvocationTargetException e) {
-                        if (e.getTargetException() != null) {
-                            Throwables.propagateIfInstanceOf(e.getTargetException(), Exception.class);
-                        }
-                        throw e;
-                    }
+                    throw e;
+                }
             }
         }
 
@@ -188,7 +189,7 @@ public class ReflectionThriftUnionCodec<T> extends AbstractReflectionThriftCodec
             }
 
             if (fieldMetadata.getMethodInjection().isPresent()) {
-                Object[] parametersValues = new Object[] { data.getValue() };
+                Object[] parametersValues = new Object[] {data.getValue()};
 
                 if (data.getValue() != null) {
                     try {
@@ -216,15 +217,15 @@ public class ReflectionThriftUnionCodec<T> extends AbstractReflectionThriftCodec
             // builder method
             if (metadata.getBuilderMethod().isPresent()) {
                 ThriftMethodInjection builderMethod = metadata.getBuilderMethod().get();
-                Object[] parametersValues = new Object[] { data.getValue() };
+                Object[] parametersValues = new Object[] {data.getValue()};
 
                 try {
                     instance = builderMethod.getMethod().invoke(instance, parametersValues);
                     checkState(instance != null, "Builder method returned a null instance");
                     checkState(metadata.getStructClass().isInstance(instance),
-                               "Builder method returned instance of type %s, but an instance of %s is required",
-                               instance.getClass().getName(),
-                               metadata.getStructClass().getName());
+                            "Builder method returned instance of type %s, but an instance of %s is required",
+                            instance.getClass().getName(),
+                            metadata.getStructClass().getName());
                 }
                 catch (InvocationTargetException e) {
                     if (e.getTargetException() != null) {

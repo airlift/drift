@@ -23,7 +23,8 @@ import org.apache.thrift.protocol.TProtocol;
 import javax.annotation.concurrent.Immutable;
 
 @Immutable
-public class BooleanThriftCodec implements ThriftCodec<Boolean>
+public class BooleanThriftCodec
+        implements ThriftCodec<Boolean>
 {
     @Override
     public ThriftType getType()

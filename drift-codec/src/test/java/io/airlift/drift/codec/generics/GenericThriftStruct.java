@@ -20,7 +20,8 @@ import io.airlift.drift.codec.ThriftField;
 import io.airlift.drift.codec.ThriftStruct;
 
 @ThriftStruct
-public final class GenericThriftStruct<T> extends GenericThriftStructBase<T>
+public final class GenericThriftStruct<T>
+        extends GenericThriftStructBase<T>
 {
     @ThriftConstructor
     public GenericThriftStruct(@ThriftField(1) T genericProperty)

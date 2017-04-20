@@ -250,7 +250,8 @@ public final class ReflectionHelper
         return names;
     }
 
-    private static class ThriftFieldParanamer extends AnnotationParanamer
+    private static class ThriftFieldParanamer
+            extends AnnotationParanamer
     {
         @Override
         protected String getNamedValue(Annotation annotation)
@@ -271,7 +272,8 @@ public final class ReflectionHelper
         }
     }
 
-    private static class GeneralParanamer implements Paranamer
+    private static class GeneralParanamer
+            implements Paranamer
     {
         @Override
         public String[] lookupParameterNames(AccessibleObject methodOrConstructor)

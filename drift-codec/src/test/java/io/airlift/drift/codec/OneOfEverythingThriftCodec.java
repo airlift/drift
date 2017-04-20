@@ -20,7 +20,8 @@ import io.airlift.drift.codec.internal.TProtocolWriter;
 import io.airlift.drift.codec.metadata.ThriftType;
 import org.apache.thrift.protocol.TProtocol;
 
-public class OneOfEverythingThriftCodec implements ThriftCodec<OneOfEverything>
+public class OneOfEverythingThriftCodec
+        implements ThriftCodec<OneOfEverything>
 {
 
     private final ThriftType type;
@@ -29,9 +30,9 @@ public class OneOfEverythingThriftCodec implements ThriftCodec<OneOfEverything>
     private final ThriftCodec<Fruit> aFruitCodec;
 
     public OneOfEverythingThriftCodec(ThriftType type,
-                                      ThriftCodec<BonkField> aStructCodec,
-                                      ThriftCodec<UnionField> aUnionCodec,
-                                      ThriftCodec<Fruit> aFruitCodec)
+            ThriftCodec<BonkField> aStructCodec,
+            ThriftCodec<UnionField> aUnionCodec,
+            ThriftCodec<Fruit> aFruitCodec)
     {
         this.type = type;
         this.aStructCodec = aStructCodec;

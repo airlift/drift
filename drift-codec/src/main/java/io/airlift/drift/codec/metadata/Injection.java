@@ -17,7 +17,8 @@ package io.airlift.drift.codec.metadata;
 
 import io.airlift.drift.codec.ThriftField;
 
-abstract class Injection extends FieldMetadata
+abstract class Injection
+        extends FieldMetadata
 {
     protected Injection(ThriftField annotation, FieldKind fieldKind)
     {

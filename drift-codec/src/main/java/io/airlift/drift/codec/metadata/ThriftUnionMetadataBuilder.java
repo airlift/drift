@@ -39,7 +39,7 @@ import static io.airlift.drift.codec.metadata.ReflectionHelper.findAnnotatedMeth
 
 @NotThreadSafe
 public class ThriftUnionMetadataBuilder
-    extends AbstractThriftMetadataBuilder
+        extends AbstractThriftMetadataBuilder
 {
     public ThriftUnionMetadataBuilder(ThriftCatalog catalog, Type structType)
     {
@@ -107,7 +107,7 @@ public class ThriftUnionMetadataBuilder
             if (idFields.size() + idMethods.size() == 0) {
                 metadataErrors.addError("Neither a field nor a method is annotated with @ThriftUnionId");
             }
-            else  if (idFields.size() > 1) {
+            else if (idFields.size() > 1) {
                 metadataErrors.addError("More than one @ThriftUnionId field present");
             }
             else if (idMethods.size() > 1) {
@@ -129,7 +129,7 @@ public class ThriftUnionMetadataBuilder
             fieldInjections.add(fieldInjection);
         }
 
-        for (Method idMethod: idMethods) {
+        for (Method idMethod : idMethods) {
             if (!Modifier.isPublic(idMethod.getModifiers())) {
                 metadataErrors.addError("@ThriftUnionId method [%s] is not public", idMethod.toGenericString());
                 continue;
@@ -153,8 +153,8 @@ public class ThriftUnionMetadataBuilder
         for (ConstructorInjection constructorInjection : constructorInjections) {
             if (constructorInjection.getParameters().size() > 1) {
                 metadataErrors.addError("@ThriftConstructor [%s] takes %d arguments, this is illegal for an union",
-                                        constructorInjection.getConstructor().toGenericString(),
-                                        constructorInjection.getParameters().size());
+                        constructorInjection.getConstructor().toGenericString(),
+                        constructorInjection.getParameters().size());
             }
         }
     }
@@ -260,7 +260,7 @@ public class ThriftUnionMetadataBuilder
             }
             else if (fieldMetadata instanceof ParameterInjection) {
                 ParameterInjection parameterInjection = (ParameterInjection) fieldMetadata;
-                ThriftParameterInjection thriftParameterInjection =  new ThriftParameterInjection(
+                ThriftParameterInjection thriftParameterInjection = new ThriftParameterInjection(
                         parameterInjection.getId(),
                         parameterInjection.getName(),
                         parameterInjection.getParameterIndex(),

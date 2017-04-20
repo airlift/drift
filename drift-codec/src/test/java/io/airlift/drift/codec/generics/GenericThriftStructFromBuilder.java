@@ -57,7 +57,7 @@ public final class GenericThriftStructFromBuilder<S, T>
         GenericThriftStructFromBuilder<?, ?> other = (GenericThriftStructFromBuilder<?, ?>) obj;
         return
                 Objects.equals(firstGenericProperty, other.firstGenericProperty) &&
-                Objects.equals(secondGenericProperty, other.secondGenericProperty);
+                        Objects.equals(secondGenericProperty, other.secondGenericProperty);
     }
 
     public static class Builder<X, Y>

@@ -101,7 +101,7 @@ public final class UnionBean
 
         UnionBean that = (UnionBean) obj;
         return Objects.equal(this.type, that.type)
-            && Objects.equal(this.value, that.value);
+                && Objects.equal(this.value, that.value);
     }
 
     @Override

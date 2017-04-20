@@ -22,7 +22,8 @@ import java.lang.reflect.Type;
 
 import static io.airlift.drift.codec.metadata.ReflectionHelper.resolveFieldType;
 
-class FieldExtractor extends Extractor
+class FieldExtractor
+        extends Extractor
 {
     private final Type thriftStructType;
     private final Field field;

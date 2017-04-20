@@ -73,15 +73,15 @@ public class ThriftType
     }
 
     public static <K, V> ThriftType map(ThriftTypeReference keyTypeReference,
-                                        ThriftTypeReference valueTypeReference)
+            ThriftTypeReference valueTypeReference)
     {
         checkNotNull(keyTypeReference, "keyTypeReference is null");
         checkNotNull(valueTypeReference, "valueTypeReference is null");
 
         @SuppressWarnings("serial")
-        Type javaType = new TypeToken<Map<K, V>>(){}
-                .where(new TypeParameter<K>(){}, (TypeToken<K>) TypeToken.of(keyTypeReference.getJavaType()))
-                .where(new TypeParameter<V>(){}, (TypeToken<V>) TypeToken.of(valueTypeReference.getJavaType()))
+        Type javaType = new TypeToken<Map<K, V>>() {}
+                .where(new TypeParameter<K>() {}, (TypeToken<K>) TypeToken.of(keyTypeReference.getJavaType()))
+                .where(new TypeParameter<V>() {}, (TypeToken<V>) TypeToken.of(valueTypeReference.getJavaType()))
                 .getType();
         return new ThriftType(ThriftProtocolType.MAP, javaType, keyTypeReference, valueTypeReference);
     }
@@ -98,8 +98,8 @@ public class ThriftType
         Preconditions.checkNotNull(valueTypeReference, "valueTypeReference is null");
 
         @SuppressWarnings("serial")
-        Type javaType = new TypeToken<Set<E>>(){}
-                .where(new TypeParameter<E>(){}, (TypeToken<E>) TypeToken.of(valueTypeReference.getJavaType()))
+        Type javaType = new TypeToken<Set<E>>() {}
+                .where(new TypeParameter<E>() {}, (TypeToken<E>) TypeToken.of(valueTypeReference.getJavaType()))
                 .getType();
         return new ThriftType(ThriftProtocolType.SET, javaType, null, valueTypeReference);
     }
@@ -116,8 +116,8 @@ public class ThriftType
         checkNotNull(valueTypeReference, "valueTypeReference is null");
 
         @SuppressWarnings("serial")
-        Type javaType = new TypeToken<List<E>>(){}
-                .where(new TypeParameter<E>(){}, (TypeToken<E>) TypeToken.of(valueTypeReference.getJavaType()))
+        Type javaType = new TypeToken<List<E>>() {}
+                .where(new TypeParameter<E>() {}, (TypeToken<E>) TypeToken.of(valueTypeReference.getJavaType()))
                 .getType();
         return new ThriftType(ThriftProtocolType.LIST, javaType, null, valueTypeReference);
     }
@@ -166,9 +166,9 @@ public class ThriftType
     }
 
     private ThriftType(ThriftProtocolType protocolType,
-                       Type javaType,
-                       ThriftTypeReference keyTypeReference,
-                       ThriftTypeReference valueTypeReference)
+            Type javaType,
+            ThriftTypeReference keyTypeReference,
+            ThriftTypeReference valueTypeReference)
     {
         Preconditions.checkNotNull(protocolType, "protocolType is null");
         Preconditions.checkNotNull(javaType, "javaType is null");
@@ -268,9 +268,9 @@ public class ThriftType
 
         Preconditions.checkState(
                 protocolType != ThriftProtocolType.STRUCT &&
-                protocolType != ThriftProtocolType.SET &&
-                protocolType != ThriftProtocolType.LIST &&
-                protocolType != ThriftProtocolType.MAP,
+                        protocolType != ThriftProtocolType.SET &&
+                        protocolType != ThriftProtocolType.LIST &&
+                        protocolType != ThriftProtocolType.MAP,
                 "Coercion is not supported for %s", protocolType
         );
         return new ThriftType(this, javaType);

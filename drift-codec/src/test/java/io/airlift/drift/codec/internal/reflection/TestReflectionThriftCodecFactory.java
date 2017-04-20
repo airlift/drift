@@ -20,7 +20,8 @@ import io.airlift.drift.codec.ThriftCodecManager;
 import org.testng.annotations.Test;
 
 @Test
-public class TestReflectionThriftCodecFactory extends AbstractThriftCodecManagerTest
+public class TestReflectionThriftCodecFactory
+        extends AbstractThriftCodecManagerTest
 {
     private final ThriftCodecManager manager = new ThriftCodecManager(new ReflectionThriftCodecFactory());
 

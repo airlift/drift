@@ -30,7 +30,7 @@ public class WithIdlRecursiveAnnotation
     @ThriftField(
             value = 1,
             requiredness = Requiredness.OPTIONAL,
-            idlAnnotations = { @ThriftIdlAnnotation(key = RECURSIVE_REFERENCE_ANNOTATION_NAME, value = "true") })
+            idlAnnotations = {@ThriftIdlAnnotation(key = RECURSIVE_REFERENCE_ANNOTATION_NAME, value = "true")})
     public WithIdlRecursiveAnnotation child;
 
     @ThriftField(2)
@@ -49,6 +49,6 @@ public class WithIdlRecursiveAnnotation
         final WithIdlRecursiveAnnotation that = (WithIdlRecursiveAnnotation) obj;
 
         return Objects.equals(data, that.data) &&
-               Objects.equals(child, that.child);
+                Objects.equals(child, that.child);
     }
 }

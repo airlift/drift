@@ -23,7 +23,6 @@ import java.util.Objects;
 import static io.airlift.drift.codec.ThriftField.Recursiveness;
 import static io.airlift.drift.codec.ThriftField.Requiredness;
 
-
 @ThriftStruct
 public class WithSwiftRecursiveAnnotation
 {
@@ -46,6 +45,6 @@ public class WithSwiftRecursiveAnnotation
         final WithSwiftRecursiveAnnotation that = (WithSwiftRecursiveAnnotation) obj;
 
         return Objects.equals(data, that.data) &&
-               Objects.equals(child, that.child);
+                Objects.equals(child, that.child);
     }
 }

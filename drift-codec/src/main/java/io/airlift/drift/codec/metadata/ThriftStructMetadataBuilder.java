@@ -38,7 +38,7 @@ import static io.airlift.drift.codec.metadata.FieldKind.THRIFT_FIELD;
 
 @NotThreadSafe
 public class ThriftStructMetadataBuilder
-    extends AbstractThriftMetadataBuilder
+        extends AbstractThriftMetadataBuilder
 {
     public ThriftStructMetadataBuilder(ThriftCatalog catalog, Type structType)
     {

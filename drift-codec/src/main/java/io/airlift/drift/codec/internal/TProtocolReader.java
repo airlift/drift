@@ -333,8 +333,9 @@ public class TProtocolReader
         T fieldValue = null;
         try {
             fieldValue = enumCodec.read(protocol);
-        } catch (UnknownEnumValueException e) {
-          // return null
+        }
+        catch (UnknownEnumValueException e) {
+            // return null
         }
         protocol.readFieldEnd();
         return fieldValue;
@@ -457,8 +458,9 @@ public class TProtocolReader
             try {
                 E element = elementCodec.read(protocol);
                 set.add(element);
-            } catch (UnknownEnumValueException e) {
-              // continue
+            }
+            catch (UnknownEnumValueException e) {
+                // continue
             }
         }
         protocol.readSetEnd();
@@ -474,14 +476,14 @@ public class TProtocolReader
             try {
                 E element = elementCodec.read(protocol);
                 list.add(element);
-            } catch (UnknownEnumValueException e) {
-              // continue
+            }
+            catch (UnknownEnumValueException e) {
+                // continue
             }
         }
         protocol.readListEnd();
         return list;
     }
-
 
     public <K, V> Map<K, V> readMap(ThriftCodec<K> keyCodec, ThriftCodec<V> valueCodec)
             throws Exception
@@ -494,8 +496,9 @@ public class TProtocolReader
                 K key = keyCodec.read(protocol);
                 V value = valueCodec.read(protocol);
                 map.put(key, value);
-            } catch (UnknownEnumValueException e) {
-              // continue
+            }
+            catch (UnknownEnumValueException e) {
+                // continue
             }
         }
         protocol.readMapEnd();

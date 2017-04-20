@@ -15,10 +15,9 @@
  */
 package io.airlift.drift.codec.metadata;
 
-
 /**
  * <p>ThriftInjection contains information an injection point for a single thrift field.</p>
- *
+ * <p>
  * <p>Implementation of this interface are expected to be thread safe.</p>
  */
 public interface ThriftInjection

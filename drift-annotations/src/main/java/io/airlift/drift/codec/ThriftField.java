@@ -36,7 +36,9 @@ public @interface ThriftField
 
     short value() default Short.MIN_VALUE;
 
-    /** Indicates this ThriftField has a negative ID, which is deprecated. */
+    /**
+     * Indicates this ThriftField has a negative ID, which is deprecated.
+     */
     boolean isLegacyId() default false;
 
     String name() default "";
@@ -73,11 +75,11 @@ public @interface ThriftField
          * if this value is explicitly specified in any annotations, it will conflict with other
          * annotations that specify either {@link #OPTIONAL} or {@link #REQUIRED} for the same
          * field.
-         *
+         * <p>
          * The serialization behavior is that {@code null} values will not be serialized, but
          * if the field is non-nullable (i.e. it's type is primitive) it will be serialized, even
          * if the field was not explicitly set.
-         *
+         * <p>
          * The deserialization behavior is similar: When no value is read, the field will be set
          * to {@code null} if the type of the field is nullable, but for primitive types the
          * field will be left untouched (so it will hold the default value for the type).

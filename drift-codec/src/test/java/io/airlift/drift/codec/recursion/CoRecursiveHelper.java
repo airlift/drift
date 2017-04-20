@@ -45,6 +45,6 @@ public class CoRecursiveHelper
         final CoRecursiveHelper that = (CoRecursiveHelper) obj;
 
         return Objects.equals(data, that.data) &&
-               Objects.equals(child, that.child);
+                Objects.equals(child, that.child);
     }
 }

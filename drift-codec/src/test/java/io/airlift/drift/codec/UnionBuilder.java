@@ -79,7 +79,7 @@ public final class UnionBuilder
 
         UnionBuilder that = (UnionBuilder) obj;
         return Objects.equal(this.type, that.type)
-            && Objects.equal(this.value, that.value);
+                && Objects.equal(this.value, that.value);
     }
 
     @Override
@@ -131,5 +131,4 @@ public final class UnionBuilder
             return new UnionBuilder(value, type);
         }
     }
-
 }

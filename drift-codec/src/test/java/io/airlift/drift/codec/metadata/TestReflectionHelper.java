@@ -29,7 +29,7 @@ public class TestReflectionHelper
             throws Exception
     {
         assertEquals(extractParameterNames(getClass().getDeclaredMethod("noAnnotations", String.class, String.class, String.class)),
-                new String[]{"a", "b", "c"});
+                new String[] {"a", "b", "c"});
     }
 
     private static void noAnnotations(String a, String b, String c)
@@ -41,7 +41,7 @@ public class TestReflectionHelper
             throws Exception
     {
         assertEquals(extractParameterNames(getClass().getDeclaredMethod("thriftFieldAnnotation", String.class, String.class, String.class)),
-                new String[]{"a", "b", "c"});
+                new String[] {"a", "b", "c"});
     }
 
     private static void thriftFieldAnnotation(

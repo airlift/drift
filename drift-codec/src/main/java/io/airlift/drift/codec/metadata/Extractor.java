@@ -17,7 +17,8 @@ package io.airlift.drift.codec.metadata;
 
 import io.airlift.drift.codec.ThriftField;
 
-abstract class Extractor extends FieldMetadata
+abstract class Extractor
+        extends FieldMetadata
 {
     protected Extractor(ThriftField annotation, FieldKind fieldKind)
     {

@@ -50,13 +50,13 @@ public class RecursiveUnion
     @ThriftField(value = 1, requiredness = Requiredness.OPTIONAL, isRecursive = Recursiveness.TRUE)
     public RecursiveUnion getChild()
     {
-        return (RecursiveUnion)value;
+        return (RecursiveUnion) value;
     }
 
     @ThriftField(2)
     public String getData()
     {
-        return (String)value;
+        return (String) value;
     }
 
     @Override
@@ -72,6 +72,6 @@ public class RecursiveUnion
         final RecursiveUnion that = (RecursiveUnion) obj;
 
         return Objects.equals(this.unionId, that.unionId) &&
-               Objects.equals(this.value, that.value);
+                Objects.equals(this.value, that.value);
     }
 }

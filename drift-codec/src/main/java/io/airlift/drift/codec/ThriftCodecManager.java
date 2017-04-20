@@ -169,11 +169,10 @@ public class ThriftCodecManager
                 finally {
                     ThriftType top = stack.get().pop();
                     checkState(type.equals(top),
-                               "ThriftCatalog circularity detection stack is corrupt: expected %s, but got %s",
-                               type,
-                               top);
+                            "ThriftCatalog circularity detection stack is corrupt: expected %s, but got %s",
+                            type,
+                            top);
                 }
-
             }
         });
 
@@ -313,8 +312,9 @@ public class ThriftCodecManager
     }
 
     public <T> T read(byte[] serializedStruct,
-                      Class<T> clazz,
-                      TProtocolFactory protocolFactory) {
+            Class<T> clazz,
+            TProtocolFactory protocolFactory)
+    {
         Preconditions.checkNotNull(serializedStruct, "ttype is null");
         Preconditions.checkNotNull(clazz, "clazz is null");
         try {
@@ -322,7 +322,8 @@ public class ThriftCodecManager
             TIOStreamTransport resultIOStream = new TIOStreamTransport(istream);
             TProtocol resultProtocolBuffer = protocolFactory.getProtocol(resultIOStream);
             return read(clazz, resultProtocolBuffer);
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             throw Throwables.propagate(e);
         }
     }
@@ -334,15 +335,17 @@ public class ThriftCodecManager
     }
 
     public <T> void write(T ttype,
-                          ByteArrayOutputStream oStream,
-                          TProtocolFactory protocolFactory) {
+            ByteArrayOutputStream oStream,
+            TProtocolFactory protocolFactory)
+    {
         Preconditions.checkNotNull(ttype, "ttype is null");
         Preconditions.checkNotNull(protocolFactory, "protocolFactory is null");
         try {
             TIOStreamTransport resultIOStream = new TIOStreamTransport(oStream);
             TProtocol resultProtocolBuffer = protocolFactory.getProtocol(resultIOStream);
             write((Class<T>) ttype.getClass(), ttype, resultProtocolBuffer);
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             throw Throwables.propagate(e);
         }
     }

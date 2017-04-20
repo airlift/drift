@@ -24,11 +24,12 @@ import java.lang.reflect.Type;
 /**
  * A placeholder for a{@link ThriftCodec} that defers computation of the real codec
  * until it is actually used, and then just delegates to that codec.
- *
+ * <p>
  * This is used to break the cycle when computing the codec for a recursive type
  * tries to compute codecs for all of its fields.
  */
-public class DelegateCodec<T> implements ThriftCodec<T>
+public class DelegateCodec<T>
+        implements ThriftCodec<T>
 {
     private final ThriftCodecManager codecManager;
     private final TypeToken<T> typeToken;
@@ -46,13 +47,15 @@ public class DelegateCodec<T> implements ThriftCodec<T>
     }
 
     @Override
-    public T read(TProtocol protocol) throws Exception
+    public T read(TProtocol protocol)
+            throws Exception
     {
         return getCodec().read(protocol);
     }
 
     @Override
-    public void write(T value, TProtocol protocol) throws Exception
+    public void write(T value, TProtocol protocol)
+            throws Exception
     {
         getCodec().write(value, protocol);
     }
@@ -62,8 +65,8 @@ public class DelegateCodec<T> implements ThriftCodec<T>
         ThriftCodec<T> codec = codecManager.getCachedCodecIfPresent(typeToken);
         if (codec == null) {
             throw new IllegalStateException(
-                "Tried to encodec/decode using a DelegateCodec before the target codec was " +
-                "built (likely a bug in recursive type support)");
+                    "Tried to encodec/decode using a DelegateCodec before the target codec was " +
+                            "built (likely a bug in recursive type support)");
         }
         return codec;
     }

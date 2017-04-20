@@ -39,7 +39,7 @@ public class CoRecursiveTreeHelper
         }
         CoRecursiveTreeHelper that = (CoRecursiveTreeHelper) o;
         return Objects.equal(child, that.child) &&
-               Objects.equal(data, that.data);
+                Objects.equal(data, that.data);
     }
 
     @Override

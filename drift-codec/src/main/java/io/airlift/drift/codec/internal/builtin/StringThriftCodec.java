@@ -23,7 +23,8 @@ import org.apache.thrift.protocol.TProtocol;
 import javax.annotation.concurrent.Immutable;
 
 @Immutable
-public class StringThriftCodec implements ThriftCodec<String>
+public class StringThriftCodec
+        implements ThriftCodec<String>
 {
     @Override
     public ThriftType getType()

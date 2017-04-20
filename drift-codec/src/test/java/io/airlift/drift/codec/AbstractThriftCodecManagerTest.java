@@ -528,7 +528,8 @@ public abstract class AbstractThriftCodecManagerTest
         testRoundTripSerialize(recursiveObject, new TCompactProtocol.Factory());
     }
 
-    @Test void testStructWithRecursionViaMapKeyAndValueTypes()
+    @Test
+    void testStructWithRecursionViaMapKeyAndValueTypes()
             throws Exception
     {
         ViaMapKeyAndValueTypes recursiveObject = new ViaMapKeyAndValueTypes();
@@ -541,7 +542,8 @@ public abstract class AbstractThriftCodecManagerTest
         testRoundTripSerialize(recursiveObject, new TCompactProtocol.Factory());
     }
 
-    @Test void testCoRecursive()
+    @Test
+    void testCoRecursive()
             throws Exception
     {
         CoRecursive recursiveObject = new CoRecursive();
@@ -553,7 +555,8 @@ public abstract class AbstractThriftCodecManagerTest
         testRoundTripSerialize(recursiveObject, new TCompactProtocol.Factory());
     }
 
-    @Test void testCoRecursiveStartingAtHelper()
+    @Test
+    void testCoRecursiveStartingAtHelper()
             throws Exception
     {
         CoRecursiveHelper recursiveObject = new CoRecursiveHelper();
@@ -565,7 +568,8 @@ public abstract class AbstractThriftCodecManagerTest
         testRoundTripSerialize(recursiveObject, new TCompactProtocol.Factory());
     }
 
-    @Test void testCoRecursiveTree()
+    @Test
+    void testCoRecursiveTree()
             throws Exception
     {
         {

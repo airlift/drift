@@ -31,7 +31,7 @@ public class ThriftMethodInjection
     private final Method method;
     private final List<ThriftParameterInjection> parameters;
 
-    public ThriftMethodInjection(Method method, ThriftParameterInjection ... parameters)
+    public ThriftMethodInjection(Method method, ThriftParameterInjection... parameters)
     {
         this(method, Arrays.asList(parameters));
     }

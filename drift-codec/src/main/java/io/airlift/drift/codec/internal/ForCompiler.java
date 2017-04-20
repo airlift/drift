@@ -26,7 +26,7 @@ import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.ElementType.PARAMETER;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
-@Target({ METHOD, CONSTRUCTOR, FIELD, PARAMETER })
+@Target({METHOD, CONSTRUCTOR, FIELD, PARAMETER})
 @Retention(RUNTIME)
 @BindingAnnotation
 public @interface ForCompiler

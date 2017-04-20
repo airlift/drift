@@ -82,7 +82,7 @@ public final class UnionMethod
 
         UnionMethod that = (UnionMethod) obj;
         return Objects.equal(this.type, that.type)
-            && Objects.equal(this.value, that.value);
+                && Objects.equal(this.value, that.value);
     }
 
     @Override

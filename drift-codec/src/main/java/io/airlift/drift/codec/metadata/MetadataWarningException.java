@@ -15,7 +15,8 @@
  */
 package io.airlift.drift.codec.metadata;
 
-public class MetadataWarningException extends RuntimeException
+public class MetadataWarningException
+        extends RuntimeException
 {
     private static final long serialVersionUID = 1L;
 

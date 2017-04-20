@@ -48,13 +48,13 @@ public class RecursiveDefaultUnion
     @ThriftField(value = 1, requiredness = ThriftField.Requiredness.NONE, isRecursive = ThriftField.Recursiveness.TRUE)
     public RecursiveDefaultUnion getChild()
     {
-        return (RecursiveDefaultUnion)value;
+        return (RecursiveDefaultUnion) value;
     }
 
     @ThriftField(2)
     public String getData()
     {
-        return (String)value;
+        return (String) value;
     }
 
     @Override

@@ -261,7 +261,8 @@ public class ThriftCatalog
                     ThriftType resolvedThriftType = buildThriftTypeInternal(unresolvedJavaType);
                     typeCache.putIfAbsent(unresolvedJavaType, resolvedThriftType);
                 }
-            } while (true);
+            }
+            while (true);
         }
         return thriftType;
     }
@@ -359,7 +360,7 @@ public class ThriftCatalog
         }
 
         return getThriftTypeReference(fieldMetadata.getJavaType(),
-                                      isRecursive ? Recursiveness.FORCED : Recursiveness.NOT_ALLOWED);
+                isRecursive ? Recursiveness.FORCED : Recursiveness.NOT_ALLOWED);
     }
 
     public ThriftTypeReference getCollectionElementThriftTypeReference(Type javaType)
@@ -415,13 +416,12 @@ public class ThriftCatalog
         ThriftType thriftType = getThriftTypeFromCache(javaType);
         if (thriftType == null) {
             if (recursiveness == Recursiveness.FORCED ||
-                (recursiveness == Recursiveness.ALLOWED && stack.get().contains(javaType))) {
+                    (recursiveness == Recursiveness.ALLOWED && stack.get().contains(javaType))) {
                 // recursion: return an unresolved ThriftTypeReference
                 deferredTypesWorkList.get().add(javaType);
                 return new RecursiveThriftTypeReference(this, javaType);
             }
-            else
-            {
+            else {
                 thriftType = buildThriftType(javaType);
                 typeCache.putIfAbsent(javaType, thriftType);
             }
@@ -475,7 +475,7 @@ public class ThriftCatalog
             Type mapKeyType = getMapKeyType(javaType);
             Type mapValueType = getMapValueType(javaType);
             if (isSupportedStructFieldType(mapKeyType) &&
-                isSupportedStructFieldType(mapValueType)) {
+                    isSupportedStructFieldType(mapValueType)) {
                 return ThriftProtocolType.MAP;
             }
         }
@@ -576,8 +576,8 @@ public class ThriftCatalog
         return structMetadata;
     }
 
-
-    private static Class<?> getSwiftMetaClassOf(Class<?> cls) throws ClassNotFoundException
+    private static Class<?> getSwiftMetaClassOf(Class<?> cls)
+            throws ClassNotFoundException
     {
         ClassLoader loader = cls.getClassLoader();
         if (loader == null) {
@@ -649,7 +649,8 @@ public class ThriftCatalog
         try {
             Field f = enumConstant.getDeclaringClass().getField(enumConstant.name());
             return getThriftDocumentation(f);
-        } catch (ReflectiveOperationException e) {
+        }
+        catch (ReflectiveOperationException e) {
             // ignore
         }
         return ImmutableList.<String>of();
@@ -689,7 +690,7 @@ public class ThriftCatalog
                 }
             }));
             throw new IllegalArgumentException(
-                "Circular references must be qualified with 'isRecursive' on a @ThriftField annotation in the cycle: " + path);
+                    "Circular references must be qualified with 'isRecursive' on a @ThriftField annotation in the cycle: " + path);
         }
         else {
             stack.push(structType);
@@ -702,9 +703,9 @@ public class ThriftCatalog
             finally {
                 Type top = stack.pop();
                 checkState(structType.equals(top),
-                           "ThriftCatalog circularity detection stack is corrupt: expected %s, but got %s",
-                           structType,
-                           top);
+                        "ThriftCatalog circularity detection stack is corrupt: expected %s, but got %s",
+                        structType,
+                        top);
             }
         }
     }
@@ -724,7 +725,7 @@ public class ThriftCatalog
                 }
             }));
             throw new IllegalArgumentException(
-                "Circular references must be qualified with 'isRecursive' on a @ThriftField annotation in the cycle: " + path);
+                    "Circular references must be qualified with 'isRecursive' on a @ThriftField annotation in the cycle: " + path);
         }
 
         stack.push(unionType);

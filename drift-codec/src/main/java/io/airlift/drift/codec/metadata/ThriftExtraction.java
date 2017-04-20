@@ -15,10 +15,9 @@
  */
 package io.airlift.drift.codec.metadata;
 
-
 /**
  * <p>ThriftExtraction contains information an extraction point for a single thrift field.</p>
- *
+ * <p>
  * <p>Implementations of this interface are expected to be thread safe.</p>
  */
 public interface ThriftExtraction

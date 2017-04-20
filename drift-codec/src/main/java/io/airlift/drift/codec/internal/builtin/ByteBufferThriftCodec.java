@@ -25,7 +25,8 @@ import javax.annotation.concurrent.Immutable;
 import java.nio.ByteBuffer;
 
 @Immutable
-public class ByteBufferThriftCodec implements ThriftCodec<ByteBuffer>
+public class ByteBufferThriftCodec
+        implements ThriftCodec<ByteBuffer>
 {
     @Override
     public ThriftType getType()

@@ -18,7 +18,8 @@ package io.airlift.drift.codec.internal.compiler;
 /**
  * A ClassLoader that allows for loading of classes from an array of bytes.
  */
-public class DynamicClassLoader extends ClassLoader
+public class DynamicClassLoader
+        extends ClassLoader
 {
     public DynamicClassLoader(ClassLoader parent)
     {

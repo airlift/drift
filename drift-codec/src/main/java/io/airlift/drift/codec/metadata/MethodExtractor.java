@@ -23,7 +23,8 @@ import java.lang.reflect.Type;
 import static io.airlift.drift.codec.metadata.ReflectionHelper.extractFieldName;
 import static io.airlift.drift.codec.metadata.ReflectionHelper.resolveFieldType;
 
-class MethodExtractor extends Extractor
+class MethodExtractor
+        extends Extractor
 {
     private final Type thriftStructType;
     private final Method method;

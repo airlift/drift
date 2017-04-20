@@ -37,10 +37,12 @@ import static io.airlift.drift.codec.metadata.ThriftFieldMetadata.isTypePredicat
 @Immutable
 public class ThriftStructMetadata
 {
-    public static enum MetadataType {
+    public static enum MetadataType
+    {
         STRUCT, UNION;
 
     }
+
     private final String structName;
 
     private final Map<String, String> idlAnnotations;

@@ -123,7 +123,8 @@ public class ThriftCodecBinder
         return (Key<ThriftCodec<?>>) Key.get(new ParameterizedTypeImpl(null, ThriftCodec.class, type));
     }
 
-    static class ThriftCodecProvider implements Provider<ThriftCodec<?>>
+    static class ThriftCodecProvider
+            implements Provider<ThriftCodec<?>>
     {
         private final Type type;
         private ThriftCodecManager thriftCodecManager;

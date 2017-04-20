@@ -25,13 +25,14 @@ import io.airlift.drift.codec.ThriftStruct;
                 @ThriftIdlAnnotation(key = "message", value = "message")
         }
 )
-public class ExceptionWithIdlAnnotations extends Exception
+public class ExceptionWithIdlAnnotations
+        extends Exception
 {
     private int type;
 
     @ThriftConstructor
     public ExceptionWithIdlAnnotations(@ThriftField(1) String message,
-                                       @ThriftField(2) int type)
+            @ThriftField(2) int type)
     {
         super(message);
         this.type = type;

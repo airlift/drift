@@ -27,7 +27,8 @@ import javax.annotation.concurrent.Immutable;
 import java.util.Map;
 
 @Immutable
-public class MapThriftCodec<K, V> implements ThriftCodec<Map<K, V>>
+public class MapThriftCodec<K, V>
+        implements ThriftCodec<Map<K, V>>
 {
     private final ThriftType thriftType;
     private final ThriftCodec<K> keyCodec;

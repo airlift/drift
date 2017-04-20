@@ -33,7 +33,6 @@ import java.util.Set;
 
 import static org.fest.assertions.Assertions.assertThat;
 
-
 public class TestLegacyFieldIds
 {
     @Test
@@ -65,37 +64,38 @@ public class TestLegacyFieldIds
             boolean legacy = field.isLegacyId();
 
             assertThat(name)
-                .as("name of field " + field)
-                .matches("^(notLegacy|legacy).*");
+                    .as("name of field " + field)
+                    .matches("^(notLegacy|legacy).*");
             if (name.startsWith("legacy")) {
                 assertThat(id)
-                    .as("id of field " + field)
-                    .isLessThan((short) 0);
+                        .as("id of field " + field)
+                        .isLessThan((short) 0);
                 assertThat(legacy)
-                    .as("isLegacyId of field " + field)
-                    .isTrue();
-            } else {
+                        .as("isLegacyId of field " + field)
+                        .isTrue();
+            }
+            else {
                 assertThat(id)
-                    .as("id of field " + field)
-                    .isGreaterThanOrEqualTo((short) 0);
+                        .as("id of field " + field)
+                        .isGreaterThanOrEqualTo((short) 0);
                 assertThat(legacy)
-                    .as("isLegacyId of field " + field)
-                    .isFalse();
+                        .as("isLegacyId of field " + field)
+                        .isFalse();
             }
 
             seen.add((int) id);
         }
 
         assertThat(seen)
-             .as("present fields in the struct")
-             .isEqualTo(LegacyIdCorrect.IDS);
+                .as("present fields in the struct")
+                .isEqualTo(LegacyIdCorrect.IDS);
     }
 
     @ThriftStruct
     public static final class LegacyIdCorrect
     {
         private static final Set<Integer> IDS =
-            ImmutableSet.<Integer>of(-4, -3, -2, -1, 0, 1, 2);
+                ImmutableSet.<Integer>of(-4, -3, -2, -1, 0, 1, 2);
 
         @ThriftField(value = 0, isLegacyId = false) public boolean notLegacyId0;
         @ThriftField(value = 1, isLegacyId = false) public boolean notLegacyId1;
@@ -179,10 +179,10 @@ public class TestLegacyFieldIds
 
         // 3: Must be consistent
         for (Class<?> klass : Arrays.asList(
-                        LegacyIdInconsistent1.class,
-                        LegacyIdInconsistent2.class,
-                        LegacyIdInconsistent3.class,
-                        LegacyIdInconsistent4.class
+                LegacyIdInconsistent1.class,
+                LegacyIdInconsistent2.class,
+                LegacyIdInconsistent3.class,
+                LegacyIdInconsistent4.class
         )) {
             ThriftStructMetadataBuilder builder = new ThriftStructMetadataBuilder(new ThriftCatalog(), klass);
 
@@ -203,18 +203,21 @@ public class TestLegacyFieldIds
     }
 
     @ThriftStruct
-    public static final class LegacyIdIncorrectlyMissing {
+    public static final class LegacyIdIncorrectlyMissing
+    {
         @ThriftField(value = -4) public boolean field;
     }
 
     @ThriftStruct
-    public static final class LegacyIdIncorrectlyPresent {
+    public static final class LegacyIdIncorrectlyPresent
+    {
         @ThriftField(value = 4, isLegacyId = true) public boolean field;
     }
 
     /* legacy, getter correct, setter wrong */
     @ThriftStruct
-    public static final class LegacyIdInconsistent1 {
+    public static final class LegacyIdInconsistent1
+    {
         @ThriftField(value = -4, isLegacyId = true)
         public boolean getField()
         {
@@ -229,7 +232,8 @@ public class TestLegacyFieldIds
 
     /* legacy, setter correct, getter wrong */
     @ThriftStruct
-    public static final class LegacyIdInconsistent2 {
+    public static final class LegacyIdInconsistent2
+    {
         @ThriftField(value = -4, isLegacyId = false)
         public boolean getField()
         {
@@ -244,7 +248,8 @@ public class TestLegacyFieldIds
 
     /* not legacy, setter correct, getter wrong */
     @ThriftStruct
-    public static final class LegacyIdInconsistent3 {
+    public static final class LegacyIdInconsistent3
+    {
         @ThriftField(value = 4, isLegacyId = true)
         public boolean getField()
         {
@@ -259,7 +264,8 @@ public class TestLegacyFieldIds
 
     /* not legacy, getter correct, setter wrong */
     @ThriftStruct
-    public static final class LegacyIdInconsistent4 {
+    public static final class LegacyIdInconsistent4
+    {
         @ThriftField(value = 4, isLegacyId = false)
         public boolean getField()
         {
@@ -273,14 +279,17 @@ public class TestLegacyFieldIds
     }
 
     @Test
-    public void testGetThriftFieldIsLegacyId() {
+    public void testGetThriftFieldIsLegacyId()
+    {
         Function<FieldMetadata, Optional<Boolean>> getter = FieldMetadata.getThriftFieldIsLegacyId();
 
-        Function<ThriftField, FieldMetadata> makeFakeFieldMetadata = new Function<ThriftField, FieldMetadata>() {
+        Function<ThriftField, FieldMetadata> makeFakeFieldMetadata = new Function<ThriftField, FieldMetadata>()
+        {
             @Override
             public FieldMetadata apply(ThriftField input)
             {
-                return new FieldMetadata(input, FieldKind.THRIFT_FIELD) {
+                return new FieldMetadata(input, FieldKind.THRIFT_FIELD)
+                {
                     @Override
                     public Type getJavaType()
                     {
@@ -300,11 +309,14 @@ public class TestLegacyFieldIds
             final Optional<Boolean> expected;
             if (f.getName().startsWith("expectTrue")) {
                 expected = Optional.of(true);
-            } else if (f.getName().startsWith("expectFalse")) {
+            }
+            else if (f.getName().startsWith("expectFalse")) {
                 expected = Optional.of(false);
-            } else if (f.getName().startsWith("expectNothing")) {
+            }
+            else if (f.getName().startsWith("expectNothing")) {
                 expected = Optional.absent();
-            } else {
+            }
+            else {
                 Preconditions.checkArgument(f.getName().startsWith("broken"));
                 continue;
             }
@@ -312,8 +324,8 @@ public class TestLegacyFieldIds
             Optional<Boolean> actual = getter.apply(makeFakeFieldMetadata.apply(f.getAnnotation(ThriftField.class)));
 
             assertThat(actual)
-                .as("result of getThriftFieldIsLegacyId on " + f)
-                .isEqualTo(expected);
+                    .as("result of getThriftFieldIsLegacyId on " + f)
+                    .isEqualTo(expected);
         }
     }
 
@@ -350,7 +362,7 @@ public class TestLegacyFieldIds
     public static final class LegacyIdUnionCorrect
     {
         private static final Set<Integer> IDS =
-            ImmutableSet.<Integer>of(-4, -3, -2, -1, 0, 1, 2, (int) Short.MIN_VALUE);
+                ImmutableSet.<Integer>of(-4, -3, -2, -1, 0, 1, 2, (int) Short.MIN_VALUE);
 
         @ThriftUnionId public short unionId;
 

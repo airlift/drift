@@ -21,7 +21,7 @@ import java.lang.reflect.Type;
 
 /**
  * An interface to either a resolved {@link ThriftType} or the information to compute one.
- *
+ * <p>
  * Used when computing struct/union metadata, as a placeholder for field types that might
  * not be directly resolvable yet (in cases of recursive types).
  */

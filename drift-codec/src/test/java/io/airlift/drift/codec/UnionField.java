@@ -73,19 +73,19 @@ public final class UnionField
 
         UnionField that = (UnionField) obj;
         return this._id == that._id
-            && Objects.equal(this.stringValue, that.stringValue)
-            && Objects.equal(this.longValue, that.longValue)
-            && Objects.equal(this.fruitValue, that.fruitValue);
+                && Objects.equal(this.stringValue, that.stringValue)
+                && Objects.equal(this.longValue, that.longValue)
+                && Objects.equal(this.fruitValue, that.fruitValue);
     }
 
     @Override
     public String toString()
     {
         return MoreObjects.toStringHelper(this)
-                          .add("_id", _id)
-                          .add("stringValue", stringValue)
-                          .add("longValue", longValue)
-                          .add("fruitValue", fruitValue)
-                          .toString();
+                .add("_id", _id)
+                .add("stringValue", stringValue)
+                .add("longValue", longValue)
+                .add("fruitValue", fruitValue)
+                .toString();
     }
 }

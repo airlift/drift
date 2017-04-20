@@ -41,7 +41,8 @@ import static org.testng.Assert.assertTrue;
 public class TestThriftStructMetadata
 {
     @Test
-    public void testField() throws Exception
+    public void testField()
+            throws Exception
     {
         ThriftStructMetadata metadata = testStructMetadataBuild(BonkField.class, 0, 0);
 
@@ -69,7 +70,8 @@ public class TestThriftStructMetadata
     }
 
     @Test
-    public void testBean() throws Exception
+    public void testBean()
+            throws Exception
     {
         ThriftStructMetadata metadata = testStructMetadataBuild(BonkBean.class, 0, 2);
         verifyParameterInjection(metadata, 1, "message", 0);
@@ -99,7 +101,8 @@ public class TestThriftStructMetadata
     }
 
     @Test
-    public void testConstructor() throws Exception
+    public void testConstructor()
+            throws Exception
     {
         ThriftStructMetadata metadata = testStructMetadataBuild(BonkConstructor.class, 2, 0);
         verifyParameterInjection(metadata, 1, "message", 0);
@@ -109,7 +112,8 @@ public class TestThriftStructMetadata
     }
 
     @Test
-    public void testMethod() throws Exception
+    public void testMethod()
+            throws Exception
     {
         ThriftStructMetadata metadata = testStructMetadataBuild(BonkMethod.class, 0, 1);
         verifyParameterInjection(metadata, 1, "message", 0);
@@ -119,7 +123,8 @@ public class TestThriftStructMetadata
     }
 
     @Test
-    public void testBuilder() throws Exception
+    public void testBuilder()
+            throws Exception
     {
         ThriftStructMetadata metadata = testStructMetadataBuild(BonkBuilder.class, 0, 2);
         verifyParameterInjection(metadata, 1, "message", 0);
@@ -129,7 +134,8 @@ public class TestThriftStructMetadata
     }
 
     @Test
-    public void testFieldWithOneIdlAnnotationMap() throws Exception
+    public void testFieldWithOneIdlAnnotationMap()
+            throws Exception
     {
         /**
          * Single field with IDL annotation map on getter, but not on setter: should be okay
@@ -142,7 +148,8 @@ public class TestThriftStructMetadata
     }
 
     @Test
-    public void testFieldWithMatchingIdlAnnotationMaps() throws Exception
+    public void testFieldWithMatchingIdlAnnotationMaps()
+            throws Exception
     {
         /**
          * Single field with matching IDL annotation maps on setter vs getter: should be okay
@@ -155,7 +162,8 @@ public class TestThriftStructMetadata
     }
 
     @Test(expectedExceptions = MetadataErrorException.class)
-    public void testFieldWithConflictingIdlAnnotationMap() throws Exception
+    public void testFieldWithConflictingIdlAnnotationMap()
+            throws Exception
     {
         /**
          * Single field with conflicting IDL annotation maps on setter vs getter: should fail
@@ -164,7 +172,8 @@ public class TestThriftStructMetadata
     }
 
     @Test
-    public void testStructWithIdlAnnotationsMap() throws Exception
+    public void testStructWithIdlAnnotationsMap()
+            throws Exception
     {
         ThriftStructMetadata metadata = testStructMetadataBuild(StructWithIdlAnnotations.class, 0, 0);
         Map<String, String> idlAnnotations = metadata.getIdlAnnotations();
@@ -174,7 +183,8 @@ public class TestThriftStructMetadata
     }
 
     @Test
-    public void testUnionWithIdlAnnotationsMap() throws Exception
+    public void testUnionWithIdlAnnotationsMap()
+            throws Exception
     {
         ThriftStructMetadata metadata = testUnionMetadataBuild(UnionWithIdlAnnotations.class, 0, 2);
         Map<String, String> idlAnnotations = metadata.getIdlAnnotations();
@@ -184,7 +194,8 @@ public class TestThriftStructMetadata
     }
 
     @Test
-    public void testExceptionWithIdlAnnotationsMap() throws Exception
+    public void testExceptionWithIdlAnnotationsMap()
+            throws Exception
     {
         ThriftStructMetadata metadata = testStructMetadataBuild(ExceptionWithIdlAnnotations.class, 2, 0);
         Map<String, String> idlAnnotations = metadata.getIdlAnnotations();
@@ -229,7 +240,7 @@ public class TestThriftStructMetadata
         assertNotNull(metadata);
         assertTrue(
                 MetadataType.UNION == metadata.getMetadataType() ||
-                MetadataType.STRUCT == metadata.getMetadataType());
+                        MetadataType.STRUCT == metadata.getMetadataType());
 
         verifyField(metadata, 1, "message");
         verifyField(metadata, 2, "type");
@@ -251,7 +262,7 @@ public class TestThriftStructMetadata
         ThriftCatalog catalog = new ThriftCatalog();
         AbstractThriftMetadataBuilder builder =
                 metadataBuilderType.getConstructor(ThriftCatalog.class, Type.class)
-                                   .newInstance(catalog, structClass);
+                        .newInstance(catalog, structClass);
         assertNotNull(builder);
 
         assertNotNull(builder.getMetadataErrors());

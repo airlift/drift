@@ -43,6 +43,6 @@ public class ViaListElementType
         final ViaListElementType that = (ViaListElementType) obj;
 
         return Objects.equals(data, that.data) &&
-               Objects.equals(children, that.children);
+                Objects.equals(children, that.children);
     }
 }

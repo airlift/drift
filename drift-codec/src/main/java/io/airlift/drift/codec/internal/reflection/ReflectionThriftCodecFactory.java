@@ -28,7 +28,8 @@ import static java.lang.String.format;
  * Creates reflection based thrift codecs.
  */
 @Immutable
-public class ReflectionThriftCodecFactory implements ThriftCodecFactory
+public class ReflectionThriftCodecFactory
+        implements ThriftCodecFactory
 {
     @Override
     public ThriftCodec<?> generateThriftTypeCodec(ThriftCodecManager codecManager, ThriftStructMetadata metadata)

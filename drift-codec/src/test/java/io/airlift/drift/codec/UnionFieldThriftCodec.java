@@ -21,7 +21,8 @@ import io.airlift.drift.codec.internal.TProtocolWriter;
 import io.airlift.drift.codec.metadata.ThriftType;
 import org.apache.thrift.protocol.TProtocol;
 
-public class UnionFieldThriftCodec implements ThriftCodec<UnionField>
+public class UnionFieldThriftCodec
+        implements ThriftCodec<UnionField>
 {
     private final ThriftType type;
     private final ThriftCodec<Fruit> fruitCodec;
@@ -48,26 +49,26 @@ public class UnionFieldThriftCodec implements ThriftCodec<UnionField>
         reader.readStructBegin();
 
         boolean consumed = false;
-        while(reader.nextField()) {
+        while (reader.nextField()) {
             Preconditions.checkState(!consumed, "already consumed");
 
             field._id = reader.getFieldId();
             switch (field._id) {
-            case 1:
-                field.stringValue = reader.readStringField();
-                consumed = true;
-                break;
-            case 2:
-                field.longValue = reader.readI64Field();
-                consumed = true;
-                break;
-            case 3:
-                field.fruitValue = reader.readEnumField(fruitCodec);
-                consumed = true;
-                break;
-            default:
-                field._id = -1;
-                reader.skipFieldData();
+                case 1:
+                    field.stringValue = reader.readStringField();
+                    consumed = true;
+                    break;
+                case 2:
+                    field.longValue = reader.readI64Field();
+                    consumed = true;
+                    break;
+                case 3:
+                    field.fruitValue = reader.readEnumField(fruitCodec);
+                    consumed = true;
+                    break;
+                default:
+                    field._id = -1;
+                    reader.skipFieldData();
             }
         }
         reader.readStructEnd();
@@ -84,15 +85,15 @@ public class UnionFieldThriftCodec implements ThriftCodec<UnionField>
         writer.writeStructBegin("union");
 
         switch (value._id) {
-        case 1:
-            writer.writeStringField("stringValue", (short) 1, value.stringValue);
-            break;
-        case 2:
-            writer.writeI64Field("longValue", (short) 2, value.longValue);
-            break;
-        case 3:
-            writer.writeEnumField("fruitValue", (short) 3, fruitCodec, value.fruitValue);
-            break;
+            case 1:
+                writer.writeStringField("stringValue", (short) 1, value.stringValue);
+                break;
+            case 2:
+                writer.writeI64Field("longValue", (short) 2, value.longValue);
+                break;
+            case 3:
+                writer.writeEnumField("fruitValue", (short) 3, fruitCodec, value.fruitValue);
+                break;
         }
         writer.writeStructEnd();
     }

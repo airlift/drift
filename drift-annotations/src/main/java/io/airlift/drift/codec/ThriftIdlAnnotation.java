@@ -18,5 +18,6 @@ package io.airlift.drift.codec;
 public @interface ThriftIdlAnnotation
 {
     String key() default "";
+
     String value() default "";
 }

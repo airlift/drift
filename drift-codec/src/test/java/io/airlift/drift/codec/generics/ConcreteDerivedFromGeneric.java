@@ -22,7 +22,8 @@ import io.airlift.drift.codec.ThriftStruct;
 import java.util.Objects;
 
 @ThriftStruct
-public final class ConcreteDerivedFromGeneric extends GenericThriftStructBase<Double>
+public final class ConcreteDerivedFromGeneric
+        extends GenericThriftStructBase<Double>
 {
     private final Double concreteProperty;
 

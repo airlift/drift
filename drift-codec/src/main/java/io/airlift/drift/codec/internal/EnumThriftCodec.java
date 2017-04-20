@@ -28,7 +28,8 @@ import javax.annotation.concurrent.Immutable;
  * class handles converting this vale to a Java enum constant.
  */
 @Immutable
-public class EnumThriftCodec<T extends Enum<T>> implements ThriftCodec<T>
+public class EnumThriftCodec<T extends Enum<T>>
+        implements ThriftCodec<T>
 {
     private final ThriftType type;
     private final ThriftEnumMetadata<T> enumMetadata;

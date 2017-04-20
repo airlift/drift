@@ -41,7 +41,7 @@ public class CoRecursiveTree
         }
         CoRecursiveTree that = (CoRecursiveTree) o;
         return Objects.equal(children, that.children) &&
-               Objects.equal(data, that.data);
+                Objects.equal(data, that.data);
     }
 
     @Override

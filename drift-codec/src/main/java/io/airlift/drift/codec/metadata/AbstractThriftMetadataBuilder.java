@@ -172,7 +172,6 @@ public abstract class AbstractThriftMetadataBuilder
         return new MoreTypes.ParameterizedTypeImpl(builderClass.getEnclosingClass(), builderClass, parameterizedStructType.getActualTypeArguments());
     }
 
-
     protected final void verifyClass(Class<? extends Annotation> annotation)
     {
         String annotationName = annotation.getSimpleName();
@@ -481,7 +480,6 @@ public abstract class AbstractThriftMetadataBuilder
         return parameters;
     }
 
-
     protected final void normalizeThriftFields(ThriftCatalog catalog)
     {
         // assign all fields an id (if possible)
@@ -609,10 +607,10 @@ public abstract class AbstractThriftMetadataBuilder
     protected final Map<String, String> extractFieldIdlAnnotations(short fieldId, Collection<FieldMetadata> fields)
     {
         Set<Map<String, String>> idlAnnotationMaps =
-            fields.stream()
-                  .map(field -> field == null ? null : field.getIdlAnnotations())
-                  .filter(annotationMap -> annotationMap != null && !annotationMap.isEmpty())
-                  .collect(toImmutableSet());
+                fields.stream()
+                        .map(field -> field == null ? null : field.getIdlAnnotations())
+                        .filter(annotationMap -> annotationMap != null && !annotationMap.isEmpty())
+                        .collect(toImmutableSet());
 
         if (idlAnnotationMaps.isEmpty()) {
             return ImmutableMap.of();
@@ -627,10 +625,10 @@ public abstract class AbstractThriftMetadataBuilder
     protected final boolean extractFieldIsRecursiveReference(short fieldId, Collection<FieldMetadata> fields)
     {
         Set<Boolean> isRecursiveReferences =
-            fields.stream()
-                  .map(FieldMetadata::isRecursiveReference)
-                  .filter(value -> value != null)
-                  .collect(toImmutableSet());
+                fields.stream()
+                        .map(FieldMetadata::isRecursiveReference)
+                        .filter(value -> value != null)
+                        .collect(toImmutableSet());
 
         if (isRecursiveReferences.isEmpty()) {
             return false;
@@ -650,10 +648,11 @@ public abstract class AbstractThriftMetadataBuilder
             metadataErrors.addError("Thrift class '%s' field '%s' has both isLegacyId=true and isLegacyId=false", structName, fieldName);
         }
         if (id < 0) {
-            if (! isLegacyIds.contains(true)) {
+            if (!isLegacyIds.contains(true)) {
                 metadataErrors.addError("Thrift class '%s' field '%s' has a negative field id but not isLegacyId=true", structName, fieldName);
             }
-        } else {
+        }
+        else {
             if (isLegacyIds.contains(true)) {
                 metadataErrors.addError("Thrift class '%s' field '%s' has isLegacyId=true but not a negative field id", structName, fieldName);
             }
@@ -736,7 +735,6 @@ public abstract class AbstractThriftMetadataBuilder
             }
         }
     }
-
 
     protected final ThriftMethodInjection buildBuilderConstructorInjections()
     {

@@ -42,6 +42,6 @@ public class WithoutRecursiveAnnotation
         final WithoutRecursiveAnnotation that = (WithoutRecursiveAnnotation) obj;
 
         return Objects.equals(data, that.data) &&
-               Objects.equals(child, that.child);
+                Objects.equals(child, that.child);
     }
 }

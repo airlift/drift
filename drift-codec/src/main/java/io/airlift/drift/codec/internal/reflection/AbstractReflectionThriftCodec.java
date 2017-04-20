@@ -31,7 +31,8 @@ import java.util.SortedMap;
 
 import static io.airlift.drift.codec.metadata.FieldKind.THRIFT_FIELD;
 
-public abstract class AbstractReflectionThriftCodec<T> implements ThriftCodec<T>
+public abstract class AbstractReflectionThriftCodec<T>
+        implements ThriftCodec<T>
 {
     protected final ThriftStructMetadata metadata;
     protected final SortedMap<Short, ThriftCodec<?>> fields;
@@ -54,7 +55,7 @@ public abstract class AbstractReflectionThriftCodec<T> implements ThriftCodec<T>
     }
 
     protected Object getFieldValue(Object instance, ThriftFieldMetadata field)
-        throws Exception
+            throws Exception
     {
         try {
             if (field.getExtraction().isPresent()) {

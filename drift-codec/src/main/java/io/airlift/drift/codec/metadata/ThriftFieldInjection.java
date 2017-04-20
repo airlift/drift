@@ -23,7 +23,8 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 @Immutable
-public class ThriftFieldInjection implements ThriftInjection
+public class ThriftFieldInjection
+        implements ThriftInjection
 {
     private final short id;
     private final String name;
@@ -41,7 +42,7 @@ public class ThriftFieldInjection implements ThriftInjection
                 // Nothing to check
                 break;
             case THRIFT_UNION_ID:
-                checkArgument (id == Short.MIN_VALUE, "fieldId must be Short.MIN_VALUE for thrift_union_id");
+                checkArgument(id == Short.MIN_VALUE, "fieldId must be Short.MIN_VALUE for thrift_union_id");
                 break;
         }
 
