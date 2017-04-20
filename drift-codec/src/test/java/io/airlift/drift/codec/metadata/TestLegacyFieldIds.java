@@ -15,15 +15,14 @@
  */
 package io.airlift.drift.codec.metadata;
 
-import io.airlift.drift.codec.ThriftField;
-import io.airlift.drift.codec.ThriftStruct;
-import io.airlift.drift.codec.ThriftUnion;
-import io.airlift.drift.codec.ThriftUnionId;
 import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
-
+import io.airlift.drift.codec.ThriftField;
+import io.airlift.drift.codec.ThriftStruct;
+import io.airlift.drift.codec.ThriftUnion;
+import io.airlift.drift.codec.ThriftUnionId;
 import org.testng.annotations.Test;
 
 import java.lang.reflect.Field;

@@ -18,6 +18,7 @@ package io.airlift.drift.codec.metadata;
 import com.google.common.base.Preconditions;
 
 import javax.annotation.concurrent.Immutable;
+
 import java.lang.reflect.Method;
 
 @Immutable

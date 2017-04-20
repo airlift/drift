@@ -19,7 +19,6 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
-
 import org.objectweb.asm.Label;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.AbstractInsnNode;
@@ -46,16 +45,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.collect.Iterables.any;
+import static com.google.common.collect.Iterables.transform;
 import static io.airlift.drift.codec.internal.compiler.byteCode.Access.STATIC;
 import static io.airlift.drift.codec.internal.compiler.byteCode.Access.toAccessModifier;
 import static io.airlift.drift.codec.internal.compiler.byteCode.NamedParameterDefinition.getNamedParameterType;
 import static io.airlift.drift.codec.internal.compiler.byteCode.ParameterizedType.getParameterType;
 import static io.airlift.drift.codec.internal.compiler.byteCode.ParameterizedType.toParameterizedType;
 import static io.airlift.drift.codec.internal.compiler.byteCode.ParameterizedType.type;
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.collect.Iterables.any;
-import static com.google.common.collect.Iterables.transform;
-
 import static org.objectweb.asm.Opcodes.ACONST_NULL;
 import static org.objectweb.asm.Opcodes.ALOAD;
 import static org.objectweb.asm.Opcodes.ARETURN;

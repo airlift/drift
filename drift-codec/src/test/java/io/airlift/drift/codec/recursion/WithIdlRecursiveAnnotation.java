@@ -21,8 +21,8 @@ import io.airlift.drift.codec.ThriftStruct;
 
 import java.util.Objects;
 
-import static io.airlift.drift.codec.ThriftField.Requiredness;
 import static io.airlift.drift.codec.ThriftField.RECURSIVE_REFERENCE_ANNOTATION_NAME;
+import static io.airlift.drift.codec.ThriftField.Requiredness;
 
 @ThriftStruct
 public class WithIdlRecursiveAnnotation

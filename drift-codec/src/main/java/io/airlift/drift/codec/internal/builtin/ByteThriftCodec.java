@@ -15,9 +15,9 @@
  */
 package io.airlift.drift.codec.internal.builtin;
 
+import com.google.common.base.Preconditions;
 import io.airlift.drift.codec.ThriftCodec;
 import io.airlift.drift.codec.metadata.ThriftType;
-import com.google.common.base.Preconditions;
 import org.apache.thrift.protocol.TProtocol;
 
 import javax.annotation.concurrent.Immutable;

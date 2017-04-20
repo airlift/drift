@@ -20,7 +20,8 @@ import io.airlift.drift.codec.ThriftStruct;
 
 import java.util.Objects;
 
-import static io.airlift.drift.codec.ThriftField.*;
+import static io.airlift.drift.codec.ThriftField.Recursiveness;
+import static io.airlift.drift.codec.ThriftField.Requiredness;
 
 @ThriftStruct
 public class CoRecursiveHelper

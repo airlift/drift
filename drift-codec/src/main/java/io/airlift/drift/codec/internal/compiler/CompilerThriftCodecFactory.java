@@ -15,17 +15,17 @@
  */
 package io.airlift.drift.codec.internal.compiler;
 
+import com.google.inject.Inject;
 import io.airlift.drift.codec.ThriftCodec;
 import io.airlift.drift.codec.ThriftCodecManager;
 import io.airlift.drift.codec.internal.ForCompiler;
 import io.airlift.drift.codec.internal.ThriftCodecFactory;
 import io.airlift.drift.codec.metadata.ThriftStructMetadata;
-import com.google.inject.Inject;
+
+import javax.annotation.concurrent.Immutable;
 
 import java.security.AccessController;
 import java.security.PrivilegedAction;
-
-import javax.annotation.concurrent.Immutable;
 
 /**
  * Creates Thrift codecs directly in byte code.

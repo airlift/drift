@@ -20,6 +20,7 @@ import com.google.common.collect.Sets;
 import org.objectweb.asm.tree.FieldNode;
 
 import javax.annotation.concurrent.Immutable;
+
 import java.util.EnumSet;
 
 import static io.airlift.drift.codec.internal.compiler.byteCode.Access.toAccessModifier;

@@ -15,8 +15,8 @@
  */
 package io.airlift.drift.codec.metadata;
 
-import io.airlift.drift.codec.ThriftField;
 import com.google.common.base.Preconditions;
+import io.airlift.drift.codec.ThriftField;
 
 import java.lang.reflect.Type;
 

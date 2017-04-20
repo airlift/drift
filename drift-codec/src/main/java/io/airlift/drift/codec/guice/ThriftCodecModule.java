@@ -15,6 +15,10 @@
  */
 package io.airlift.drift.codec.guice;
 
+import com.google.inject.Binder;
+import com.google.inject.Module;
+import com.google.inject.Scopes;
+import com.google.inject.TypeLiteral;
 import io.airlift.drift.codec.InternalThriftCodec;
 import io.airlift.drift.codec.ThriftCodec;
 import io.airlift.drift.codec.ThriftCodecManager;
@@ -22,10 +26,6 @@ import io.airlift.drift.codec.internal.ForCompiler;
 import io.airlift.drift.codec.internal.ThriftCodecFactory;
 import io.airlift.drift.codec.internal.compiler.CompilerThriftCodecFactory;
 import io.airlift.drift.codec.metadata.ThriftCatalog;
-import com.google.inject.Binder;
-import com.google.inject.Module;
-import com.google.inject.Scopes;
-import com.google.inject.TypeLiteral;
 
 import static com.google.inject.multibindings.Multibinder.newSetBinder;
 

@@ -15,6 +15,7 @@
  */
 package io.airlift.drift.codec.internal.reflection;
 
+import com.google.common.base.Throwables;
 import io.airlift.drift.codec.ThriftCodec;
 import io.airlift.drift.codec.ThriftCodecManager;
 import io.airlift.drift.codec.ThriftField;
@@ -27,8 +28,6 @@ import io.airlift.drift.codec.metadata.ThriftInjection;
 import io.airlift.drift.codec.metadata.ThriftMethodInjection;
 import io.airlift.drift.codec.metadata.ThriftParameterInjection;
 import io.airlift.drift.codec.metadata.ThriftStructMetadata;
-import com.google.common.base.Throwables;
-
 import org.apache.thrift.protocol.TProtocol;
 import org.apache.thrift.protocol.TProtocolException;
 
@@ -39,7 +38,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static io.airlift.drift.codec.metadata.FieldKind.THRIFT_FIELD;
-
 import static java.lang.String.format;
 
 @Immutable

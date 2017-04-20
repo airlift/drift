@@ -15,6 +15,12 @@
  */
 package io.airlift.drift.codec.internal.compiler;
 
+import com.google.common.base.Function;
+import com.google.common.base.Throwables;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
+import com.google.common.reflect.TypeToken;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.airlift.drift.codec.ThriftCodec;
 import io.airlift.drift.codec.ThriftCodecManager;
 import io.airlift.drift.codec.ThriftProtocolType;
@@ -42,12 +48,6 @@ import io.airlift.drift.codec.metadata.ThriftParameterInjection;
 import io.airlift.drift.codec.metadata.ThriftStructMetadata;
 import io.airlift.drift.codec.metadata.ThriftType;
 import io.airlift.drift.codec.metadata.ThriftTypeReference;
-import com.google.common.base.Function;
-import com.google.common.base.Throwables;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Lists;
-import com.google.common.reflect.TypeToken;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.apache.thrift.protocol.TProtocol;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
@@ -66,6 +66,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
+import static com.google.common.collect.Iterables.getOnlyElement;
 import static io.airlift.drift.codec.ThriftProtocolType.BINARY;
 import static io.airlift.drift.codec.ThriftProtocolType.BOOL;
 import static io.airlift.drift.codec.ThriftProtocolType.BYTE;
@@ -91,7 +92,6 @@ import static io.airlift.drift.codec.internal.compiler.byteCode.NamedParameterDe
 import static io.airlift.drift.codec.internal.compiler.byteCode.ParameterizedType.type;
 import static io.airlift.drift.codec.metadata.FieldKind.THRIFT_FIELD;
 import static io.airlift.drift.codec.metadata.FieldKind.THRIFT_UNION_ID;
-import static com.google.common.collect.Iterables.getOnlyElement;
 import static java.lang.String.format;
 
 @NotThreadSafe

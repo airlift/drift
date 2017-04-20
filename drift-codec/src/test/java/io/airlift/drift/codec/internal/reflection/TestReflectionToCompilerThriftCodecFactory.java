@@ -18,7 +18,6 @@ package io.airlift.drift.codec.internal.reflection;
 import io.airlift.drift.codec.AbstractThriftCodecManagerTest;
 import io.airlift.drift.codec.ThriftCodecManager;
 import io.airlift.drift.codec.internal.compiler.CompilerThriftCodecFactory;
-
 import org.testng.annotations.Test;
 
 @Test

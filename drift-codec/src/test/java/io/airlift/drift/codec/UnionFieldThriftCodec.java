@@ -15,11 +15,10 @@
  */
 package io.airlift.drift.codec;
 
+import com.google.common.base.Preconditions;
 import io.airlift.drift.codec.internal.TProtocolReader;
 import io.airlift.drift.codec.internal.TProtocolWriter;
 import io.airlift.drift.codec.metadata.ThriftType;
-import com.google.common.base.Preconditions;
-
 import org.apache.thrift.protocol.TProtocol;
 
 public class UnionFieldThriftCodec implements ThriftCodec<UnionField>

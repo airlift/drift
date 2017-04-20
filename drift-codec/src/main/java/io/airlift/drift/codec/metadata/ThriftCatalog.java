@@ -15,6 +15,14 @@
  */
 package io.airlift.drift.codec.metadata;
 
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Function;
+import com.google.common.base.Joiner;
+import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Sets;
+import com.google.common.reflect.TypeToken;
+import com.google.common.util.concurrent.ListenableFuture;
 import io.airlift.drift.codec.ThriftDocumentation;
 import io.airlift.drift.codec.ThriftOrder;
 import io.airlift.drift.codec.ThriftProtocolType;
@@ -24,14 +32,6 @@ import io.airlift.drift.codec.internal.coercion.DefaultJavaCoercions;
 import io.airlift.drift.codec.internal.coercion.FromThrift;
 import io.airlift.drift.codec.internal.coercion.ToThrift;
 import io.airlift.drift.codec.metadata.MetadataErrors.Monitor;
-import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Function;
-import com.google.common.base.Joiner;
-import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Sets;
-import com.google.common.reflect.TypeToken;
-import com.google.common.util.concurrent.ListenableFuture;
 
 import javax.annotation.concurrent.ThreadSafe;
 
@@ -47,6 +47,9 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+import static com.google.common.base.Preconditions.checkState;
+import static com.google.common.collect.Iterables.concat;
+import static com.google.common.collect.Iterables.transform;
 import static io.airlift.drift.codec.metadata.ReflectionHelper.getFutureReturnType;
 import static io.airlift.drift.codec.metadata.ReflectionHelper.getIterableType;
 import static io.airlift.drift.codec.metadata.ReflectionHelper.getMapKeyType;
@@ -66,10 +69,6 @@ import static io.airlift.drift.codec.metadata.ThriftType.list;
 import static io.airlift.drift.codec.metadata.ThriftType.map;
 import static io.airlift.drift.codec.metadata.ThriftType.set;
 import static io.airlift.drift.codec.metadata.ThriftType.struct;
-import static com.google.common.base.Preconditions.checkState;
-import static com.google.common.collect.Iterables.concat;
-import static com.google.common.collect.Iterables.transform;
-
 import static java.lang.reflect.Modifier.isStatic;
 
 /**

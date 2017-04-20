@@ -15,10 +15,10 @@
  */
 package io.airlift.drift.codec.metadata;
 
-import io.airlift.drift.codec.ThriftProtocolType;
 import com.google.common.base.Preconditions;
 import com.google.common.reflect.TypeParameter;
 import com.google.common.reflect.TypeToken;
+import io.airlift.drift.codec.ThriftProtocolType;
 
 import javax.annotation.concurrent.Immutable;
 
@@ -28,10 +28,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static io.airlift.drift.codec.ThriftProtocolType.ENUM;
-import static io.airlift.drift.codec.ThriftProtocolType.STRUCT;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
+import static io.airlift.drift.codec.ThriftProtocolType.ENUM;
+import static io.airlift.drift.codec.ThriftProtocolType.STRUCT;
 
 /**
  * ThriftType contains all metadata necessary for converting the java type to and from Thrift.

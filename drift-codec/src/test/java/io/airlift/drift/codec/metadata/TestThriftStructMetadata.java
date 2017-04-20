@@ -27,7 +27,6 @@ import io.airlift.drift.codec.idlannotations.ExceptionWithIdlAnnotations;
 import io.airlift.drift.codec.idlannotations.StructWithIdlAnnotations;
 import io.airlift.drift.codec.idlannotations.UnionWithIdlAnnotations;
 import io.airlift.drift.codec.metadata.ThriftStructMetadata.MetadataType;
-
 import org.testng.annotations.Test;
 
 import java.lang.reflect.Type;

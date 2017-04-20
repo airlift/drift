@@ -15,10 +15,10 @@
  */
 package io.airlift.drift.codec;
 
-import io.airlift.drift.codec.UnionBuilder.Builder;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.MoreObjects.ToStringHelper;
 import com.google.common.base.Objects;
+import io.airlift.drift.codec.UnionBuilder.Builder;
 
 @ThriftUnion(value = "Union", builder = Builder.class)
 public final class UnionBuilder

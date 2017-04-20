@@ -26,6 +26,7 @@ import org.apache.thrift.protocol.TStruct;
 import org.apache.thrift.protocol.TType;
 
 import javax.annotation.concurrent.NotThreadSafe;
+
 import java.nio.ByteBuffer;
 import java.util.List;
 import java.util.Map;

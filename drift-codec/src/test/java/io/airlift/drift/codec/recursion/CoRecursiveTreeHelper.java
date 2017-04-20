@@ -15,9 +15,9 @@
  */
 package io.airlift.drift.codec.recursion;
 
+import com.google.common.base.Objects;
 import io.airlift.drift.codec.ThriftField;
 import io.airlift.drift.codec.ThriftStruct;
-import com.google.common.base.Objects;
 
 @ThriftStruct
 public class CoRecursiveTreeHelper

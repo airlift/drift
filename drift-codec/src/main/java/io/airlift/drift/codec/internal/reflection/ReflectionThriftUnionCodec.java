@@ -15,6 +15,8 @@
  */
 package io.airlift.drift.codec.internal.reflection;
 
+import com.google.common.base.Throwables;
+import com.google.common.collect.Maps;
 import io.airlift.drift.codec.ThriftCodec;
 import io.airlift.drift.codec.ThriftCodecManager;
 import io.airlift.drift.codec.internal.TProtocolReader;
@@ -26,9 +28,6 @@ import io.airlift.drift.codec.metadata.ThriftFieldMetadata;
 import io.airlift.drift.codec.metadata.ThriftInjection;
 import io.airlift.drift.codec.metadata.ThriftMethodInjection;
 import io.airlift.drift.codec.metadata.ThriftStructMetadata;
-import com.google.common.base.Throwables;
-import com.google.common.collect.Maps;
-
 import org.apache.thrift.protocol.TProtocol;
 
 import javax.annotation.concurrent.Immutable;
@@ -36,11 +35,10 @@ import javax.annotation.concurrent.Immutable;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 
-import static io.airlift.drift.codec.metadata.FieldKind.THRIFT_FIELD;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 import static com.google.common.collect.Iterables.getOnlyElement;
-
+import static io.airlift.drift.codec.metadata.FieldKind.THRIFT_FIELD;
 import static java.lang.String.format;
 
 @Immutable

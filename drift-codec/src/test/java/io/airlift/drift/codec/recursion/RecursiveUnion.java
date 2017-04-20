@@ -22,7 +22,8 @@ import io.airlift.drift.codec.ThriftUnionId;
 
 import java.util.Objects;
 
-import static io.airlift.drift.codec.ThriftField.*;
+import static io.airlift.drift.codec.ThriftField.Recursiveness;
+import static io.airlift.drift.codec.ThriftField.Requiredness;
 
 @ThriftUnion
 public class RecursiveUnion

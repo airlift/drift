@@ -15,6 +15,8 @@
  */
 package io.airlift.drift.codec.internal.reflection;
 
+import com.google.common.base.Throwables;
+import com.google.common.collect.ImmutableSortedMap;
 import io.airlift.drift.codec.ThriftCodec;
 import io.airlift.drift.codec.ThriftCodecManager;
 import io.airlift.drift.codec.metadata.ThriftExtraction;
@@ -23,8 +25,6 @@ import io.airlift.drift.codec.metadata.ThriftFieldMetadata;
 import io.airlift.drift.codec.metadata.ThriftMethodExtractor;
 import io.airlift.drift.codec.metadata.ThriftStructMetadata;
 import io.airlift.drift.codec.metadata.ThriftType;
-import com.google.common.base.Throwables;
-import com.google.common.collect.ImmutableSortedMap;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.SortedMap;

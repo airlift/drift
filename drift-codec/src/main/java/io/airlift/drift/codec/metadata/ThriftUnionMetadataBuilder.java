@@ -15,13 +15,13 @@
  */
 package io.airlift.drift.codec.metadata;
 
+import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import io.airlift.drift.codec.ThriftIdlAnnotation;
 import io.airlift.drift.codec.ThriftUnion;
 import io.airlift.drift.codec.ThriftUnionId;
 import io.airlift.drift.codec.metadata.ThriftStructMetadata.MetadataType;
-import com.google.common.base.Optional;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 
 import javax.annotation.concurrent.NotThreadSafe;
 

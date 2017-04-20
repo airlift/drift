@@ -15,6 +15,12 @@
  */
 package io.airlift.drift.codec;
 
+import com.google.common.collect.HashBiMap;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
+import com.google.common.reflect.TypeToken;
 import io.airlift.drift.codec.generics.ConcreteDerivedFromGeneric;
 import io.airlift.drift.codec.generics.ConcreteDerivedFromGenericBean;
 import io.airlift.drift.codec.generics.ConcreteThriftStructDerivedFromGenericField;
@@ -27,13 +33,18 @@ import io.airlift.drift.codec.internal.coercion.DefaultJavaCoercions;
 import io.airlift.drift.codec.metadata.ThriftCatalog;
 import io.airlift.drift.codec.metadata.ThriftStructMetadata;
 import io.airlift.drift.codec.metadata.ThriftType;
-import io.airlift.drift.codec.recursion.*;
-import com.google.common.collect.HashBiMap;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Lists;
-import com.google.common.reflect.TypeToken;
+import io.airlift.drift.codec.recursion.CoRecursive;
+import io.airlift.drift.codec.recursion.CoRecursiveHelper;
+import io.airlift.drift.codec.recursion.CoRecursiveTree;
+import io.airlift.drift.codec.recursion.CoRecursiveTreeHelper;
+import io.airlift.drift.codec.recursion.RecursiveDefaultUnion;
+import io.airlift.drift.codec.recursion.RecursiveUnion;
+import io.airlift.drift.codec.recursion.ViaListElementType;
+import io.airlift.drift.codec.recursion.ViaMapKeyAndValueTypes;
+import io.airlift.drift.codec.recursion.ViaNestedListElementType;
+import io.airlift.drift.codec.recursion.WithIdlRecursiveAnnotation;
+import io.airlift.drift.codec.recursion.WithSwiftRecursiveAnnotation;
+import io.airlift.drift.codec.recursion.WithoutRecursiveAnnotation;
 import org.apache.thrift.protocol.TCompactProtocol;
 import org.apache.thrift.protocol.TJSONProtocol;
 import org.apache.thrift.protocol.TProtocol;

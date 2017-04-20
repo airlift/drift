@@ -15,20 +15,20 @@
  */
 package io.airlift.drift.codec.metadata;
 
-import io.airlift.drift.codec.ThriftField;
-import io.airlift.drift.codec.ThriftIdlAnnotation;
 import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
+import io.airlift.drift.codec.ThriftField;
+import io.airlift.drift.codec.ThriftIdlAnnotation;
 
 import javax.annotation.Nullable;
 
 import java.lang.reflect.Type;
 import java.util.Map;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static io.airlift.drift.codec.ThriftField.RECURSIVE_REFERENCE_ANNOTATION_NAME;
 import static io.airlift.drift.codec.ThriftField.Requiredness;
-import static com.google.common.base.Preconditions.checkNotNull;
 
 abstract class FieldMetadata
 {

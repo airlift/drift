@@ -15,16 +15,16 @@
  */
 package io.airlift.drift.codec.metadata;
 
-import io.airlift.drift.codec.ThriftEnumValue;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import io.airlift.drift.codec.ThriftEnumValue;
+
+import javax.annotation.concurrent.Immutable;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Map;
-
-import javax.annotation.concurrent.Immutable;
 
 import static java.lang.String.format;
 

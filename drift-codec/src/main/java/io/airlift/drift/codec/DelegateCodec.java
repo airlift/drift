@@ -15,8 +15,8 @@
  */
 package io.airlift.drift.codec;
 
-import io.airlift.drift.codec.metadata.ThriftType;
 import com.google.common.reflect.TypeToken;
+import io.airlift.drift.codec.metadata.ThriftType;
 import org.apache.thrift.protocol.TProtocol;
 
 import java.lang.reflect.Type;

@@ -15,12 +15,12 @@
  */
 package io.airlift.drift.codec.metadata;
 
+import com.google.common.reflect.TypeToken;
+
 import javax.annotation.concurrent.Immutable;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
-
-import com.google.common.reflect.TypeToken;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;

@@ -30,9 +30,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
 
-import static io.airlift.drift.codec.metadata.ThriftFieldMetadata.isTypePredicate;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.collect.Maps.uniqueIndex;
+import static io.airlift.drift.codec.metadata.ThriftFieldMetadata.isTypePredicate;
 
 @Immutable
 public class ThriftStructMetadata

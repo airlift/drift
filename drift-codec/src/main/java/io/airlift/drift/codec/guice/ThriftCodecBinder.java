@@ -15,9 +15,6 @@
  */
 package io.airlift.drift.codec.guice;
 
-import io.airlift.drift.codec.InternalThriftCodec;
-import io.airlift.drift.codec.ThriftCodec;
-import io.airlift.drift.codec.ThriftCodecManager;
 import com.google.common.base.Preconditions;
 import com.google.inject.Binder;
 import com.google.inject.Inject;
@@ -26,6 +23,9 @@ import com.google.inject.Provider;
 import com.google.inject.Scopes;
 import com.google.inject.TypeLiteral;
 import com.google.inject.internal.MoreTypes.ParameterizedTypeImpl;
+import io.airlift.drift.codec.InternalThriftCodec;
+import io.airlift.drift.codec.ThriftCodec;
+import io.airlift.drift.codec.ThriftCodecManager;
 
 import java.lang.reflect.Type;
 import java.util.List;

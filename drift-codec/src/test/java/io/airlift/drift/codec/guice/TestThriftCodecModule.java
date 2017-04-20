@@ -15,9 +15,6 @@
  */
 package io.airlift.drift.codec.guice;
 
-import io.airlift.drift.codec.BonkConstructor;
-import io.airlift.drift.codec.ThriftCodec;
-import io.airlift.drift.codec.metadata.ThriftType;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -28,6 +25,9 @@ import com.google.inject.Key;
 import com.google.inject.Module;
 import com.google.inject.Stage;
 import com.google.inject.TypeLiteral;
+import io.airlift.drift.codec.BonkConstructor;
+import io.airlift.drift.codec.ThriftCodec;
+import io.airlift.drift.codec.metadata.ThriftType;
 import org.apache.thrift.protocol.TCompactProtocol;
 import org.apache.thrift.protocol.TProtocol;
 import org.apache.thrift.transport.TMemoryBuffer;

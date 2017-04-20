@@ -15,11 +15,10 @@
  */
 package io.airlift.drift.codec.metadata;
 
+import com.google.common.reflect.TypeToken;
 import io.airlift.drift.codec.ThriftConstructor;
 import io.airlift.drift.codec.ThriftField;
 import io.airlift.drift.codec.ThriftStruct;
-import com.google.common.reflect.TypeToken;
-
 import org.testng.annotations.Test;
 
 import java.lang.reflect.Type;

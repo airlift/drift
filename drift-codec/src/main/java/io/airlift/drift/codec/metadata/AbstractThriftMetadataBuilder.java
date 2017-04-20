@@ -15,8 +15,6 @@
  */
 package io.airlift.drift.codec.metadata;
 
-import io.airlift.drift.codec.ThriftConstructor;
-import io.airlift.drift.codec.ThriftField;
 import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
@@ -30,6 +28,8 @@ import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
 import com.google.common.reflect.TypeToken;
 import com.google.inject.internal.MoreTypes;
+import io.airlift.drift.codec.ThriftConstructor;
+import io.airlift.drift.codec.ThriftField;
 
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.NotThreadSafe;
@@ -48,6 +48,14 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Predicates.notNull;
+import static com.google.common.collect.Iterables.filter;
+import static com.google.common.collect.Iterables.transform;
+import static com.google.common.collect.Lists.newArrayList;
+import static com.google.common.collect.Lists.newArrayListWithCapacity;
+import static com.google.common.collect.Sets.newTreeSet;
 import static io.airlift.drift.codec.ThriftField.Requiredness;
 import static io.airlift.drift.codec.metadata.FieldKind.THRIFT_FIELD;
 import static io.airlift.drift.codec.metadata.FieldMetadata.extractThriftFieldName;
@@ -61,14 +69,6 @@ import static io.airlift.drift.codec.metadata.ReflectionHelper.findAnnotatedMeth
 import static io.airlift.drift.codec.metadata.ReflectionHelper.getAllDeclaredFields;
 import static io.airlift.drift.codec.metadata.ReflectionHelper.getAllDeclaredMethods;
 import static io.airlift.drift.codec.metadata.ReflectionHelper.resolveFieldTypes;
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Predicates.notNull;
-import static com.google.common.collect.Iterables.filter;
-import static com.google.common.collect.Iterables.transform;
-import static com.google.common.collect.Lists.newArrayList;
-import static com.google.common.collect.Lists.newArrayListWithCapacity;
-import static com.google.common.collect.Sets.newTreeSet;
 import static java.util.Arrays.asList;
 import static jp.skypencil.guava.stream.GuavaCollectors.toImmutableSet;
 

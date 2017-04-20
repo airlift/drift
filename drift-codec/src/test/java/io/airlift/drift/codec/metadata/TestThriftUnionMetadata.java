@@ -21,7 +21,6 @@ import io.airlift.drift.codec.UnionConstructor;
 import io.airlift.drift.codec.UnionField;
 import io.airlift.drift.codec.UnionMethod;
 import io.airlift.drift.codec.metadata.ThriftStructMetadata.MetadataType;
-
 import org.testng.annotations.Test;
 
 import static org.fest.assertions.Assertions.assertThat;

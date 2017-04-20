@@ -18,7 +18,6 @@ package io.airlift.drift.codec;
 import io.airlift.drift.codec.internal.TProtocolReader;
 import io.airlift.drift.codec.internal.TProtocolWriter;
 import io.airlift.drift.codec.metadata.ThriftType;
-
 import org.apache.thrift.protocol.TProtocol;
 
 public class OneOfEverythingThriftCodec implements ThriftCodec<OneOfEverything>

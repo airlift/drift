@@ -16,6 +16,7 @@
 package io.airlift.drift.codec.internal.coercion;
 
 import javax.annotation.concurrent.Immutable;
+
 import java.nio.ByteBuffer;
 
 @Immutable
