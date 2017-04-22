@@ -16,7 +16,6 @@
 package io.airlift.drift.codec.metadata;
 
 import com.google.common.base.Function;
-import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -26,6 +25,7 @@ import javax.annotation.concurrent.Immutable;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static io.airlift.drift.codec.ThriftField.RECURSIVE_REFERENCE_ANNOTATION_NAME;

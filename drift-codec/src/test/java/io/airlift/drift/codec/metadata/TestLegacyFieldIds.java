@@ -16,7 +16,6 @@
 package io.airlift.drift.codec.metadata;
 
 import com.google.common.base.Function;
-import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
 import io.airlift.drift.codec.ThriftField;
@@ -29,6 +28,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 import static org.fest.assertions.Assertions.assertThat;
@@ -314,7 +314,7 @@ public class TestLegacyFieldIds
                 expected = Optional.of(false);
             }
             else if (f.getName().startsWith("expectNothing")) {
-                expected = Optional.absent();
+                expected = Optional.empty();
             }
             else {
                 Preconditions.checkArgument(f.getName().startsWith("broken"));

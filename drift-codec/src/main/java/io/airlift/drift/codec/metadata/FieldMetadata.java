@@ -16,7 +16,6 @@
 package io.airlift.drift.codec.metadata;
 
 import com.google.common.base.Function;
-import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 import io.airlift.drift.codec.ThriftField;
 import io.airlift.drift.codec.ThriftIdlAnnotation;
@@ -25,6 +24,7 @@ import javax.annotation.Nullable;
 
 import java.lang.reflect.Type;
 import java.util.Map;
+import java.util.Optional;
 
 import static io.airlift.drift.codec.ThriftField.RECURSIVE_REFERENCE_ANNOTATION_NAME;
 import static io.airlift.drift.codec.ThriftField.Requiredness;
@@ -148,17 +148,16 @@ abstract class FieldMetadata
             public Optional<Short> apply(@Nullable T input)
             {
                 if (input == null) {
-                    return Optional.absent();
+                    return Optional.empty();
                 }
                 Short value = input.getId();
-                return Optional.fromNullable(value);
+                return Optional.ofNullable(value);
             }
         };
     }
 
     /**
-     * Returns a Function which gets the `isLegacyId` setting from a FieldMetadata, if present,
-     * or {@link Optional#absent()} if not, ish.
+     * Returns a Function which gets the `isLegacyId` setting from a FieldMetadata, if present.
      * <p>
      * The semantics would ideally want are:
      * <pre>
@@ -195,17 +194,17 @@ abstract class FieldMetadata
             public Optional<Boolean> apply(@Nullable T input)
             {
                 if (input == null) {
-                    return Optional.absent();
+                    return Optional.empty();
                 }
                 Boolean value = input.isLegacyId();
 
                 if (input.getId() == null || input.getId().shortValue() == Short.MIN_VALUE) {
                     if (value != null && value.booleanValue() == false) {
-                        return Optional.absent();
+                        return Optional.empty();
                     }
                 }
 
-                return Optional.fromNullable(value);
+                return Optional.ofNullable(value);
             }
         };
     }

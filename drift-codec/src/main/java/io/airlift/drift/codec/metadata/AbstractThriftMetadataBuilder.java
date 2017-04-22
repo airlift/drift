@@ -16,7 +16,6 @@
 package io.airlift.drift.codec.metadata;
 
 import com.google.common.base.Function;
-import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.collect.ImmutableList;
@@ -46,6 +45,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Set;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -70,6 +70,7 @@ import static io.airlift.drift.codec.metadata.ReflectionHelper.getAllDeclaredMet
 import static io.airlift.drift.codec.metadata.ReflectionHelper.resolveFieldTypes;
 import static java.util.Arrays.asList;
 import static java.util.Objects.requireNonNull;
+import static java.util.stream.Collectors.toSet;
 import static jp.skypencil.guava.stream.GuavaCollectors.toImmutableSet;
 
 @NotThreadSafe
@@ -577,7 +578,11 @@ public abstract class AbstractThriftMetadataBuilder
             }
 
             // all ids used by this named field
-            Set<Short> ids = ImmutableSet.copyOf(Optional.presentInstances(transform(fields, getThriftFieldId())));
+            Set<Short> ids = fields.stream()
+                    .map(field -> getThriftFieldId().apply(field))
+                    .filter(Optional::isPresent)
+                    .map(Optional::get)
+                    .collect(toSet());
 
             // multiple conflicting ids
             if (ids.size() > 1) {
@@ -642,7 +647,11 @@ public abstract class AbstractThriftMetadataBuilder
 
     protected final boolean extractFieldIsLegacyId(short id, String fieldName, Collection<FieldMetadata> fields)
     {
-        Set<Boolean> isLegacyIds = ImmutableSet.copyOf(Optional.presentInstances(transform(fields, getThriftFieldIsLegacyId())));
+        Set<Boolean> isLegacyIds = fields.stream()
+                .map(field -> getThriftFieldIsLegacyId().apply(field))
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .collect(toSet());
 
         if (isLegacyIds.size() > 1) {
             metadataErrors.addError("Thrift class '%s' field '%s' has both isLegacyId=true and isLegacyId=false", structName, fieldName);

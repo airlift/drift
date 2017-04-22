@@ -16,7 +16,6 @@
 package io.airlift.drift.codec.metadata;
 
 import com.google.common.base.Function;
-import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
@@ -32,6 +31,7 @@ import java.lang.reflect.Type;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static io.airlift.drift.codec.ThriftField.Requiredness;
 import static io.airlift.drift.codec.metadata.FieldKind.THRIFT_FIELD;
@@ -135,7 +135,7 @@ public class ThriftStructMetadataBuilder
                 structType,
                 builderType,
                 MetadataType.STRUCT,
-                Optional.fromNullable(builderMethodInjection),
+                Optional.ofNullable(builderMethodInjection),
                 ImmutableList.copyOf(documentation),
                 ImmutableList.copyOf(fieldsMetadata),
                 Optional.of(constructorInjections),
@@ -223,10 +223,10 @@ public class ThriftStructMetadataBuilder
                 name,
                 THRIFT_FIELD,
                 injections.build(),
-                Optional.<ThriftConstructorInjection>absent(),
-                Optional.<ThriftMethodInjection>absent(),
-                Optional.fromNullable(extraction),
-                Optional.fromNullable(coercion)
+                Optional.empty(),
+                Optional.empty(),
+                Optional.ofNullable(extraction),
+                Optional.ofNullable(coercion)
         );
         return thriftFieldMetadata;
     }
