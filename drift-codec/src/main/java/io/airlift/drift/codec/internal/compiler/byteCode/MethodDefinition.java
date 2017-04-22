@@ -18,7 +18,6 @@ package io.airlift.drift.codec.internal.compiler.byteCode;
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.AbstractInsnNode;
@@ -40,21 +39,18 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.collect.Iterables.any;
-import static com.google.common.collect.Iterables.transform;
 import static io.airlift.drift.codec.internal.compiler.byteCode.Access.STATIC;
 import static io.airlift.drift.codec.internal.compiler.byteCode.Access.toAccessModifier;
-import static io.airlift.drift.codec.internal.compiler.byteCode.NamedParameterDefinition.getNamedParameterType;
-import static io.airlift.drift.codec.internal.compiler.byteCode.ParameterizedType.getParameterType;
-import static io.airlift.drift.codec.internal.compiler.byteCode.ParameterizedType.toParameterizedType;
 import static io.airlift.drift.codec.internal.compiler.byteCode.ParameterizedType.type;
 import static java.util.Objects.requireNonNull;
+import static java.util.stream.Collectors.toList;
 import static org.objectweb.asm.Opcodes.ACONST_NULL;
 import static org.objectweb.asm.Opcodes.ALOAD;
 import static org.objectweb.asm.Opcodes.ARETURN;
@@ -127,7 +123,9 @@ public class MethodDefinition
         else {
             this.returnType = type(void.class);
         }
-        this.parameters = Lists.transform(parameters, getNamedParameterType());
+        this.parameters = parameters.stream()
+                .map(NamedParameterDefinition::getType)
+                .collect(toList());
 
         if (!access.contains(STATIC)) {
             localVariables.put("this", new LocalVariableDefinition("this", 0, type(Object.class)));
@@ -245,7 +243,7 @@ public class MethodDefinition
         methodNode.desc = methodDescription(returnType, parameters);
 
         // add generic signature if return type or any parameter is generic
-        if (returnType.isGeneric() || any(parameters, ParameterizedType.isGenericType())) {
+        if (returnType.isGeneric() || parameters.stream().anyMatch(ParameterizedType::isGeneric)) {
             methodNode.signature = genericMethodSignature(returnType, parameters);
         }
 
@@ -264,7 +262,9 @@ public class MethodDefinition
 
     public static String methodDescription(Class<?> returnType, List<Class<?>> parameterTypes)
     {
-        return methodDescription(type(returnType), Lists.transform(parameterTypes, toParameterizedType()));
+        return methodDescription(type(returnType), parameterTypes.stream()
+                .map(ParameterizedType::type)
+                .collect(toList()));
     }
 
     public static String methodDescription(ParameterizedType returnType, ParameterizedType... parameterTypes)
@@ -276,7 +276,9 @@ public class MethodDefinition
     {
         StringBuilder sb = new StringBuilder();
         sb.append("(");
-        Joiner.on("").appendTo(sb, transform(parameterTypes, getParameterType()));
+        parameterTypes.stream()
+                .map(ParameterizedType::getType)
+                .forEach(sb::append);
         sb.append(")");
         sb.append(returnType.getType());
         return sb.toString();
@@ -331,8 +333,9 @@ public class MethodDefinition
     {
         invokeConstructor(
                 type(type),
-                Lists.transform(ImmutableList.copyOf(parameterTypes), toParameterizedType())
-        );
+                Arrays.stream(parameterTypes)
+                        .map(ParameterizedType::type)
+                        .collect(toList()));
         return this;
     }
 

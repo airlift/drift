@@ -15,11 +15,7 @@
  */
 package io.airlift.drift.codec.internal.compiler.byteCode;
 
-import com.google.common.base.Function;
-
 import javax.annotation.concurrent.Immutable;
-
-import static java.util.Objects.requireNonNull;
 
 @Immutable
 public class NamedParameterDefinition
@@ -72,18 +68,5 @@ public class NamedParameterDefinition
         sb.append(", type=").append(type);
         sb.append('}');
         return sb.toString();
-    }
-
-    public static Function<NamedParameterDefinition, ParameterizedType> getNamedParameterType()
-    {
-        return new Function<NamedParameterDefinition, ParameterizedType>()
-        {
-            @Override
-            public ParameterizedType apply(NamedParameterDefinition input)
-            {
-                requireNonNull(input);
-                return input.getType();
-            }
-        };
     }
 }

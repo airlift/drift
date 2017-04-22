@@ -25,7 +25,6 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 
-import static com.google.common.collect.Iterables.any;
 import static com.google.common.collect.Iterables.concat;
 import static io.airlift.drift.codec.internal.compiler.byteCode.Access.toAccessModifier;
 import static org.objectweb.asm.Opcodes.V1_6;
@@ -67,7 +66,7 @@ public class ClassDefinition
         }
 
         // add generic signature if super class or any interface is generic
-        if (superClass.isGeneric() || any(interfaces, ParameterizedType.isGenericType())) {
+        if (superClass.isGeneric() || interfaces.stream().anyMatch(ParameterizedType::isGeneric)) {
             classNode.signature = genericClassSignature(superClass, interfaces);
         }
 

@@ -15,11 +15,8 @@
  */
 package io.airlift.drift.codec.internal.compiler.byteCode;
 
-import com.google.common.base.Function;
-import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableList;
 
-import javax.annotation.Nullable;
 import javax.annotation.concurrent.Immutable;
 
 import java.util.List;
@@ -51,7 +48,7 @@ public class ParameterizedType
     private final String className;
     private final List<String> parameters;
 
-    public ParameterizedType(String className)
+    private ParameterizedType(String className)
     {
         this.className = className;
         this.type = "L" + className + ";";
@@ -204,41 +201,5 @@ public class ParameterizedType
                 return "L" + getPathName(n) + ";";
             }
         }
-    }
-
-    public static Predicate<ParameterizedType> isGenericType()
-    {
-        return new Predicate<ParameterizedType>()
-        {
-            @Override
-            public boolean apply(ParameterizedType input)
-            {
-                return input.isGeneric();
-            }
-        };
-    }
-
-    public static Function<ParameterizedType, String> getParameterType()
-    {
-        return new Function<ParameterizedType, String>()
-        {
-            @Override
-            public String apply(ParameterizedType input)
-            {
-                return input.getType();
-            }
-        };
-    }
-
-    public static Function<Class<?>, ParameterizedType> toParameterizedType()
-    {
-        return new Function<Class<?>, ParameterizedType>()
-        {
-            @Override
-            public ParameterizedType apply(@Nullable Class<?> input)
-            {
-                return new ParameterizedType(input);
-            }
-        };
     }
 }

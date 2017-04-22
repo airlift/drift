@@ -15,7 +15,6 @@
  */
 package io.airlift.drift.codec.metadata;
 
-import com.google.common.base.Function;
 import com.google.common.collect.ImmutableMap;
 import io.airlift.drift.codec.ThriftField;
 import io.airlift.drift.codec.ThriftIdlAnnotation;
@@ -140,24 +139,8 @@ abstract class FieldMetadata
 
     public abstract String extractName();
 
-    static <T extends FieldMetadata> Function<T, Optional<Short>> getThriftFieldId()
-    {
-        return new Function<T, Optional<Short>>()
-        {
-            @Override
-            public Optional<Short> apply(@Nullable T input)
-            {
-                if (input == null) {
-                    return Optional.empty();
-                }
-                Short value = input.getId();
-                return Optional.ofNullable(value);
-            }
-        };
-    }
-
     /**
-     * Returns a Function which gets the `isLegacyId` setting from a FieldMetadata, if present.
+     * Returns the `isLegacyId` setting from a FieldMetadata, if present.
      * <p>
      * The semantics would ideally want are:
      * <pre>
@@ -186,92 +169,28 @@ abstract class FieldMetadata
      * <p>
      * but other than that, ends up working out fine.
      */
-    static <T extends FieldMetadata> Function<T, Optional<Boolean>> getThriftFieldIsLegacyId()
+    public Optional<Boolean> getThriftFieldIsLegacyId()
     {
-        return new Function<T, Optional<Boolean>>()
-        {
-            @Override
-            public Optional<Boolean> apply(@Nullable T input)
-            {
-                if (input == null) {
-                    return Optional.empty();
-                }
-                Boolean value = input.isLegacyId();
-
-                if (input.getId() == null || input.getId().shortValue() == Short.MIN_VALUE) {
-                    if (value != null && value.booleanValue() == false) {
-                        return Optional.empty();
-                    }
-                }
-
-                return Optional.ofNullable(value);
+        Boolean value = isLegacyId();
+        if (getId() == null || getId() == Short.MIN_VALUE) {
+            if ((value != null) && !value) {
+                return Optional.empty();
             }
-        };
+        }
+
+        return Optional.ofNullable(value);
     }
 
-    static <T extends FieldMetadata> Function<T, String> getThriftFieldName()
+    public String getOrExtractThriftFieldName()
     {
-        return new Function<T, String>()
-        {
-            @Override
-            public String apply(@Nullable T input)
-            {
-                if (input == null) {
-                    return null;
-                }
-                return input.getName();
-            }
-        };
-    }
-
-    static <T extends FieldMetadata> Function<T, String> getOrExtractThriftFieldName()
-    {
-        return new Function<T, String>()
-        {
-            @Override
-            public String apply(@Nullable T input)
-            {
-                if (input == null) {
-                    return null;
-                }
-                String name = input.getName();
-                if (name == null) {
-                    name = input.extractName();
-                }
-                if (name == null) {
-                    throw new NullPointerException(String.valueOf("name is null"));
-                }
-                return name;
-            }
-        };
-    }
-
-    static <T extends FieldMetadata> Function<T, String> extractThriftFieldName()
-    {
-        return new Function<T, String>()
-        {
-            @Override
-            public String apply(@Nullable T input)
-            {
-                if (input == null) {
-                    return null;
-                }
-                return input.extractName();
-            }
-        };
-    }
-
-    static <T extends FieldMetadata> Function<T, Requiredness> getThriftFieldRequiredness()
-    {
-        return new Function<T, Requiredness>()
-        {
-            @Nullable
-            @Override
-            public Requiredness apply(@Nullable T input)
-            {
-                return input.getRequiredness();
-            }
-        };
+        String name = getName();
+        if (name == null) {
+            name = extractName();
+        }
+        if (name == null) {
+            throw new IllegalStateException("name is null");
+        }
+        return name;
     }
 
     public Requiredness getRequiredness()

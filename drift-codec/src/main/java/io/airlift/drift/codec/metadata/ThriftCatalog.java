@@ -16,8 +16,6 @@
 package io.airlift.drift.codec.metadata;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Function;
-import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Sets;
@@ -46,10 +44,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.stream.Stream;
 
 import static com.google.common.base.Preconditions.checkState;
-import static com.google.common.collect.Iterables.concat;
-import static com.google.common.collect.Iterables.transform;
 import static io.airlift.drift.codec.metadata.ReflectionHelper.getFutureReturnType;
 import static io.airlift.drift.codec.metadata.ReflectionHelper.getIterableType;
 import static io.airlift.drift.codec.metadata.ReflectionHelper.getMapKeyType;
@@ -71,6 +68,7 @@ import static io.airlift.drift.codec.metadata.ThriftType.set;
 import static io.airlift.drift.codec.metadata.ThriftType.struct;
 import static java.lang.reflect.Modifier.isStatic;
 import static java.util.Objects.requireNonNull;
+import static java.util.stream.Collectors.joining;
 
 /**
  * ThriftCatalog contains the metadata for all known structs, enums and type coercions.  Since,
@@ -682,14 +680,9 @@ public class ThriftCatalog
 
         Deque<Type> stack = this.stack.get();
         if (stack.contains(structType)) {
-            String path = Joiner.on("->").join(transform(concat(stack, ImmutableList.of(structType)), new Function<Type, Object>()
-            {
-                @Override
-                public Object apply(Type input)
-                {
-                    return TypeToken.of(input).getRawType().getName();
-                }
-            }));
+            String path = Stream.concat(stack.stream(), Stream.of(structType))
+                    .map(type -> TypeToken.of(type).getRawType().getName())
+                    .collect(joining("->"));
             throw new IllegalArgumentException(
                     "Circular references must be qualified with 'isRecursive' on a @ThriftField annotation in the cycle: " + path);
         }
@@ -717,14 +710,9 @@ public class ThriftCatalog
 
         Deque<Type> stack = this.stack.get();
         if (stack.contains(unionType)) {
-            String path = Joiner.on("->").join(transform(concat(stack, ImmutableList.of(unionType)), new Function<Type, Object>()
-            {
-                @Override
-                public Object apply(Type input)
-                {
-                    return TypeToken.of(input).getRawType().getName();
-                }
-            }));
+            String path = Stream.concat(stack.stream(), Stream.of(unionType))
+                    .map(type -> TypeToken.of(type).getRawType().getName())
+                    .collect(joining("->"));
             throw new IllegalArgumentException(
                     "Circular references must be qualified with 'isRecursive' on a @ThriftField annotation in the cycle: " + path);
         }

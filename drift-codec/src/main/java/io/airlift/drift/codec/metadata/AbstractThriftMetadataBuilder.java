@@ -15,14 +15,9 @@
  */
 package io.airlift.drift.codec.metadata;
 
-import com.google.common.base.Function;
-import com.google.common.base.Predicate;
-import com.google.common.base.Predicates;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
 import com.google.common.reflect.TypeToken;
@@ -30,7 +25,6 @@ import com.google.inject.internal.MoreTypes;
 import io.airlift.drift.codec.ThriftConstructor;
 import io.airlift.drift.codec.ThriftField;
 
-import javax.annotation.Nullable;
 import javax.annotation.concurrent.NotThreadSafe;
 
 import java.lang.annotation.Annotation;
@@ -45,33 +39,25 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.TreeSet;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Predicates.notNull;
-import static com.google.common.collect.Iterables.filter;
-import static com.google.common.collect.Iterables.transform;
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Lists.newArrayListWithCapacity;
-import static com.google.common.collect.Sets.newTreeSet;
 import static io.airlift.drift.codec.ThriftField.Requiredness;
 import static io.airlift.drift.codec.metadata.FieldKind.THRIFT_FIELD;
-import static io.airlift.drift.codec.metadata.FieldMetadata.extractThriftFieldName;
-import static io.airlift.drift.codec.metadata.FieldMetadata.getOrExtractThriftFieldName;
-import static io.airlift.drift.codec.metadata.FieldMetadata.getThriftFieldId;
-import static io.airlift.drift.codec.metadata.FieldMetadata.getThriftFieldIsLegacyId;
-import static io.airlift.drift.codec.metadata.FieldMetadata.getThriftFieldName;
-import static io.airlift.drift.codec.metadata.FieldMetadata.getThriftFieldRequiredness;
 import static io.airlift.drift.codec.metadata.ReflectionHelper.extractParameterNames;
 import static io.airlift.drift.codec.metadata.ReflectionHelper.findAnnotatedMethods;
 import static io.airlift.drift.codec.metadata.ReflectionHelper.getAllDeclaredFields;
 import static io.airlift.drift.codec.metadata.ReflectionHelper.getAllDeclaredMethods;
 import static io.airlift.drift.codec.metadata.ReflectionHelper.resolveFieldTypes;
-import static java.util.Arrays.asList;
 import static java.util.Objects.requireNonNull;
+import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
-import static jp.skypencil.guava.stream.GuavaCollectors.toImmutableSet;
 
 @NotThreadSafe
 public abstract class AbstractThriftMetadataBuilder
@@ -405,7 +391,7 @@ public abstract class AbstractThriftMetadataBuilder
         else if (isValidateSetter(method)) {
             if (allowWriters) {
                 List<ParameterInjection> parameters;
-                if (method.getParameterTypes().length > 1 || Iterables.any(asList(method.getParameterAnnotations()[0]), Predicates.instanceOf(ThriftField.class))) {
+                if ((method.getParameterCount() > 1) || hasThriftFieldAnnotation(method)) {
                     parameters = getParameterInjections(
                             type,
                             method.getParameterAnnotations(),
@@ -487,16 +473,20 @@ public abstract class AbstractThriftMetadataBuilder
         Set<String> fieldsWithConflictingIds = inferThriftFieldIds();
 
         // group fields by id
-        Multimap<Optional<Short>, FieldMetadata> fieldsById = Multimaps.index(fields, getThriftFieldId());
-        for (Entry<Optional<Short>, Collection<FieldMetadata>> entry : fieldsById.asMap().entrySet()) {
+        Map<Optional<Short>, List<FieldMetadata>> fieldsById = fields.stream()
+                .collect(groupingBy(field -> Optional.ofNullable(field.getId())));
+        for (Entry<Optional<Short>, List<FieldMetadata>> entry : fieldsById.entrySet()) {
             Collection<FieldMetadata> fields = entry.getValue();
 
             // fields must have an id
             if (!entry.getKey().isPresent()) {
-                for (String fieldName : newTreeSet(transform(fields, getOrExtractThriftFieldName()))) {
+                Set<String> sortedFields = new TreeSet<>(fields.stream()
+                        .map(FieldMetadata::getOrExtractThriftFieldName)
+                        .collect(toSet()));
+                for (String fieldName : sortedFields) {
                     // only report errors for fields that don't have conflicting ids
                     if (!fieldsWithConflictingIds.contains(fieldName)) {
-                        metadataErrors.addError("Thrift class '%s' fields %s do not have an id", structName, newTreeSet(transform(fields, getOrExtractThriftFieldName())));
+                        metadataErrors.addError("Thrift class '%s' fields %s do not have an id", structName, sortedFields);
                     }
                 }
                 continue;
@@ -553,13 +543,13 @@ public abstract class AbstractThriftMetadataBuilder
         Set<String> fieldsWithConflictingIds = new HashSet<>();
 
         // group fields by explicit name or by name extracted from field, method or property
-        Multimap<String, FieldMetadata> fieldsByExplicitOrExtractedName = Multimaps.index(fields, getOrExtractThriftFieldName());
+        Multimap<String, FieldMetadata> fieldsByExplicitOrExtractedName = Multimaps.index(fields, FieldMetadata::getOrExtractThriftFieldName);
         inferThriftFieldIds(fieldsByExplicitOrExtractedName, fieldsWithConflictingIds);
 
         // group fields by name extracted from field, method or property
         // this allows thrift name to be set explicitly without having to duplicate the name on getters and setters
         // todo should this be the only way this works?
-        Multimap<String, FieldMetadata> fieldsByExtractedName = Multimaps.index(fields, extractThriftFieldName());
+        Multimap<String, FieldMetadata> fieldsByExtractedName = Multimaps.index(fields, FieldMetadata::extractName);
         inferThriftFieldIds(fieldsByExtractedName, fieldsWithConflictingIds);
 
         return fieldsWithConflictingIds;
@@ -579,9 +569,8 @@ public abstract class AbstractThriftMetadataBuilder
 
             // all ids used by this named field
             Set<Short> ids = fields.stream()
-                    .map(field -> getThriftFieldId().apply(field))
-                    .filter(Optional::isPresent)
-                    .map(Optional::get)
+                    .map(FieldMetadata::getId)
+                    .filter(Objects::nonNull)
                     .collect(toSet());
 
             // multiple conflicting ids
@@ -615,7 +604,7 @@ public abstract class AbstractThriftMetadataBuilder
                 fields.stream()
                         .map(field -> field == null ? null : field.getIdlAnnotations())
                         .filter(annotationMap -> annotationMap != null && !annotationMap.isEmpty())
-                        .collect(toImmutableSet());
+                        .collect(toSet());
 
         if (idlAnnotationMaps.isEmpty()) {
             return ImmutableMap.of();
@@ -633,7 +622,7 @@ public abstract class AbstractThriftMetadataBuilder
                 fields.stream()
                         .map(FieldMetadata::isRecursiveReference)
                         .filter(value -> value != null)
-                        .collect(toImmutableSet());
+                        .collect(toSet());
 
         if (isRecursiveReferences.isEmpty()) {
             return false;
@@ -648,7 +637,7 @@ public abstract class AbstractThriftMetadataBuilder
     protected final boolean extractFieldIsLegacyId(short id, String fieldName, Collection<FieldMetadata> fields)
     {
         Set<Boolean> isLegacyIds = fields.stream()
-                .map(field -> getThriftFieldIsLegacyId().apply(field))
+                .map(FieldMetadata::getThriftFieldIsLegacyId)
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .collect(toSet());
@@ -673,34 +662,32 @@ public abstract class AbstractThriftMetadataBuilder
     protected final String extractFieldName(short id, Collection<FieldMetadata> fields)
     {
         // get the names used by these fields
-        Set<String> names = ImmutableSet.copyOf(filter(transform(fields, getThriftFieldName()), notNull()));
+        Set<String> names = fields.stream()
+                .map(FieldMetadata::getName)
+                .filter(Objects::nonNull)
+                .collect(toSet());
 
-        String name;
         if (!names.isEmpty()) {
             if (names.size() > 1) {
                 metadataErrors.addWarning("Thrift class %s field %s has multiple names %s", structName, id, names);
             }
-            name = names.iterator().next();
+            return names.iterator().next();
         }
-        else {
-            // pick a name for this field
-            name = Iterables.find(transform(fields, extractThriftFieldName()), notNull());
-        }
-        return name;
+
+        return fields.stream()
+                .map(FieldMetadata::extractName)
+                .filter(Objects::nonNull)
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Field name not found for ID: " + id));
     }
 
     protected final Requiredness extractFieldRequiredness(short fieldId, String fieldName, Collection<FieldMetadata> fields)
     {
-        Predicate<Requiredness> specificRequiredness = new Predicate<Requiredness>()
-        {
-            @Override
-            public boolean apply(@Nullable Requiredness input)
-            {
-                return (input != null) && (input != Requiredness.UNSPECIFIED);
-            }
-        };
-
-        Set<Requiredness> requirednessValues = ImmutableSet.copyOf(filter(transform(fields, getThriftFieldRequiredness()), specificRequiredness));
+        Set<Requiredness> requirednessValues = fields.stream()
+                .map(FieldMetadata::getRequiredness)
+                .filter(Objects::nonNull)
+                .filter(field -> field != Requiredness.UNSPECIFIED)
+                .collect(toSet());
 
         if (requirednessValues.size() > 1) {
             metadataErrors.addError("Thrift class '%s' field '%s(%d)' has multiple requiredness values: %s", structName, fieldName, fieldId, requirednessValues.toString());
@@ -757,45 +744,27 @@ public abstract class AbstractThriftMetadataBuilder
 
     protected final Iterable<ThriftFieldMetadata> buildFieldInjections()
     {
-        Multimap<Optional<Short>, FieldMetadata> fieldsById = Multimaps.index(fields, getThriftFieldId());
-        return Iterables.transform(fieldsById.asMap().values(), new Function<Collection<FieldMetadata>, ThriftFieldMetadata>()
-        {
-            @Override
-            public ThriftFieldMetadata apply(Collection<FieldMetadata> input)
-            {
-                checkArgument(!input.isEmpty(), "input is empty");
-                return buildField(input);
-            }
-        });
+        Map<Short, List<FieldMetadata>> fieldsById = fields.stream().collect(groupingBy(FieldMetadata::getId));
+        return fieldsById.values().stream()
+                .map(this::buildField)
+                .collect(toList());
     }
 
     protected final List<ThriftMethodInjection> buildMethodInjections()
     {
-        return Lists.transform(methodInjections, new Function<MethodInjection, ThriftMethodInjection>()
-        {
-            @Override
-            public ThriftMethodInjection apply(MethodInjection injection)
-            {
-                return new ThriftMethodInjection(injection.getMethod(), buildParameterInjections(injection.getParameters()));
-            }
-        });
+        return methodInjections.stream()
+                .map(injection -> new ThriftMethodInjection(injection.getMethod(), buildParameterInjections(injection.getParameters())))
+                .collect(toList());
     }
 
-    protected final List<ThriftParameterInjection> buildParameterInjections(List<ParameterInjection> parameters)
+    protected static List<ThriftParameterInjection> buildParameterInjections(List<ParameterInjection> parameters)
     {
-        return Lists.transform(parameters, new Function<ParameterInjection, ThriftParameterInjection>()
-        {
-            @Override
-            public ThriftParameterInjection apply(ParameterInjection injection)
-            {
-                return new ThriftParameterInjection(
+        return parameters.stream()
+                .map(injection -> new ThriftParameterInjection(
                         injection.getId(),
                         injection.getName(),
                         injection.getParameterIndex(),
-                        injection.getJavaType()
-                );
-            }
-        });
+                        injection.getJavaType()))
+                .collect(toList());
     }
 }
-

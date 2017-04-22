@@ -37,6 +37,7 @@ import java.util.Map;
 
 import static com.google.common.base.Preconditions.checkState;
 import static com.google.common.collect.Iterables.getOnlyElement;
+import static com.google.common.collect.Maps.uniqueIndex;
 import static io.airlift.drift.codec.metadata.FieldKind.THRIFT_FIELD;
 import static java.lang.String.format;
 import static java.util.Objects.requireNonNull;
@@ -57,7 +58,7 @@ public class ReflectionThriftUnionCodec<T>
         this.idField = Maps.<ThriftFieldMetadata, ThriftCodec<?>>immutableEntry(idField, manager.getCodec(idField.getThriftType()));
         requireNonNull(this.idField.getValue(), () -> "No codec for ID field found: " + idField);
 
-        this.metadataMap = Maps.uniqueIndex(metadata.getFields(), ThriftFieldMetadata.getIdGetter());
+        this.metadataMap = uniqueIndex(metadata.getFields(), ThriftFieldMetadata::getId);
     }
 
     @Override

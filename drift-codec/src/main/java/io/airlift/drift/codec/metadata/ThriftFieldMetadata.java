@@ -15,8 +15,6 @@
  */
 package io.airlift.drift.codec.metadata;
 
-import com.google.common.base.Function;
-import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
@@ -257,29 +255,5 @@ public class ThriftFieldMetadata
         }
         final ThriftFieldMetadata other = (ThriftFieldMetadata) obj;
         return Objects.equals(this.id, other.id) && Objects.equals(this.thriftTypeReference, other.thriftTypeReference) && Objects.equals(this.name, other.name);
-    }
-
-    public static Function<ThriftFieldMetadata, Short> getIdGetter()
-    {
-        return new Function<ThriftFieldMetadata, Short>()
-        {
-            @Override
-            public Short apply(ThriftFieldMetadata metadata)
-            {
-                return metadata.getId();
-            }
-        };
-    }
-
-    public static Predicate<ThriftFieldMetadata> isTypePredicate(final FieldKind type)
-    {
-        return new Predicate<ThriftFieldMetadata>()
-        {
-            @Override
-            public boolean apply(ThriftFieldMetadata fieldMetadata)
-            {
-                return fieldMetadata.getType() == type;
-            }
-        };
     }
 }

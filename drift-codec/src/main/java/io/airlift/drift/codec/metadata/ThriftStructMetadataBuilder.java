@@ -15,11 +15,9 @@
  */
 package io.airlift.drift.codec.metadata;
 
-import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
 import io.airlift.drift.codec.ThriftIdlAnnotation;
 import io.airlift.drift.codec.ThriftStruct;
 import io.airlift.drift.codec.metadata.ThriftStructMetadata.MetadataType;
@@ -145,14 +143,8 @@ public class ThriftStructMetadataBuilder
 
     private ThriftConstructorInjection buildConstructorInjection()
     {
-        return Iterables.getOnlyElement(Lists.transform(constructorInjections, new Function<ConstructorInjection, ThriftConstructorInjection>()
-        {
-            @Override
-            public ThriftConstructorInjection apply(ConstructorInjection injection)
-            {
-                return new ThriftConstructorInjection(injection.getConstructor(), buildParameterInjections(injection.getParameters()));
-            }
-        }));
+        ConstructorInjection injection = Iterables.getOnlyElement(constructorInjections);
+        return new ThriftConstructorInjection(injection.getConstructor(), buildParameterInjections(injection.getParameters()));
     }
 
     @Override

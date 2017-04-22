@@ -15,10 +15,8 @@
  */
 package io.airlift.drift.codec.internal.compiler;
 
-import com.google.common.base.Function;
 import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Lists;
 import com.google.common.reflect.TypeToken;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.airlift.drift.codec.ThriftCodec;
@@ -93,6 +91,7 @@ import static io.airlift.drift.codec.internal.compiler.byteCode.ParameterizedTyp
 import static io.airlift.drift.codec.metadata.FieldKind.THRIFT_FIELD;
 import static io.airlift.drift.codec.metadata.FieldKind.THRIFT_UNION_ID;
 import static java.lang.String.format;
+import static java.util.stream.Collectors.toList;
 
 @NotThreadSafe
 public class ThriftCodecByteCodeGenerator<T>
@@ -1119,26 +1118,16 @@ public class ThriftCodecByteCodeGenerator<T>
 
         public List<NamedParameterDefinition> getParameters()
         {
-            return Lists.transform(fields, new Function<FieldDefinition, NamedParameterDefinition>()
-            {
-                public NamedParameterDefinition apply(FieldDefinition field)
-                {
-                    return arg(field.getName(), field.getType());
-                }
-            });
+            return fields.stream()
+                    .map(field -> arg(field.getName(), field.getType()))
+                    .collect(toList());
         }
 
         public Class<?>[] getTypes()
         {
-            List<Class<?>> types = Lists.transform(values, new Function<Object, Class<?>>()
-            {
-                public Class<?> apply(Object value)
-                {
-                    return value.getClass();
-                }
-            });
-
-            return types.toArray(new Class<?>[types.size()]);
+            return values.stream()
+                    .map(Object::getClass)
+                    .toArray(Class<?>[]::new);
         }
     }
 

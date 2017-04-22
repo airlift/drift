@@ -15,7 +15,6 @@
  */
 package io.airlift.drift.codec;
 
-import com.google.common.base.Function;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Objects;
 import com.google.common.collect.Maps;
@@ -24,8 +23,6 @@ import com.google.common.primitives.Doubles;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 import com.google.common.primitives.Shorts;
-
-import javax.annotation.Nullable;
 
 import java.util.Arrays;
 import java.util.List;
@@ -111,7 +108,7 @@ public final class ArrayField
         if (mapBooleanArray == null) {
             return null;
         }
-        return Maps.transformValues(mapBooleanArray, booleanArrayAsList());
+        return Maps.transformValues(mapBooleanArray, Booleans::asList);
     }
 
     public Map<Short, List<Short>> getMapShortList()
@@ -119,7 +116,7 @@ public final class ArrayField
         if (mapShortArray == null) {
             return null;
         }
-        return Maps.transformValues(mapShortArray, shortArrayAsList());
+        return Maps.transformValues(mapShortArray, Shorts::asList);
     }
 
     public Map<Short, List<Integer>> getMapIntegerList()
@@ -127,7 +124,7 @@ public final class ArrayField
         if (mapIntArray == null) {
             return null;
         }
-        return Maps.transformValues(mapIntArray, intArrayAsList());
+        return Maps.transformValues(mapIntArray, Ints::asList);
     }
 
     public Map<Short, List<Long>> getMapLongList()
@@ -135,7 +132,7 @@ public final class ArrayField
         if (mapLongArray == null) {
             return null;
         }
-        return Maps.transformValues(this.mapLongArray, longArrayAsList());
+        return Maps.transformValues(this.mapLongArray, Longs::asList);
     }
 
     public Map<Short, List<Double>> getMapDoubleList()
@@ -143,7 +140,7 @@ public final class ArrayField
         if (mapDoubleArray == null) {
             return null;
         }
-        return Maps.transformValues(mapDoubleArray, doubleArrayAsList());
+        return Maps.transformValues(mapDoubleArray, Doubles::asList);
     }
 
     @Override
@@ -202,85 +199,5 @@ public final class ArrayField
                 .add("mapLongArray", getMapLongList())
                 .add("mapDoubleArray", getMapDoubleList())
                 .toString();
-    }
-
-    private static Function<boolean[], List<Boolean>> booleanArrayAsList()
-    {
-        return new Function<boolean[], List<Boolean>>()
-        {
-            @Nullable
-            @Override
-            public List<Boolean> apply(@Nullable boolean[] input)
-            {
-                if (input == null) {
-                    return null;
-                }
-                return Booleans.asList(input);
-            }
-        };
-    }
-
-    private static Function<short[], List<Short>> shortArrayAsList()
-    {
-        return new Function<short[], List<Short>>()
-        {
-            @Nullable
-            @Override
-            public List<Short> apply(@Nullable short[] input)
-            {
-                if (input == null) {
-                    return null;
-                }
-                return Shorts.asList(input);
-            }
-        };
-    }
-
-    private static Function<int[], List<Integer>> intArrayAsList()
-    {
-        return new Function<int[], List<Integer>>()
-        {
-            @Nullable
-            @Override
-            public List<Integer> apply(@Nullable int[] input)
-            {
-                if (input == null) {
-                    return null;
-                }
-                return Ints.asList(input);
-            }
-        };
-    }
-
-    private static Function<long[], List<Long>> longArrayAsList()
-    {
-        return new Function<long[], List<Long>>()
-        {
-            @Nullable
-            @Override
-            public List<Long> apply(@Nullable long[] input)
-            {
-                if (input == null) {
-                    return null;
-                }
-                return Longs.asList(input);
-            }
-        };
-    }
-
-    private static Function<double[], List<Double>> doubleArrayAsList()
-    {
-        return new Function<double[], List<Double>>()
-        {
-            @Nullable
-            @Override
-            public List<Double> apply(@Nullable double[] input)
-            {
-                if (input == null) {
-                    return null;
-                }
-                return Doubles.asList(input);
-            }
-        };
     }
 }

@@ -75,13 +75,6 @@
                 <version>2.8</version>
             </dependency>
 
-            <!-- provides helpers for using Guava with Java 8 streams -->
-            <dependency>
-                <groupId>jp.skypencil.guava</groupId>
-                <artifactId>helper</artifactId>
-                <version>1.0.1</version>
-            </dependency>
-
             <dependency>
                 <groupId>org.easytesting</groupId>
                 <artifactId>fest-assert</artifactId>

@@ -15,7 +15,6 @@
  */
 package io.airlift.drift.codec.metadata;
 
-import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
 import io.airlift.drift.codec.ThriftField;
@@ -30,6 +29,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 
 import static org.fest.assertions.Assertions.assertThat;
 
@@ -281,8 +281,6 @@ public class TestLegacyFieldIds
     @Test
     public void testGetThriftFieldIsLegacyId()
     {
-        Function<FieldMetadata, Optional<Boolean>> getter = FieldMetadata.getThriftFieldIsLegacyId();
-
         Function<ThriftField, FieldMetadata> makeFakeFieldMetadata = new Function<ThriftField, FieldMetadata>()
         {
             @Override
@@ -321,7 +319,7 @@ public class TestLegacyFieldIds
                 continue;
             }
 
-            Optional<Boolean> actual = getter.apply(makeFakeFieldMetadata.apply(f.getAnnotation(ThriftField.class)));
+            Optional<Boolean> actual = makeFakeFieldMetadata.apply(f.getAnnotation(ThriftField.class)).getThriftFieldIsLegacyId();
 
             assertThat(actual)
                     .as("result of getThriftFieldIsLegacyId on " + f)

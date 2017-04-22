@@ -15,8 +15,6 @@
  */
 package io.airlift.drift.codec.metadata;
 
-import com.google.common.base.Function;
-import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSortedMap;
 import com.google.common.reflect.TypeToken;
@@ -31,8 +29,8 @@ import java.util.Optional;
 import java.util.SortedMap;
 
 import static com.google.common.collect.Maps.uniqueIndex;
-import static io.airlift.drift.codec.metadata.ThriftFieldMetadata.isTypePredicate;
 import static java.util.Objects.requireNonNull;
+import static java.util.stream.Collectors.toList;
 
 @Immutable
 public class ThriftStructMetadata
@@ -78,14 +76,7 @@ public class ThriftStructMetadata
         this.structType = requireNonNull(structType, "structType is null");
         this.constructorInjection = requireNonNull(constructorInjection, "constructorInjection is null");
         this.documentation = ImmutableList.copyOf(requireNonNull(documentation, "documentation is null"));
-        this.fields = ImmutableSortedMap.copyOf(uniqueIndex(requireNonNull(fields, "fields is null"), new Function<ThriftFieldMetadata, Short>()
-        {
-            @Override
-            public Short apply(ThriftFieldMetadata input)
-            {
-                return input.getId();
-            }
-        }));
+        this.fields = ImmutableSortedMap.copyOf(uniqueIndex(requireNonNull(fields, "fields is null"), ThriftFieldMetadata::getId));
         this.methodInjections = ImmutableList.copyOf(requireNonNull(methodInjections, "methodInjections is null"));
     }
 
@@ -141,7 +132,9 @@ public class ThriftStructMetadata
 
     public Collection<ThriftFieldMetadata> getFields(FieldKind type)
     {
-        return Collections2.filter(getFields(), isTypePredicate(type));
+        return getFields().stream()
+                .filter(field -> field.getType() == type)
+                .collect(toList());
     }
 
     public Collection<ThriftFieldMetadata> getFields()
