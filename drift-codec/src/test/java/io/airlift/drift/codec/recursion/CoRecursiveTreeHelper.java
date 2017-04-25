@@ -15,9 +15,10 @@
  */
 package io.airlift.drift.codec.recursion;
 
-import com.google.common.base.Objects;
 import io.airlift.drift.codec.ThriftField;
 import io.airlift.drift.codec.ThriftStruct;
+
+import java.util.Objects;
 
 @ThriftStruct
 public class CoRecursiveTreeHelper
@@ -38,13 +39,13 @@ public class CoRecursiveTreeHelper
             return false;
         }
         CoRecursiveTreeHelper that = (CoRecursiveTreeHelper) o;
-        return Objects.equal(child, that.child) &&
-                Objects.equal(data, that.data);
+        return Objects.equals(child, that.child) &&
+                Objects.equals(data, that.data);
     }
 
     @Override
     public int hashCode()
     {
-        return Objects.hashCode(child, data);
+        return Objects.hash(child, data);
     }
 }

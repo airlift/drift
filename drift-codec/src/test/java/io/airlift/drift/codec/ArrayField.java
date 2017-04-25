@@ -15,8 +15,6 @@
  */
 package io.airlift.drift.codec;
 
-import com.google.common.base.MoreObjects;
-import com.google.common.base.Objects;
 import com.google.common.collect.Maps;
 import com.google.common.primitives.Booleans;
 import com.google.common.primitives.Doubles;
@@ -27,6 +25,9 @@ import com.google.common.primitives.Shorts;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+
+import static com.google.common.base.MoreObjects.toStringHelper;
 
 @ThriftStruct("Array")
 public final class ArrayField
@@ -146,7 +147,7 @@ public final class ArrayField
     @Override
     public int hashCode()
     {
-        return Objects.hashCode(
+        return Objects.hash(
                 booleanArray,
                 shortArray,
                 intArray,
@@ -176,17 +177,17 @@ public final class ArrayField
                 Arrays.equals(this.longArray, other.longArray) &&
                 Arrays.equals(this.doubleArray, other.doubleArray) &&
                 Arrays.equals(this.byteArray, other.byteArray) &&
-                Objects.equal(getMapBooleanList(), other.getMapBooleanList()) &&
-                Objects.equal(getMapShortList(), other.getMapShortList()) &&
-                Objects.equal(getMapIntegerList(), other.getMapIntegerList()) &&
-                Objects.equal(getMapLongList(), other.getMapLongList()) &&
-                Objects.equal(getMapDoubleList(), other.getMapDoubleList());
+                Objects.equals(getMapBooleanList(), other.getMapBooleanList()) &&
+                Objects.equals(getMapShortList(), other.getMapShortList()) &&
+                Objects.equals(getMapIntegerList(), other.getMapIntegerList()) &&
+                Objects.equals(getMapLongList(), other.getMapLongList()) &&
+                Objects.equals(getMapDoubleList(), other.getMapDoubleList());
     }
 
     @Override
     public String toString()
     {
-        return MoreObjects.toStringHelper(this)
+        return toStringHelper(this)
                 .add("booleanArray", Arrays.toString(booleanArray))
                 .add("shortArray", Arrays.toString(shortArray))
                 .add("intArray", Arrays.toString(intArray))
