@@ -55,6 +55,7 @@ import org.testng.annotations.Test;
 
 import java.lang.reflect.Type;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -514,12 +515,12 @@ public abstract class AbstractThriftCodecManagerTest
     {
         ViaNestedListElementType recursiveObject = new ViaNestedListElementType();
         recursiveObject.data = "parent";
-        recursiveObject.children = ImmutableList.of(Lists.newArrayList());
+        recursiveObject.children = ImmutableList.of(new ArrayList<>());
 
         ViaNestedListElementType child = new ViaNestedListElementType();
         child.data = "child";
         recursiveObject.children.get(0).add(child);
-        child.children = ImmutableList.of(Lists.newArrayList());
+        child.children = ImmutableList.of(new ArrayList<>());
 
         ViaNestedListElementType grandChild = new ViaNestedListElementType();
         grandChild.data = "grandchild";

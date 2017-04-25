@@ -16,10 +16,10 @@
 package io.airlift.drift.codec.metadata;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
 
 import javax.annotation.concurrent.NotThreadSafe;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -31,8 +31,8 @@ import java.util.List;
 @NotThreadSafe
 public class MetadataErrors
 {
-    private final List<MetadataErrorException> errors = Lists.newArrayList();
-    private final List<MetadataWarningException> warnings = Lists.newArrayList();
+    private final List<MetadataErrorException> errors = new ArrayList<>();
+    private final List<MetadataWarningException> warnings = new ArrayList<>();
     private final Monitor monitor;
 
     public interface Monitor

@@ -34,6 +34,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -45,8 +46,6 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.collect.Lists.newArrayList;
-import static com.google.common.collect.Lists.newArrayListWithCapacity;
 import static io.airlift.drift.codec.ThriftField.Requiredness;
 import static io.airlift.drift.codec.metadata.FieldKind.THRIFT_FIELD;
 import static io.airlift.drift.codec.metadata.ReflectionHelper.extractParameterNames;
@@ -67,16 +66,16 @@ public abstract class AbstractThriftMetadataBuilder
     protected final Type builderType;
 
     protected final List<String> documentation;
-    protected final List<FieldMetadata> fields = newArrayList();
+    protected final List<FieldMetadata> fields = new ArrayList<>();
 
     // readers
-    protected final List<Extractor> extractors = newArrayList();
+    protected final List<Extractor> extractors = new ArrayList<>();
 
     // writers
-    protected final List<MethodInjection> builderMethodInjections = newArrayList();
-    protected final List<ConstructorInjection> constructorInjections = newArrayList();
-    protected final List<FieldInjection> fieldInjections = newArrayList();
-    protected final List<MethodInjection> methodInjections = newArrayList();
+    protected final List<MethodInjection> builderMethodInjections = new ArrayList<>();
+    protected final List<ConstructorInjection> constructorInjections = new ArrayList<>();
+    protected final List<FieldInjection> fieldInjections = new ArrayList<>();
+    protected final List<MethodInjection> methodInjections = new ArrayList<>();
 
     protected final ThriftCatalog catalog;
     protected final MetadataErrors metadataErrors;
@@ -442,7 +441,7 @@ public abstract class AbstractThriftMetadataBuilder
 
     protected final List<ParameterInjection> getParameterInjections(Type type, Annotation[][] parameterAnnotations, Type[] parameterTypes, String[] parameterNames)
     {
-        List<ParameterInjection> parameters = newArrayListWithCapacity(parameterAnnotations.length);
+        List<ParameterInjection> parameters = new ArrayList<>(parameterAnnotations.length);
         for (int parameterIndex = 0; parameterIndex < parameterAnnotations.length; parameterIndex++) {
             Annotation[] annotations = parameterAnnotations[parameterIndex];
             Type parameterType = parameterTypes[parameterIndex];
