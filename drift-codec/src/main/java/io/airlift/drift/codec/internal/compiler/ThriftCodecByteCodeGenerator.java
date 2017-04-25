@@ -15,8 +15,6 @@
  */
 package io.airlift.drift.codec.internal.compiler;
 
-import com.google.common.base.Function;
-import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.reflect.TypeToken;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;

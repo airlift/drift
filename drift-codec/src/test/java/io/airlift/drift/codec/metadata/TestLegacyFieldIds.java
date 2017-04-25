@@ -17,10 +17,10 @@ package io.airlift.drift.codec.metadata;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
-import io.airlift.drift.codec.ThriftField;
-import io.airlift.drift.codec.ThriftStruct;
-import io.airlift.drift.codec.ThriftUnion;
-import io.airlift.drift.codec.ThriftUnionId;
+import io.airlift.drift.annotations.ThriftField;
+import io.airlift.drift.annotations.ThriftStruct;
+import io.airlift.drift.annotations.ThriftUnion;
+import io.airlift.drift.annotations.ThriftUnionId;
 import org.testng.annotations.Test;
 
 import java.lang.reflect.Field;

@@ -15,7 +15,7 @@
  */
 package io.airlift.drift.codec.metadata;
 
-import io.airlift.drift.codec.ThriftEnum;
+import io.airlift.drift.annotations.ThriftEnum;
 
 import javax.annotation.concurrent.NotThreadSafe;
 

@@ -15,7 +15,7 @@
  */
 package io.airlift.drift.codec.metadata;
 
-import io.airlift.drift.codec.ThriftField;
+import io.airlift.drift.annotations.ThriftField;
 import org.testng.annotations.Test;
 
 import static io.airlift.drift.codec.metadata.ReflectionHelper.extractParameterNames;

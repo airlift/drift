@@ -17,9 +17,9 @@ package io.airlift.drift.codec.metadata;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import io.airlift.drift.codec.ThriftIdlAnnotation;
-import io.airlift.drift.codec.ThriftUnion;
-import io.airlift.drift.codec.ThriftUnionId;
+import io.airlift.drift.annotations.ThriftIdlAnnotation;
+import io.airlift.drift.annotations.ThriftUnion;
+import io.airlift.drift.annotations.ThriftUnionId;
 import io.airlift.drift.codec.metadata.ThriftStructMetadata.MetadataType;
 
 import javax.annotation.concurrent.NotThreadSafe;
@@ -33,7 +33,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import static io.airlift.drift.codec.ThriftField.Requiredness;
+import static io.airlift.drift.annotations.ThriftField.Requiredness;
 import static io.airlift.drift.codec.metadata.FieldKind.THRIFT_UNION_ID;
 import static io.airlift.drift.codec.metadata.ReflectionHelper.findAnnotatedMethods;
 

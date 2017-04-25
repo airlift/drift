@@ -15,8 +15,8 @@
  */
 package io.airlift.drift.codec.recursion;
 
-import io.airlift.drift.codec.ThriftField;
-import io.airlift.drift.codec.ThriftStruct;
+import io.airlift.drift.annotations.ThriftField;
+import io.airlift.drift.annotations.ThriftStruct;
 
 import java.util.List;
 import java.util.Objects;

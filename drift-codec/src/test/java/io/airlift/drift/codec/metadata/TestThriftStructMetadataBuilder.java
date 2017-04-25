@@ -16,15 +16,15 @@
 package io.airlift.drift.codec.metadata;
 
 import com.google.common.reflect.TypeToken;
-import io.airlift.drift.codec.ThriftConstructor;
-import io.airlift.drift.codec.ThriftField;
-import io.airlift.drift.codec.ThriftStruct;
+import io.airlift.drift.annotations.ThriftConstructor;
+import io.airlift.drift.annotations.ThriftField;
+import io.airlift.drift.annotations.ThriftStruct;
 import org.testng.annotations.Test;
 
 import java.lang.reflect.Type;
 import java.util.concurrent.locks.Lock;
 
-import static io.airlift.drift.codec.ThriftField.Requiredness;
+import static io.airlift.drift.annotations.ThriftField.Requiredness;
 import static org.fest.assertions.Assertions.assertThat;
 
 public class TestThriftStructMetadataBuilder

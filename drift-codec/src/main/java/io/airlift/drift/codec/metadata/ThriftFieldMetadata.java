@@ -26,8 +26,8 @@ import java.util.Objects;
 import java.util.Optional;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static io.airlift.drift.codec.ThriftField.RECURSIVE_REFERENCE_ANNOTATION_NAME;
-import static io.airlift.drift.codec.ThriftField.Requiredness;
+import static io.airlift.drift.annotations.ThriftField.RECURSIVE_REFERENCE_ANNOTATION_NAME;
+import static io.airlift.drift.annotations.ThriftField.Requiredness;
 import static java.util.Objects.requireNonNull;
 
 /**

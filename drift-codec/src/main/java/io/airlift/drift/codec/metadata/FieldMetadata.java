@@ -16,8 +16,8 @@
 package io.airlift.drift.codec.metadata;
 
 import com.google.common.collect.ImmutableMap;
-import io.airlift.drift.codec.ThriftField;
-import io.airlift.drift.codec.ThriftIdlAnnotation;
+import io.airlift.drift.annotations.ThriftField;
+import io.airlift.drift.annotations.ThriftIdlAnnotation;
 
 import javax.annotation.Nullable;
 
@@ -25,8 +25,8 @@ import java.lang.reflect.Type;
 import java.util.Map;
 import java.util.Optional;
 
-import static io.airlift.drift.codec.ThriftField.RECURSIVE_REFERENCE_ANNOTATION_NAME;
-import static io.airlift.drift.codec.ThriftField.Requiredness;
+import static io.airlift.drift.annotations.ThriftField.RECURSIVE_REFERENCE_ANNOTATION_NAME;
+import static io.airlift.drift.annotations.ThriftField.Requiredness;
 import static java.util.Objects.requireNonNull;
 
 abstract class FieldMetadata

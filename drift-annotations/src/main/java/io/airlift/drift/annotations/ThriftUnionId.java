@@ -13,19 +13,22 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
-package io.airlift.drift.codec;
+package io.airlift.drift.annotations;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
-import static java.lang.annotation.ElementType.TYPE;
+import static java.lang.annotation.ElementType.FIELD;
+import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
+/**
+ * Marks a field or method as the field containing the state of an union.
+ */
 @Documented
 @Retention(RUNTIME)
-@Target({TYPE})
-public @interface ThriftEnum
+@Target({METHOD, FIELD})
+public @interface ThriftUnionId
 {
-    String value() default "";
 }

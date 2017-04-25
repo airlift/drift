@@ -22,8 +22,8 @@ import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
 import com.google.common.reflect.TypeToken;
 import com.google.inject.internal.MoreTypes;
-import io.airlift.drift.codec.ThriftConstructor;
-import io.airlift.drift.codec.ThriftField;
+import io.airlift.drift.annotations.ThriftConstructor;
+import io.airlift.drift.annotations.ThriftField;
 
 import javax.annotation.concurrent.NotThreadSafe;
 
@@ -46,7 +46,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static io.airlift.drift.codec.ThriftField.Requiredness;
+import static io.airlift.drift.annotations.ThriftField.Requiredness;
 import static io.airlift.drift.codec.metadata.FieldKind.THRIFT_FIELD;
 import static io.airlift.drift.codec.metadata.ReflectionHelper.extractParameterNames;
 import static io.airlift.drift.codec.metadata.ReflectionHelper.findAnnotatedMethods;

@@ -18,6 +18,8 @@ package io.airlift.drift.codec;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import io.airlift.drift.annotations.ThriftField;
+import io.airlift.drift.annotations.ThriftStruct;
 
 import java.nio.ByteBuffer;
 import java.util.List;

@@ -15,15 +15,15 @@
  */
 package io.airlift.drift.codec.recursion;
 
-import io.airlift.drift.codec.ThriftConstructor;
-import io.airlift.drift.codec.ThriftField;
-import io.airlift.drift.codec.ThriftUnion;
-import io.airlift.drift.codec.ThriftUnionId;
+import io.airlift.drift.annotations.ThriftConstructor;
+import io.airlift.drift.annotations.ThriftField;
+import io.airlift.drift.annotations.ThriftUnion;
+import io.airlift.drift.annotations.ThriftUnionId;
 
 import java.util.Objects;
 
-import static io.airlift.drift.codec.ThriftField.Recursiveness;
-import static io.airlift.drift.codec.ThriftField.Requiredness;
+import static io.airlift.drift.annotations.ThriftField.Recursiveness;
+import static io.airlift.drift.annotations.ThriftField.Requiredness;
 
 @ThriftUnion
 public class RecursiveUnion

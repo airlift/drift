@@ -15,9 +15,9 @@
  */
 package io.airlift.drift.codec.internal.reflection;
 
+import io.airlift.drift.annotations.ThriftField;
 import io.airlift.drift.codec.ThriftCodec;
 import io.airlift.drift.codec.ThriftCodecManager;
-import io.airlift.drift.codec.ThriftField;
 import io.airlift.drift.codec.internal.TProtocolReader;
 import io.airlift.drift.codec.internal.TProtocolWriter;
 import io.airlift.drift.codec.metadata.ThriftConstructorInjection;

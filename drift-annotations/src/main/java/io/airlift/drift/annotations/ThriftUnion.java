@@ -13,26 +13,23 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
-package io.airlift.drift.service;
+package io.airlift.drift.annotations;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
-import static java.lang.annotation.ElementType.METHOD;
+import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
-/**
- * Marks a method to be exported in a Thrift service.
- */
 @Documented
 @Retention(RUNTIME)
-@Target(METHOD)
-public @interface ThriftMethod
+@Target({TYPE})
+public @interface ThriftUnion
 {
     String value() default "";
 
-    boolean oneway() default false;
+    Class<?> builder() default void.class;
 
-    ThriftException[] exception() default {};
+    ThriftIdlAnnotation[] idlAnnotations() default {};
 }

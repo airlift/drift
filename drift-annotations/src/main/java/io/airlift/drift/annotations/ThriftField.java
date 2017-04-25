@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
-package io.airlift.drift.codec;
+package io.airlift.drift.annotations;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
@@ -65,7 +65,7 @@ public @interface ThriftField
         /**
          * This is the default (unset) value for {@link ThriftField#requiredness()}. It will not
          * conflict with other explicit settings of {@link #NONE}, {@link #REQUIRED}, or {@link
-         * #OPTIONAL}. If all of the {@link io.airlift.drift.codec.ThriftField} annotations for
+         * #OPTIONAL}. If all of the {@link ThriftField} annotations for
          * a field are left {@link #UNSPECIFIED}, it will default to {@link #NONE}.
          */
         UNSPECIFIED,

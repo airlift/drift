@@ -15,6 +15,9 @@
  */
 package io.airlift.drift.codec;
 
+import io.airlift.drift.annotations.ThriftConstructor;
+import io.airlift.drift.annotations.ThriftField;
+import io.airlift.drift.annotations.ThriftStruct;
 import io.airlift.drift.codec.BonkBuilder.Builder;
 
 import javax.annotation.concurrent.Immutable;

@@ -15,6 +15,9 @@
  */
 package io.airlift.drift.codec;
 
+import io.airlift.drift.annotations.ThriftField;
+import io.airlift.drift.annotations.ThriftStruct;
+
 @ThriftStruct("Bonk")
 public final class BonkMethod
 {

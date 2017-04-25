@@ -23,7 +23,7 @@ import com.thoughtworks.paranamer.AnnotationParanamer;
 import com.thoughtworks.paranamer.BytecodeReadingParanamer;
 import com.thoughtworks.paranamer.CachingParanamer;
 import com.thoughtworks.paranamer.Paranamer;
-import io.airlift.drift.codec.ThriftField;
+import io.airlift.drift.annotations.ThriftField;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AccessibleObject;

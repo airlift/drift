@@ -15,13 +15,13 @@
  */
 package io.airlift.drift.codec.recursion;
 
-import io.airlift.drift.codec.ThriftField;
-import io.airlift.drift.codec.ThriftStruct;
+import io.airlift.drift.annotations.ThriftField;
+import io.airlift.drift.annotations.ThriftStruct;
 
 import java.util.Objects;
 
-import static io.airlift.drift.codec.ThriftField.Recursiveness;
-import static io.airlift.drift.codec.ThriftField.Requiredness;
+import static io.airlift.drift.annotations.ThriftField.Recursiveness;
+import static io.airlift.drift.annotations.ThriftField.Requiredness;
 
 @ThriftStruct
 public class WithSwiftRecursiveAnnotation

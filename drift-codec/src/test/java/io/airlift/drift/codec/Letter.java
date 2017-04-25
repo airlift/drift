@@ -15,6 +15,8 @@
  */
 package io.airlift.drift.codec;
 
+import io.airlift.drift.annotations.ThriftEnumValue;
+
 public enum Letter
 {
     A(65), B(66), C(67), D(68);

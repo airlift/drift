@@ -18,8 +18,8 @@ package io.airlift.drift.codec.metadata;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
-import io.airlift.drift.codec.ThriftIdlAnnotation;
-import io.airlift.drift.codec.ThriftStruct;
+import io.airlift.drift.annotations.ThriftIdlAnnotation;
+import io.airlift.drift.annotations.ThriftStruct;
 import io.airlift.drift.codec.metadata.ThriftStructMetadata.MetadataType;
 
 import javax.annotation.concurrent.NotThreadSafe;
@@ -31,7 +31,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import static io.airlift.drift.codec.ThriftField.Requiredness;
+import static io.airlift.drift.annotations.ThriftField.Requiredness;
 import static io.airlift.drift.codec.metadata.FieldKind.THRIFT_FIELD;
 
 @NotThreadSafe

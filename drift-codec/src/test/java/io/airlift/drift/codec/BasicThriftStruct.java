@@ -15,6 +15,10 @@
  */
 package io.airlift.drift.codec;
 
+import io.airlift.drift.annotations.ThriftConstructor;
+import io.airlift.drift.annotations.ThriftField;
+import io.airlift.drift.annotations.ThriftStruct;
+
 import static com.google.common.base.MoreObjects.toStringHelper;
 
 @ThriftStruct("ThriftStructForTesting")

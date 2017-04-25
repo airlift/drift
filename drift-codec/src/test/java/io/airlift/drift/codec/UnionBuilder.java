@@ -16,6 +16,10 @@
 package io.airlift.drift.codec;
 
 import com.google.common.base.MoreObjects.ToStringHelper;
+import io.airlift.drift.annotations.ThriftConstructor;
+import io.airlift.drift.annotations.ThriftField;
+import io.airlift.drift.annotations.ThriftUnion;
+import io.airlift.drift.annotations.ThriftUnionId;
 import io.airlift.drift.codec.UnionBuilder.Builder;
 
 import java.util.Objects;

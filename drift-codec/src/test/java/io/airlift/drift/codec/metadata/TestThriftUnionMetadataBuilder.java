@@ -15,9 +15,9 @@
  */
 package io.airlift.drift.codec.metadata;
 
-import io.airlift.drift.codec.ThriftField;
-import io.airlift.drift.codec.ThriftUnion;
-import io.airlift.drift.codec.ThriftUnionId;
+import io.airlift.drift.annotations.ThriftField;
+import io.airlift.drift.annotations.ThriftUnion;
+import io.airlift.drift.annotations.ThriftUnionId;
 import org.testng.annotations.Test;
 
 import java.util.concurrent.locks.Lock;

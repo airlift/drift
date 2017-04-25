@@ -15,10 +15,10 @@
  */
 package io.airlift.drift.codec.idlannotations;
 
-import io.airlift.drift.codec.ThriftConstructor;
-import io.airlift.drift.codec.ThriftField;
-import io.airlift.drift.codec.ThriftIdlAnnotation;
-import io.airlift.drift.codec.ThriftStruct;
+import io.airlift.drift.annotations.ThriftConstructor;
+import io.airlift.drift.annotations.ThriftField;
+import io.airlift.drift.annotations.ThriftIdlAnnotation;
+import io.airlift.drift.annotations.ThriftStruct;
 
 @ThriftStruct(
         idlAnnotations = {

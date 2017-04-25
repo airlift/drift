@@ -15,14 +15,14 @@
  */
 package io.airlift.drift.codec.recursion;
 
-import io.airlift.drift.codec.ThriftField;
-import io.airlift.drift.codec.ThriftIdlAnnotation;
-import io.airlift.drift.codec.ThriftStruct;
+import io.airlift.drift.annotations.ThriftField;
+import io.airlift.drift.annotations.ThriftIdlAnnotation;
+import io.airlift.drift.annotations.ThriftStruct;
 
 import java.util.Objects;
 
-import static io.airlift.drift.codec.ThriftField.RECURSIVE_REFERENCE_ANNOTATION_NAME;
-import static io.airlift.drift.codec.ThriftField.Requiredness;
+import static io.airlift.drift.annotations.ThriftField.RECURSIVE_REFERENCE_ANNOTATION_NAME;
+import static io.airlift.drift.annotations.ThriftField.Requiredness;
 
 @ThriftStruct
 public class WithIdlRecursiveAnnotation

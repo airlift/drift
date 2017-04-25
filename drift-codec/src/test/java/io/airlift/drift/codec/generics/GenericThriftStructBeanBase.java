@@ -15,7 +15,7 @@
  */
 package io.airlift.drift.codec.generics;
 
-import io.airlift.drift.codec.ThriftField;
+import io.airlift.drift.annotations.ThriftField;
 
 import java.util.Objects;
 

@@ -15,7 +15,7 @@
  */
 package io.airlift.drift.codec.generics;
 
-import io.airlift.drift.codec.ThriftStruct;
+import io.airlift.drift.annotations.ThriftStruct;
 
 @ThriftStruct
 public final class GenericThriftStructField<T>

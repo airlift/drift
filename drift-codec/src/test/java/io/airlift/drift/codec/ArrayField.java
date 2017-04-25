@@ -21,6 +21,8 @@ import com.google.common.primitives.Doubles;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 import com.google.common.primitives.Shorts;
+import io.airlift.drift.annotations.ThriftField;
+import io.airlift.drift.annotations.ThriftStruct;
 
 import java.util.Arrays;
 import java.util.List;
