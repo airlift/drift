@@ -363,9 +363,8 @@ public class MethodDefinition
                         INVOKESPECIAL,
                         type.getClassName(),
                         name,
-                        methodDescription(returnType, parameterTypes)
-                )
-        );
+                        methodDescription(returnType, parameterTypes),
+                        false));
         return this;
     }
 
@@ -376,9 +375,8 @@ public class MethodDefinition
                         INVOKESTATIC,
                         Type.getInternalName(method.getDeclaringClass()),
                         method.getName(),
-                        Type.getMethodDescriptor(method)
-                )
-        );
+                        Type.getMethodDescriptor(method),
+                        false));
         return this;
     }
 
@@ -389,9 +387,8 @@ public class MethodDefinition
                         INVOKEVIRTUAL,
                         Type.getInternalName(method.getDeclaringClass()),
                         method.getName(),
-                        Type.getMethodDescriptor(method)
-                )
-        );
+                        Type.getMethodDescriptor(method),
+                        false));
         return this;
     }
 
@@ -407,9 +404,8 @@ public class MethodDefinition
                         INVOKEVIRTUAL,
                         type(type).getClassName(),
                         name,
-                        methodDescription(returnType, parameterTypes)
-                )
-        );
+                        methodDescription(returnType, parameterTypes),
+                        false));
         return this;
     }
 
@@ -425,9 +421,8 @@ public class MethodDefinition
                         INVOKEVIRTUAL,
                         type.getClassName(),
                         name,
-                        methodDescription(returnType, parameterTypes)
-                )
-        );
+                        methodDescription(returnType, parameterTypes),
+                        false));
         return this;
     }
 
