@@ -17,6 +17,8 @@ package io.airlift.drift.annotations;
 
 public @interface ThriftIdlAnnotation
 {
+    String RECURSIVE_REFERENCE_ANNOTATION_KEY = "drift.recursive_reference";
+
     String key() default "";
 
     String value() default "";

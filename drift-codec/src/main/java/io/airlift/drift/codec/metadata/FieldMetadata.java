@@ -25,7 +25,7 @@ import java.lang.reflect.Type;
 import java.util.Map;
 import java.util.Optional;
 
-import static io.airlift.drift.annotations.ThriftField.RECURSIVE_REFERENCE_ANNOTATION_NAME;
+import static io.airlift.drift.annotations.ThriftIdlAnnotation.RECURSIVE_REFERENCE_ANNOTATION_KEY;
 import static io.airlift.drift.annotations.ThriftField.Requiredness;
 import static java.util.Objects.requireNonNull;
 
@@ -73,8 +73,8 @@ abstract class FieldMetadata
                                 throw new IllegalStateException("Unexpected get for isRecursive field");
                         }
                     }
-                    else if (idlAnnotations.containsKey(RECURSIVE_REFERENCE_ANNOTATION_NAME)) {
-                        isRecursiveReference = "true".equalsIgnoreCase(idlAnnotations.getOrDefault(RECURSIVE_REFERENCE_ANNOTATION_NAME, "false"));
+                    else if (idlAnnotations.containsKey(RECURSIVE_REFERENCE_ANNOTATION_KEY)) {
+                        isRecursiveReference = "true".equalsIgnoreCase(idlAnnotations.getOrDefault(RECURSIVE_REFERENCE_ANNOTATION_KEY, "false"));
                     }
                 }
                 break;

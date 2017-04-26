@@ -26,7 +26,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static io.airlift.drift.annotations.ThriftField.RECURSIVE_REFERENCE_ANNOTATION_NAME;
+import static io.airlift.drift.annotations.ThriftIdlAnnotation.RECURSIVE_REFERENCE_ANNOTATION_KEY;
 import static io.airlift.drift.annotations.ThriftField.Requiredness;
 import static java.util.Objects.requireNonNull;
 
@@ -150,7 +150,7 @@ public class ThriftFieldMetadata
         annotationsBuilder.putAll(idlAnnotations);
 
         if (isRecursiveReference()) {
-            annotationsBuilder.put(RECURSIVE_REFERENCE_ANNOTATION_NAME, "true");
+            annotationsBuilder.put(RECURSIVE_REFERENCE_ANNOTATION_KEY, "true");
         }
 
         return annotationsBuilder.build();

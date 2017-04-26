@@ -21,7 +21,7 @@ import io.airlift.drift.annotations.ThriftStruct;
 
 import java.util.Objects;
 
-import static io.airlift.drift.annotations.ThriftField.RECURSIVE_REFERENCE_ANNOTATION_NAME;
+import static io.airlift.drift.annotations.ThriftIdlAnnotation.RECURSIVE_REFERENCE_ANNOTATION_KEY;
 import static io.airlift.drift.annotations.ThriftField.Requiredness;
 
 @ThriftStruct
@@ -30,7 +30,7 @@ public class WithIdlRecursiveAnnotation
     @ThriftField(
             value = 1,
             requiredness = Requiredness.OPTIONAL,
-            idlAnnotations = {@ThriftIdlAnnotation(key = RECURSIVE_REFERENCE_ANNOTATION_NAME, value = "true")})
+            idlAnnotations = @ThriftIdlAnnotation(key = RECURSIVE_REFERENCE_ANNOTATION_KEY, value = "true"))
     public WithIdlRecursiveAnnotation child;
 
     @ThriftField(2)
