@@ -575,14 +575,14 @@ public class ThriftCatalog
         return structMetadata;
     }
 
-    private static Class<?> getSwiftMetaClassOf(Class<?> cls)
+    private static Class<?> getDriftMetaClassOf(Class<?> cls)
             throws ClassNotFoundException
     {
         ClassLoader loader = cls.getClassLoader();
         if (loader == null) {
             throw new ClassNotFoundException("null class loader");
         }
-        return loader.loadClass(cls.getName() + "$swift_meta");
+        return loader.loadClass(cls.getName() + "$drift_meta");
     }
 
     @SuppressWarnings("PMD.EmptyCatchBlock")
@@ -592,9 +592,9 @@ public class ThriftCatalog
 
         if (documentation == null) {
             try {
-                Class<?> swiftDocsClass = getSwiftMetaClassOf(objectClass);
+                Class<?> docsClass = getDriftMetaClassOf(objectClass);
 
-                documentation = swiftDocsClass.getAnnotation(ThriftDocumentation.class);
+                documentation = docsClass.getAnnotation(ThriftDocumentation.class);
             }
             catch (ClassNotFoundException e) {
                 // ignored
@@ -611,9 +611,9 @@ public class ThriftCatalog
 
         if (documentation == null) {
             try {
-                Class<?> swiftDocsClass = getSwiftMetaClassOf(method.getDeclaringClass());
+                Class<?> docsClass = getDriftMetaClassOf(method.getDeclaringClass());
 
-                documentation = swiftDocsClass.getDeclaredMethod(method.getName()).getAnnotation(ThriftDocumentation.class);
+                documentation = docsClass.getDeclaredMethod(method.getName()).getAnnotation(ThriftDocumentation.class);
             }
             catch (ReflectiveOperationException e) {
                 // ignored
@@ -630,9 +630,9 @@ public class ThriftCatalog
 
         if (documentation == null) {
             try {
-                Class<?> swiftDocsClass = getSwiftMetaClassOf(field.getDeclaringClass());
+                Class<?> docsClass = getDriftMetaClassOf(field.getDeclaringClass());
 
-                documentation = swiftDocsClass.getDeclaredField(field.getName()).getAnnotation(ThriftDocumentation.class);
+                documentation = docsClass.getDeclaredField(field.getName()).getAnnotation(ThriftDocumentation.class);
             }
             catch (ReflectiveOperationException e) {
                 // ignored
@@ -662,9 +662,9 @@ public class ThriftCatalog
 
         if (order == null) {
             try {
-                Class<?> swiftDocsClass = getSwiftMetaClassOf(method.getDeclaringClass());
+                Class<?> docsClass = getDriftMetaClassOf(method.getDeclaringClass());
 
-                order = swiftDocsClass.getDeclaredMethod(method.getName()).getAnnotation(ThriftOrder.class);
+                order = docsClass.getDeclaredMethod(method.getName()).getAnnotation(ThriftOrder.class);
             }
             catch (ReflectiveOperationException e) {
                 // ignored

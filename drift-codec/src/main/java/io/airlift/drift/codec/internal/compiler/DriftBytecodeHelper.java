@@ -17,20 +17,20 @@ package io.airlift.drift.codec.internal.compiler;
 
 import java.lang.reflect.Method;
 
-public final class SwiftBytecodeHelper
+public final class DriftBytecodeHelper
 {
     public static final Method NO_CONSTRUCTOR_FOUND;
 
     static {
         try {
-            NO_CONSTRUCTOR_FOUND = SwiftBytecodeHelper.class.getMethod("noConstructorFound", new Class<?>[] {Class.class, short.class});
+            NO_CONSTRUCTOR_FOUND = DriftBytecodeHelper.class.getMethod("noConstructorFound", new Class<?>[] {Class.class, short.class});
         }
         catch (Throwable t) {
             throw new ExceptionInInitializerError(t);
         }
     }
 
-    private SwiftBytecodeHelper()
+    private DriftBytecodeHelper()
     {
     }
 

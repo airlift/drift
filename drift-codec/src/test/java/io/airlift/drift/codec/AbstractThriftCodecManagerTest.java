@@ -43,7 +43,7 @@ import io.airlift.drift.codec.recursion.ViaListElementType;
 import io.airlift.drift.codec.recursion.ViaMapKeyAndValueTypes;
 import io.airlift.drift.codec.recursion.ViaNestedListElementType;
 import io.airlift.drift.codec.recursion.WithIdlRecursiveAnnotation;
-import io.airlift.drift.codec.recursion.WithSwiftRecursiveAnnotation;
+import io.airlift.drift.codec.recursion.WithDriftRecursiveAnnotation;
 import io.airlift.drift.codec.recursion.WithoutRecursiveAnnotation;
 import org.apache.thrift.protocol.TCompactProtocol;
 import org.apache.thrift.protocol.TJSONProtocol;
@@ -458,14 +458,14 @@ public abstract class AbstractThriftCodecManagerTest
     }
 
     @Test
-    public void testRecursiveStructWithSwiftAnnotation()
+    public void testRecursiveStructWithDriftAnnotation()
             throws Exception
     {
-        WithSwiftRecursiveAnnotation recursiveObject = new WithSwiftRecursiveAnnotation();
+        WithDriftRecursiveAnnotation recursiveObject = new WithDriftRecursiveAnnotation();
         recursiveObject.data = "parent";
-        recursiveObject.child = new WithSwiftRecursiveAnnotation();
+        recursiveObject.child = new WithDriftRecursiveAnnotation();
         recursiveObject.child.data = "child";
-        recursiveObject.child.child = new WithSwiftRecursiveAnnotation();
+        recursiveObject.child.child = new WithDriftRecursiveAnnotation();
         recursiveObject.child.child.data = "grandchild";
         testRoundTripSerialize(recursiveObject, new TCompactProtocol.Factory());
     }

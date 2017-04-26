@@ -95,7 +95,7 @@ import static java.util.stream.Collectors.toList;
 @NotThreadSafe
 public class ThriftCodecByteCodeGenerator<T>
 {
-    private static final String PACKAGE = "$wift";
+    private static final String PACKAGE = "$drift";
 
     private static final Map<ThriftProtocolType, Method> READ_METHODS;
     private static final Map<ThriftProtocolType, Method> WRITE_METHODS;
@@ -692,7 +692,7 @@ public class ThriftCodecByteCodeGenerator<T>
             read.pop() // get rid of the half-constructed element
                     .loadConstant(metadata.getStructClass())
                     .loadVariable("fieldId")
-                    .invokeStatic(SwiftBytecodeHelper.NO_CONSTRUCTOR_FOUND)
+                    .invokeStatic(DriftBytecodeHelper.NO_CONSTRUCTOR_FOUND)
                     .throwException();
         }
         read.visitLabel("instance-ok");

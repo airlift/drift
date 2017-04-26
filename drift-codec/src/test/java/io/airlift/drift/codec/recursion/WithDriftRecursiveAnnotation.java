@@ -24,10 +24,10 @@ import static io.airlift.drift.annotations.ThriftField.Recursiveness;
 import static io.airlift.drift.annotations.ThriftField.Requiredness;
 
 @ThriftStruct
-public class WithSwiftRecursiveAnnotation
+public class WithDriftRecursiveAnnotation
 {
     @ThriftField(value = 1, requiredness = Requiredness.OPTIONAL, isRecursive = Recursiveness.TRUE)
-    public WithSwiftRecursiveAnnotation child;
+    public WithDriftRecursiveAnnotation child;
 
     @ThriftField(2)
     public String data;
@@ -42,7 +42,7 @@ public class WithSwiftRecursiveAnnotation
             return false;
         }
 
-        final WithSwiftRecursiveAnnotation that = (WithSwiftRecursiveAnnotation) obj;
+        final WithDriftRecursiveAnnotation that = (WithDriftRecursiveAnnotation) obj;
 
         return Objects.equals(data, that.data) &&
                 Objects.equals(child, that.child);

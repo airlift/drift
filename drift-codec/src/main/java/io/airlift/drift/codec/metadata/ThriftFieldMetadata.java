@@ -169,11 +169,11 @@ public class ThriftFieldMetadata
     public boolean isInternal()
     {
         switch (getType()) {
-            // These are normal thrift fields (i.e. they should be emitted by the swift2thrift generator)
+            // These are normal thrift fields (i.e. they should be emitted by the drift2thrift generator)
             case THRIFT_FIELD:
                 return false;
 
-            // Other fields types are used internally in swift, but do not make up part of the external
+            // Other fields types are used internally in drift, but do not make up part of the external
             // thrift interface
             default:
                 return true;

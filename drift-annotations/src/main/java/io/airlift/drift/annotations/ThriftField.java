@@ -32,7 +32,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Target({METHOD, FIELD, PARAMETER})
 public @interface ThriftField
 {
-    String RECURSIVE_REFERENCE_ANNOTATION_NAME = "swift.recursive_reference";
+    String RECURSIVE_REFERENCE_ANNOTATION_NAME = "drift.recursive_reference";
 
     short value() default Short.MIN_VALUE;
 
