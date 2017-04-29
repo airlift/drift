@@ -15,6 +15,7 @@
  */
 package io.airlift.drift.codec.metadata;
 
+import com.google.common.collect.ImmutableList;
 import io.airlift.drift.annotations.ThriftField;
 import org.testng.annotations.Test;
 
@@ -30,7 +31,7 @@ public class TestReflectionHelper
     {
         assertEquals(
                 extractParameterNames(getClass().getDeclaredMethod("noAnnotations", String.class, String.class, String.class)),
-                new String[] {"a", "b", "c"});
+                ImmutableList.of("a", "b", "c"));
     }
 
     private static void noAnnotations(String a, String b, String c)
@@ -43,12 +44,28 @@ public class TestReflectionHelper
     {
         assertEquals(
                 extractParameterNames(getClass().getDeclaredMethod("thriftFieldAnnotation", String.class, String.class, String.class)),
-                new String[] {"a", "b", "c"});
+                ImmutableList.of("a", "b", "c"));
     }
 
     private static void thriftFieldAnnotation(
             @ThriftField(name = "a") String arg0,
             @ThriftField(name = "b") String arg1,
+            @ThriftField(name = "c") String arg2)
+    {
+    }
+
+    @Test
+    public void testExtractParameterNamesMixedThriftFieldAnnotation()
+            throws Exception
+    {
+        assertEquals(
+                extractParameterNames(getClass().getDeclaredMethod("mixedThriftFieldAnnotation", String.class, String.class, String.class)),
+                ImmutableList.of("a", "b", "c"));
+    }
+
+    private static void mixedThriftFieldAnnotation(
+            @ThriftField(name = "a") String arg0,
+            String b,
             @ThriftField(name = "c") String arg2)
     {
     }

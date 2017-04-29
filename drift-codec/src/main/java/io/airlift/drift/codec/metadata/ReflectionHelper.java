@@ -15,22 +15,21 @@
  */
 package io.airlift.drift.codec.metadata;
 
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.reflect.TypeToken;
-import com.thoughtworks.paranamer.AdaptiveParanamer;
-import com.thoughtworks.paranamer.AnnotationParanamer;
-import com.thoughtworks.paranamer.BytecodeReadingParanamer;
-import com.thoughtworks.paranamer.CachingParanamer;
-import com.thoughtworks.paranamer.Paranamer;
 import io.airlift.drift.annotations.ThriftField;
+import io.airlift.parameternames.ParameterNames;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Array;
-import java.lang.reflect.Constructor;
+import java.lang.reflect.Executable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -38,10 +37,14 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.Future;
 
+import static com.google.common.base.Strings.emptyToNull;
+import static com.google.common.collect.ImmutableList.toImmutableList;
 import static java.lang.reflect.Modifier.isStatic;
+import static java.util.Collections.emptyList;
 import static java.util.Objects.requireNonNull;
 
 public final class ReflectionHelper
@@ -233,68 +236,52 @@ public final class ReflectionHelper
         return result;
     }
 
-    private static final Paranamer PARANAMER = new CachingParanamer(
-            new AdaptiveParanamer(
-                    new ThriftFieldParanamer(),
-                    new BytecodeReadingParanamer(),
-                    new GeneralParanamer()));
-
-    public static String[] extractParameterNames(AccessibleObject methodOrConstructor)
-    {
-        return PARANAMER.lookupParameterNames(methodOrConstructor);
-    }
-
-    private static class ThriftFieldParanamer
-            extends AnnotationParanamer
-    {
-        @Override
-        protected String getNamedValue(Annotation annotation)
-        {
-            if (annotation instanceof ThriftField) {
-                String name = ((ThriftField) annotation).name();
-                if (!name.isEmpty()) {
-                    return name;
+    private static final LoadingCache<Executable, List<String>> PARAMETER_NAMES = CacheBuilder.newBuilder().build(
+            new CacheLoader<Executable, List<String>>()
+            {
+                @Override
+                public List<String> load(Executable executable)
+                {
+                    return getParameterNames(executable);
                 }
-            }
-            return super.getNamedValue(annotation);
-        }
+            });
 
-        @Override
-        protected boolean isNamed(Annotation annotation)
-        {
-            return annotation instanceof ThriftField || super.isNamed(annotation);
-        }
+    public static List<String> extractParameterNames(Executable methodOrConstructor)
+    {
+        return PARAMETER_NAMES.getUnchecked(methodOrConstructor);
     }
 
-    private static class GeneralParanamer
-            implements Paranamer
+    private static List<String> getParameterNames(Executable executable)
     {
-        @Override
-        public String[] lookupParameterNames(AccessibleObject methodOrConstructor)
-        {
-            String[] names;
-            if (methodOrConstructor instanceof Method) {
-                Method method = (Method) methodOrConstructor;
-                names = new String[method.getParameterTypes().length];
-            }
-            else if (methodOrConstructor instanceof Constructor<?>) {
-                Constructor<?> constructor = (Constructor<?>) methodOrConstructor;
-                names = new String[constructor.getParameterTypes().length];
-            }
-            else {
-                throw new IllegalArgumentException("methodOrConstructor is not an instance of Method or Constructor but is " + methodOrConstructor.getClass().getName());
-            }
-            for (int i = 0; i < names.length; i++) {
-                names[i] = "arg" + i;
-            }
-            return names;
+        requireNonNull(executable, "executable is null");
+
+        if (executable.getParameterCount() == 0) {
+            return emptyList();
         }
 
-        @Override
-        public String[] lookupParameterNames(AccessibleObject methodOrConstructor, boolean throwExceptionIfMissing)
-        {
-            return lookupParameterNames(methodOrConstructor);
+        // first try to get the parameter names from the ThriftField annotations
+        List<Optional<String>> parameterNamesFromThriftField = Arrays.stream(executable.getParameters())
+                .map(ReflectionHelper::getThriftFieldParameterName)
+                .collect(toImmutableList());
+        if (parameterNamesFromThriftField.stream().allMatch(Optional::isPresent)) {
+            return parameterNamesFromThriftField.stream()
+                    .map(Optional::get)
+                    .collect(toImmutableList());
         }
+
+        // otherwise get the parameter names from the class, but use any ThriftField annotations as overrides
+        List<String> parameterNamesFromClass = ParameterNames.getParameterNames(executable);
+        ImmutableList.Builder<String> parameterNames = ImmutableList.builder();
+        for (int i = 0; i < parameterNamesFromThriftField.size(); i++) {
+            parameterNames.add(parameterNamesFromThriftField.get(i).orElse(parameterNamesFromClass.get(i)));
+        }
+        return parameterNames.build();
+    }
+
+    private static Optional<String> getThriftFieldParameterName(Parameter parameter)
+    {
+        return Optional.ofNullable(parameter.getAnnotation(ThriftField.class))
+                .flatMap(thriftField -> Optional.ofNullable(emptyToNull(thriftField.name())));
     }
 
     public static String extractFieldName(Method method)
