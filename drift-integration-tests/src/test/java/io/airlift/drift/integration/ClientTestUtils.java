@@ -171,7 +171,7 @@ final class ClientTestUtils
         trustManagerFactory.init(loadTrustStore(getCertificateChainFile()));
 
         KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
-        keyManagerFactory.init(PemReader.loadKeyStore(getCertificateChainFile(), getPrivateKeyFile(), Optional.empty()), new char[0]);
+        keyManagerFactory.init(PemReader.loadKeyStore(getPrivateKeyFile(), getPrivateKeyFile(), Optional.empty()), new char[0]);
 
         SSLContext sslContext = SSLContext.getInstance("TLS");
         sslContext.init(keyManagerFactory.getKeyManagers(), trustManagerFactory.getTrustManagers(), null);
@@ -189,7 +189,7 @@ final class ClientTestUtils
         return sslContext;
     }
 
-    private static File getPrivateKeyFile()
+    public static File getPrivateKeyFile()
     {
         return getResourceFile("rsa.key");
     }

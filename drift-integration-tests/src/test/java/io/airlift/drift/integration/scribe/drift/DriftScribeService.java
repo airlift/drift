@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012 Facebook, Inc.
+ * Copyright (C) 2013 Facebook, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may
  * not use this file except in compliance with the License. You may obtain
@@ -15,16 +15,23 @@
  */
 package io.airlift.drift.integration.scribe.drift;
 
-import io.airlift.drift.TException;
-import io.airlift.drift.annotations.ThriftMethod;
-import io.airlift.drift.annotations.ThriftService;
-
+import java.util.ArrayList;
 import java.util.List;
 
-@ThriftService("scribe")
-public interface DriftScribe
+public class DriftScribeService
+        implements DriftScribe
 {
-    @ThriftMethod("Log")
-    DriftResultCode log(List<DriftLogEntry> messages)
-            throws TException;
+    private final List<DriftLogEntry> messages = new ArrayList<>();
+
+    public List<DriftLogEntry> getMessages()
+    {
+        return messages;
+    }
+
+    @Override
+    public DriftResultCode log(List<DriftLogEntry> messages)
+    {
+        this.messages.addAll(messages);
+        return DriftResultCode.OK;
+    }
 }

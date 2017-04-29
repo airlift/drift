@@ -13,26 +13,26 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
-package io.airlift.drift.transport.netty;
+package io.airlift.drift.transport.netty.server;
 
 import io.airlift.drift.TApplicationException;
 import io.airlift.drift.TException;
 import io.airlift.drift.codec.ThriftCodec;
 import io.airlift.drift.codec.ThriftCodecManager;
-import io.airlift.drift.protocol.TProtocolReader;
+import io.airlift.drift.protocol.TProtocolWriter;
 
-final class ExceptionReader
+final class ExceptionWriter
 {
     private static final ThriftCodec<TApplicationException> CODEC =
             new ThriftCodecManager().getCodec(TApplicationException.class);
 
-    private ExceptionReader() {}
+    private ExceptionWriter() {}
 
-    public static TApplicationException readTApplicationException(TProtocolReader protocol)
+    public static void writeTApplicationException(TApplicationException exception, TProtocolWriter protocol)
             throws TException
     {
         try {
-            return CODEC.read(protocol);
+            CODEC.write(exception, protocol);
         }
         catch (TException e) {
             throw e;

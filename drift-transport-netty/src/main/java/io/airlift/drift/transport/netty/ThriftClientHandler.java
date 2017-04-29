@@ -44,7 +44,7 @@ import static java.util.Objects.requireNonNull;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 @ThreadSafe
-class ThriftClientHandler
+public class ThriftClientHandler
         extends ChannelDuplexHandler
 {
     private static final int ONEWAY_SEQUENCE_ID = 0xFFFF_FFFF;

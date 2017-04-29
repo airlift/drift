@@ -21,7 +21,7 @@ import io.netty.channel.ChannelPipeline;
 
 import static java.util.Objects.requireNonNull;
 
-class NoMessageFraming
+public class NoMessageFraming
         implements MessageFraming
 {
     private final TProtocolFactory protocolFactory;

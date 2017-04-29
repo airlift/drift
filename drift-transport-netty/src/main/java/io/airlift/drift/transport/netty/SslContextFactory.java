@@ -36,19 +36,20 @@ public class SslContextFactory
 {
     private final LoadingCache<SslContextConfig, ReloadableSslContext> cache;
 
-    public static SslContextFactory createSslContextFactory(Duration refreshTime, ScheduledExecutorService scheduledExecutor)
+    public static SslContextFactory createSslContextFactory(boolean forClient, Duration refreshTime, ScheduledExecutorService scheduledExecutor)
     {
-        SslContextFactory sslContextFactory = new SslContextFactory();
+        SslContextFactory sslContextFactory = new SslContextFactory(forClient);
         scheduledExecutor.scheduleWithFixedDelay(sslContextFactory::refresh, refreshTime.toMillis(), refreshTime.toMillis(), MILLISECONDS);
         return sslContextFactory;
     }
 
-    private SslContextFactory()
+    private SslContextFactory(boolean forClient)
     {
         this.cache = CacheBuilder.newBuilder()
                 .expireAfterAccess(1, TimeUnit.HOURS)
                 .build(CacheLoader.from(key ->
                         new ReloadableSslContext(
+                                forClient,
                                 key.getTrustCertificatesFile(),
                                 key.getClientCertificatesFile(),
                                 key.getPrivateKeyFile(),

@@ -13,35 +13,27 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
-package io.airlift.drift.transport.netty;
+package io.airlift.drift.transport.netty.server;
 
-import io.airlift.drift.protocol.TTransport;
-import io.netty.buffer.ByteBuf;
-
-import javax.annotation.concurrent.NotThreadSafe;
+import io.airlift.drift.transport.server.ServerMethodInvoker;
+import io.airlift.drift.transport.server.ServerTransport;
+import io.airlift.drift.transport.server.ServerTransportFactory;
 
 import static java.util.Objects.requireNonNull;
 
-@NotThreadSafe
-public class TChannelBufferInputTransport
-        implements TTransport
+public class DriftNettyServerTransportFactory
+        implements ServerTransportFactory
 {
-    private final ByteBuf buffer;
+    private final DriftNettyServerConfig config;
 
-    public TChannelBufferInputTransport(ByteBuf buffer)
+    public DriftNettyServerTransportFactory(DriftNettyServerConfig config)
     {
-        this.buffer = requireNonNull(buffer, "buffer is null");
+        this.config = requireNonNull(config, "config is null");
     }
 
     @Override
-    public void read(byte[] buf, int off, int len)
+    public ServerTransport createServerTransport(ServerMethodInvoker methodInvoker)
     {
-        buffer.readBytes(buf, off, len);
-    }
-
-    @Override
-    public void write(byte[] buf, int off, int len)
-    {
-        throw new UnsupportedOperationException();
+        return new DriftNettyServerTransport(methodInvoker, config);
     }
 }

@@ -18,6 +18,7 @@ package io.airlift.drift.transport.netty;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.net.HostAndPort;
+import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.SettableFuture;
 import io.airlift.drift.TApplicationException;
@@ -29,6 +30,8 @@ import io.airlift.drift.transport.InvokeRequest;
 import io.airlift.drift.transport.MethodInvoker;
 import io.airlift.drift.transport.MethodMetadata;
 import io.airlift.drift.transport.ParameterMetadata;
+import io.airlift.drift.transport.netty.DriftNettyClientConfig.Protocol;
+import io.airlift.drift.transport.netty.DriftNettyClientConfig.Transport;
 import io.airlift.drift.transport.netty.scribe.apache.LogEntry;
 import io.airlift.drift.transport.netty.scribe.apache.ResultCode;
 import io.airlift.drift.transport.netty.scribe.apache.ScribeService;
@@ -37,6 +40,12 @@ import io.airlift.drift.transport.netty.scribe.apache.scribe.AsyncClient.Log_cal
 import io.airlift.drift.transport.netty.scribe.apache.scribe.Client;
 import io.airlift.drift.transport.netty.scribe.drift.DriftLogEntry;
 import io.airlift.drift.transport.netty.scribe.drift.DriftResultCode;
+import io.airlift.drift.transport.netty.server.DriftNettyServerConfig;
+import io.airlift.drift.transport.netty.server.DriftNettyServerTransport;
+import io.airlift.drift.transport.netty.server.DriftNettyServerTransportFactory;
+import io.airlift.drift.transport.server.ServerInvokeRequest;
+import io.airlift.drift.transport.server.ServerMethodInvoker;
+import io.airlift.drift.transport.server.ServerTransport;
 import io.airlift.units.Duration;
 import io.netty.channel.Channel;
 import io.netty.util.concurrent.DefaultEventExecutor;
@@ -46,6 +55,8 @@ import org.apache.thrift.TProcessor;
 import org.apache.thrift.async.AsyncMethodCallback;
 import org.apache.thrift.async.TAsyncClientManager;
 import org.apache.thrift.protocol.TBinaryProtocol;
+import org.apache.thrift.protocol.TCompactProtocol;
+import org.apache.thrift.protocol.TProtocol;
 import org.apache.thrift.protocol.TProtocolFactory;
 import org.apache.thrift.server.TServer;
 import org.apache.thrift.server.TServer.Args;
@@ -59,6 +70,7 @@ import org.testng.annotations.Test;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.function.ToIntFunction;
@@ -67,6 +79,7 @@ import java.util.stream.Collectors;
 import static com.google.common.collect.Iterables.concat;
 import static com.google.common.collect.Lists.newArrayList;
 import static io.airlift.concurrent.Threads.daemonThreadsNamed;
+import static io.airlift.drift.TApplicationException.Type.UNSUPPORTED_CLIENT_TYPE;
 import static io.airlift.drift.codec.metadata.ThriftType.list;
 import static io.airlift.drift.codec.metadata.ThriftType.optional;
 import static io.airlift.testing.Assertions.assertInstanceOf;
@@ -78,7 +91,19 @@ import static org.testng.Assert.fail;
 
 public class TestDriftNettyMethodInvoker
 {
-    private static final ThriftCodecManager codecManager = new ThriftCodecManager();
+    private static final ThriftCodecManager CODEC_MANAGER = new ThriftCodecManager();
+
+    private static final MethodMetadata LOG_METHOD_METADATA = new MethodMetadata(
+            "Log",
+            ImmutableList.of(new ParameterMetadata(
+                    0,
+                    (short) 1,
+                    "messages",
+                    (ThriftCodec<Object>) CODEC_MANAGER.getCodec(list(CODEC_MANAGER.getCodec(DriftLogEntry.class).getType())))),
+            (ThriftCodec<Object>) (Object) CODEC_MANAGER.getCodec(DriftResultCode.class),
+            ImmutableMap.of(),
+            false);
+
     private static final List<LogEntry> MESSAGES = ImmutableList.of(
             new LogEntry("hello", "world"),
             new LogEntry("bye", "world"));
@@ -103,10 +128,10 @@ public class TestDriftNettyMethodInvoker
             throws Exception
     {
         int invocationCount = testProcessor(processor, ImmutableList.of(
-                address -> logThrift(address, MESSAGES),
+                address -> logThrift(address, MESSAGES, new TFramedTransport.Factory(), new TBinaryProtocol.Factory()),
                 address -> logThriftAsync(address, MESSAGES),
-                address -> logNiftyInvocationHandler1(address, DRIFT_MESSAGES),
-                address -> logNiftyInvocationHandlerOptional(address, DRIFT_MESSAGES)));
+                address -> logNiftyInvocationHandlerOptional(address, DRIFT_MESSAGES),
+                address -> logNiftyInvocationHandler(address, DRIFT_MESSAGES, Transport.FRAMED, Protocol.BINARY)));
 
         return newArrayList(concat(nCopies(invocationCount, MESSAGES)));
     }
@@ -142,13 +167,61 @@ public class TestDriftNettyMethodInvoker
         }
     }
 
-    private static int logThrift(HostAndPort address, List<LogEntry> messages)
+    @Test
+    public void testDriftNettyService()
+            throws Exception
+    {
+        TestServerMethodInvoker methodInvoker = new TestServerMethodInvoker();
+        List<DriftLogEntry> expectedMessages = testMethodInvoker(methodInvoker);
+        assertEquals(ImmutableList.copyOf(methodInvoker.getMessages()), expectedMessages);
+    }
+
+    private static List<DriftLogEntry> testMethodInvoker(ServerMethodInvoker methodInvoker)
+            throws Exception
+    {
+        int invocationCount = testMethodInvoker(methodInvoker, ImmutableList.of(
+                address -> logThrift(address, MESSAGES, new TTransportFactory(), new TBinaryProtocol.Factory()),
+                address -> logThrift(address, MESSAGES, new TTransportFactory(), new TCompactProtocol.Factory()),
+                address -> logThrift(address, MESSAGES, new TFramedTransport.Factory(), new TBinaryProtocol.Factory()),
+                address -> logThrift(address, MESSAGES, new TFramedTransport.Factory(), new TCompactProtocol.Factory()),
+                address -> logThriftAsync(address, MESSAGES),
+                address -> logNiftyInvocationHandler(address, DRIFT_MESSAGES, Transport.UNFRAMED, Protocol.BINARY),
+                address -> logNiftyInvocationHandler(address, DRIFT_MESSAGES, Transport.UNFRAMED, Protocol.COMPACT),
+                address -> logNiftyInvocationHandler(address, DRIFT_MESSAGES, Transport.FRAMED, Protocol.BINARY),
+                address -> logNiftyInvocationHandler(address, DRIFT_MESSAGES, Transport.FRAMED, Protocol.COMPACT),
+                address -> logNiftyInvocationHandler(address, DRIFT_MESSAGES, Transport.HEADER, Protocol.BINARY),
+                address -> logNiftyInvocationHandler(address, DRIFT_MESSAGES, Transport.HEADER, Protocol.COMPACT)));
+
+        return newArrayList(concat(nCopies(invocationCount, DRIFT_MESSAGES)));
+    }
+
+    private static int testMethodInvoker(ServerMethodInvoker methodInvoker, List<ToIntFunction<HostAndPort>> clients)
+            throws Exception
+    {
+        ServerTransport serverTransport = new DriftNettyServerTransportFactory(new DriftNettyServerConfig()).createServerTransport(methodInvoker);
+        try {
+            serverTransport.start();
+
+            HostAndPort address = HostAndPort.fromParts("localhost", ((DriftNettyServerTransport) serverTransport).getPort());
+
+            int sum = 0;
+            for (ToIntFunction<HostAndPort> client : clients) {
+                sum += client.applyAsInt(address);
+            }
+            return sum;
+        }
+        finally {
+            serverTransport.shutdownGracefully();
+        }
+    }
+
+    private static int logThrift(HostAndPort address, List<LogEntry> messages, TTransportFactory framingFactory, TProtocolFactory protocolFactory)
     {
         try {
             TSocket socket = new TSocket(address.getHost(), address.getPort());
             socket.open();
             try {
-                TBinaryProtocol tp = new TBinaryProtocol(new TFramedTransport(socket));
+                TProtocol tp = protocolFactory.getProtocol(framingFactory.getTransport(socket));
                 Client client = new Client(tp);
                 assertEquals(client.Log(messages), ResultCode.OK);
 
@@ -209,32 +282,21 @@ public class TestDriftNettyMethodInvoker
         return 1;
     }
 
-    private static int logNiftyInvocationHandler1(HostAndPort address, List<DriftLogEntry> entries)
+    private static int logNiftyInvocationHandler(HostAndPort address, List<DriftLogEntry> entries, Transport transport, Protocol protocol)
     {
         DriftNettyClientConfig config = new DriftNettyClientConfig()
+                .setTransport(transport)
+                .setProtocol(protocol)
                 .setPoolEnabled(true);
         try (DriftNettyMethodInvokerFactory<Void> methodInvokerFactory = new DriftNettyMethodInvokerFactory<>(new DriftNettyConnectionFactoryConfig(), clientIdentity -> config)) {
             MethodInvoker methodInvoker = methodInvokerFactory.createMethodInvoker(null);
 
-            ParameterMetadata parameter = new ParameterMetadata(
-                    0,
-                    (short) 1,
-                    "messages",
-                    (ThriftCodec<Object>) codecManager.getCodec(list(codecManager.getCodec(DriftLogEntry.class).getType())));
-
-            MethodMetadata methodMetadata = new MethodMetadata(
-                    "Log",
-                    ImmutableList.of(parameter),
-                    (ThriftCodec<Object>) (Object) codecManager.getCodec(DriftResultCode.class),
-                    ImmutableMap.of(),
-                    false);
-
-            ListenableFuture<Object> future = methodInvoker.invoke(new InvokeRequest(methodMetadata, () -> address, ImmutableMap.of(), ImmutableList.of(entries)));
+            ListenableFuture<Object> future = methodInvoker.invoke(new InvokeRequest(LOG_METHOD_METADATA, () -> address, ImmutableMap.of(), ImmutableList.of(entries)));
             assertEquals(future.get(), DRIFT_OK);
 
             try {
-                future = methodInvoker.invoke(new InvokeRequest(methodMetadata, () -> address, ImmutableMap.of(), ImmutableList.of(ImmutableList.of(new DriftLogEntry("exception", "test")))));
-                future.get();
+                future = methodInvoker.invoke(new InvokeRequest(LOG_METHOD_METADATA, () -> address, ImmutableMap.of(), ImmutableList.of(ImmutableList.of(new DriftLogEntry("exception", "test")))));
+                assertEquals(future.get(), DRIFT_OK);
                 fail("Expected exception");
             }
             catch (ExecutionException e) {
@@ -292,17 +354,17 @@ public class TestDriftNettyMethodInvoker
         try (DriftNettyMethodInvokerFactory<Void> methodInvokerFactory = new DriftNettyMethodInvokerFactory<>(new DriftNettyConnectionFactoryConfig(), clientIdentity -> config)) {
             MethodInvoker methodInvoker = methodInvokerFactory.createMethodInvoker(null);
 
-            ThriftType optionalType = optional(list(codecManager.getCatalog().getThriftType(DriftLogEntry.class)));
+            ThriftType optionalType = optional(list(CODEC_MANAGER.getCatalog().getThriftType(DriftLogEntry.class)));
             ParameterMetadata parameter = new ParameterMetadata(
                     0,
                     (short) 1,
                     "messages",
-                    (ThriftCodec<Object>) codecManager.getCodec(optionalType));
+                    (ThriftCodec<Object>) CODEC_MANAGER.getCodec(optionalType));
 
             MethodMetadata methodMetadata = new MethodMetadata(
                     "Log",
                     ImmutableList.of(parameter),
-                    (ThriftCodec<Object>) (Object) codecManager.getCodec(DriftResultCode.class),
+                    (ThriftCodec<Object>) (Object) CODEC_MANAGER.getCodec(DriftResultCode.class),
                     ImmutableMap.of(),
                     false);
 
@@ -346,6 +408,55 @@ public class TestDriftNettyMethodInvoker
         public void returnConnection(Channel connection)
         {
             throw new UnsupportedOperationException();
+        }
+    }
+
+    private static class TestServerMethodInvoker
+            implements ServerMethodInvoker
+    {
+        private final List<DriftLogEntry> messages = new CopyOnWriteArrayList<>();
+
+        private List<DriftLogEntry> getMessages()
+        {
+            return messages;
+        }
+
+        @Override
+        public Optional<MethodMetadata> getMethodMetadata(String name)
+        {
+            if (LOG_METHOD_METADATA.getName().equals(name)) {
+                return Optional.of(LOG_METHOD_METADATA);
+            }
+            return Optional.empty();
+        }
+
+        @Override
+        public ListenableFuture<Object> invoke(ServerInvokeRequest request)
+        {
+            MethodMetadata method = request.getMethod();
+            if (!LOG_METHOD_METADATA.getName().equals(method.getName())) {
+                return Futures.immediateFailedFuture(new IllegalArgumentException("unknown method " + method));
+            }
+
+            List<Object> parameters = request.getParameters();
+            if (parameters.size() != 1 || !(parameters.get(0) instanceof List)) {
+                return Futures.immediateFailedFuture(new IllegalArgumentException("invalid parameters"));
+            }
+            List<DriftLogEntry> messages = (List<DriftLogEntry>) parameters.get(0);
+
+            for (DriftLogEntry message : messages) {
+                if (message.getCategory().equals("exception")) {
+                    return Futures.immediateFailedFuture(new TApplicationException(UNSUPPORTED_CLIENT_TYPE, message.getMessage()));
+                }
+            }
+            this.messages.addAll(messages);
+            return Futures.immediateFuture(DRIFT_OK);
+        }
+
+        @Override
+        public void recordResult(String methodName, long startTime, ListenableFuture<Object> result)
+        {
+            // todo implement
         }
     }
 }

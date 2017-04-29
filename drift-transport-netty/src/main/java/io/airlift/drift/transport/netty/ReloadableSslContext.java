@@ -38,6 +38,7 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 public final class ReloadableSslContext
         implements Supplier<SslContext>
 {
+    private final boolean forClient;
     private final FileWatch trustCertificatesFileWatch;
     private final Optional<FileWatch> clientCertificatesFileWatch;
     private final Optional<FileWatch> privateKeyFileWatch;
@@ -50,6 +51,7 @@ public final class ReloadableSslContext
     private final AtomicReference<SslContextHolder> sslContext = new AtomicReference<>(new SslContextHolder(new UncheckedIOException(new IOException("Not initialized"))));
 
     public ReloadableSslContext(
+            boolean forClient,
             File trustCertificatesFile,
             Optional<File> clientCertificatesFile,
             Optional<File> privateKeyFile,
@@ -58,6 +60,7 @@ public final class ReloadableSslContext
             Duration sessionTimeout,
             List<String> ciphers)
     {
+        this.forClient = forClient;
         this.trustCertificatesFileWatch = new FileWatch(requireNonNull(trustCertificatesFile, "trustCertificatesFile is null"));
         requireNonNull(clientCertificatesFile, "clientCertificatesFile is null");
         this.clientCertificatesFileWatch = clientCertificatesFile.map(FileWatch::new);
@@ -90,12 +93,22 @@ public final class ReloadableSslContext
                 privateKeyModified = privateKeyFileWatch.get().updateState();
             }
             if (trustCertificateModified || clientCertificateModified || privateKeyModified) {
-                SslContextBuilder sslContextBuilder = SslContextBuilder.forClient()
+                SslContextBuilder sslContextBuilder;
+                if (forClient) {
+                    sslContextBuilder = SslContextBuilder.forClient()
+                            .keyManager(
+                                    clientCertificatesFileWatch.map(FileWatch::getFile).orElse(null),
+                                    privateKeyFileWatch.map(FileWatch::getFile).orElse(null),
+                                    privateKeyPassword.orElse(null));
+                }
+                else {
+                    sslContextBuilder = SslContextBuilder.forServer(
+                            clientCertificatesFileWatch.map(FileWatch::getFile).orElse(null),
+                            privateKeyFileWatch.map(FileWatch::getFile).orElse(null),
+                            privateKeyPassword.orElse(null));
+                }
+                sslContextBuilder
                         .trustManager(trustCertificatesFileWatch.getFile())
-                        .keyManager(
-                                clientCertificatesFileWatch.map(FileWatch::getFile).orElse(null),
-                                privateKeyFileWatch.map(FileWatch::getFile).orElse(null),
-                                privateKeyPassword.orElse(null))
                         .sessionCacheSize(sessionCacheSize)
                         .sessionTimeout(sessionTimeout.roundTo(SECONDS));
                 if (!ciphers.isEmpty()) {

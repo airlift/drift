@@ -50,6 +50,11 @@ public class DriftServer
         serverTransport = serverTransportFactory.createServerTransport(methodInvoker);
     }
 
+    public ServerTransport getServerTransport()
+    {
+        return serverTransport;
+    }
+
     @PostConstruct
     public void start()
     {

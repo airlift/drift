@@ -21,7 +21,7 @@ import io.netty.buffer.ByteBuf;
 import javax.annotation.concurrent.NotThreadSafe;
 
 @NotThreadSafe
-class TChannelBufferOutputTransport
+public class TChannelBufferOutputTransport
         implements TTransport
 {
     private final ByteBuf outputBuffer;

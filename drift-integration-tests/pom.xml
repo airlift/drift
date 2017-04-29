@@ -39,6 +39,12 @@
 
         <dependency>
             <groupId>io.airlift.drift</groupId>
+            <artifactId>drift-server</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>io.airlift.drift</groupId>
             <artifactId>drift-transport-apache</artifactId>
             <scope>test</scope>
         </dependency>

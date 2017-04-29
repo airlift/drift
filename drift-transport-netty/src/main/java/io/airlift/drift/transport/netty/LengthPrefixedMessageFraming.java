@@ -23,7 +23,7 @@ import io.netty.handler.codec.LengthFieldPrepender;
 import static java.lang.Math.toIntExact;
 import static java.util.Objects.requireNonNull;
 
-class LengthPrefixedMessageFraming
+public class LengthPrefixedMessageFraming
         implements MessageFraming
 {
     private final int maxFrameSize;

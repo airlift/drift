@@ -70,7 +70,7 @@ public class DriftNettyMethodInvokerFactory<I>
                 .build());
 
         this.clientConfigurationProvider = requireNonNull(clientConfigurationProvider, "clientConfigurationProvider is null");
-        this.sslContextFactory = createSslContextFactory(factoryConfig.getSslContextRefreshTime(), group);
+        this.sslContextFactory = createSslContextFactory(true, factoryConfig.getSslContextRefreshTime(), group);
         this.defaultSocksProxy = factoryConfig.getSocksProxy();
     }
 

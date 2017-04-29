@@ -18,15 +18,15 @@ package io.airlift.drift.transport.netty.scribe.apache;
 import org.apache.thrift.TApplicationException;
 import org.apache.thrift.TException;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import static org.apache.thrift.TApplicationException.UNSUPPORTED_CLIENT_TYPE;
 
 public class ScribeService
         implements scribe.Iface
 {
-    private final List<LogEntry> messages = new ArrayList<>();
+    private final List<LogEntry> messages = new CopyOnWriteArrayList<>();
 
     public List<LogEntry> getMessages()
     {

@@ -17,7 +17,7 @@ package io.airlift.drift.transport.netty;
 
 import io.netty.channel.ChannelPipeline;
 
-interface MessageFraming
+public interface MessageFraming
 {
     void addFrameHandlers(ChannelPipeline pipeline);
 }
