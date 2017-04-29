@@ -34,7 +34,7 @@ public enum ThriftProtocolType
 
     private final byte type;
 
-    private ThriftProtocolType(byte type)
+    ThriftProtocolType(byte type)
     {
         this.type = type;
     }

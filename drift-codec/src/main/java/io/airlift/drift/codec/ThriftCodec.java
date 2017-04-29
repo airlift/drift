@@ -32,7 +32,7 @@ public interface ThriftCodec<T>
      * The Thrift type this codec supports.  The Thrift type contains the Java generic Type of the
      * codec.
      */
-    public ThriftType getType();
+    ThriftType getType();
 
     /**
      * Reads a value from supplied Thrift protocol reader.
@@ -41,7 +41,7 @@ public interface ThriftCodec<T>
      * @return the value; not null
      * @throws Exception if any problems occurred when reading or coercing the value
      */
-    public T read(TProtocol protocol)
+    T read(TProtocol protocol)
             throws Exception;
 
     /**
@@ -51,6 +51,6 @@ public interface ThriftCodec<T>
      * @param protocol the protocol to write to
      * @throws Exception if any problems occurred when writing or coercing the value
      */
-    public void write(T value, TProtocol protocol)
+    void write(T value, TProtocol protocol)
             throws Exception;
 }

@@ -80,28 +80,14 @@ public class ThriftCodecManager
      * This stack tracks the java Types for which building a ThriftCodec is in progress (used to
      * detect recursion)
      */
-    private final ThreadLocal<Deque<ThriftType>> stack = new ThreadLocal<Deque<ThriftType>>()
-    {
-        @Override
-        protected Deque<ThriftType> initialValue()
-        {
-            return new ArrayDeque<>();
-        }
-    };
+    private final ThreadLocal<Deque<ThriftType>> stack = ThreadLocal.withInitial(ArrayDeque::new);
 
     /**
      * Tracks the Types for which building a ThriftCodec was deferred to allow for recursive type
      * structures. These will be handled immediately after the originally requested ThriftCodec is
      * built and cached.
      */
-    private final ThreadLocal<Deque<ThriftType>> deferredTypesWorkList = new ThreadLocal<Deque<ThriftType>>()
-    {
-        @Override
-        protected Deque<ThriftType> initialValue()
-        {
-            return new ArrayDeque<>();
-        }
-    };
+    private final ThreadLocal<Deque<ThriftType>> deferredTypesWorkList = ThreadLocal.withInitial(ArrayDeque::new);
 
     public ThriftCodecManager(ThriftCodec<?>... codecs)
     {
@@ -197,7 +183,6 @@ public class ThriftCodecManager
     }
 
     public ThriftCodec<?> getElementCodec(ThriftTypeReference thriftTypeReference)
-            throws Exception
     {
         return getCodec(thriftTypeReference.get());
     }
@@ -271,8 +256,7 @@ public class ThriftCodecManager
 
     public ThriftCodec<?> getCachedCodecIfPresent(ThriftType type)
     {
-        ThriftCodec<?> thriftCodec = typeCodecs.getIfPresent(type);
-        return thriftCodec;
+        return typeCodecs.getIfPresent(type);
     }
 
     /**

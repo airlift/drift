@@ -52,8 +52,7 @@ public class CoercionThriftCodec<T>
             throws Exception
     {
         Object thriftValue = codec.read(protocol);
-        T javaValue = (T) typeCoercion.getFromThrift().invoke(null, thriftValue);
-        return javaValue;
+        return (T) typeCoercion.getFromThrift().invoke(null, thriftValue);
     }
 
     @Override

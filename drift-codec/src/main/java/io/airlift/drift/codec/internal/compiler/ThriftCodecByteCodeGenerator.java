@@ -1071,8 +1071,7 @@ public class ThriftCodecByteCodeGenerator<T>
         else {
             fieldType = TypeToken.of(field.getThriftType().getJavaType()).getRawType();
         }
-        boolean needsCast = !fieldType.isAssignableFrom(methodReturn);
-        return needsCast;
+        return !fieldType.isAssignableFrom(methodReturn);
     }
 
     private boolean needsCodec(ThriftFieldMetadata fieldMetadata)

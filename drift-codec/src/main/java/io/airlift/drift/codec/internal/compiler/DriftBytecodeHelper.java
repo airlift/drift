@@ -23,7 +23,7 @@ public final class DriftBytecodeHelper
 
     static {
         try {
-            NO_CONSTRUCTOR_FOUND = DriftBytecodeHelper.class.getMethod("noConstructorFound", new Class<?>[] {Class.class, short.class});
+            NO_CONSTRUCTOR_FOUND = DriftBytecodeHelper.class.getMethod("noConstructorFound", Class.class, short.class);
         }
         catch (Throwable t) {
             throw new ExceptionInInitializerError(t);

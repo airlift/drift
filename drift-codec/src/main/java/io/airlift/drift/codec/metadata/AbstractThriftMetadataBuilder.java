@@ -626,7 +626,7 @@ public abstract class AbstractThriftMetadataBuilder
         Set<Boolean> isRecursiveReferences =
                 fields.stream()
                         .map(FieldMetadata::isRecursiveReference)
-                        .filter(value -> value != null)
+                        .filter(Objects::nonNull)
                         .collect(toSet());
 
         if (isRecursiveReferences.isEmpty()) {

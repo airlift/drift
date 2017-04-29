@@ -19,6 +19,8 @@ import io.airlift.drift.annotations.ThriftConstructor;
 import io.airlift.drift.annotations.ThriftField;
 import io.airlift.drift.annotations.ThriftStruct;
 
+import java.util.Objects;
+
 import static com.google.common.base.MoreObjects.toStringHelper;
 
 @ThriftStruct("ThriftStructForTesting")
@@ -90,7 +92,7 @@ public final class BasicThriftStruct
         if (!baz.equals(that.baz)) {
             return false;
         }
-        if (qux != that.qux) {
+        if (!Objects.equals(qux, that.qux)) {
             return false;
         }
         return true;

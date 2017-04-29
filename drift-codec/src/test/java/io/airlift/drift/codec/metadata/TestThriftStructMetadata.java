@@ -137,9 +137,7 @@ public class TestThriftStructMetadata
     public void testFieldWithOneIdlAnnotationMap()
             throws Exception
     {
-        /**
-         * Single field with IDL annotation map on getter, but not on setter: should be okay
-         */
+        // Single field with IDL annotation map on getter, but not on setter: should be okay
         ThriftStructMetadata metadata = testStructMetadataBuild(BeanWithOneIdlAnnotationMapForField.class, 0, 1);
         Map<String, String> idlAnnotations = metadata.getField(2).getIdlAnnotations();
         assertEquals(idlAnnotations.size(), 2);
@@ -151,9 +149,7 @@ public class TestThriftStructMetadata
     public void testFieldWithMatchingIdlAnnotationMaps()
             throws Exception
     {
-        /**
-         * Single field with matching IDL annotation maps on setter vs getter: should be okay
-         */
+        // Single field with matching IDL annotation maps on setter vs getter: should be okay
         ThriftStructMetadata metadata = testStructMetadataBuild(BeanWithMatchingIdlAnnotationsMapsForField.class, 0, 1);
         Map<String, String> idlAnnotations = metadata.getField(2).getIdlAnnotations();
         assertEquals(idlAnnotations.size(), 2);
@@ -165,9 +161,7 @@ public class TestThriftStructMetadata
     public void testFieldWithConflictingIdlAnnotationMap()
             throws Exception
     {
-        /**
-         * Single field with conflicting IDL annotation maps on setter vs getter: should fail
-         */
+        // Single field with conflicting IDL annotation maps on setter vs getter: should fail
         testStructMetadataBuild(BeanWIthConflictingIdlAnnotationMapsForField.class, 0, 1);
     }
 

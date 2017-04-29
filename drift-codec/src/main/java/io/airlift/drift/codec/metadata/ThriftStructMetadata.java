@@ -35,10 +35,9 @@ import static java.util.stream.Collectors.toList;
 @Immutable
 public class ThriftStructMetadata
 {
-    public static enum MetadataType
+    public enum MetadataType
     {
-        STRUCT, UNION;
-
+        STRUCT, UNION
     }
 
     private final String structName;

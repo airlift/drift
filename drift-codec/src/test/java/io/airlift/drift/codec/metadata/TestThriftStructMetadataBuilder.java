@@ -223,7 +223,7 @@ public class TestThriftStructMetadataBuilder
     @ThriftStruct(builder = GenericStruct.GenericBuilder.class)
     public final static class GenericStruct<T>
     {
-        private T fieldValue;
+        private final T fieldValue;
 
         private GenericStruct(T fieldValue)
         {

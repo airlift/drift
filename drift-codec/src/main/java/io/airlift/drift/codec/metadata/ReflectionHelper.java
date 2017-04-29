@@ -241,8 +241,7 @@ public final class ReflectionHelper
 
     public static String[] extractParameterNames(AccessibleObject methodOrConstructor)
     {
-        String[] names = PARANAMER.lookupParameterNames(methodOrConstructor);
-        return names;
+        return PARANAMER.lookupParameterNames(methodOrConstructor);
     }
 
     private static class ThriftFieldParanamer
@@ -308,12 +307,10 @@ public final class ReflectionHelper
     {
         requireNonNull(methodName, "methodName is null");
         if ((methodName.startsWith("get") || methodName.startsWith("set")) && methodName.length() > 3) {
-            String name = Character.toLowerCase(methodName.charAt(3)) + methodName.substring(4);
-            return name;
+            return Character.toLowerCase(methodName.charAt(3)) + methodName.substring(4);
         }
         else if (methodName.startsWith("is") && methodName.length() > 2) {
-            String name = Character.toLowerCase(methodName.charAt(2)) + methodName.substring(3);
-            return name;
+            return Character.toLowerCase(methodName.charAt(2)) + methodName.substring(3);
         }
         else {
             return methodName;

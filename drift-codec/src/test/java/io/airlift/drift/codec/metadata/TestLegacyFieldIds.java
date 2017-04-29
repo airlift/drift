@@ -52,7 +52,7 @@ public class TestLegacyFieldIds
     }
 
     @Test
-    public void testLegacyIdCorrectlyAnnotatedWhitebox()
+    public void testLegacyIdCorrectlyAnnotatedWhiteBox()
     {
         ThriftStructMetadataBuilder builder = new ThriftStructMetadataBuilder(new ThriftCatalog(), LegacyIdCorrect.class);
 
@@ -61,7 +61,7 @@ public class TestLegacyFieldIds
         for (FieldMetadata field : builder.fields) {
             String name = field.getName();
             short id = field.getId();
-            boolean legacy = field.isLegacyId();
+            Boolean legacy = field.isLegacyId();
 
             assertThat(name)
                     .as("name of field " + field)
@@ -94,12 +94,11 @@ public class TestLegacyFieldIds
     @ThriftStruct
     public static final class LegacyIdCorrect
     {
-        private static final Set<Integer> IDS =
-                ImmutableSet.<Integer>of(-4, -3, -2, -1, 0, 1, 2);
+        private static final Set<Integer> IDS = ImmutableSet.of(-4, -3, -2, -1, 0, 1, 2);
 
-        @ThriftField(value = 0, isLegacyId = false)
+        @ThriftField(value = 0)
         public boolean notLegacyId0;
-        @ThriftField(value = 1, isLegacyId = false)
+        @ThriftField(value = 1)
         public boolean notLegacyId1;
         @ThriftField(value = 2)
         public boolean notLegacyId2;
@@ -182,13 +181,8 @@ public class TestLegacyFieldIds
         }
 
         // 3: Must be consistent
-        for (Class<?> klass : Arrays.asList(
-                LegacyIdInconsistent1.class,
-                LegacyIdInconsistent2.class,
-                LegacyIdInconsistent3.class,
-                LegacyIdInconsistent4.class
-        )) {
-            ThriftStructMetadataBuilder builder = new ThriftStructMetadataBuilder(new ThriftCatalog(), klass);
+        for (Class<?> invalidClass : Arrays.asList(LegacyIdInconsistent1.class, LegacyIdInconsistent2.class, LegacyIdInconsistent3.class, LegacyIdInconsistent4.class)) {
+            ThriftStructMetadataBuilder builder = new ThriftStructMetadataBuilder(new ThriftCatalog(), invalidClass);
 
             MetadataErrors metadataErrors = builder.getMetadataErrors();
 
@@ -230,7 +224,7 @@ public class TestLegacyFieldIds
             return false;
         }
 
-        @ThriftField(value = -4, isLegacyId = false)
+        @ThriftField(value = -4)
         public void setField(boolean value)
         {
         }
@@ -240,7 +234,7 @@ public class TestLegacyFieldIds
     @ThriftStruct
     public static final class LegacyIdInconsistent2
     {
-        @ThriftField(value = -4, isLegacyId = false)
+        @ThriftField(value = -4)
         public boolean getField()
         {
             return false;
@@ -262,7 +256,7 @@ public class TestLegacyFieldIds
             return false;
         }
 
-        @ThriftField(value = 4, isLegacyId = false)
+        @ThriftField(value = 4)
         public void setField(boolean value)
         {
         }
@@ -272,7 +266,7 @@ public class TestLegacyFieldIds
     @ThriftStruct
     public static final class LegacyIdInconsistent4
     {
-        @ThriftField(value = 4, isLegacyId = false)
+        @ThriftField(value = 4)
         public boolean getField()
         {
             return false;
@@ -287,25 +281,18 @@ public class TestLegacyFieldIds
     @Test
     public void testGetThriftFieldIsLegacyId()
     {
-        Function<ThriftField, FieldMetadata> makeFakeFieldMetadata = new Function<ThriftField, FieldMetadata>()
+        Function<ThriftField, FieldMetadata> makeFakeFieldMetadata = input -> new FieldMetadata(input, FieldKind.THRIFT_FIELD)
         {
             @Override
-            public FieldMetadata apply(ThriftField input)
+            public Type getJavaType()
             {
-                return new FieldMetadata(input, FieldKind.THRIFT_FIELD)
-                {
-                    @Override
-                    public Type getJavaType()
-                    {
-                        throw new UnsupportedOperationException();
-                    }
+                throw new UnsupportedOperationException();
+            }
 
-                    @Override
-                    public String extractName()
-                    {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+            @Override
+            public String extractName()
+            {
+                throw new UnsupportedOperationException();
             }
         };
 
@@ -335,11 +322,11 @@ public class TestLegacyFieldIds
 
     private static class SomeThriftFields
     {
-        @ThriftField(value = +1, isLegacyId = false)
+        @ThriftField(value = +1)
         boolean expectFalse1;
-        @ThriftField(value = -1, isLegacyId = false)
+        @ThriftField(value = -1)
         boolean expectFalse2;
-        @ThriftField(isLegacyId = false)
+        @ThriftField()
         boolean broken;  // see comments in impl.
 
         @ThriftField(value = +1, isLegacyId = true)
@@ -372,17 +359,16 @@ public class TestLegacyFieldIds
     @ThriftUnion
     public static final class LegacyIdUnionCorrect
     {
-        private static final Set<Integer> IDS =
-                ImmutableSet.<Integer>of(-4, -3, -2, -1, 0, 1, 2, (int) Short.MIN_VALUE);
+        private static final Set<Integer> IDS = ImmutableSet.of(-4, -3, -2, -1, 0, 1, 2, (int) Short.MIN_VALUE);
 
         @ThriftUnionId
         public short unionId;
 
-        @ThriftField(value = 0, isLegacyId = false)
+        @ThriftField(0)
         public boolean notLegacyId0;
-        @ThriftField(value = 1, isLegacyId = false)
+        @ThriftField(1)
         public boolean notLegacyId1;
-        @ThriftField(value = 2)
+        @ThriftField(2)
         public boolean notLegacyId2;
         @ThriftField(value = -1, isLegacyId = true)
         public boolean legacyIdOnField;

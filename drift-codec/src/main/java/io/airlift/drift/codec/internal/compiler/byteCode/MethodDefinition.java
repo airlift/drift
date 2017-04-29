@@ -206,11 +206,7 @@ public class MethodDefinition
 
     private LabelNode getLabel(String name)
     {
-        Label label = labels.get(name);
-        if (label == null) {
-            label = new Label();
-            labels.put(name, label);
-        }
+        Label label = labels.computeIfAbsent(name, k -> new Label());
         return new LabelNode(label);
     }
 

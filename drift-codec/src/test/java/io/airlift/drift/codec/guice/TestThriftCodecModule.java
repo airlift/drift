@@ -17,11 +17,9 @@ package io.airlift.drift.codec.guice;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.google.inject.Binder;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Key;
-import com.google.inject.Module;
 import com.google.inject.Stage;
 import com.google.inject.TypeLiteral;
 import io.airlift.drift.codec.BonkConstructor;
@@ -49,40 +47,35 @@ public class TestThriftCodecModule
         Injector injector = Guice.createInjector(
                 Stage.PRODUCTION,
                 new ThriftCodecModule(),
-                new Module()
-                {
-                    @Override
-                    public void configure(Binder binder)
+                binder -> {
+                    thriftCodecBinder(binder).bindThriftCodec(BonkConstructor.class);
+                    thriftCodecBinder(binder).bindListThriftCodec(BonkConstructor.class);
+                    thriftCodecBinder(binder).bindMapThriftCodec(String.class, BonkConstructor.class);
+
+                    thriftCodecBinder(binder).bindThriftCodec(new TypeLiteral<Map<Integer, List<String>>>() {});
+
+                    thriftCodecBinder(binder).bindCustomThriftCodec(new ThriftCodec<ValueClass>()
                     {
-                        thriftCodecBinder(binder).bindThriftCodec(BonkConstructor.class);
-                        thriftCodecBinder(binder).bindListThriftCodec(BonkConstructor.class);
-                        thriftCodecBinder(binder).bindMapThriftCodec(String.class, BonkConstructor.class);
-
-                        thriftCodecBinder(binder).bindThriftCodec(new TypeLiteral<Map<Integer, List<String>>>() {});
-
-                        thriftCodecBinder(binder).bindCustomThriftCodec(new ThriftCodec<ValueClass>()
+                        @Override
+                        public ThriftType getType()
                         {
-                            @Override
-                            public ThriftType getType()
-                            {
-                                return new ThriftType(ThriftType.STRING, ValueClass.class);
-                            }
+                            return new ThriftType(ThriftType.STRING, ValueClass.class);
+                        }
 
-                            @Override
-                            public ValueClass read(TProtocol protocol)
-                                    throws Exception
-                            {
-                                return new ValueClass(protocol.readString());
-                            }
+                        @Override
+                        public ValueClass read(TProtocol protocol)
+                                throws Exception
+                        {
+                            return new ValueClass(protocol.readString());
+                        }
 
-                            @Override
-                            public void write(ValueClass value, TProtocol protocol)
-                                    throws Exception
-                            {
-                                protocol.writeString(value.getValue());
-                            }
-                        });
-                    }
+                        @Override
+                        public void write(ValueClass value, TProtocol protocol)
+                                throws Exception
+                        {
+                            protocol.writeString(value.getValue());
+                        }
+                    });
                 });
 
         testRoundTripSerialize(
@@ -99,7 +92,7 @@ public class TestThriftCodecModule
 
         testRoundTripSerialize(
                 injector.getInstance(Key.get(new TypeLiteral<ThriftCodec<Map<Integer, List<String>>>>() {})),
-                ImmutableMap.<Integer, List<String>>of(1, ImmutableList.of("one", "uno"), 2, ImmutableList.of("two", "dos")));
+                ImmutableMap.of(1, ImmutableList.of("one", "uno"), 2, ImmutableList.of("two", "dos")));
 
         testRoundTripSerialize(
                 injector.getInstance(Key.get(new TypeLiteral<ThriftCodec<ValueClass>>() {})),

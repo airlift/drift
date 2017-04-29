@@ -21,7 +21,7 @@ import java.util.Objects;
 
 public class GenericThriftStructBase<T>
 {
-    private T genericProperty;
+    private final T genericProperty;
 
     public GenericThriftStructBase(@ThriftField(1) T genericProperty)
     {

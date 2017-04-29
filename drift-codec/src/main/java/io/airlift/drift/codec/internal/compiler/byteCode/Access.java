@@ -59,7 +59,7 @@ public enum Access
     ANNOTATION(ACC_ANNOTATION),
     ENUM(ACC_ENUM);
 
-    private int modifier;
+    private final int modifier;
 
     Access(int modifier)
     {

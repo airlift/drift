@@ -89,28 +89,14 @@ public class ThriftCatalog
      * This stack tracks the java Types for which building a ThriftType is in progress (used to
      * detect recursion)
      */
-    private final ThreadLocal<Deque<Type>> stack = new ThreadLocal<Deque<Type>>()
-    {
-        @Override
-        protected Deque<Type> initialValue()
-        {
-            return new ArrayDeque<>();
-        }
-    };
+    private final ThreadLocal<Deque<Type>> stack = ThreadLocal.withInitial(ArrayDeque::new);
 
     /**
      * This queue tracks the Types for which resolution was deferred in order to allow for
      * recursive type structures. ThriftTypes for these types will be built after the originally
      * requested ThriftType is built and cached.
      */
-    private final ThreadLocal<Deque<Type>> deferredTypesWorkList = new ThreadLocal<Deque<Type>>()
-    {
-        @Override
-        protected Deque<Type> initialValue()
-        {
-            return new ArrayDeque<>();
-        }
-    };
+    private final ThreadLocal<Deque<Type>> deferredTypesWorkList = ThreadLocal.withInitial(ArrayDeque::new);
 
     public ThriftCatalog()
     {
@@ -245,11 +231,9 @@ public class ThriftCatalog
         typeCache.putIfAbsent(javaType, thriftType);
 
         if (stack.get().isEmpty()) {
-            /**
-             * The stack represents the processing of nested types, so when the stack is empty
-             * at this point, we've just finished processing and caching the originally requested
-             * type. There may be some unresolved type references we should revisit now.
-             */
+            // The stack represents the processing of nested types, so when the stack is empty
+            // at this point, we've just finished processing and caching the originally requested
+            // type. There may be some unresolved type references we should revisit now.
             Deque<Type> unresolvedJavaTypes = deferredTypesWorkList.get();
             do {
                 if (unresolvedJavaTypes.isEmpty()) {
@@ -367,11 +351,9 @@ public class ThriftCatalog
     {
         // Collection element types are always allowed to be recursive links
         if (isStructType(javaType)) {
-            /**
-             * TODO: This gets things working, but is only necessary when this collection is
-             * involved in a recursive chain. Otherwise, it's just introducing unnecessary
-             * references. We should see if we can clean this up.
-             */
+            // TODO: This gets things working, but is only necessary when this collection is
+            // involved in a recursive chain. Otherwise, it's just introducing unnecessary
+            // references. We should see if we can clean this up.
             return getThriftTypeReference(javaType, Recursiveness.FORCED);
         }
         else {
@@ -383,11 +365,9 @@ public class ThriftCatalog
     {
         // Maps key types are always allowed to be recursive links
         if (isStructType(javaType)) {
-            /**
-             * TODO: This gets things working, but is only necessary when this collection is
-             * involved in a recursive chain. Otherwise, it's just introducing unnecessary
-             * references. We should see if we can clean this up.
-             */
+            // TODO: This gets things working, but is only necessary when this collection is
+            // involved in a recursive chain. Otherwise, it's just introducing unnecessary
+            // references. We should see if we can clean this up.
             return getThriftTypeReference(javaType, Recursiveness.FORCED);
         }
         else {
@@ -399,11 +379,9 @@ public class ThriftCatalog
     {
         // Maps value types are always allowed to be recursive links
         if (isStructType(javaType)) {
-            /**
-             * TODO: This gets things working, but is only necessary when this collection is
-             * involved in a recursive chain. Otherwise, it's just introducing unnecessary
-             * references. We should see if we can clean this up.
-             */
+            // TODO: This gets things working, but is only necessary when this collection is
+            // involved in a recursive chain. Otherwise, it's just introducing unnecessary
+            // references. We should see if we can clean this up.
             return getThriftTypeReference(javaType, Recursiveness.FORCED);
         }
         else {
@@ -602,7 +580,7 @@ public class ThriftCatalog
             }
         }
 
-        return documentation == null ? ImmutableList.<String>of() : ImmutableList.copyOf(documentation.value());
+        return documentation == null ? ImmutableList.of() : ImmutableList.copyOf(documentation.value());
     }
 
     @SuppressWarnings("PMD.EmptyCatchBlock")
@@ -621,7 +599,7 @@ public class ThriftCatalog
             }
         }
 
-        return documentation == null ? ImmutableList.<String>of() : ImmutableList.copyOf(documentation.value());
+        return documentation == null ? ImmutableList.of() : ImmutableList.copyOf(documentation.value());
     }
 
     @SuppressWarnings("PMD.EmptyCatchBlock")
@@ -640,7 +618,7 @@ public class ThriftCatalog
             }
         }
 
-        return documentation == null ? ImmutableList.<String>of() : ImmutableList.copyOf(documentation.value());
+        return documentation == null ? ImmutableList.of() : ImmutableList.copyOf(documentation.value());
     }
 
     @SuppressWarnings("PMD.EmptyCatchBlock")
@@ -653,7 +631,7 @@ public class ThriftCatalog
         catch (ReflectiveOperationException e) {
             // ignore
         }
-        return ImmutableList.<String>of();
+        return ImmutableList.of();
     }
 
     @SuppressWarnings("PMD.EmptyCatchBlock")
@@ -692,8 +670,7 @@ public class ThriftCatalog
 
             try {
                 ThriftStructMetadataBuilder builder = new ThriftStructMetadataBuilder(this, structType);
-                ThriftStructMetadata structMetadata = builder.build();
-                return structMetadata;
+                return builder.build();
             }
             finally {
                 Type top = stack.pop();
@@ -722,8 +699,7 @@ public class ThriftCatalog
         stack.push(unionType);
         try {
             ThriftUnionMetadataBuilder builder = new ThriftUnionMetadataBuilder(this, unionType);
-            ThriftStructMetadata unionMetadata = builder.build();
-            return unionMetadata;
+            return builder.build();
         }
         finally {
             Type top = stack.pop();

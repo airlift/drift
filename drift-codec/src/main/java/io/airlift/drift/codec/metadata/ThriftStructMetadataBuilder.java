@@ -72,7 +72,7 @@ public class ThriftStructMetadataBuilder
             return ImmutableMap.of();
         }
         else {
-            ImmutableMap.Builder<String, String> builder = ImmutableMap.<String, String>builder();
+            ImmutableMap.Builder<String, String> builder = ImmutableMap.builder();
             for (ThriftIdlAnnotation idlAnnotation : annotation.idlAnnotations()) {
                 builder.put(idlAnnotation.key(), idlAnnotation.value());
             }
@@ -216,7 +216,7 @@ public class ThriftStructMetadataBuilder
                     name);
         }
 
-        ThriftFieldMetadata thriftFieldMetadata = new ThriftFieldMetadata(
+        return new ThriftFieldMetadata(
                 id,
                 isLegacyId,
                 recursive,
@@ -231,6 +231,5 @@ public class ThriftStructMetadataBuilder
                 Optional.ofNullable(extraction),
                 Optional.ofNullable(coercion)
         );
-        return thriftFieldMetadata;
     }
 }

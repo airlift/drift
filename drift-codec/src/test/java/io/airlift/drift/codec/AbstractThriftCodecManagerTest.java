@@ -56,9 +56,6 @@ import org.testng.annotations.Test;
 import java.lang.reflect.Type;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.testng.Assert.assertEquals;
@@ -90,7 +87,7 @@ public abstract class AbstractThriftCodecManagerTest
         ThriftCatalog catalog = new ThriftCatalog();
         ThriftType unionFieldType = catalog.getThriftType(UnionField.class);
         ThriftType fruitType = catalog.getThriftType(Fruit.class);
-        ThriftCodec<Fruit> fruitCodec = new EnumThriftCodec<Fruit>(fruitType);
+        ThriftCodec<Fruit> fruitCodec = new EnumThriftCodec<>(fruitType);
         UnionFieldThriftCodec unionFieldCodec = new UnionFieldThriftCodec(unionFieldType, fruitCodec);
 
         UnionField unionField = new UnionField();
@@ -735,8 +732,8 @@ public abstract class AbstractThriftCodecManagerTest
         one.aEnumKeyMap = ImmutableMap.of(Fruit.APPLE, "apple", Fruit.BANANA, "banana");
         one.aCustomEnumKeyMap = ImmutableMap.of(Letter.A, "a", Letter.B, "b");
 
-        one.aSetOfListsOfMaps = ImmutableSet.<List<Map<String, BonkField>>>of(
-                ImmutableList.<Map<String, BonkField>>of(
+        one.aSetOfListsOfMaps = ImmutableSet.of(
+                ImmutableList.of(
                         ImmutableMap.of(
                                 "1: main", new BonkField("message", 42),
                                 "1: other", new BonkField("other", 11)
@@ -746,7 +743,7 @@ public abstract class AbstractThriftCodecManagerTest
                                 "1: other", new BonkField("other", 11)
                         )
                 ),
-                ImmutableList.<Map<String, BonkField>>of(
+                ImmutableList.of(
                         ImmutableMap.of(
                                 "2: main", new BonkField("message", 42),
                                 "2: other", new BonkField("other", 11)
@@ -758,7 +755,7 @@ public abstract class AbstractThriftCodecManagerTest
                 )
         );
 
-        one.aMapOfListToSet = ImmutableMap.<List<String>, Set<BonkField>>of(
+        one.aMapOfListToSet = ImmutableMap.of(
                 ImmutableList.of("a", "b"),
                 ImmutableSet.of(
                         new BonkField("1: message", 42),

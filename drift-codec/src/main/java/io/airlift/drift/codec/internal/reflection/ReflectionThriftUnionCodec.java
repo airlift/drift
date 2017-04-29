@@ -56,7 +56,7 @@ public class ReflectionThriftUnionCodec<T>
 
         ThriftFieldMetadata idField = getOnlyElement(metadata.getFields(FieldKind.THRIFT_UNION_ID));
 
-        this.idField = Maps.<ThriftFieldMetadata, ThriftCodec<?>>immutableEntry(idField, manager.getCodec(idField.getThriftType()));
+        this.idField = Maps.immutableEntry(idField, manager.getCodec(idField.getThriftType()));
         requireNonNull(this.idField.getValue(), () -> "No codec for ID field found: " + idField);
 
         this.metadataMap = uniqueIndex(metadata.getFields(), ThriftFieldMetadata::getId);

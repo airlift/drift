@@ -28,7 +28,7 @@ import io.airlift.drift.annotations.ThriftStruct;
 public class ExceptionWithIdlAnnotations
         extends Exception
 {
-    private int type;
+    private final int type;
 
     @ThriftConstructor
     public ExceptionWithIdlAnnotations(@ThriftField(1) String message,

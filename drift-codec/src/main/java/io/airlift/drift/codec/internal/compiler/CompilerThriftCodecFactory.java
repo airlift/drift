@@ -45,13 +45,13 @@ public class CompilerThriftCodecFactory
 
     public CompilerThriftCodecFactory(boolean debug)
     {
-        this(debug, getPriviledgedClassLoader(CompilerThriftCodecFactory.class.getClassLoader()));
+        this(debug, getPrivilegedClassLoader(CompilerThriftCodecFactory.class.getClassLoader()));
     }
 
     public CompilerThriftCodecFactory(boolean debug, ClassLoader parent)
     {
         this.debug = debug;
-        this.classLoader = getPriviledgedClassLoader(parent);
+        this.classLoader = getPrivilegedClassLoader(parent);
     }
 
     @Override
@@ -66,14 +66,8 @@ public class CompilerThriftCodecFactory
         return generator.getThriftCodec();
     }
 
-    private static DynamicClassLoader getPriviledgedClassLoader(final ClassLoader parent)
+    private static DynamicClassLoader getPrivilegedClassLoader(final ClassLoader parent)
     {
-        return AccessController.doPrivileged(new PrivilegedAction<DynamicClassLoader>()
-        {
-            public DynamicClassLoader run()
-            {
-                return new DynamicClassLoader(parent);
-            }
-        });
+        return AccessController.doPrivileged((PrivilegedAction<DynamicClassLoader>) () -> new DynamicClassLoader(parent));
     }
 }

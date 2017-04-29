@@ -19,12 +19,10 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import io.airlift.drift.codec.internal.EnumThriftCodec;
-import io.airlift.drift.codec.internal.ThriftCodecFactory;
 import io.airlift.drift.codec.internal.coercion.DefaultJavaCoercions;
 import io.airlift.drift.codec.metadata.ThriftCatalog;
 import io.airlift.drift.codec.metadata.ThriftEnumMetadata;
 import io.airlift.drift.codec.metadata.ThriftEnumMetadataBuilder;
-import io.airlift.drift.codec.metadata.ThriftStructMetadata;
 import io.airlift.drift.codec.metadata.ThriftType;
 import org.apache.thrift.protocol.TBinaryProtocol;
 import org.apache.thrift.protocol.TCompactProtocol;
@@ -64,13 +62,8 @@ public class TestThriftCodecManager
     protected void setUp()
             throws Exception
     {
-        codecManager = new ThriftCodecManager(new ThriftCodecFactory()
-        {
-            @Override
-            public ThriftCodec<?> generateThriftTypeCodec(ThriftCodecManager codecManager, ThriftStructMetadata metadata)
-            {
-                throw new UnsupportedOperationException();
-            }
+        codecManager = new ThriftCodecManager((codecManager, metadata) -> {
+            throw new UnsupportedOperationException();
         });
         ThriftCatalog catalog = codecManager.getCatalog();
         catalog.addDefaultCoercions(DefaultJavaCoercions.class);

@@ -64,7 +64,7 @@ public @interface ThriftField
          * This is the default (unset) value for {@link ThriftField#requiredness()}. It will not
          * conflict with other explicit settings of {@link #NONE}, {@link #REQUIRED}, or {@link
          * #OPTIONAL}. If all of the {@link ThriftField} annotations for
-         * a field are left {@link #UNSPECIFIED}, it will default to {@link #NONE}.
+         * a field are left UNSPECIFIED, it will default to {@link #NONE}.
          */
         UNSPECIFIED,
         /**

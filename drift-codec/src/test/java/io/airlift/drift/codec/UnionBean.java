@@ -30,10 +30,6 @@ public final class UnionBean
     private Object value;
     private short type;
 
-    public UnionBean()
-    {
-    }
-
     @ThriftUnionId
     public short getType()
     {
@@ -115,13 +111,13 @@ public final class UnionBean
         ToStringHelper helper = toStringHelper(this);
 
         if (type == 1) {
-            helper.add("stringValue", (String) value);
+            helper.add("stringValue", value);
         }
         else if (type == 2) {
-            helper.add("longValue", (Long) value);
+            helper.add("longValue", value);
         }
         else if (type == 3) {
-            helper.add("fruitValue", (Fruit) value);
+            helper.add("fruitValue", value);
         }
         return helper.toString();
     }
