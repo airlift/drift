@@ -25,8 +25,8 @@ import java.lang.reflect.Type;
 import java.util.Map;
 import java.util.Optional;
 
-import static io.airlift.drift.annotations.ThriftIdlAnnotation.RECURSIVE_REFERENCE_ANNOTATION_KEY;
 import static io.airlift.drift.annotations.ThriftField.Requiredness;
+import static io.airlift.drift.annotations.ThriftIdlAnnotation.RECURSIVE_REFERENCE_ANNOTATION_KEY;
 import static java.util.Objects.requireNonNull;
 
 abstract class FieldMetadata
