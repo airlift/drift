@@ -17,6 +17,8 @@ package io.airlift.drift.codec.internal.compiler.byteCode;
 
 import javax.annotation.concurrent.Immutable;
 
+import static com.google.common.base.MoreObjects.toStringHelper;
+
 @Immutable
 public class NamedParameterDefinition
 {
@@ -40,8 +42,8 @@ public class NamedParameterDefinition
         return new NamedParameterDefinition(name, type);
     }
 
-    private final ParameterizedType type;
     private final String name;
+    private final ParameterizedType type;
 
     NamedParameterDefinition(String name, ParameterizedType type)
     {
@@ -62,11 +64,9 @@ public class NamedParameterDefinition
     @Override
     public String toString()
     {
-        final StringBuilder sb = new StringBuilder();
-        sb.append("NamedParameterDefinition");
-        sb.append("{name='").append(name).append('\'');
-        sb.append(", type=").append(type);
-        sb.append('}');
-        return sb.toString();
+        return toStringHelper(this)
+                .add("type", type)
+                .add("name", name)
+                .toString();
     }
 }

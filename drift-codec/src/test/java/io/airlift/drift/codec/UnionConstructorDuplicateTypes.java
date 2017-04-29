@@ -21,7 +21,6 @@ import io.airlift.drift.annotations.ThriftField.Requiredness;
 import io.airlift.drift.annotations.ThriftUnion;
 import io.airlift.drift.annotations.ThriftUnionId;
 
-import java.util.Arrays;
 import java.util.Objects;
 
 import static com.google.common.base.MoreObjects.toStringHelper;
@@ -94,29 +93,24 @@ public class UnionConstructorDuplicateTypes
     }
 
     @Override
-    public int hashCode()
+    public boolean equals(Object o)
     {
-        return Arrays.deepHashCode(new Object[] {
-                id,
-                value,
-                name
-        });
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        UnionConstructorDuplicateTypes that = (UnionConstructorDuplicateTypes) o;
+        return id == that.id &&
+                Objects.equals(value, that.value) &&
+                Objects.equals(name, that.name);
     }
 
     @Override
-    public boolean equals(Object obj)
+    public int hashCode()
     {
-        if (this == obj) {
-            return true;
-        }
-        else if (obj == null || getClass() != obj.getClass()) {
-            return false;
-        }
-
-        UnionConstructorDuplicateTypes that = (UnionConstructorDuplicateTypes) obj;
-        return Objects.equals(this.id, that.id)
-                && Objects.equals(this.value, that.value)
-                && Objects.equals(this.name, that.name);
+        return Objects.hash(value, id, name);
     }
 
     @Override
@@ -126,7 +120,6 @@ public class UnionConstructorDuplicateTypes
                 .add("value", value)
                 .add("id", id)
                 .add("name", name)
-                .add("type", value == null ? "<null>" : value.getClass().getSimpleName())
                 .toString();
     }
 }

@@ -17,6 +17,8 @@ package io.airlift.drift.codec.internal.compiler.byteCode;
 
 import javax.annotation.concurrent.Immutable;
 
+import static com.google.common.base.MoreObjects.toStringHelper;
+
 @Immutable
 public class LocalVariableDefinition
 {
@@ -49,11 +51,9 @@ public class LocalVariableDefinition
     @Override
     public String toString()
     {
-        final StringBuilder sb = new StringBuilder();
-        sb.append("LocalVariableDefinition");
-        sb.append("{name='").append(name).append('\'');
-        sb.append(", slot=").append(slot);
-        sb.append('}');
-        return sb.toString();
+        return toStringHelper(this)
+                .add("name", name)
+                .add("slot", slot)
+                .toString();
     }
 }

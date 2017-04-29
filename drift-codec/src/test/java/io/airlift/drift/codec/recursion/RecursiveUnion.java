@@ -60,18 +60,22 @@ public class RecursiveUnion
     }
 
     @Override
-    public boolean equals(Object obj)
+    public boolean equals(Object o)
     {
-        if (this == obj) {
+        if (this == o) {
             return true;
         }
-        if (obj == null || getClass() != obj.getClass()) {
+        if (o == null || getClass() != o.getClass()) {
             return false;
         }
+        RecursiveUnion that = (RecursiveUnion) o;
+        return unionId == that.unionId &&
+                Objects.equals(value, that.value);
+    }
 
-        final RecursiveUnion that = (RecursiveUnion) obj;
-
-        return Objects.equals(this.unionId, that.unionId) &&
-                Objects.equals(this.value, that.value);
+    @Override
+    public int hashCode()
+    {
+        return Objects.hash(unionId, value);
     }
 }

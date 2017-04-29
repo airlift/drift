@@ -25,7 +25,9 @@ import javax.annotation.concurrent.Immutable;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Map;
+import java.util.Objects;
 
+import static com.google.common.base.MoreObjects.toStringHelper;
 import static java.lang.String.format;
 import static java.util.Objects.requireNonNull;
 
@@ -156,30 +158,22 @@ public class ThriftEnumMetadata<T extends Enum<T>>
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-
-        final ThriftEnumMetadata<?> that = (ThriftEnumMetadata<?>) o;
-
-        if (!enumClass.equals(that.enumClass)) {
-            return false;
-        }
-
-        return true;
+        ThriftEnumMetadata<?> that = (ThriftEnumMetadata<?>) o;
+        return Objects.equals(enumClass, that.enumClass);
     }
 
     @Override
     public int hashCode()
     {
-        return enumClass.hashCode();
+        return Objects.hash(enumClass);
     }
 
     @Override
     public String toString()
     {
-        final StringBuilder sb = new StringBuilder();
-        sb.append("ThriftEnumMetadata");
-        sb.append("{enumClass=").append(enumClass);
-        sb.append(", byThriftValue=").append(byEnumValue);
-        sb.append('}');
-        return sb.toString();
+        return toStringHelper(this)
+                .add("enumClass", enumClass)
+                .add("byThriftValue", byEnumValue)
+                .toString();
     }
 }

@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 
+import static com.google.common.base.MoreObjects.toStringHelper;
 import static com.google.common.collect.Iterables.concat;
 import static io.airlift.drift.codec.internal.compiler.byteCode.Access.toAccessModifier;
 import static org.objectweb.asm.Opcodes.V1_6;
@@ -120,11 +121,9 @@ public class ClassDefinition
     @Override
     public String toString()
     {
-        final StringBuilder sb = new StringBuilder();
-        sb.append("ClassDefinition");
-        sb.append("{access=").append(access);
-        sb.append(", name='").append(name).append('\'');
-        sb.append('}');
-        return sb.toString();
+        return toStringHelper(this)
+                .add("access", access)
+                .add("name", name)
+                .toString();
     }
 }

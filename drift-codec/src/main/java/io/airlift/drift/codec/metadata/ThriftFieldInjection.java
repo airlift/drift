@@ -19,6 +19,7 @@ import javax.annotation.concurrent.Immutable;
 
 import java.lang.reflect.Field;
 
+import static com.google.common.base.MoreObjects.toStringHelper;
 import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.Objects.requireNonNull;
 
@@ -75,13 +76,11 @@ public class ThriftFieldInjection
     @Override
     public String toString()
     {
-        final StringBuilder sb = new StringBuilder();
-        sb.append("ThriftFieldInjection");
-        sb.append("{fieldId=").append(id);
-        sb.append(", name=").append(name);
-        sb.append(", fieldKind=").append(fieldKind);
-        sb.append(", field=").append(field.getDeclaringClass().getSimpleName()).append(".").append(field.getName());
-        sb.append('}');
-        return sb.toString();
+        return toStringHelper(this)
+                .add("id", id)
+                .add("name", name)
+                .add("field", field)
+                .add("fieldKind", fieldKind)
+                .toString();
     }
 }

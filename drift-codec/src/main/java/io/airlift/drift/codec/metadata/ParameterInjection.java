@@ -20,6 +20,7 @@ import io.airlift.drift.annotations.ThriftField;
 
 import java.lang.reflect.Type;
 
+import static com.google.common.base.MoreObjects.toStringHelper;
 import static io.airlift.drift.codec.metadata.FieldKind.THRIFT_FIELD;
 import static io.airlift.drift.codec.metadata.ReflectionHelper.resolveFieldType;
 import static java.util.Objects.requireNonNull;
@@ -67,12 +68,10 @@ class ParameterInjection
     @Override
     public String toString()
     {
-        final StringBuilder sb = new StringBuilder();
-        sb.append("ParameterInjection");
-        sb.append("{parameterIndex=").append(parameterIndex);
-        sb.append(", extractedName='").append(extractedName).append('\'');
-        sb.append(", parameterJavaType=").append(parameterJavaType);
-        sb.append('}');
-        return sb.toString();
+        return toStringHelper(this)
+                .add("parameterIndex", parameterIndex)
+                .add("extractedName", extractedName)
+                .add("parameterJavaType", parameterJavaType)
+                .toString();
     }
 }

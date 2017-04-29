@@ -30,6 +30,7 @@ import javax.inject.Provider;
 import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import static com.google.inject.multibindings.Multibinder.newSetBinder;
 import static java.util.Objects.requireNonNull;
@@ -156,20 +157,14 @@ public class ThriftCodecBinder
             if (o == null || getClass() != o.getClass()) {
                 return false;
             }
-
             ThriftCodecProvider that = (ThriftCodecProvider) o;
-
-            if (!type.equals(that.type)) {
-                return false;
-            }
-
-            return true;
+            return Objects.equals(type, that.type);
         }
 
         @Override
         public int hashCode()
         {
-            return type.hashCode();
+            return Objects.hash(type);
         }
     }
 }

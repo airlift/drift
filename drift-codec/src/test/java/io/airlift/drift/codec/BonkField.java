@@ -18,6 +18,10 @@ package io.airlift.drift.codec;
 import io.airlift.drift.annotations.ThriftField;
 import io.airlift.drift.annotations.ThriftStruct;
 
+import java.util.Objects;
+
+import static com.google.common.base.MoreObjects.toStringHelper;
+
 @ThriftStruct("Bonk")
 public final class BonkField
 {
@@ -46,35 +50,23 @@ public final class BonkField
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-
         BonkField bonkField = (BonkField) o;
-
-        if (type != bonkField.type) {
-            return false;
-        }
-        if (message != null ? !message.equals(bonkField.message) : bonkField.message != null) {
-            return false;
-        }
-
-        return true;
+        return type == bonkField.type &&
+                Objects.equals(message, bonkField.message);
     }
 
     @Override
     public int hashCode()
     {
-        int result = message != null ? message.hashCode() : 0;
-        result = 31 * result + type;
-        return result;
+        return Objects.hash(message, type);
     }
 
     @Override
     public String toString()
     {
-        final StringBuilder sb = new StringBuilder();
-        sb.append("BonkField");
-        sb.append("{message='").append(message).append('\'');
-        sb.append(", type=").append(type);
-        sb.append('}');
-        return sb.toString();
+        return toStringHelper(this)
+                .add("message", message)
+                .add("type", type)
+                .toString();
     }
 }

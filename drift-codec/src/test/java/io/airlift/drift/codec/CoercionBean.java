@@ -19,6 +19,9 @@ import io.airlift.drift.annotations.ThriftField;
 import io.airlift.drift.annotations.ThriftStruct;
 
 import java.util.List;
+import java.util.Objects;
+
+import static com.google.common.base.MoreObjects.toStringHelper;
 
 @ThriftStruct
 public final class CoercionBean
@@ -178,70 +181,37 @@ public final class CoercionBean
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-
-        final CoercionBean that = (CoercionBean) o;
-
-        if (Float.compare(that.primitiveFloat, primitiveFloat) != 0) {
-            return false;
-        }
-        if (booleanValue != null ? !booleanValue.equals(that.booleanValue) : that.booleanValue != null) {
-            return false;
-        }
-        if (byteValue != null ? !byteValue.equals(that.byteValue) : that.byteValue != null) {
-            return false;
-        }
-        if (doubleValue != null ? !doubleValue.equals(that.doubleValue) : that.doubleValue != null) {
-            return false;
-        }
-        if (floatList != null ? !floatList.equals(that.floatList) : that.floatList != null) {
-            return false;
-        }
-        if (floatValue != null ? !floatValue.equals(that.floatValue) : that.floatValue != null) {
-            return false;
-        }
-        if (integerValue != null ? !integerValue.equals(that.integerValue) : that.integerValue != null) {
-            return false;
-        }
-        if (longValue != null ? !longValue.equals(that.longValue) : that.longValue != null) {
-            return false;
-        }
-        if (shortValue != null ? !shortValue.equals(that.shortValue) : that.shortValue != null) {
-            return false;
-        }
-
-        return true;
+        CoercionBean that = (CoercionBean) o;
+        return Float.compare(that.primitiveFloat, primitiveFloat) == 0 &&
+                Objects.equals(booleanValue, that.booleanValue) &&
+                Objects.equals(byteValue, that.byteValue) &&
+                Objects.equals(shortValue, that.shortValue) &&
+                Objects.equals(integerValue, that.integerValue) &&
+                Objects.equals(longValue, that.longValue) &&
+                Objects.equals(floatValue, that.floatValue) &&
+                Objects.equals(doubleValue, that.doubleValue) &&
+                Objects.equals(floatList, that.floatList);
     }
 
     @Override
     public int hashCode()
     {
-        int result = booleanValue != null ? booleanValue.hashCode() : 0;
-        result = 31 * result + (byteValue != null ? byteValue.hashCode() : 0);
-        result = 31 * result + (shortValue != null ? shortValue.hashCode() : 0);
-        result = 31 * result + (integerValue != null ? integerValue.hashCode() : 0);
-        result = 31 * result + (longValue != null ? longValue.hashCode() : 0);
-        result = 31 * result + (floatValue != null ? floatValue.hashCode() : 0);
-        result = 31 * result + (doubleValue != null ? doubleValue.hashCode() : 0);
-        result = 31 * result + (primitiveFloat != +0.0f ? Float.floatToIntBits(primitiveFloat) : 0);
-        result = 31 * result + (floatList != null ? floatList.hashCode() : 0);
-        return result;
+        return Objects.hash(booleanValue, byteValue, shortValue, integerValue, longValue, floatValue, doubleValue, primitiveFloat, floatList);
     }
 
     @Override
     public String toString()
     {
-        final StringBuilder sb = new StringBuilder();
-        sb.append("CoercionBean");
-        sb.append("{booleanValue=").append(booleanValue);
-        sb.append(", byteValue=").append(byteValue);
-        sb.append(", shortValue=").append(shortValue);
-        sb.append(", integerValue=").append(integerValue);
-        sb.append(", longValue=").append(longValue);
-        sb.append(", floatValue=").append(floatValue);
-        sb.append(", doubleValue=").append(doubleValue);
-        sb.append(", primitiveFloat=").append(primitiveFloat);
-        sb.append(", floatList=").append(floatList);
-        sb.append('}');
-        return sb.toString();
+        return toStringHelper(this)
+                .add("booleanValue", booleanValue)
+                .add("byteValue", byteValue)
+                .add("shortValue", shortValue)
+                .add("integerValue", integerValue)
+                .add("longValue", longValue)
+                .add("floatValue", floatValue)
+                .add("doubleValue", doubleValue)
+                .add("primitiveFloat", primitiveFloat)
+                .add("floatList", floatList)
+                .toString();
     }
 }

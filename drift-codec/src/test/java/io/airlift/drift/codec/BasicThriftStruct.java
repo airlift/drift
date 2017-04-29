@@ -61,17 +61,6 @@ public final class BasicThriftStruct
     public Long getQux() { return qux; }
 
     @Override
-    public String toString()
-    {
-        return toStringHelper(this)
-                .add("foo", foo)
-                .add("bar", bar)
-                .add("baz", baz)
-                .add("qux", qux)
-                .toString();
-    }
-
-    @Override
     public boolean equals(Object o)
     {
         if (this == o) {
@@ -80,21 +69,27 @@ public final class BasicThriftStruct
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
+        BasicThriftStruct that = (BasicThriftStruct) o;
+        return Objects.equals(foo, that.foo) &&
+                Objects.equals(bar, that.bar) &&
+                Objects.equals(baz, that.baz) &&
+                Objects.equals(qux, that.qux);
+    }
 
-        final BasicThriftStruct that = (BasicThriftStruct) o;
+    @Override
+    public int hashCode()
+    {
+        return Objects.hash(foo, bar, baz, qux);
+    }
 
-        if (!foo.equals(that.foo)) {
-            return false;
-        }
-        if (!bar.equals(that.bar)) {
-            return false;
-        }
-        if (!baz.equals(that.baz)) {
-            return false;
-        }
-        if (!Objects.equals(qux, that.qux)) {
-            return false;
-        }
-        return true;
+    @Override
+    public String toString()
+    {
+        return toStringHelper(this)
+                .add("foo", foo)
+                .add("bar", bar)
+                .add("baz", baz)
+                .add("qux", qux)
+                .toString();
     }
 }

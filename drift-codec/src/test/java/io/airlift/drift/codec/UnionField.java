@@ -61,26 +61,25 @@ public final class UnionField
     }
 
     @Override
-    public int hashCode()
+    public boolean equals(Object o)
     {
-        return Objects.hash(stringValue, longValue, fruitValue);
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        UnionField that = (UnionField) o;
+        return _id == that._id &&
+                Objects.equals(stringValue, that.stringValue) &&
+                Objects.equals(longValue, that.longValue) &&
+                fruitValue == that.fruitValue;
     }
 
     @Override
-    public boolean equals(Object obj)
+    public int hashCode()
     {
-        if (this == obj) {
-            return true;
-        }
-        else if (obj == null || getClass() != obj.getClass()) {
-            return false;
-        }
-
-        UnionField that = (UnionField) obj;
-        return this._id == that._id
-                && Objects.equals(this.stringValue, that.stringValue)
-                && Objects.equals(this.longValue, that.longValue)
-                && Objects.equals(this.fruitValue, that.fruitValue);
+        return Objects.hash(stringValue, longValue, fruitValue, _id);
     }
 
     @Override

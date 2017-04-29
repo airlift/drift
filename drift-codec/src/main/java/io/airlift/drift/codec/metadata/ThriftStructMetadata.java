@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.SortedMap;
 
+import static com.google.common.base.MoreObjects.toStringHelper;
 import static com.google.common.collect.Maps.uniqueIndex;
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toList;
@@ -169,16 +170,14 @@ public class ThriftStructMetadata
     @Override
     public String toString()
     {
-        final StringBuilder sb = new StringBuilder();
-        sb.append("ThriftStructMetadata");
-        sb.append("{structName='").append(structName).append('\'');
-        sb.append(", structType=").append(structType);
-        sb.append(", builderType=").append(builderType);
-        sb.append(", builderMethod=").append(builderMethod);
-        sb.append(", fields=").append(fields);
-        sb.append(", constructorInjection=").append(constructorInjection);
-        sb.append(", methodInjections=").append(methodInjections);
-        sb.append('}');
-        return sb.toString();
+        return toStringHelper(this)
+                .add("structName", structName)
+                .add("builderMethod", builderMethod)
+                .add("fields", fields)
+                .add("constructorInjection", constructorInjection)
+                .add("methodInjections", methodInjections)
+                .add("structType", structType)
+                .add("builderType", builderType)
+                .toString();
     }
 }

@@ -32,7 +32,9 @@ import org.testng.annotations.Test;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
+import static com.google.common.base.MoreObjects.toStringHelper;
 import static io.airlift.drift.codec.guice.ThriftCodecBinder.thriftCodecBinder;
 import static java.util.Objects.requireNonNull;
 import static org.testng.Assert.assertEquals;
@@ -138,30 +140,22 @@ public class TestThriftCodecModule
             if (o == null || getClass() != o.getClass()) {
                 return false;
             }
-
             ValueClass that = (ValueClass) o;
-
-            if (!value.equals(that.value)) {
-                return false;
-            }
-
-            return true;
+            return Objects.equals(value, that.value);
         }
 
         @Override
         public int hashCode()
         {
-            return value.hashCode();
+            return Objects.hash(value);
         }
 
         @Override
         public String toString()
         {
-            final StringBuilder sb = new StringBuilder();
-            sb.append("ValueClass");
-            sb.append("{value='").append(value).append('\'');
-            sb.append('}');
-            return sb.toString();
+            return toStringHelper(this)
+                    .add("value", value)
+                    .toString();
         }
     }
 }

@@ -19,6 +19,7 @@ import javax.annotation.concurrent.Immutable;
 
 import java.lang.reflect.Type;
 
+import static com.google.common.base.MoreObjects.toStringHelper;
 import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.Objects.requireNonNull;
 
@@ -78,13 +79,11 @@ public class ThriftParameterInjection
     @Override
     public String toString()
     {
-        final StringBuilder sb = new StringBuilder();
-        sb.append("ThriftParameterInjection");
-        sb.append("{fieldId=").append(id);
-        sb.append(", name=").append(name);
-        sb.append(", index=").append(parameterIndex);
-        sb.append(", javaType=").append(javaType);
-        sb.append('}');
-        return sb.toString();
+        return toStringHelper(this)
+                .add("id", id)
+                .add("name", name)
+                .add("parameterIndex", parameterIndex)
+                .add("javaType", javaType)
+                .toString();
     }
 }

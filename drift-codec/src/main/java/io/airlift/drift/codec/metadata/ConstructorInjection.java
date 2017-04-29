@@ -20,6 +20,8 @@ import com.google.common.collect.ImmutableList;
 import java.lang.reflect.Constructor;
 import java.util.List;
 
+import static com.google.common.base.MoreObjects.toStringHelper;
+
 class ConstructorInjection
 {
     private final Constructor<?> constructor;
@@ -50,11 +52,9 @@ class ConstructorInjection
     @Override
     public String toString()
     {
-        final StringBuilder sb = new StringBuilder();
-        sb.append("ConstructorInjection");
-        sb.append("{constructor=").append(constructor);
-        sb.append(", parameters=").append(parameters);
-        sb.append('}');
-        return sb.toString();
+        return toStringHelper(this)
+                .add("constructor", constructor)
+                .add("parameters", parameters)
+                .toString();
     }
 }

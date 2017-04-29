@@ -26,8 +26,10 @@ import java.lang.reflect.Type;
 import java.nio.ByteBuffer;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
+import static com.google.common.base.MoreObjects.toStringHelper;
 import static com.google.common.base.Preconditions.checkState;
 import static io.airlift.drift.codec.ThriftProtocolType.ENUM;
 import static io.airlift.drift.codec.ThriftProtocolType.STRUCT;
@@ -290,45 +292,26 @@ public class ThriftType
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-
-        final ThriftType that = (ThriftType) o;
-
-        if (javaType != null ? !javaType.equals(that.javaType) : that.javaType != null) {
-            return false;
-        }
-        if (protocolType != that.protocolType) {
-            return false;
-        }
-
-        return true;
+        ThriftType that = (ThriftType) o;
+        return protocolType == that.protocolType &&
+                Objects.equals(javaType, that.javaType);
     }
 
     @Override
     public int hashCode()
     {
-        int result = protocolType != null ? protocolType.hashCode() : 0;
-        result = 31 * result + (javaType != null ? javaType.hashCode() : 0);
-        return result;
+        return Objects.hash(protocolType, javaType);
     }
 
     @Override
     public String toString()
     {
-        final StringBuilder sb = new StringBuilder();
-        sb.append("ThriftType");
-        sb.append("{");
-        sb.append(protocolType).append(" ").append(javaType);
-        if (structMetadata != null) {
-            sb.append(" ").append(getStructMetadata().getStructClass().getName());
-        }
-        else if (keyTypeReference != null) {
-            sb.append(" keyTypeReference=").append(keyTypeReference);
-            sb.append(", valueTypeReference=").append(valueTypeReference);
-        }
-        else if (valueTypeReference != null) {
-            sb.append(" valueTypeReference=").append(valueTypeReference);
-        }
-        sb.append('}');
-        return sb.toString();
+        return toStringHelper(this).omitNullValues()
+                .add("protocolType", protocolType)
+                .add("javaType", javaType)
+                .add("structMetadata", structMetadata)
+                .add("keyTypeReference", keyTypeReference)
+                .add("valueTypeReference", valueTypeReference)
+                .toString();
     }
 }

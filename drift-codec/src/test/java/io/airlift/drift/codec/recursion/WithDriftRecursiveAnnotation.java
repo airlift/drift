@@ -33,18 +33,22 @@ public class WithDriftRecursiveAnnotation
     public String data;
 
     @Override
-    public boolean equals(Object obj)
+    public boolean equals(Object o)
     {
-        if (this == obj) {
+        if (this == o) {
             return true;
         }
-        if (obj == null || getClass() != obj.getClass()) {
+        if (o == null || getClass() != o.getClass()) {
             return false;
         }
+        WithDriftRecursiveAnnotation that = (WithDriftRecursiveAnnotation) o;
+        return Objects.equals(child, that.child) &&
+                Objects.equals(data, that.data);
+    }
 
-        final WithDriftRecursiveAnnotation that = (WithDriftRecursiveAnnotation) obj;
-
-        return Objects.equals(data, that.data) &&
-                Objects.equals(child, that.child);
+    @Override
+    public int hashCode()
+    {
+        return Objects.hash(child, data);
     }
 }

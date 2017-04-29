@@ -68,24 +68,23 @@ public final class UnionBuilder
     }
 
     @Override
-    public int hashCode()
+    public boolean equals(Object o)
     {
-        return Objects.hash(value, type);
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        UnionBuilder that = (UnionBuilder) o;
+        return type == that.type &&
+                Objects.equals(value, that.value);
     }
 
     @Override
-    public boolean equals(Object obj)
+    public int hashCode()
     {
-        if (this == obj) {
-            return true;
-        }
-        else if (obj == null || getClass() != obj.getClass()) {
-            return false;
-        }
-
-        UnionBuilder that = (UnionBuilder) obj;
-        return Objects.equals(this.type, that.type)
-                && Objects.equals(this.value, that.value);
+        return Objects.hash(value, type);
     }
 
     @Override

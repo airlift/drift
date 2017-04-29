@@ -58,18 +58,22 @@ public class RecursiveDefaultUnion
     }
 
     @Override
-    public boolean equals(Object obj)
+    public boolean equals(Object o)
     {
-        if (this == obj) {
+        if (this == o) {
             return true;
         }
-        if (obj == null || getClass() != obj.getClass()) {
+        if (o == null || getClass() != o.getClass()) {
             return false;
         }
+        RecursiveDefaultUnion that = (RecursiveDefaultUnion) o;
+        return unionId == that.unionId &&
+                Objects.equals(value, that.value);
+    }
 
-        final RecursiveDefaultUnion that = (RecursiveDefaultUnion) obj;
-
-        return Objects.equals(this.unionId, that.unionId) &&
-                Objects.equals(this.value, that.value);
+    @Override
+    public int hashCode()
+    {
+        return Objects.hash(unionId, value);
     }
 }

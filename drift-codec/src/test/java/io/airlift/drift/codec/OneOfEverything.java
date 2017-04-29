@@ -20,7 +20,10 @@ import io.airlift.drift.annotations.ThriftStruct;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
+
+import static com.google.common.base.MoreObjects.toStringHelper;
 
 @ThriftStruct
 public final class OneOfEverything
@@ -155,316 +158,190 @@ public final class OneOfEverything
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-
-        final OneOfEverything that = (OneOfEverything) o;
-
-        if (aBoolean != that.aBoolean) {
-            return false;
-        }
-        if (aByte != that.aByte) {
-            return false;
-        }
-        if (Double.compare(that.aDouble, aDouble) != 0) {
-            return false;
-        }
-        if (aInt != that.aInt) {
-            return false;
-        }
-        if (aLong != that.aLong) {
-            return false;
-        }
-        if (aShort != that.aShort) {
-            return false;
-        }
-        if (aBooleanKeyMap != null ? !aBooleanKeyMap.equals(that.aBooleanKeyMap) : that.aBooleanKeyMap != null) {
-            return false;
-        }
-        if (aBooleanList != null ? !aBooleanList.equals(that.aBooleanList) : that.aBooleanList != null) {
-            return false;
-        }
-        if (aBooleanSet != null ? !aBooleanSet.equals(that.aBooleanSet) : that.aBooleanSet != null) {
-            return false;
-        }
-        if (aBooleanValueMap != null ? !aBooleanValueMap.equals(that.aBooleanValueMap) : that.aBooleanValueMap != null) {
-            return false;
-        }
-        if (aByteKeyMap != null ? !aByteKeyMap.equals(that.aByteKeyMap) : that.aByteKeyMap != null) {
-            return false;
-        }
-        if (aByteList != null ? !aByteList.equals(that.aByteList) : that.aByteList != null) {
-            return false;
-        }
-        if (aByteSet != null ? !aByteSet.equals(that.aByteSet) : that.aByteSet != null) {
-            return false;
-        }
-        if (aByteValueMap != null ? !aByteValueMap.equals(that.aByteValueMap) : that.aByteValueMap != null) {
-            return false;
-        }
-        if (aCustomEnum != that.aCustomEnum) {
-            return false;
-        }
-        if (aCustomEnumKeyMap != null ? !aCustomEnumKeyMap.equals(that.aCustomEnumKeyMap) : that.aCustomEnumKeyMap != null) {
-            return false;
-        }
-        if (aCustomEnumList != null ? !aCustomEnumList.equals(that.aCustomEnumList) : that.aCustomEnumList != null) {
-            return false;
-        }
-        if (aCustomEnumSet != null ? !aCustomEnumSet.equals(that.aCustomEnumSet) : that.aCustomEnumSet != null) {
-            return false;
-        }
-        if (aCustomEnumValueMap != null ? !aCustomEnumValueMap.equals(that.aCustomEnumValueMap) : that.aCustomEnumValueMap != null) {
-            return false;
-        }
-        if (aDoubleKeyMap != null ? !aDoubleKeyMap.equals(that.aDoubleKeyMap) : that.aDoubleKeyMap != null) {
-            return false;
-        }
-        if (aDoubleList != null ? !aDoubleList.equals(that.aDoubleList) : that.aDoubleList != null) {
-            return false;
-        }
-        if (aDoubleSet != null ? !aDoubleSet.equals(that.aDoubleSet) : that.aDoubleSet != null) {
-            return false;
-        }
-        if (aDoubleValueMap != null ? !aDoubleValueMap.equals(that.aDoubleValueMap) : that.aDoubleValueMap != null) {
-            return false;
-        }
-        if (aEnum != that.aEnum) {
-            return false;
-        }
-        if (aEnumKeyMap != null ? !aEnumKeyMap.equals(that.aEnumKeyMap) : that.aEnumKeyMap != null) {
-            return false;
-        }
-        if (aEnumList != null ? !aEnumList.equals(that.aEnumList) : that.aEnumList != null) {
-            return false;
-        }
-        if (aEnumSet != null ? !aEnumSet.equals(that.aEnumSet) : that.aEnumSet != null) {
-            return false;
-        }
-        if (aEnumValueMap != null ? !aEnumValueMap.equals(that.aEnumValueMap) : that.aEnumValueMap != null) {
-            return false;
-        }
-        if (aIntegerKeyMap != null ? !aIntegerKeyMap.equals(that.aIntegerKeyMap) : that.aIntegerKeyMap != null) {
-            return false;
-        }
-        if (aIntegerList != null ? !aIntegerList.equals(that.aIntegerList) : that.aIntegerList != null) {
-            return false;
-        }
-        if (aIntegerSet != null ? !aIntegerSet.equals(that.aIntegerSet) : that.aIntegerSet != null) {
-            return false;
-        }
-        if (aIntegerValueMap != null ? !aIntegerValueMap.equals(that.aIntegerValueMap) : that.aIntegerValueMap != null) {
-            return false;
-        }
-        if (aLongKeyMap != null ? !aLongKeyMap.equals(that.aLongKeyMap) : that.aLongKeyMap != null) {
-            return false;
-        }
-        if (aLongList != null ? !aLongList.equals(that.aLongList) : that.aLongList != null) {
-            return false;
-        }
-        if (aLongSet != null ? !aLongSet.equals(that.aLongSet) : that.aLongSet != null) {
-            return false;
-        }
-        if (aLongValueMap != null ? !aLongValueMap.equals(that.aLongValueMap) : that.aLongValueMap != null) {
-            return false;
-        }
-        if (aMapOfListToSet != null ? !aMapOfListToSet.equals(that.aMapOfListToSet) : that.aMapOfListToSet != null) {
-            return false;
-        }
-        if (aSetOfListsOfMaps != null ? !aSetOfListsOfMaps.equals(that.aSetOfListsOfMaps) : that.aSetOfListsOfMaps != null) {
-            return false;
-        }
-        if (aShortKeyMap != null ? !aShortKeyMap.equals(that.aShortKeyMap) : that.aShortKeyMap != null) {
-            return false;
-        }
-        if (aShortList != null ? !aShortList.equals(that.aShortList) : that.aShortList != null) {
-            return false;
-        }
-        if (aShortSet != null ? !aShortSet.equals(that.aShortSet) : that.aShortSet != null) {
-            return false;
-        }
-        if (aShortValueMap != null ? !aShortValueMap.equals(that.aShortValueMap) : that.aShortValueMap != null) {
-            return false;
-        }
-        if (aString != null ? !aString.equals(that.aString) : that.aString != null) {
-            return false;
-        }
-        if (aStringKeyMap != null ? !aStringKeyMap.equals(that.aStringKeyMap) : that.aStringKeyMap != null) {
-            return false;
-        }
-        if (aStringList != null ? !aStringList.equals(that.aStringList) : that.aStringList != null) {
-            return false;
-        }
-        if (aStringSet != null ? !aStringSet.equals(that.aStringSet) : that.aStringSet != null) {
-            return false;
-        }
-        if (aStringValueMap != null ? !aStringValueMap.equals(that.aStringValueMap) : that.aStringValueMap != null) {
-            return false;
-        }
-        if (aStruct != null ? !aStruct.equals(that.aStruct) : that.aStruct != null) {
-            return false;
-        }
-        if (aStructKeyMap != null ? !aStructKeyMap.equals(that.aStructKeyMap) : that.aStructKeyMap != null) {
-            return false;
-        }
-        if (aStructList != null ? !aStructList.equals(that.aStructList) : that.aStructList != null) {
-            return false;
-        }
-        if (aStructSet != null ? !aStructSet.equals(that.aStructSet) : that.aStructSet != null) {
-            return false;
-        }
-        if (aStructValueMap != null ? !aStructValueMap.equals(that.aStructValueMap) : that.aStructValueMap != null) {
-            return false;
-        }
-
-        if (aUnion != null ? !aUnion.equals(that.aUnion) : that.aUnion != null) {
-            return false;
-        }
-        if (aUnionKeyMap != null ? !aUnionKeyMap.equals(that.aUnionKeyMap) : that.aUnionKeyMap != null) {
-            return false;
-        }
-        if (aUnionList != null ? !aUnionList.equals(that.aUnionList) : that.aUnionList != null) {
-            return false;
-        }
-        if (aUnionSet != null ? !aUnionSet.equals(that.aUnionSet) : that.aUnionSet != null) {
-            return false;
-        }
-        if (aUnionValueMap != null ? !aUnionValueMap.equals(that.aUnionValueMap) : that.aUnionValueMap != null) {
-            return false;
-        }
-
-        return true;
+        OneOfEverything that = (OneOfEverything) o;
+        return aBoolean == that.aBoolean &&
+                aByte == that.aByte &&
+                aShort == that.aShort &&
+                aInt == that.aInt &&
+                aLong == that.aLong &&
+                Double.compare(that.aDouble, aDouble) == 0 &&
+                Objects.equals(aString, that.aString) &&
+                Objects.equals(aStruct, that.aStruct) &&
+                aEnum == that.aEnum &&
+                aCustomEnum == that.aCustomEnum &&
+                Objects.equals(aBooleanSet, that.aBooleanSet) &&
+                Objects.equals(aByteSet, that.aByteSet) &&
+                Objects.equals(aShortSet, that.aShortSet) &&
+                Objects.equals(aIntegerSet, that.aIntegerSet) &&
+                Objects.equals(aLongSet, that.aLongSet) &&
+                Objects.equals(aDoubleSet, that.aDoubleSet) &&
+                Objects.equals(aStringSet, that.aStringSet) &&
+                Objects.equals(aStructSet, that.aStructSet) &&
+                Objects.equals(aEnumSet, that.aEnumSet) &&
+                Objects.equals(aCustomEnumSet, that.aCustomEnumSet) &&
+                Objects.equals(aBooleanList, that.aBooleanList) &&
+                Objects.equals(aByteList, that.aByteList) &&
+                Objects.equals(aShortList, that.aShortList) &&
+                Objects.equals(aIntegerList, that.aIntegerList) &&
+                Objects.equals(aLongList, that.aLongList) &&
+                Objects.equals(aDoubleList, that.aDoubleList) &&
+                Objects.equals(aStringList, that.aStringList) &&
+                Objects.equals(aStructList, that.aStructList) &&
+                Objects.equals(aEnumList, that.aEnumList) &&
+                Objects.equals(aCustomEnumList, that.aCustomEnumList) &&
+                Objects.equals(aBooleanValueMap, that.aBooleanValueMap) &&
+                Objects.equals(aByteValueMap, that.aByteValueMap) &&
+                Objects.equals(aShortValueMap, that.aShortValueMap) &&
+                Objects.equals(aIntegerValueMap, that.aIntegerValueMap) &&
+                Objects.equals(aLongValueMap, that.aLongValueMap) &&
+                Objects.equals(aDoubleValueMap, that.aDoubleValueMap) &&
+                Objects.equals(aStringValueMap, that.aStringValueMap) &&
+                Objects.equals(aStructValueMap, that.aStructValueMap) &&
+                Objects.equals(aEnumValueMap, that.aEnumValueMap) &&
+                Objects.equals(aCustomEnumValueMap, that.aCustomEnumValueMap) &&
+                Objects.equals(aBooleanKeyMap, that.aBooleanKeyMap) &&
+                Objects.equals(aByteKeyMap, that.aByteKeyMap) &&
+                Objects.equals(aShortKeyMap, that.aShortKeyMap) &&
+                Objects.equals(aIntegerKeyMap, that.aIntegerKeyMap) &&
+                Objects.equals(aLongKeyMap, that.aLongKeyMap) &&
+                Objects.equals(aDoubleKeyMap, that.aDoubleKeyMap) &&
+                Objects.equals(aStringKeyMap, that.aStringKeyMap) &&
+                Objects.equals(aStructKeyMap, that.aStructKeyMap) &&
+                Objects.equals(aEnumKeyMap, that.aEnumKeyMap) &&
+                Objects.equals(aCustomEnumKeyMap, that.aCustomEnumKeyMap) &&
+                Objects.equals(aUnion, that.aUnion) &&
+                Objects.equals(aUnionSet, that.aUnionSet) &&
+                Objects.equals(aUnionList, that.aUnionList) &&
+                Objects.equals(aUnionKeyMap, that.aUnionKeyMap) &&
+                Objects.equals(aUnionValueMap, that.aUnionValueMap) &&
+                Objects.equals(aSetOfListsOfMaps, that.aSetOfListsOfMaps) &&
+                Objects.equals(aMapOfListToSet, that.aMapOfListToSet);
     }
 
     @Override
     public int hashCode()
     {
-        int result;
-        long temp;
-        result = (aBoolean ? 1 : 0);
-        result = 31 * result + (int) aByte;
-        result = 31 * result + (int) aShort;
-        result = 31 * result + aInt;
-        result = 31 * result + (int) (aLong ^ (aLong >>> 32));
-        temp = aDouble != +0.0d ? Double.doubleToLongBits(aDouble) : 0L;
-        result = 31 * result + (int) (temp ^ (temp >>> 32));
-        result = 31 * result + (aString != null ? aString.hashCode() : 0);
-        result = 31 * result + (aStruct != null ? aStruct.hashCode() : 0);
-        result = 31 * result + (aEnum != null ? aEnum.hashCode() : 0);
-        result = 31 * result + (aCustomEnum != null ? aCustomEnum.hashCode() : 0);
-        result = 31 * result + (aBooleanSet != null ? aBooleanSet.hashCode() : 0);
-        result = 31 * result + (aByteSet != null ? aByteSet.hashCode() : 0);
-        result = 31 * result + (aShortSet != null ? aShortSet.hashCode() : 0);
-        result = 31 * result + (aIntegerSet != null ? aIntegerSet.hashCode() : 0);
-        result = 31 * result + (aLongSet != null ? aLongSet.hashCode() : 0);
-        result = 31 * result + (aDoubleSet != null ? aDoubleSet.hashCode() : 0);
-        result = 31 * result + (aStringSet != null ? aStringSet.hashCode() : 0);
-        result = 31 * result + (aStructSet != null ? aStructSet.hashCode() : 0);
-        result = 31 * result + (aEnumSet != null ? aEnumSet.hashCode() : 0);
-        result = 31 * result + (aCustomEnumSet != null ? aCustomEnumSet.hashCode() : 0);
-        result = 31 * result + (aBooleanList != null ? aBooleanList.hashCode() : 0);
-        result = 31 * result + (aByteList != null ? aByteList.hashCode() : 0);
-        result = 31 * result + (aShortList != null ? aShortList.hashCode() : 0);
-        result = 31 * result + (aIntegerList != null ? aIntegerList.hashCode() : 0);
-        result = 31 * result + (aLongList != null ? aLongList.hashCode() : 0);
-        result = 31 * result + (aDoubleList != null ? aDoubleList.hashCode() : 0);
-        result = 31 * result + (aStringList != null ? aStringList.hashCode() : 0);
-        result = 31 * result + (aStructList != null ? aStructList.hashCode() : 0);
-        result = 31 * result + (aEnumList != null ? aEnumList.hashCode() : 0);
-        result = 31 * result + (aCustomEnumList != null ? aCustomEnumList.hashCode() : 0);
-        result = 31 * result + (aBooleanValueMap != null ? aBooleanValueMap.hashCode() : 0);
-        result = 31 * result + (aByteValueMap != null ? aByteValueMap.hashCode() : 0);
-        result = 31 * result + (aShortValueMap != null ? aShortValueMap.hashCode() : 0);
-        result = 31 * result + (aIntegerValueMap != null ? aIntegerValueMap.hashCode() : 0);
-        result = 31 * result + (aLongValueMap != null ? aLongValueMap.hashCode() : 0);
-        result = 31 * result + (aDoubleValueMap != null ? aDoubleValueMap.hashCode() : 0);
-        result = 31 * result + (aStringValueMap != null ? aStringValueMap.hashCode() : 0);
-        result = 31 * result + (aStructValueMap != null ? aStructValueMap.hashCode() : 0);
-        result = 31 * result + (aEnumValueMap != null ? aEnumValueMap.hashCode() : 0);
-        result = 31 * result + (aCustomEnumValueMap != null ? aCustomEnumValueMap.hashCode() : 0);
-        result = 31 * result + (aBooleanKeyMap != null ? aBooleanKeyMap.hashCode() : 0);
-        result = 31 * result + (aByteKeyMap != null ? aByteKeyMap.hashCode() : 0);
-        result = 31 * result + (aShortKeyMap != null ? aShortKeyMap.hashCode() : 0);
-        result = 31 * result + (aIntegerKeyMap != null ? aIntegerKeyMap.hashCode() : 0);
-        result = 31 * result + (aLongKeyMap != null ? aLongKeyMap.hashCode() : 0);
-        result = 31 * result + (aDoubleKeyMap != null ? aDoubleKeyMap.hashCode() : 0);
-        result = 31 * result + (aStringKeyMap != null ? aStringKeyMap.hashCode() : 0);
-        result = 31 * result + (aStructKeyMap != null ? aStructKeyMap.hashCode() : 0);
-        result = 31 * result + (aEnumKeyMap != null ? aEnumKeyMap.hashCode() : 0);
-        result = 31 * result + (aCustomEnumKeyMap != null ? aCustomEnumKeyMap.hashCode() : 0);
-        result = 31 * result + (aSetOfListsOfMaps != null ? aSetOfListsOfMaps.hashCode() : 0);
-        result = 31 * result + (aMapOfListToSet != null ? aMapOfListToSet.hashCode() : 0);
-
-        result = 31 * result + (aUnion != null ? aUnion.hashCode() : 0);
-        result = 31 * result + (aUnionList != null ? aUnionList.hashCode() : 0);
-        result = 31 * result + (aUnionSet != null ? aUnionSet.hashCode() : 0);
-        result = 31 * result + (aUnionKeyMap != null ? aUnionKeyMap.hashCode() : 0);
-        result = 31 * result + (aUnionValueMap != null ? aUnionValueMap.hashCode() : 0);
-        return result;
+        return Objects.hash(
+                aBoolean,
+                aByte,
+                aShort,
+                aInt,
+                aLong,
+                aDouble,
+                aString,
+                aStruct,
+                aEnum,
+                aCustomEnum,
+                aBooleanSet,
+                aByteSet,
+                aShortSet,
+                aIntegerSet,
+                aLongSet,
+                aDoubleSet,
+                aStringSet,
+                aStructSet,
+                aEnumSet,
+                aCustomEnumSet,
+                aBooleanList,
+                aByteList,
+                aShortList,
+                aIntegerList,
+                aLongList,
+                aDoubleList,
+                aStringList,
+                aStructList,
+                aEnumList,
+                aCustomEnumList,
+                aBooleanValueMap,
+                aByteValueMap,
+                aShortValueMap,
+                aIntegerValueMap,
+                aLongValueMap,
+                aDoubleValueMap,
+                aStringValueMap,
+                aStructValueMap,
+                aEnumValueMap,
+                aCustomEnumValueMap,
+                aBooleanKeyMap,
+                aByteKeyMap,
+                aShortKeyMap,
+                aIntegerKeyMap,
+                aLongKeyMap,
+                aDoubleKeyMap,
+                aStringKeyMap,
+                aStructKeyMap,
+                aEnumKeyMap,
+                aCustomEnumKeyMap,
+                aUnion,
+                aUnionSet,
+                aUnionList,
+                aUnionKeyMap,
+                aUnionValueMap,
+                aSetOfListsOfMaps,
+                aMapOfListToSet);
     }
 
     @Override
     public String toString()
     {
-        final StringBuilder sb = new StringBuilder();
-        sb.append("OneOfEverything");
-        sb.append("{aBoolean=").append(aBoolean);
-        sb.append(", aByte=").append(aByte);
-        sb.append(", aShort=").append(aShort);
-        sb.append(", aInt=").append(aInt);
-        sb.append(", aLong=").append(aLong);
-        sb.append(", aDouble=").append(aDouble);
-        sb.append(", aString='").append(aString).append('\'');
-        sb.append(", aStruct=").append(aStruct);
-        sb.append(", aEnum=").append(aEnum);
-        sb.append(", aCustomEnum=").append(aCustomEnum);
-        sb.append(", aBooleanSet=").append(aBooleanSet);
-        sb.append(", aByteSet=").append(aByteSet);
-        sb.append(", aShortSet=").append(aShortSet);
-        sb.append(", aIntegerSet=").append(aIntegerSet);
-        sb.append(", aLongSet=").append(aLongSet);
-        sb.append(", aDoubleSet=").append(aDoubleSet);
-        sb.append(", aStringSet=").append(aStringSet);
-        sb.append(", aStructSet=").append(aStructSet);
-        sb.append(", aEnumSet=").append(aEnumSet);
-        sb.append(", aCustomEnumSet=").append(aCustomEnumSet);
-        sb.append(", aBooleanList=").append(aBooleanList);
-        sb.append(", aByteList=").append(aByteList);
-        sb.append(", aShortList=").append(aShortList);
-        sb.append(", aIntegerList=").append(aIntegerList);
-        sb.append(", aLongList=").append(aLongList);
-        sb.append(", aDoubleList=").append(aDoubleList);
-        sb.append(", aStringList=").append(aStringList);
-        sb.append(", aStructList=").append(aStructList);
-        sb.append(", aEnumList=").append(aEnumList);
-        sb.append(", aCustomEnumList=").append(aCustomEnumList);
-        sb.append(", aBooleanValueMap=").append(aBooleanValueMap);
-        sb.append(", aByteValueMap=").append(aByteValueMap);
-        sb.append(", aShortValueMap=").append(aShortValueMap);
-        sb.append(", aIntegerValueMap=").append(aIntegerValueMap);
-        sb.append(", aLongValueMap=").append(aLongValueMap);
-        sb.append(", aDoubleValueMap=").append(aDoubleValueMap);
-        sb.append(", aStringValueMap=").append(aStringValueMap);
-        sb.append(", aStructValueMap=").append(aStructValueMap);
-        sb.append(", aEnumValueMap=").append(aEnumValueMap);
-        sb.append(", aCustomEnumValueMap=").append(aCustomEnumValueMap);
-        sb.append(", aBooleanKeyMap=").append(aBooleanKeyMap);
-        sb.append(", aByteKeyMap=").append(aByteKeyMap);
-        sb.append(", aShortKeyMap=").append(aShortKeyMap);
-        sb.append(", aIntegerKeyMap=").append(aIntegerKeyMap);
-        sb.append(", aLongKeyMap=").append(aLongKeyMap);
-        sb.append(", aDoubleKeyMap=").append(aDoubleKeyMap);
-        sb.append(", aStringKeyMap=").append(aStringKeyMap);
-        sb.append(", aStructKeyMap=").append(aStructKeyMap);
-        sb.append(", aEnumKeyMap=").append(aEnumKeyMap);
-        sb.append(", aCustomEnumKeyMap=").append(aCustomEnumKeyMap);
-        sb.append(", aSetOfListsOfMaps=").append(aSetOfListsOfMaps);
-        sb.append(", aMapOfListToSet=").append(aMapOfListToSet);
-        sb.append(", aUnion=").append(aUnion);
-        sb.append(", aUnionSet=").append(aUnionSet);
-        sb.append(", aUnionList=").append(aUnionList);
-        sb.append(", aUnionKeyMap=").append(aUnionKeyMap);
-        sb.append(", aUnionValueMap=").append(aUnionValueMap);
-
-        sb.append('}');
-        return sb.toString();
+        return toStringHelper(this)
+                .add("aBoolean", aBoolean)
+                .add("aByte", aByte)
+                .add("aShort", aShort)
+                .add("aInt", aInt)
+                .add("aLong", aLong)
+                .add("aDouble", aDouble)
+                .add("aString", aString)
+                .add("aStruct", aStruct)
+                .add("aEnum", aEnum)
+                .add("aCustomEnum", aCustomEnum)
+                .add("aBooleanSet", aBooleanSet)
+                .add("aByteSet", aByteSet)
+                .add("aShortSet", aShortSet)
+                .add("aIntegerSet", aIntegerSet)
+                .add("aLongSet", aLongSet)
+                .add("aDoubleSet", aDoubleSet)
+                .add("aStringSet", aStringSet)
+                .add("aStructSet", aStructSet)
+                .add("aEnumSet", aEnumSet)
+                .add("aCustomEnumSet", aCustomEnumSet)
+                .add("aBooleanList", aBooleanList)
+                .add("aByteList", aByteList)
+                .add("aShortList", aShortList)
+                .add("aIntegerList", aIntegerList)
+                .add("aLongList", aLongList)
+                .add("aDoubleList", aDoubleList)
+                .add("aStringList", aStringList)
+                .add("aStructList", aStructList)
+                .add("aEnumList", aEnumList)
+                .add("aCustomEnumList", aCustomEnumList)
+                .add("aBooleanValueMap", aBooleanValueMap)
+                .add("aByteValueMap", aByteValueMap)
+                .add("aShortValueMap", aShortValueMap)
+                .add("aIntegerValueMap", aIntegerValueMap)
+                .add("aLongValueMap", aLongValueMap)
+                .add("aDoubleValueMap", aDoubleValueMap)
+                .add("aStringValueMap", aStringValueMap)
+                .add("aStructValueMap", aStructValueMap)
+                .add("aEnumValueMap", aEnumValueMap)
+                .add("aCustomEnumValueMap", aCustomEnumValueMap)
+                .add("aBooleanKeyMap", aBooleanKeyMap)
+                .add("aByteKeyMap", aByteKeyMap)
+                .add("aShortKeyMap", aShortKeyMap)
+                .add("aIntegerKeyMap", aIntegerKeyMap)
+                .add("aLongKeyMap", aLongKeyMap)
+                .add("aDoubleKeyMap", aDoubleKeyMap)
+                .add("aStringKeyMap", aStringKeyMap)
+                .add("aStructKeyMap", aStructKeyMap)
+                .add("aEnumKeyMap", aEnumKeyMap)
+                .add("aCustomEnumKeyMap", aCustomEnumKeyMap)
+                .add("aUnion", aUnion)
+                .add("aUnionSet", aUnionSet)
+                .add("aUnionList", aUnionList)
+                .add("aUnionKeyMap", aUnionKeyMap)
+                .add("aUnionValueMap", aUnionValueMap)
+                .add("aSetOfListsOfMaps", aSetOfListsOfMaps)
+                .add("aMapOfListToSet", aMapOfListToSet)
+                .toString();
     }
 }

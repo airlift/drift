@@ -20,6 +20,7 @@ import io.airlift.drift.annotations.ThriftField;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 
+import static com.google.common.base.MoreObjects.toStringHelper;
 import static io.airlift.drift.codec.metadata.ReflectionHelper.extractFieldName;
 import static io.airlift.drift.codec.metadata.ReflectionHelper.resolveFieldType;
 
@@ -56,10 +57,8 @@ class MethodExtractor
     @Override
     public String toString()
     {
-        final StringBuilder sb = new StringBuilder();
-        sb.append("MethodExtractor");
-        sb.append("{method=").append(method);
-        sb.append('}');
-        return sb.toString();
+        return toStringHelper(this)
+                .add("method", method)
+                .toString();
     }
 }

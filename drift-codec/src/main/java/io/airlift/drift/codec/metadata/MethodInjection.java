@@ -20,6 +20,8 @@ import com.google.common.collect.ImmutableList;
 import java.lang.reflect.Method;
 import java.util.List;
 
+import static com.google.common.base.MoreObjects.toStringHelper;
+
 class MethodInjection
 {
     private final Method method;
@@ -44,11 +46,9 @@ class MethodInjection
     @Override
     public String toString()
     {
-        final StringBuilder sb = new StringBuilder();
-        sb.append("MethodInjection");
-        sb.append("{method=").append(method);
-        sb.append(", parameters=").append(parameters);
-        sb.append('}');
-        return sb.toString();
+        return toStringHelper(this)
+                .add("method", method)
+                .add("parameters", parameters)
+                .toString();
     }
 }

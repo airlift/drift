@@ -70,24 +70,23 @@ public final class UnionMethod
     }
 
     @Override
-    public int hashCode()
+    public boolean equals(Object o)
     {
-        return Objects.hash(value, type);
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        UnionMethod that = (UnionMethod) o;
+        return type == that.type &&
+                Objects.equals(value, that.value);
     }
 
     @Override
-    public boolean equals(Object obj)
+    public int hashCode()
     {
-        if (this == obj) {
-            return true;
-        }
-        else if (obj == null || getClass() != obj.getClass()) {
-            return false;
-        }
-
-        UnionMethod that = (UnionMethod) obj;
-        return Objects.equals(this.type, that.type)
-                && Objects.equals(this.value, that.value);
+        return Objects.hash(value, type);
     }
 
     @Override

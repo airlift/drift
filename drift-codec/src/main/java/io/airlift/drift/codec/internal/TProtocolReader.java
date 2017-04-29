@@ -36,6 +36,7 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
+import static com.google.common.base.MoreObjects.toStringHelper;
 import static com.google.common.base.Preconditions.checkState;
 
 @NotThreadSafe
@@ -523,10 +524,8 @@ public class TProtocolReader
     @Override
     public String toString()
     {
-        final StringBuilder sb = new StringBuilder();
-        sb.append("TProtocolReader");
-        sb.append("{currentField=").append(currentField);
-        sb.append('}');
-        return sb.toString();
+        return toStringHelper(this)
+                .add("currentField", currentField)
+                .toString();
     }
 }

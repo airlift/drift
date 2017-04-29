@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
+import static com.google.common.base.MoreObjects.toStringHelper;
 import static com.google.common.base.Preconditions.checkArgument;
 import static io.airlift.drift.annotations.ThriftField.Requiredness;
 import static io.airlift.drift.annotations.ThriftIdlAnnotation.RECURSIVE_REFERENCE_ANNOTATION_KEY;
@@ -221,21 +222,18 @@ public class ThriftFieldMetadata
     }
 
     @Override
-    public String toString()
+    public boolean equals(Object o)
     {
-        final StringBuilder sb = new StringBuilder();
-        sb.append("ThriftFieldMetadata");
-        sb.append("{id=").append(id);
-        sb.append(", thriftType=").append(thriftTypeReference);
-        sb.append(", name='").append(name).append('\'');
-        sb.append(", fieldKind=").append(fieldKind);
-        sb.append(", injections=").append(injections);
-        sb.append(", constructorInjection=").append(constructorInjection);
-        sb.append(", methodInjection=").append(methodInjection);
-        sb.append(", extraction=").append(extraction);
-        sb.append(", coercion=").append(coercion);
-        sb.append('}');
-        return sb.toString();
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        ThriftFieldMetadata that = (ThriftFieldMetadata) o;
+        return id == that.id &&
+                Objects.equals(thriftTypeReference, that.thriftTypeReference) &&
+                Objects.equals(name, that.name);
     }
 
     @Override
@@ -245,15 +243,18 @@ public class ThriftFieldMetadata
     }
 
     @Override
-    public boolean equals(Object obj)
+    public String toString()
     {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null || getClass() != obj.getClass()) {
-            return false;
-        }
-        final ThriftFieldMetadata other = (ThriftFieldMetadata) obj;
-        return Objects.equals(this.id, other.id) && Objects.equals(this.thriftTypeReference, other.thriftTypeReference) && Objects.equals(this.name, other.name);
+        return toStringHelper(this)
+                .add("id", id)
+                .add("thriftTypeReference", thriftTypeReference)
+                .add("name", name)
+                .add("fieldKind", fieldKind)
+                .add("injections", injections)
+                .add("constructorInjection", constructorInjection)
+                .add("methodInjection", methodInjection)
+                .add("extraction", extraction)
+                .add("coercion", coercion)
+                .toString();
     }
 }

@@ -22,6 +22,7 @@ import javax.annotation.concurrent.Immutable;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 
+import static com.google.common.base.MoreObjects.toStringHelper;
 import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.Objects.requireNonNull;
 
@@ -91,14 +92,12 @@ public class ThriftMethodExtractor
     @Override
     public String toString()
     {
-        final StringBuilder sb = new StringBuilder();
-        sb.append("ThriftMethodExtractor");
-        sb.append("{id=").append(id);
-        sb.append(", name='").append(name).append('\'');
-        sb.append(", fieldKind=").append(fieldKind);
-        sb.append(", method=").append(method);
-        sb.append(", type=").append(type);
-        sb.append('}');
-        return sb.toString();
+        return toStringHelper(this)
+                .add("id", id)
+                .add("name", name)
+                .add("method", method)
+                .add("fieldKind", fieldKind)
+                .add("type", type)
+                .toString();
     }
 }

@@ -85,24 +85,23 @@ public final class UnionBean
     }
 
     @Override
-    public int hashCode()
+    public boolean equals(Object o)
     {
-        return Objects.hash(value, type);
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        UnionBean unionBean = (UnionBean) o;
+        return type == unionBean.type &&
+                Objects.equals(value, unionBean.value);
     }
 
     @Override
-    public boolean equals(Object obj)
+    public int hashCode()
     {
-        if (this == obj) {
-            return true;
-        }
-        else if (obj == null || getClass() != obj.getClass()) {
-            return false;
-        }
-
-        UnionBean that = (UnionBean) obj;
-        return Objects.equals(this.type, that.type)
-                && Objects.equals(this.value, that.value);
+        return Objects.hash(value, type);
     }
 
     @Override

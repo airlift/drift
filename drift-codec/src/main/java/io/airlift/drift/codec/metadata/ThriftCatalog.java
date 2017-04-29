@@ -487,15 +487,7 @@ public class ThriftCatalog
     public static boolean isStructType(Type javaType)
     {
         Class<?> rawType = TypeToken.of(javaType).getRawType();
-
-        if (rawType.isAnnotationPresent(ThriftStruct.class)) {
-            return true;
-        }
-        if (rawType.isAnnotationPresent(ThriftUnion.class)) {
-            return true;
-        }
-
-        return false;
+        return rawType.isAnnotationPresent(ThriftStruct.class) || rawType.isAnnotationPresent(ThriftUnion.class);
     }
 
     public boolean isSupportedArrayComponentType(Class<?> componentType)

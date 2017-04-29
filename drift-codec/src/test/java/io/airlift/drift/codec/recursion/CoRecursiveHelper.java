@@ -33,18 +33,22 @@ public class CoRecursiveHelper
     public String data;
 
     @Override
-    public boolean equals(Object obj)
+    public boolean equals(Object o)
     {
-        if (this == obj) {
+        if (this == o) {
             return true;
         }
-        if (obj == null || getClass() != obj.getClass()) {
+        if (o == null || getClass() != o.getClass()) {
             return false;
         }
+        CoRecursiveHelper that = (CoRecursiveHelper) o;
+        return Objects.equals(child, that.child) &&
+                Objects.equals(data, that.data);
+    }
 
-        final CoRecursiveHelper that = (CoRecursiveHelper) obj;
-
-        return Objects.equals(data, that.data) &&
-                Objects.equals(child, that.child);
+    @Override
+    public int hashCode()
+    {
+        return Objects.hash(child, data);
     }
 }

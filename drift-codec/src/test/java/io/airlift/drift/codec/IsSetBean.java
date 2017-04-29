@@ -24,6 +24,7 @@ import io.airlift.drift.annotations.ThriftStruct;
 import java.nio.ByteBuffer;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -297,64 +298,24 @@ public final class IsSetBean
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-
-        final IsSetBean isSetBean = (IsSetBean) o;
-
-        if (aBoolean != null ? !aBoolean.equals(isSetBean.aBoolean) : isSetBean.aBoolean != null) {
-            return false;
-        }
-        if (aByte != null ? !aByte.equals(isSetBean.aByte) : isSetBean.aByte != null) {
-            return false;
-        }
-        if (aDouble != null ? !aDouble.equals(isSetBean.aDouble) : isSetBean.aDouble != null) {
-            return false;
-        }
-        if (aInteger != null ? !aInteger.equals(isSetBean.aInteger) : isSetBean.aInteger != null) {
-            return false;
-        }
-        if (aList != null ? !aList.equals(isSetBean.aList) : isSetBean.aList != null) {
-            return false;
-        }
-        if (aLong != null ? !aLong.equals(isSetBean.aLong) : isSetBean.aLong != null) {
-            return false;
-        }
-        if (aMap != null ? !aMap.equals(isSetBean.aMap) : isSetBean.aMap != null) {
-            return false;
-        }
-        if (aSet != null ? !aSet.equals(isSetBean.aSet) : isSetBean.aSet != null) {
-            return false;
-        }
-        if (aShort != null ? !aShort.equals(isSetBean.aShort) : isSetBean.aShort != null) {
-            return false;
-        }
-        if (aString != null ? !aString.equals(isSetBean.aString) : isSetBean.aString != null) {
-            return false;
-        }
-        if (aStruct != null ? !aStruct.equals(isSetBean.aStruct) : isSetBean.aStruct != null) {
-            return false;
-        }
-        if (field != null ? !field.equals(isSetBean.field) : isSetBean.field != null) {
-            return false;
-        }
-
-        return true;
+        IsSetBean isSetBean = (IsSetBean) o;
+        return Objects.equals(aBoolean, isSetBean.aBoolean) &&
+                Objects.equals(aByte, isSetBean.aByte) &&
+                Objects.equals(aShort, isSetBean.aShort) &&
+                Objects.equals(aInteger, isSetBean.aInteger) &&
+                Objects.equals(aLong, isSetBean.aLong) &&
+                Objects.equals(aDouble, isSetBean.aDouble) &&
+                Objects.equals(aString, isSetBean.aString) &&
+                Objects.equals(aStruct, isSetBean.aStruct) &&
+                Objects.equals(aSet, isSetBean.aSet) &&
+                Objects.equals(aList, isSetBean.aList) &&
+                Objects.equals(aMap, isSetBean.aMap) &&
+                Objects.equals(field, isSetBean.field);
     }
 
     @Override
     public int hashCode()
     {
-        int result = aBoolean != null ? aBoolean.hashCode() : 0;
-        result = 31 * result + (aByte != null ? aByte.hashCode() : 0);
-        result = 31 * result + (aShort != null ? aShort.hashCode() : 0);
-        result = 31 * result + (aInteger != null ? aInteger.hashCode() : 0);
-        result = 31 * result + (aLong != null ? aLong.hashCode() : 0);
-        result = 31 * result + (aDouble != null ? aDouble.hashCode() : 0);
-        result = 31 * result + (aString != null ? aString.hashCode() : 0);
-        result = 31 * result + (aStruct != null ? aStruct.hashCode() : 0);
-        result = 31 * result + (aSet != null ? aSet.hashCode() : 0);
-        result = 31 * result + (aList != null ? aList.hashCode() : 0);
-        result = 31 * result + (aMap != null ? aMap.hashCode() : 0);
-        result = 31 * result + (field != null ? field.hashCode() : 0);
-        return result;
+        return Objects.hash(aBoolean, aByte, aShort, aInteger, aLong, aDouble, aString, aStruct, aSet, aList, aMap, field);
     }
 }

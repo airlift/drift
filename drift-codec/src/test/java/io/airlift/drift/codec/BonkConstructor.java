@@ -21,6 +21,10 @@ import io.airlift.drift.annotations.ThriftStruct;
 
 import javax.annotation.concurrent.Immutable;
 
+import java.util.Objects;
+
+import static com.google.common.base.MoreObjects.toStringHelper;
+
 @Immutable
 @ThriftStruct("Bonk")
 public final class BonkConstructor
@@ -56,35 +60,23 @@ public final class BonkConstructor
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-
         BonkConstructor that = (BonkConstructor) o;
-
-        if (type != that.type) {
-            return false;
-        }
-        if (message != null ? !message.equals(that.message) : that.message != null) {
-            return false;
-        }
-
-        return true;
+        return type == that.type &&
+                Objects.equals(message, that.message);
     }
 
     @Override
     public int hashCode()
     {
-        int result = message != null ? message.hashCode() : 0;
-        result = 31 * result + type;
-        return result;
+        return Objects.hash(message, type);
     }
 
     @Override
     public String toString()
     {
-        final StringBuilder sb = new StringBuilder();
-        sb.append("BonkConstructor");
-        sb.append("{message='").append(message).append('\'');
-        sb.append(", type=").append(type);
-        sb.append('}');
-        return sb.toString();
+        return toStringHelper(this)
+                .add("message", message)
+                .add("type", type)
+                .toString();
     }
 }

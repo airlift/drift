@@ -23,7 +23,6 @@ import org.apache.thrift.protocol.TProtocol;
 public class OneOfEverythingThriftCodec
         implements ThriftCodec<OneOfEverything>
 {
-
     private final ThriftType type;
     private final ThriftCodec<BonkField> aStructCodec;
     private final ThriftCodec<UnionField> aUnionCodec;

@@ -31,18 +31,22 @@ public class ViaMapKeyAndValueTypes
     public String data;
 
     @Override
-    public boolean equals(Object obj)
+    public boolean equals(Object o)
     {
-        if (this == obj) {
+        if (this == o) {
             return true;
         }
-        if (obj == null || getClass() != obj.getClass()) {
+        if (o == null || getClass() != o.getClass()) {
             return false;
         }
+        ViaMapKeyAndValueTypes that = (ViaMapKeyAndValueTypes) o;
+        return Objects.equals(children, that.children) &&
+                Objects.equals(data, that.data);
+    }
 
-        final ViaMapKeyAndValueTypes that = (ViaMapKeyAndValueTypes) obj;
-
-        return Objects.equals(data, that.data) &&
-                Objects.equals(children, that.children);
+    @Override
+    public int hashCode()
+    {
+        return Objects.hash(children, data);
     }
 }

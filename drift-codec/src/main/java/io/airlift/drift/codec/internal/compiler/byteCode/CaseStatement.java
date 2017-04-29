@@ -17,6 +17,8 @@ package io.airlift.drift.codec.internal.compiler.byteCode;
 
 import javax.annotation.concurrent.Immutable;
 
+import static com.google.common.base.MoreObjects.toStringHelper;
+
 @Immutable
 public class CaseStatement
 {
@@ -25,8 +27,8 @@ public class CaseStatement
         return new CaseStatement(label, key);
     }
 
-    private final int key;
     private final String label;
+    private final int key;
 
     CaseStatement(String label, int key)
     {
@@ -47,11 +49,9 @@ public class CaseStatement
     @Override
     public String toString()
     {
-        final StringBuilder sb = new StringBuilder();
-        sb.append("CaseStatement");
-        sb.append("{label='").append(label).append('\'');
-        sb.append(", value=").append(key);
-        sb.append('}');
-        return sb.toString();
+        return toStringHelper(this)
+                .add("label", label)
+                .add("key", key)
+                .toString();
     }
 }

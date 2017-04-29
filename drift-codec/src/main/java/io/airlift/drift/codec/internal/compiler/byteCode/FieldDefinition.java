@@ -23,6 +23,7 @@ import javax.annotation.concurrent.Immutable;
 
 import java.util.EnumSet;
 
+import static com.google.common.base.MoreObjects.toStringHelper;
 import static io.airlift.drift.codec.internal.compiler.byteCode.Access.toAccessModifier;
 
 @Immutable
@@ -67,12 +68,10 @@ public class FieldDefinition
     @Override
     public String toString()
     {
-        final StringBuilder sb = new StringBuilder();
-        sb.append("FieldDefinition");
-        sb.append("{access=").append(access);
-        sb.append(", name='").append(name).append('\'');
-        sb.append(", type=").append(type);
-        sb.append('}');
-        return sb.toString();
+        return toStringHelper(this)
+                .add("access", access)
+                .add("name", name)
+                .add("type", type)
+                .toString();
     }
 }

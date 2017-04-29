@@ -19,6 +19,7 @@ import javax.annotation.concurrent.Immutable;
 
 import java.lang.reflect.Method;
 
+import static com.google.common.base.MoreObjects.toStringHelper;
 import static java.util.Objects.requireNonNull;
 
 @Immutable
@@ -53,12 +54,10 @@ public class TypeCoercion
     @Override
     public String toString()
     {
-        final StringBuilder sb = new StringBuilder();
-        sb.append("TypeCoercion");
-        sb.append("{thriftType=").append(thriftType);
-        sb.append(", toThrift=").append(toThrift);
-        sb.append(", fromThrift=").append(fromThrift);
-        sb.append('}');
-        return sb.toString();
+        return toStringHelper(this)
+                .add("thriftType", thriftType)
+                .add("toThrift", toThrift)
+                .add("fromThrift", fromThrift)
+                .toString();
     }
 }
