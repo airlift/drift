@@ -242,6 +242,7 @@ public class TestThriftUnionMetadataBuilder
     @ThriftUnion
     public static class NotFinalUnion
     {
-        @ThriftUnionId public short id;
+        @ThriftUnionId
+        public short id;
     }
 }

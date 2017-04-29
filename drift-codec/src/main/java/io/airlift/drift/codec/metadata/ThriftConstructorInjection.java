@@ -33,7 +33,8 @@ public class ThriftConstructorInjection
 
     public ThriftConstructorInjection(Constructor<?> constructor, ThriftParameterInjection... parameters)
     {
-        this(requireNonNull(constructor, "constructor is null"),
+        this(
+                requireNonNull(constructor, "constructor is null"),
                 ImmutableList.copyOf(requireNonNull(parameters, "parameters is null")));
     }
 

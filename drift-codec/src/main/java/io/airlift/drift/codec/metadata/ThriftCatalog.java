@@ -358,7 +358,8 @@ public class ThriftCatalog
                     "Field normalization should have set a non-null value for isRecursiveReference");
         }
 
-        return getThriftTypeReference(fieldMetadata.getJavaType(),
+        return getThriftTypeReference(
+                fieldMetadata.getJavaType(),
                 isRecursive ? Recursiveness.FORCED : Recursiveness.NOT_ALLOWED);
     }
 
@@ -696,7 +697,8 @@ public class ThriftCatalog
             }
             finally {
                 Type top = stack.pop();
-                checkState(structType.equals(top),
+                checkState(
+                        structType.equals(top),
                         "ThriftCatalog circularity detection stack is corrupt: expected %s, but got %s",
                         structType,
                         top);
@@ -725,7 +727,8 @@ public class ThriftCatalog
         }
         finally {
             Type top = stack.pop();
-            checkState(unionType.equals(top),
+            checkState(
+                    unionType.equals(top),
                     "ThriftCatalog circularity detection stack is corrupt: expected %s, but got %s",
                     unionType,
                     top);

@@ -28,7 +28,8 @@ public class TestReflectionHelper
     public void testExtractParameterNamesNoAnnotations()
             throws Exception
     {
-        assertEquals(extractParameterNames(getClass().getDeclaredMethod("noAnnotations", String.class, String.class, String.class)),
+        assertEquals(
+                extractParameterNames(getClass().getDeclaredMethod("noAnnotations", String.class, String.class, String.class)),
                 new String[] {"a", "b", "c"});
     }
 
@@ -40,7 +41,8 @@ public class TestReflectionHelper
     public void testExtractParameterNamesThriftFieldAnnotation()
             throws Exception
     {
-        assertEquals(extractParameterNames(getClass().getDeclaredMethod("thriftFieldAnnotation", String.class, String.class, String.class)),
+        assertEquals(
+                extractParameterNames(getClass().getDeclaredMethod("thriftFieldAnnotation", String.class, String.class, String.class)),
                 new String[] {"a", "b", "c"});
     }
 

@@ -167,7 +167,8 @@ public class ThriftCodecManager
                 }
                 finally {
                     ThriftType top = stack.get().pop();
-                    checkState(type.equals(top),
+                    checkState(
+                            type.equals(top),
                             "ThriftCatalog circularity detection stack is corrupt: expected %s, but got %s",
                             type,
                             top);

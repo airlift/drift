@@ -46,7 +46,8 @@ public class TestThriftCodecModule
     public void testThriftClientAndServerModules()
             throws Exception
     {
-        Injector injector = Guice.createInjector(Stage.PRODUCTION,
+        Injector injector = Guice.createInjector(
+                Stage.PRODUCTION,
                 new ThriftCodecModule(),
                 new Module()
                 {
@@ -84,19 +85,24 @@ public class TestThriftCodecModule
                     }
                 });
 
-        testRoundTripSerialize(injector.getInstance(Key.get(new TypeLiteral<ThriftCodec<BonkConstructor>>() {})),
+        testRoundTripSerialize(
+                injector.getInstance(Key.get(new TypeLiteral<ThriftCodec<BonkConstructor>>() {})),
                 new BonkConstructor("message", 42));
 
-        testRoundTripSerialize(injector.getInstance(Key.get(new TypeLiteral<ThriftCodec<List<BonkConstructor>>>() {})),
+        testRoundTripSerialize(
+                injector.getInstance(Key.get(new TypeLiteral<ThriftCodec<List<BonkConstructor>>>() {})),
                 ImmutableList.of(new BonkConstructor("one", 1), new BonkConstructor("two", 2)));
 
-        testRoundTripSerialize(injector.getInstance(Key.get(new TypeLiteral<ThriftCodec<Map<String, BonkConstructor>>>() {})),
+        testRoundTripSerialize(
+                injector.getInstance(Key.get(new TypeLiteral<ThriftCodec<Map<String, BonkConstructor>>>() {})),
                 ImmutableMap.of("uno", new BonkConstructor("one", 1), "dos", new BonkConstructor("two", 2)));
 
-        testRoundTripSerialize(injector.getInstance(Key.get(new TypeLiteral<ThriftCodec<Map<Integer, List<String>>>>() {})),
+        testRoundTripSerialize(
+                injector.getInstance(Key.get(new TypeLiteral<ThriftCodec<Map<Integer, List<String>>>>() {})),
                 ImmutableMap.<Integer, List<String>>of(1, ImmutableList.of("one", "uno"), 2, ImmutableList.of("two", "dos")));
 
-        testRoundTripSerialize(injector.getInstance(Key.get(new TypeLiteral<ThriftCodec<ValueClass>>() {})),
+        testRoundTripSerialize(
+                injector.getInstance(Key.get(new TypeLiteral<ThriftCodec<ValueClass>>() {})),
                 new ValueClass("my value"));
     }
 

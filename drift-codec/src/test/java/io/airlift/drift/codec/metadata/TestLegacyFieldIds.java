@@ -97,10 +97,14 @@ public class TestLegacyFieldIds
         private static final Set<Integer> IDS =
                 ImmutableSet.<Integer>of(-4, -3, -2, -1, 0, 1, 2);
 
-        @ThriftField(value = 0, isLegacyId = false) public boolean notLegacyId0;
-        @ThriftField(value = 1, isLegacyId = false) public boolean notLegacyId1;
-        @ThriftField(value = 2) public boolean notLegacyId2;
-        @ThriftField(value = -1, isLegacyId = true) public boolean legacyIdOnField;
+        @ThriftField(value = 0, isLegacyId = false)
+        public boolean notLegacyId0;
+        @ThriftField(value = 1, isLegacyId = false)
+        public boolean notLegacyId1;
+        @ThriftField(value = 2)
+        public boolean notLegacyId2;
+        @ThriftField(value = -1, isLegacyId = true)
+        public boolean legacyIdOnField;
 
         @ThriftField(value = -2, isLegacyId = true)
         public boolean getLegacyIdOnGetterOnly()
@@ -205,13 +209,15 @@ public class TestLegacyFieldIds
     @ThriftStruct
     public static final class LegacyIdIncorrectlyMissing
     {
-        @ThriftField(value = -4) public boolean field;
+        @ThriftField(value = -4)
+        public boolean field;
     }
 
     @ThriftStruct
     public static final class LegacyIdIncorrectlyPresent
     {
-        @ThriftField(value = 4, isLegacyId = true) public boolean field;
+        @ThriftField(value = 4, isLegacyId = true)
+        public boolean field;
     }
 
     /* legacy, getter correct, setter wrong */
@@ -329,15 +335,22 @@ public class TestLegacyFieldIds
 
     private static class SomeThriftFields
     {
-        @ThriftField(value = +1, isLegacyId = false) boolean expectFalse1;
-        @ThriftField(value = -1, isLegacyId = false) boolean expectFalse2;
-        @ThriftField(isLegacyId = false) boolean broken;  // see comments in impl.
+        @ThriftField(value = +1, isLegacyId = false)
+        boolean expectFalse1;
+        @ThriftField(value = -1, isLegacyId = false)
+        boolean expectFalse2;
+        @ThriftField(isLegacyId = false)
+        boolean broken;  // see comments in impl.
 
-        @ThriftField(value = +1, isLegacyId = true) boolean expectTrue1;
-        @ThriftField(value = -1, isLegacyId = true) boolean expectTrue2;
-        @ThriftField(isLegacyId = true) boolean expectTrue3;
+        @ThriftField(value = +1, isLegacyId = true)
+        boolean expectTrue1;
+        @ThriftField(value = -1, isLegacyId = true)
+        boolean expectTrue2;
+        @ThriftField(isLegacyId = true)
+        boolean expectTrue3;
 
-        @ThriftField boolean expectNothing;
+        @ThriftField
+        boolean expectNothing;
     }
 
     @Test
@@ -362,12 +375,17 @@ public class TestLegacyFieldIds
         private static final Set<Integer> IDS =
                 ImmutableSet.<Integer>of(-4, -3, -2, -1, 0, 1, 2, (int) Short.MIN_VALUE);
 
-        @ThriftUnionId public short unionId;
+        @ThriftUnionId
+        public short unionId;
 
-        @ThriftField(value = 0, isLegacyId = false) public boolean notLegacyId0;
-        @ThriftField(value = 1, isLegacyId = false) public boolean notLegacyId1;
-        @ThriftField(value = 2) public boolean notLegacyId2;
-        @ThriftField(value = -1, isLegacyId = true) public boolean legacyIdOnField;
+        @ThriftField(value = 0, isLegacyId = false)
+        public boolean notLegacyId0;
+        @ThriftField(value = 1, isLegacyId = false)
+        public boolean notLegacyId1;
+        @ThriftField(value = 2)
+        public boolean notLegacyId2;
+        @ThriftField(value = -1, isLegacyId = true)
+        public boolean legacyIdOnField;
 
         @ThriftField(value = -2, isLegacyId = true)
         public boolean getLegacyIdOnGetterOnly()

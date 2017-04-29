@@ -189,7 +189,8 @@ public class ReflectionThriftStructCodec<T>
     {
         verify(instance != null, "Builder method returned a null instance");
 
-        verify(clazz.isInstance(instance),
+        verify(
+                clazz.isInstance(instance),
                 "Builder method returned instance of type %s, but an instance of %s is required",
                 instance.getClass().getName(),
                 clazz.getName());

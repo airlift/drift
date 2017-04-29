@@ -185,11 +185,21 @@ public class ThriftStructMetadataBuilder
             }
             else if (fieldMetadata instanceof FieldExtractor) {
                 FieldExtractor fieldExtractor = (FieldExtractor) fieldMetadata;
-                extraction = new ThriftFieldExtractor(fieldExtractor.getId(), fieldExtractor.getName(), fieldExtractor.getType(), fieldExtractor.getField(), fieldExtractor.getJavaType());
+                extraction = new ThriftFieldExtractor(
+                        fieldExtractor.getId(),
+                        fieldExtractor.getName(),
+                        fieldExtractor.getType(),
+                        fieldExtractor.getField(),
+                        fieldExtractor.getJavaType());
             }
             else if (fieldMetadata instanceof MethodExtractor) {
                 MethodExtractor methodExtractor = (MethodExtractor) fieldMetadata;
-                extraction = new ThriftMethodExtractor(methodExtractor.getId(), methodExtractor.getName(), methodExtractor.getType(), methodExtractor.getMethod(), methodExtractor.getJavaType());
+                extraction = new ThriftMethodExtractor(
+                        methodExtractor.getId(),
+                        methodExtractor.getName(),
+                        methodExtractor.getType(),
+                        methodExtractor.getMethod(),
+                        methodExtractor.getJavaType());
             }
         }
 
@@ -200,7 +210,8 @@ public class ThriftStructMetadataBuilder
         }
 
         if (recursive && requiredness != Requiredness.OPTIONAL) {
-            metadataErrors.addError("Struct '%s' field '%s' is recursive but not marked optional",
+            metadataErrors.addError(
+                    "Struct '%s' field '%s' is recursive but not marked optional",
                     structName,
                     name);
         }

@@ -152,7 +152,8 @@ public class ThriftUnionMetadataBuilder
     {
         for (ConstructorInjection constructorInjection : constructorInjections) {
             if (constructorInjection.getParameters().size() > 1) {
-                metadataErrors.addError("@ThriftConstructor [%s] takes %d arguments, this is illegal for an union",
+                metadataErrors.addError(
+                        "@ThriftConstructor [%s] takes %d arguments, this is illegal for an union",
                         constructorInjection.getConstructor().toGenericString(),
                         constructorInjection.getParameters().size());
             }
@@ -283,11 +284,21 @@ public class ThriftUnionMetadataBuilder
             }
             else if (fieldMetadata instanceof FieldExtractor) {
                 FieldExtractor fieldExtractor = (FieldExtractor) fieldMetadata;
-                extraction = new ThriftFieldExtractor(fieldExtractor.getId(), fieldExtractor.getName(), fieldExtractor.getType(), fieldExtractor.getField(), fieldExtractor.getJavaType());
+                extraction = new ThriftFieldExtractor(
+                        fieldExtractor.getId(),
+                        fieldExtractor.getName(),
+                        fieldExtractor.getType(),
+                        fieldExtractor.getField(),
+                        fieldExtractor.getJavaType());
             }
             else if (fieldMetadata instanceof MethodExtractor) {
                 MethodExtractor methodExtractor = (MethodExtractor) fieldMetadata;
-                extraction = new ThriftMethodExtractor(methodExtractor.getId(), methodExtractor.getName(), methodExtractor.getType(), methodExtractor.getMethod(), methodExtractor.getJavaType());
+                extraction = new ThriftMethodExtractor(
+                        methodExtractor.getId(),
+                        methodExtractor.getName(),
+                        methodExtractor.getType(),
+                        methodExtractor.getMethod(),
+                        methodExtractor.getJavaType());
             }
         }
 

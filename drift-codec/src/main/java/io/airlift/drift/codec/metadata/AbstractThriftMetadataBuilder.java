@@ -149,7 +149,10 @@ public abstract class AbstractThriftMetadataBuilder
         }
 
         if (builderClass.getTypeParameters().length != getStructClass().getTypeParameters().length) {
-            metadataErrors.addError("Generic builder class '%s' must have the same number of type parameters as the type it builds ('%s')", builderClass.getName(), getStructClass().getName());
+            metadataErrors.addError(
+                    "Generic builder class '%s' must have the same number of type parameters as the type it builds ('%s')",
+                    builderClass.getName(),
+                    getStructClass().getName());
             return builderClass;
         }
 
@@ -189,7 +192,10 @@ public abstract class AbstractThriftMetadataBuilder
             // verify struct class does not have @ThriftConstructors
             for (Constructor<?> constructor : getStructClass().getConstructors()) {
                 if (constructor.isAnnotationPresent(ThriftConstructor.class)) {
-                    metadataErrors.addWarning("Thrift class '%s' has a builder class, but constructor '%s' annotated with @ThriftConstructor", getStructClass().getName(), constructor);
+                    metadataErrors.addWarning(
+                            "Thrift class '%s' has a builder class, but constructor '%s' annotated with @ThriftConstructor",
+                            getStructClass().getName(),
+                            constructor);
                 }
             }
         }
