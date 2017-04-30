@@ -153,11 +153,7 @@ public class ThriftCodecManager
                 }
                 finally {
                     ThriftType top = stack.get().pop();
-                    checkState(
-                            type.equals(top),
-                            "ThriftCatalog circularity detection stack is corrupt: expected %s, but got %s",
-                            type,
-                            top);
+                    checkState(type.equals(top), "ThriftCatalog circularity detection stack is corrupt: expected %s, but got %s", type, top);
                 }
             }
         });
@@ -296,16 +292,13 @@ public class ThriftCodecManager
         return codec.read(protocol);
     }
 
-    public <T> T read(byte[] serializedStruct,
-            Class<T> clazz,
-            TProtocolFactory protocolFactory)
+    public <T> T read(byte[] serializedStruct, Class<T> clazz, TProtocolFactory protocolFactory)
     {
         requireNonNull(serializedStruct, "ttype is null");
         requireNonNull(clazz, "clazz is null");
         try {
-            ByteArrayInputStream istream = new ByteArrayInputStream(serializedStruct);
-            TIOStreamTransport resultIOStream = new TIOStreamTransport(istream);
-            TProtocol resultProtocolBuffer = protocolFactory.getProtocol(resultIOStream);
+            ByteArrayInputStream inputStream = new ByteArrayInputStream(serializedStruct);
+            TProtocol resultProtocolBuffer = protocolFactory.getProtocol(new TIOStreamTransport(inputStream));
             return read(clazz, resultProtocolBuffer);
         }
         catch (Exception e) {
@@ -320,16 +313,13 @@ public class ThriftCodecManager
         getCodec(type).write(value, protocol);
     }
 
-    public <T> void write(T ttype,
-            ByteArrayOutputStream oStream,
-            TProtocolFactory protocolFactory)
+    public <T> void write(T type, ByteArrayOutputStream outputStream, TProtocolFactory protocolFactory)
     {
-        requireNonNull(ttype, "ttype is null");
+        requireNonNull(type, "type is null");
         requireNonNull(protocolFactory, "protocolFactory is null");
         try {
-            TIOStreamTransport resultIOStream = new TIOStreamTransport(oStream);
-            TProtocol resultProtocolBuffer = protocolFactory.getProtocol(resultIOStream);
-            write((Class<T>) ttype.getClass(), ttype, resultProtocolBuffer);
+            TProtocol resultProtocolBuffer = protocolFactory.getProtocol(new TIOStreamTransport(outputStream));
+            write((Class<T>) type.getClass(), type, resultProtocolBuffer);
         }
         catch (Exception e) {
             throwIfUnchecked(e);

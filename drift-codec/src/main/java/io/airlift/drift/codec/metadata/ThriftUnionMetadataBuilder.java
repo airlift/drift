@@ -244,11 +244,7 @@ public class ThriftUnionMetadataBuilder
             switch (requiredness) {
                 case REQUIRED:
                 case OPTIONAL:
-                    metadataErrors.addError(
-                            "Thrift union '%s' field '%s(%s)' should not be marked required or optional",
-                            structName,
-                            name,
-                            id);
+                    metadataErrors.addError("Thrift union '%s' field '%s(%s)' should not be marked required or optional", structName, name, id);
                     break;
 
                 default:

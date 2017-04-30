@@ -20,6 +20,8 @@ import io.airlift.drift.codec.ThriftProtocolType;
 import java.lang.reflect.Type;
 import java.util.Objects;
 
+import static java.lang.String.format;
+
 public class RecursiveThriftTypeReference
         implements ThriftTypeReference
 {
@@ -57,11 +59,9 @@ public class RecursiveThriftTypeReference
     {
         ThriftType resolvedType = catalog.getThriftTypeFromCache(javaType);
         if (resolvedType == null) {
-            throw new UnsupportedOperationException(
-                    String.format(
-                            "Attempted to resolve a recursive reference to type '%s' before the " +
-                                    "referenced type was cached (most likely a recursive type support bug)",
-                            javaType.getTypeName()));
+            throw new UnsupportedOperationException(format(
+                    "Attempted to resolve a recursive reference to type '%s' before the referenced type was cached (most likely a recursive type support bug)",
+                    javaType.getTypeName()));
         }
         return resolvedType;
     }

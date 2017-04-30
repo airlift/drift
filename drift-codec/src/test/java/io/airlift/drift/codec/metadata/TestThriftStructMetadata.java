@@ -26,12 +26,13 @@ import io.airlift.drift.codec.idlannotations.BeanWithOneIdlAnnotationMapForField
 import io.airlift.drift.codec.idlannotations.ExceptionWithIdlAnnotations;
 import io.airlift.drift.codec.idlannotations.StructWithIdlAnnotations;
 import io.airlift.drift.codec.idlannotations.UnionWithIdlAnnotations;
-import io.airlift.drift.codec.metadata.ThriftStructMetadata.MetadataType;
 import org.testng.annotations.Test;
 
 import java.lang.reflect.Type;
 import java.util.Map;
 
+import static io.airlift.drift.codec.metadata.ThriftStructMetadata.MetadataType.STRUCT;
+import static io.airlift.drift.codec.metadata.ThriftStructMetadata.MetadataType.UNION;
 import static org.fest.assertions.Assertions.assertThat;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -197,10 +198,7 @@ public class TestThriftStructMetadata
         assertEquals(idlAnnotations.get("message"), "message");
     }
 
-    private ThriftStructMetadata testStructMetadataBuild(
-            Class<?> structClass,
-            int expectedConstructorParameters,
-            int expectedMethodInjections)
+    private ThriftStructMetadata testStructMetadataBuild(Class<?> structClass, int expectedConstructorParameters, int expectedMethodInjections)
             throws Exception
     {
         return testMetadataBuild(
@@ -210,10 +208,7 @@ public class TestThriftStructMetadata
                 expectedMethodInjections);
     }
 
-    private ThriftStructMetadata testUnionMetadataBuild(
-            Class<?> structClass,
-            int expectedConstructorParameters,
-            int expectedMethodInjections)
+    private ThriftStructMetadata testUnionMetadataBuild(Class<?> structClass, int expectedConstructorParameters, int expectedMethodInjections)
             throws Exception
     {
         return testMetadataBuild(
@@ -232,9 +227,7 @@ public class TestThriftStructMetadata
     {
         ThriftStructMetadata metadata = buildMetadata(structClass, metadataBuilderType);
         assertNotNull(metadata);
-        assertTrue(
-                MetadataType.UNION == metadata.getMetadataType() ||
-                        MetadataType.STRUCT == metadata.getMetadataType());
+        assertTrue(UNION == metadata.getMetadataType() || STRUCT == metadata.getMetadataType());
 
         verifyField(metadata, 1, "message");
         verifyField(metadata, 2, "type");
@@ -248,9 +241,7 @@ public class TestThriftStructMetadata
         return metadata;
     }
 
-    private <T extends AbstractThriftMetadataBuilder> ThriftStructMetadata buildMetadata(
-            Class<?> structClass,
-            Class<T> metadataBuilderType)
+    private <T extends AbstractThriftMetadataBuilder> ThriftStructMetadata buildMetadata(Class<?> structClass, Class<T> metadataBuilderType)
             throws Exception
     {
         ThriftCatalog catalog = new ThriftCatalog();
@@ -266,7 +257,7 @@ public class TestThriftStructMetadata
         return builder.build();
     }
 
-    private <T> void verifyField(ThriftStructMetadata metadata, int id, String name)
+    private void verifyField(ThriftStructMetadata metadata, int id, String name)
     {
         ThriftFieldMetadata messageField = metadata.getField(id);
         assertNotNull(messageField, "field '" + name + "' is null");

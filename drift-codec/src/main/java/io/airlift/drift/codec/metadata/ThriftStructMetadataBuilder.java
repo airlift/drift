@@ -210,10 +210,7 @@ public class ThriftStructMetadataBuilder
         }
 
         if (recursive && requiredness != Requiredness.OPTIONAL) {
-            metadataErrors.addError(
-                    "Struct '%s' field '%s' is recursive but not marked optional",
-                    structName,
-                    name);
+            metadataErrors.addError("Struct '%s' field '%s' is recursive but not marked optional", structName, name);
         }
 
         return new ThriftFieldMetadata(
