@@ -15,6 +15,7 @@
  */
 package io.airlift.drift.client;
 
+import io.airlift.drift.TException;
 import io.airlift.drift.annotations.ThriftException;
 import io.airlift.drift.annotations.ThriftField;
 import io.airlift.drift.annotations.ThriftMethod;
@@ -22,7 +23,6 @@ import io.airlift.drift.annotations.ThriftStruct;
 import io.airlift.drift.codec.metadata.ThriftCatalog;
 import io.airlift.drift.codec.metadata.ThriftFieldMetadata;
 import io.airlift.drift.codec.metadata.ThriftType;
-import org.apache.thrift.TException;
 import org.testng.annotations.Test;
 
 import java.lang.reflect.Method;

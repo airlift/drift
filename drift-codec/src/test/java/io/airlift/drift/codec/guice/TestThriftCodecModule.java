@@ -25,9 +25,10 @@ import com.google.inject.TypeLiteral;
 import io.airlift.drift.codec.BonkConstructor;
 import io.airlift.drift.codec.ThriftCodec;
 import io.airlift.drift.codec.metadata.ThriftType;
-import org.apache.thrift.protocol.TCompactProtocol;
-import org.apache.thrift.protocol.TProtocol;
-import org.apache.thrift.transport.TMemoryBuffer;
+import io.airlift.drift.protocol.TCompactProtocol;
+import io.airlift.drift.protocol.TProtocolReader;
+import io.airlift.drift.protocol.TProtocolWriter;
+import io.airlift.drift.transport.TMemoryBuffer;
 import org.testng.annotations.Test;
 
 import java.util.List;
@@ -65,14 +66,14 @@ public class TestThriftCodecModule
                         }
 
                         @Override
-                        public ValueClass read(TProtocol protocol)
+                        public ValueClass read(TProtocolReader protocol)
                                 throws Exception
                         {
                             return new ValueClass(protocol.readString());
                         }
 
                         @Override
-                        public void write(ValueClass value, TProtocol protocol)
+                        public void write(ValueClass value, TProtocolWriter protocol)
                                 throws Exception
                         {
                             protocol.writeString(value.getValue());

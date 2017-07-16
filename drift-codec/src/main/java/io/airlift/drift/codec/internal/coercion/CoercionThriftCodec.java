@@ -18,7 +18,8 @@ package io.airlift.drift.codec.internal.coercion;
 import io.airlift.drift.codec.ThriftCodec;
 import io.airlift.drift.codec.metadata.ThriftType;
 import io.airlift.drift.codec.metadata.TypeCoercion;
-import org.apache.thrift.protocol.TProtocol;
+import io.airlift.drift.protocol.TProtocolReader;
+import io.airlift.drift.protocol.TProtocolWriter;
 
 import javax.annotation.concurrent.Immutable;
 
@@ -48,7 +49,7 @@ public class CoercionThriftCodec<T>
     }
 
     @Override
-    public T read(TProtocol protocol)
+    public T read(TProtocolReader protocol)
             throws Exception
     {
         Object thriftValue = codec.read(protocol);
@@ -56,7 +57,7 @@ public class CoercionThriftCodec<T>
     }
 
     @Override
-    public void write(T javaValue, TProtocol protocol)
+    public void write(T javaValue, TProtocolWriter protocol)
             throws Exception
     {
         Object thriftValue = typeCoercion.getToThrift().invoke(null, javaValue);

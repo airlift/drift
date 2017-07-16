@@ -15,7 +15,7 @@
  */
 package io.airlift.drift.client;
 
-import org.apache.thrift.TException;
+import io.airlift.drift.TException;
 
 import static java.util.Objects.requireNonNull;
 

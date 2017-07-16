@@ -21,13 +21,13 @@ import com.google.common.util.concurrent.AbstractFuture;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
+import io.airlift.drift.TApplicationException;
+import io.airlift.drift.TException;
 import io.airlift.drift.transport.ResultClassification;
+import io.airlift.drift.transport.TTransportException;
 import io.netty.channel.Channel;
 import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.GenericFutureListener;
-import org.apache.thrift.TApplicationException;
-import org.apache.thrift.TException;
-import org.apache.thrift.transport.TTransportException;
 
 import javax.annotation.Nullable;
 
@@ -37,9 +37,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
+import static io.airlift.drift.TApplicationException.Type.INTERNAL_ERROR;
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
-import static org.apache.thrift.transport.TTransportException.NOT_OPEN;
 
 class InvocationAttempt
 {
@@ -95,7 +95,7 @@ class InvocationAttempt
                 future.fatalError(cause);
             }
             else {
-                future.fatalError(new TTransportException(NOT_OPEN, "No hosts available"));
+                future.fatalError(new TTransportException("No hosts available"));
             }
             return;
         }
@@ -141,7 +141,7 @@ class InvocationAttempt
 
                     if (classification.isRetry().orElse(FALSE)) {
                         // todo message???
-                        lastException.set(new TApplicationException("Retry of successful result was requested"));
+                        lastException.set(new TApplicationException(INTERNAL_ERROR, "Retry of successful result was requested"));
                         tryNextAddress();
                     }
                     else {

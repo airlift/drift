@@ -15,32 +15,35 @@
  */
 package io.airlift.drift.transport.netty;
 
+import io.airlift.drift.TApplicationException;
 import io.airlift.drift.codec.ThriftCodec;
 import io.airlift.drift.codec.internal.ProtocolReader;
 import io.airlift.drift.codec.internal.ProtocolWriter;
 import io.airlift.drift.codec.metadata.ThriftType;
+import io.airlift.drift.protocol.TMessage;
+import io.airlift.drift.protocol.TProtocolFactory;
+import io.airlift.drift.protocol.TProtocolReader;
+import io.airlift.drift.protocol.TProtocolWriter;
 import io.airlift.drift.transport.DriftApplicationException;
 import io.airlift.drift.transport.MethodMetadata;
 import io.airlift.drift.transport.ParameterMetadata;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
-import org.apache.thrift.TApplicationException;
-import org.apache.thrift.protocol.TMessage;
-import org.apache.thrift.protocol.TProtocol;
-import org.apache.thrift.protocol.TProtocolFactory;
 
 import java.util.List;
 import java.util.Map;
 import java.util.OptionalInt;
 
+import static io.airlift.drift.TApplicationException.Type.BAD_SEQUENCE_ID;
+import static io.airlift.drift.TApplicationException.Type.INVALID_MESSAGE_TYPE;
+import static io.airlift.drift.TApplicationException.Type.MISSING_RESULT;
+import static io.airlift.drift.TApplicationException.Type.WRONG_METHOD_NAME;
+import static io.airlift.drift.protocol.TMessageType.CALL;
+import static io.airlift.drift.protocol.TMessageType.EXCEPTION;
+import static io.airlift.drift.protocol.TMessageType.ONEWAY;
+import static io.airlift.drift.protocol.TMessageType.REPLY;
+import static io.airlift.drift.transport.netty.ExceptionReader.readTApplicationException;
 import static java.lang.String.format;
-import static org.apache.thrift.TApplicationException.BAD_SEQUENCE_ID;
-import static org.apache.thrift.TApplicationException.INVALID_MESSAGE_TYPE;
-import static org.apache.thrift.TApplicationException.WRONG_METHOD_NAME;
-import static org.apache.thrift.protocol.TMessageType.CALL;
-import static org.apache.thrift.protocol.TMessageType.EXCEPTION;
-import static org.apache.thrift.protocol.TMessageType.ONEWAY;
-import static org.apache.thrift.protocol.TMessageType.REPLY;
 
 interface MessageEncoding
 {
@@ -56,7 +59,7 @@ interface MessageEncoding
             throws Exception
     {
         TChannelBufferOutputTransport transport = new TChannelBufferOutputTransport(allocator.buffer(1024));
-        TProtocol protocol = protocolFactory.getProtocol(transport);
+        TProtocolWriter protocol = protocolFactory.getProtocol(transport);
 
         // Note that though setting message type to ONEWAY can be helpful when looking at packet
         // captures, some clients always send CALL and so servers are forced to rely on the "oneway"
@@ -75,7 +78,6 @@ interface MessageEncoding
         writer.writeStructEnd();
 
         protocol.writeMessageEnd();
-        protocol.getTransport().flush();
         return transport.getOutputBuffer();
     }
 
@@ -83,22 +85,22 @@ interface MessageEncoding
             throws Exception
     {
         TChannelBufferInputTransport transport = new TChannelBufferInputTransport(responseMessage);
-        TProtocol protocol = protocolFactory.getProtocol(transport);
+        TProtocolReader protocol = protocolFactory.getProtocol(transport);
 
         // validate response header
         TMessage message = protocol.readMessageBegin();
-        if (message.type == EXCEPTION) {
-            TApplicationException exception = TApplicationException.read(protocol);
+        if (message.getType() == EXCEPTION) {
+            TApplicationException exception = readTApplicationException(protocol);
             protocol.readMessageEnd();
             throw exception;
         }
-        if (message.type != REPLY) {
-            throw new TApplicationException(INVALID_MESSAGE_TYPE, format("Received invalid message type %s from server", message.type));
+        if (message.getType() != REPLY) {
+            throw new TApplicationException(INVALID_MESSAGE_TYPE, format("Received invalid message type %s from server", message.getType()));
         }
-        if (!message.name.equals(method.getName())) {
-            throw new TApplicationException(WRONG_METHOD_NAME, format("Wrong method name in reply: expected %s but received %s", method.getName(), message.name));
+        if (!message.getName().equals(method.getName())) {
+            throw new TApplicationException(WRONG_METHOD_NAME, format("Wrong method name in reply: expected %s but received %s", method.getName(), message.getName()));
         }
-        if (message.seqid != sequenceId) {
+        if (message.getSequenceId() != sequenceId) {
             throw new TApplicationException(BAD_SEQUENCE_ID, format("%s failed: out of sequence response", method.getName()));
         }
 
@@ -134,7 +136,7 @@ interface MessageEncoding
         }
 
         if (results == null) {
-            throw new TApplicationException(TApplicationException.MISSING_RESULT, format("%s failed: unknown result", method.getName()));
+            throw new TApplicationException(MISSING_RESULT, format("%s failed: unknown result", method.getName()));
         }
         return results;
     }

@@ -20,6 +20,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.reflect.TypeToken;
 import com.google.common.util.concurrent.ListenableFuture;
+import io.airlift.drift.TException;
 import io.airlift.drift.annotations.ThriftException;
 import io.airlift.drift.annotations.ThriftField;
 import io.airlift.drift.annotations.ThriftIdlAnnotation;
@@ -31,7 +32,6 @@ import io.airlift.drift.codec.metadata.ThriftFieldMetadata;
 import io.airlift.drift.codec.metadata.ThriftInjection;
 import io.airlift.drift.codec.metadata.ThriftParameterInjection;
 import io.airlift.drift.codec.metadata.ThriftType;
-import org.apache.thrift.TException;
 
 import javax.annotation.concurrent.Immutable;
 

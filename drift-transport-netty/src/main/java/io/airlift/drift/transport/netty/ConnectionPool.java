@@ -20,10 +20,10 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.net.HostAndPort;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import io.airlift.drift.transport.TTransportException;
 import io.netty.channel.Channel;
 import io.netty.channel.EventLoopGroup;
 import io.netty.util.concurrent.Future;
-import org.apache.thrift.transport.TTransportException;
 
 import javax.annotation.concurrent.GuardedBy;
 
@@ -34,7 +34,6 @@ import java.util.concurrent.TimeUnit;
 
 import static java.util.Objects.requireNonNull;
 import static java.util.concurrent.Executors.newSingleThreadScheduledExecutor;
-import static org.apache.thrift.transport.TTransportException.NOT_OPEN;
 
 class ConnectionPool
         implements ConnectionManager, Closeable
@@ -83,7 +82,7 @@ class ConnectionPool
         Future<Channel> future;
         synchronized (this) {
             if (closed) {
-                return group.next().newFailedFuture(new TTransportException(NOT_OPEN, "Connection pool is closed"));
+                return group.next().newFailedFuture(new TTransportException("Connection pool is closed"));
             }
 
             try {

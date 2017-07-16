@@ -18,7 +18,8 @@ package io.airlift.drift.codec;
 import io.airlift.drift.codec.internal.ProtocolReader;
 import io.airlift.drift.codec.internal.ProtocolWriter;
 import io.airlift.drift.codec.metadata.ThriftType;
-import org.apache.thrift.protocol.TProtocol;
+import io.airlift.drift.protocol.TProtocolReader;
+import io.airlift.drift.protocol.TProtocolWriter;
 
 import java.nio.ByteBuffer;
 
@@ -39,7 +40,7 @@ public class ArrayFieldThriftCodec
     }
 
     @Override
-    public ArrayField read(TProtocol protocol)
+    public ArrayField read(TProtocolReader protocol)
             throws Exception
     {
         ProtocolReader reader = new ProtocolReader(protocol);
@@ -103,7 +104,7 @@ public class ArrayFieldThriftCodec
     }
 
     @Override
-    public void write(ArrayField value, TProtocol protocol)
+    public void write(ArrayField value, TProtocolWriter protocol)
             throws Exception
     {
         ProtocolWriter writer = new ProtocolWriter(protocol);

@@ -26,8 +26,8 @@
         </dependency>
 
         <dependency>
-            <groupId>org.apache.thrift</groupId>
-            <artifactId>libthrift</artifactId>
+            <groupId>io.airlift.drift</groupId>
+            <artifactId>drift-core</artifactId>
         </dependency>
 
         <dependency>

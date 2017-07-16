@@ -20,11 +20,11 @@ import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.SettableFuture;
+import io.airlift.drift.TApplicationException;
+import io.airlift.drift.TException;
+import io.airlift.drift.protocol.TProtocolException;
 import io.airlift.drift.transport.DriftApplicationException;
-import org.apache.thrift.TApplicationException;
-import org.apache.thrift.TException;
-import org.apache.thrift.protocol.TProtocolException;
-import org.apache.thrift.transport.TTransportException;
+import io.airlift.drift.transport.TTransportException;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -33,9 +33,9 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 
+import static io.airlift.drift.TApplicationException.Type.UNKNOWN_METHOD;
 import static java.util.Arrays.asList;
 import static java.util.Objects.requireNonNull;
-import static org.apache.thrift.TApplicationException.UNKNOWN_METHOD;
 
 class DriftInvocationHandler
         implements InvocationHandler

@@ -45,11 +45,11 @@ import io.airlift.drift.codec.recursion.ViaNestedListElementType;
 import io.airlift.drift.codec.recursion.WithDriftRecursiveAnnotation;
 import io.airlift.drift.codec.recursion.WithIdlRecursiveAnnotation;
 import io.airlift.drift.codec.recursion.WithoutRecursiveAnnotation;
-import org.apache.thrift.protocol.TBinaryProtocol;
-import org.apache.thrift.protocol.TCompactProtocol;
-import org.apache.thrift.protocol.TProtocol;
-import org.apache.thrift.protocol.TProtocolFactory;
-import org.apache.thrift.transport.TMemoryBuffer;
+import io.airlift.drift.protocol.TBinaryProtocol;
+import io.airlift.drift.protocol.TCompactProtocol;
+import io.airlift.drift.protocol.TProtocol;
+import io.airlift.drift.protocol.TProtocolFactory;
+import io.airlift.drift.transport.TMemoryBuffer;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -281,7 +281,7 @@ public abstract class AbstractThriftCodecManagerTest
                 ImmutableMap.of((short) 1, new long[] {30, 31, 32, 33}, (short) 2, new long[] {35, 36, 37, 38}),
                 ImmutableMap.of((short) 1, new double[] {40, 41, 42, 43}, (short) 2, new double[] {45, 46, 47, 48}));
 
-        testRoundTripSerialize(arrayField);
+        testRoundTripSerialize(arrayField, new TCompactProtocol.Factory());
     }
 
     @Test
@@ -289,7 +289,7 @@ public abstract class AbstractThriftCodecManagerTest
             throws Exception
     {
         OneOfEverything one = createOneOfEverything();
-        testRoundTripSerialize(one);
+        testRoundTripSerialize(one, new TCompactProtocol.Factory());
     }
 
     @Test
@@ -325,7 +325,8 @@ public abstract class AbstractThriftCodecManagerTest
         one.aEnum = Fruit.CHERRY;
         one.aStruct = new BonkField("struct", 66);
 
-        testRoundTripSerialize(codec, codec, one);
+        testRoundTripSerialize(codec, codec, one, new TCompactProtocol.Factory());
+        testRoundTripSerialize(codec, codec, one, new TBinaryProtocol.Factory());
     }
 
     @Test
@@ -333,7 +334,8 @@ public abstract class AbstractThriftCodecManagerTest
             throws Exception
     {
         OneOfEverything one = new OneOfEverything();
-        testRoundTripSerialize(one);
+        testRoundTripSerialize(one, new TCompactProtocol.Factory());
+        testRoundTripSerialize(one, new TBinaryProtocol.Factory());
     }
 
     @Test

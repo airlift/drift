@@ -45,7 +45,8 @@ import io.airlift.drift.codec.metadata.ThriftParameterInjection;
 import io.airlift.drift.codec.metadata.ThriftStructMetadata;
 import io.airlift.drift.codec.metadata.ThriftType;
 import io.airlift.drift.codec.metadata.ThriftTypeReference;
-import org.apache.thrift.protocol.TProtocol;
+import io.airlift.drift.protocol.TProtocolReader;
+import io.airlift.drift.protocol.TProtocolWriter;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.util.CheckClassAdapter;
@@ -278,7 +279,7 @@ public class ThriftCodecByteCodeGenerator<T>
                 a(PUBLIC),
                 "read",
                 structType,
-                arg("protocol", TProtocol.class)
+                arg("protocol", TProtocolReader.class)
         ).addException(Exception.class);
 
         // TProtocolReader reader = new TProtocolReader(protocol);
@@ -286,7 +287,7 @@ public class ThriftCodecByteCodeGenerator<T>
         read.newObject(ProtocolReader.class);
         read.dup();
         read.loadVariable("protocol");
-        read.invokeConstructor(type(ProtocolReader.class), type(TProtocol.class));
+        read.invokeConstructor(type(ProtocolReader.class), type(TProtocolReader.class));
         read.storeVariable("reader");
 
         // read all of the data in to local variables
@@ -466,7 +467,7 @@ public class ThriftCodecByteCodeGenerator<T>
                 a(PUBLIC),
                 "read",
                 structType,
-                arg("protocol", TProtocol.class)
+                arg("protocol", TProtocolReader.class)
         ).addException(Exception.class);
 
         // TProtocolReader reader = new TProtocolReader(protocol);
@@ -474,7 +475,7 @@ public class ThriftCodecByteCodeGenerator<T>
         read.newObject(ProtocolReader.class);
         read.dup();
         read.loadVariable("protocol");
-        read.invokeConstructor(type(ProtocolReader.class), type(TProtocol.class));
+        read.invokeConstructor(type(ProtocolReader.class), type(TProtocolReader.class));
         read.storeVariable("reader");
 
         // field id field.
@@ -807,7 +808,7 @@ public class ThriftCodecByteCodeGenerator<T>
                 "write",
                 null,
                 arg("struct", structType),
-                arg("protocol", TProtocol.class));
+                arg("protocol", TProtocolWriter.class));
 
         classDefinition.addMethod(write);
 
@@ -816,7 +817,7 @@ public class ThriftCodecByteCodeGenerator<T>
         write.newObject(ProtocolWriter.class);
         write.dup();
         write.loadVariable("protocol");
-        write.invokeConstructor(type(ProtocolWriter.class), type(TProtocol.class));
+        write.invokeConstructor(type(ProtocolWriter.class), type(TProtocolWriter.class));
         write.storeVariable("writer");
 
         LocalVariableDefinition protocol = write.getLocalVariable("writer");
@@ -847,7 +848,7 @@ public class ThriftCodecByteCodeGenerator<T>
                 "write",
                 null,
                 arg("struct", structType),
-                arg("protocol", TProtocol.class));
+                arg("protocol", TProtocolWriter.class));
 
         classDefinition.addMethod(write);
 
@@ -856,7 +857,7 @@ public class ThriftCodecByteCodeGenerator<T>
         write.newObject(ProtocolWriter.class);
         write.dup();
         write.loadVariable("protocol");
-        write.invokeConstructor(type(ProtocolWriter.class), type(TProtocol.class));
+        write.invokeConstructor(type(ProtocolWriter.class), type(TProtocolWriter.class));
         write.storeVariable("writer");
 
         LocalVariableDefinition protocol = write.getLocalVariable("writer");
@@ -991,11 +992,11 @@ public class ThriftCodecByteCodeGenerator<T>
     private void defineReadBridgeMethod()
     {
         classDefinition.addMethod(
-                new MethodDefinition(a(PUBLIC, BRIDGE, SYNTHETIC), "read", type(Object.class), arg("protocol", TProtocol.class))
+                new MethodDefinition(a(PUBLIC, BRIDGE, SYNTHETIC), "read", type(Object.class), arg("protocol", TProtocolReader.class))
                         .addException(Exception.class)
                         .loadThis()
                         .loadVariable("protocol")
-                        .invokeVirtual(codecType, "read", structType, type(TProtocol.class))
+                        .invokeVirtual(codecType, "read", structType, type(TProtocolReader.class))
                         .retObject());
     }
 
@@ -1005,7 +1006,7 @@ public class ThriftCodecByteCodeGenerator<T>
     private void defineWriteBridgeMethod()
     {
         classDefinition.addMethod(
-                new MethodDefinition(a(PUBLIC, BRIDGE, SYNTHETIC), "write", null, arg("struct", Object.class), arg("protocol", TProtocol.class))
+                new MethodDefinition(a(PUBLIC, BRIDGE, SYNTHETIC), "write", null, arg("struct", Object.class), arg("protocol", TProtocolWriter.class))
                         .addException(Exception.class)
                         .loadThis()
                         .loadVariable("struct", structType)
@@ -1015,7 +1016,7 @@ public class ThriftCodecByteCodeGenerator<T>
                                 "write",
                                 type(void.class),
                                 structType,
-                                type(TProtocol.class))
+                                type(TProtocolWriter.class))
                         .ret());
     }
 

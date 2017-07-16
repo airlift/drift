@@ -19,25 +19,26 @@ import com.google.common.net.HostAndPort;
 import com.google.common.primitives.Ints;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListeningExecutorService;
+import io.airlift.drift.TApplicationException;
+import io.airlift.drift.TException;
 import io.airlift.drift.codec.ThriftCodec;
 import io.airlift.drift.codec.internal.ProtocolReader;
 import io.airlift.drift.codec.internal.ProtocolWriter;
 import io.airlift.drift.codec.metadata.ThriftType;
+import io.airlift.drift.protocol.TProtocolException;
 import io.airlift.drift.transport.AddressSelector;
 import io.airlift.drift.transport.DriftApplicationException;
 import io.airlift.drift.transport.InvokeRequest;
 import io.airlift.drift.transport.MethodInvoker;
 import io.airlift.drift.transport.MethodMetadata;
 import io.airlift.drift.transport.ParameterMetadata;
+import io.airlift.drift.transport.TTransportException;
 import io.airlift.units.Duration;
-import org.apache.thrift.TApplicationException;
-import org.apache.thrift.TException;
 import org.apache.thrift.protocol.TMessage;
 import org.apache.thrift.protocol.TProtocol;
 import org.apache.thrift.protocol.TProtocolFactory;
 import org.apache.thrift.transport.TSocket;
 import org.apache.thrift.transport.TTransport;
-import org.apache.thrift.transport.TTransportException;
 import org.apache.thrift.transport.TTransportFactory;
 
 import javax.net.ssl.SSLContext;
@@ -50,18 +51,25 @@ import java.net.SocketException;
 import java.util.List;
 import java.util.Optional;
 
-import static com.google.common.base.Throwables.propagateIfPossible;
+import static com.google.common.base.Throwables.throwIfUnchecked;
 import static com.google.common.util.concurrent.Futures.immediateFailedFuture;
+import static io.airlift.drift.TApplicationException.Type.BAD_SEQUENCE_ID;
+import static io.airlift.drift.TApplicationException.Type.INTERNAL_ERROR;
+import static io.airlift.drift.TApplicationException.Type.INVALID_MESSAGE_TYPE;
+import static io.airlift.drift.TApplicationException.Type.INVALID_PROTOCOL;
+import static io.airlift.drift.TApplicationException.Type.INVALID_TRANSFORM;
+import static io.airlift.drift.TApplicationException.Type.MISSING_RESULT;
+import static io.airlift.drift.TApplicationException.Type.PROTOCOL_ERROR;
+import static io.airlift.drift.TApplicationException.Type.UNKNOWN;
+import static io.airlift.drift.TApplicationException.Type.UNKNOWN_METHOD;
+import static io.airlift.drift.TApplicationException.Type.UNSUPPORTED_CLIENT_TYPE;
+import static io.airlift.drift.TApplicationException.Type.WRONG_METHOD_NAME;
 import static java.lang.String.format;
 import static java.net.Proxy.Type.SOCKS;
 import static java.util.Objects.requireNonNull;
-import static org.apache.thrift.TApplicationException.BAD_SEQUENCE_ID;
-import static org.apache.thrift.TApplicationException.INVALID_MESSAGE_TYPE;
-import static org.apache.thrift.TApplicationException.WRONG_METHOD_NAME;
 import static org.apache.thrift.protocol.TMessageType.CALL;
 import static org.apache.thrift.protocol.TMessageType.EXCEPTION;
 import static org.apache.thrift.protocol.TMessageType.REPLY;
-import static org.apache.thrift.transport.TTransportException.NOT_OPEN;
 
 public class ApacheThriftMethodInvoker
         implements MethodInvoker
@@ -106,7 +114,7 @@ public class ApacheThriftMethodInvoker
             return executorService.submit(() -> invokeSynchronous(request, new ResultHandler() {}));
         }
         catch (Exception e) {
-            return immediateFailedFuture(e);
+            return immediateFailedFuture(toDriftException(e));
         }
     }
 
@@ -115,7 +123,7 @@ public class ApacheThriftMethodInvoker
     {
         List<HostAndPort> addresses = addressSelector.getAddresses(request.getAddressSelectionContext());
         if (addresses.isEmpty()) {
-            throw new TTransportException(NOT_OPEN, "No hosts available");
+            throw new TTransportException("No hosts available");
         }
 
         Exception lastException = null;
@@ -125,7 +133,7 @@ public class ApacheThriftMethodInvoker
                 try {
                     socket.open();
                 }
-                catch (TTransportException e) {
+                catch (org.apache.thrift.transport.TTransportException e) {
                     addressSelector.markdown(address);
                     continue;
                 }
@@ -153,7 +161,7 @@ public class ApacheThriftMethodInvoker
             }
         }
         if (lastException == null) {
-            throw new TTransportException(NOT_OPEN, "Unable to connect to any hosts");
+            throw new TTransportException("Unable to connect to any hosts");
         }
         throw lastException;
     }
@@ -182,13 +190,16 @@ public class ApacheThriftMethodInvoker
             return new TSocket(socket);
         }
         catch (Throwable t) {
+            // something went wrong, close the socket and rethrow
             try {
                 socket.close();
             }
             catch (IOException e) {
                 t.addSuppressed(e);
             }
-            propagateIfPossible(t, TTransportException.class);
+            // unchecked exceptions are not transport exceptions
+            // (any socket related exception will be a checked exception)
+            throwIfUnchecked(t);
             throw new TTransportException(t);
         }
     }
@@ -209,7 +220,7 @@ public class ApacheThriftMethodInvoker
         protocol.writeMessageBegin(requestMessage);
 
         // write the parameters
-        ProtocolWriter writer = new ProtocolWriter(protocol);
+        ProtocolWriter writer = new ProtocolWriter(new ThriftToDriftProtocolWriter(protocol));
         writer.writeStructBegin(method.getName() + "_args");
         for (int i = 0; i < parameters.size(); i++) {
             Object value = parameters.get(i);
@@ -223,13 +234,13 @@ public class ApacheThriftMethodInvoker
     }
 
     private static Object readResponse(MethodMetadata method, TProtocol responseProtocol)
-            throws TException
+            throws TException, org.apache.thrift.TException
     {
         // validate response header
         TMessage message = responseProtocol.readMessageBegin();
 
         if (message.type == EXCEPTION) {
-            TApplicationException exception = TApplicationException.read(responseProtocol);
+            org.apache.thrift.TApplicationException exception = org.apache.thrift.TApplicationException.read(responseProtocol);
             responseProtocol.readMessageEnd();
             throw exception;
         }
@@ -244,7 +255,7 @@ public class ApacheThriftMethodInvoker
         }
 
         // read response struct
-        ProtocolReader reader = new ProtocolReader(responseProtocol);
+        ProtocolReader reader = new ProtocolReader(new ThriftToDriftProtocolReader(responseProtocol));
         reader.readStructBegin();
 
         Object results = null;
@@ -283,8 +294,53 @@ public class ApacheThriftMethodInvoker
         }
 
         if (results == null) {
-            throw new TApplicationException(TApplicationException.MISSING_RESULT, format("%s failed: unknown result", method.getName()));
+            throw new TApplicationException(MISSING_RESULT, format("%s failed: unknown result", method.getName()));
         }
         return results;
+    }
+
+    private static Exception toDriftException(Exception e)
+    {
+        if (e instanceof org.apache.thrift.TApplicationException) {
+            org.apache.thrift.TApplicationException tae = (org.apache.thrift.TApplicationException) e;
+            return new TApplicationException(toDriftApplicationExceptionType(tae.getType()), tae.getMessage());
+        }
+        if (e instanceof org.apache.thrift.transport.TTransportException) {
+            return new TTransportException(e);
+        }
+        if (e instanceof org.apache.thrift.protocol.TProtocolException) {
+            return new TProtocolException(e);
+        }
+        if (e instanceof org.apache.thrift.TException) {
+            return new TException(e);
+        }
+        return e;
+    }
+
+    private static TApplicationException.Type toDriftApplicationExceptionType(int type)
+    {
+        switch (type) {
+            case org.apache.thrift.TApplicationException.UNKNOWN_METHOD:
+                return UNKNOWN_METHOD;
+            case org.apache.thrift.TApplicationException.INVALID_MESSAGE_TYPE:
+                return INVALID_MESSAGE_TYPE;
+            case org.apache.thrift.TApplicationException.WRONG_METHOD_NAME:
+                return WRONG_METHOD_NAME;
+            case org.apache.thrift.TApplicationException.BAD_SEQUENCE_ID:
+                return BAD_SEQUENCE_ID;
+            case org.apache.thrift.TApplicationException.MISSING_RESULT:
+                return MISSING_RESULT;
+            case org.apache.thrift.TApplicationException.INTERNAL_ERROR:
+                return INTERNAL_ERROR;
+            case org.apache.thrift.TApplicationException.PROTOCOL_ERROR:
+                return PROTOCOL_ERROR;
+            case org.apache.thrift.TApplicationException.INVALID_TRANSFORM:
+                return INVALID_TRANSFORM;
+            case org.apache.thrift.TApplicationException.INVALID_PROTOCOL:
+                return INVALID_PROTOCOL;
+            case org.apache.thrift.TApplicationException.UNSUPPORTED_CLIENT_TYPE:
+                return UNSUPPORTED_CLIENT_TYPE;
+        }
+        return UNKNOWN;
     }
 }

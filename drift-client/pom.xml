@@ -32,6 +32,16 @@
         </dependency>
 
         <dependency>
+            <groupId>io.airlift.drift</groupId>
+            <artifactId>drift-core</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>io.airlift.drift</groupId>
+            <artifactId>drift-transport-spi</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>com.google.code.findbugs</groupId>
             <artifactId>annotations</artifactId>
         </dependency>
@@ -46,11 +56,6 @@
             <groupId>com.google.inject.extensions</groupId>
             <artifactId>guice-multibindings</artifactId>
             <optional>true</optional>
-        </dependency>
-
-        <dependency>
-            <groupId>io.airlift.drift</groupId>
-            <artifactId>drift-transport-spi</artifactId>
         </dependency>
 
         <dependency>
@@ -77,11 +82,6 @@
             <groupId>javax.inject</groupId>
             <artifactId>javax.inject</artifactId>
             <optional>true</optional>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.thrift</groupId>
-            <artifactId>libthrift</artifactId>
         </dependency>
 
         <dependency>

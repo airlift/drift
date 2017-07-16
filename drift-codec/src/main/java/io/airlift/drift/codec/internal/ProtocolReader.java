@@ -15,15 +15,15 @@
  */
 package io.airlift.drift.codec.internal;
 
+import io.airlift.drift.TException;
 import io.airlift.drift.codec.ThriftCodec;
-import org.apache.thrift.TException;
-import org.apache.thrift.protocol.TField;
-import org.apache.thrift.protocol.TList;
-import org.apache.thrift.protocol.TMap;
-import org.apache.thrift.protocol.TProtocol;
-import org.apache.thrift.protocol.TProtocolUtil;
-import org.apache.thrift.protocol.TSet;
-import org.apache.thrift.protocol.TType;
+import io.airlift.drift.protocol.TField;
+import io.airlift.drift.protocol.TList;
+import io.airlift.drift.protocol.TMap;
+import io.airlift.drift.protocol.TProtocolReader;
+import io.airlift.drift.protocol.TProtocolUtil;
+import io.airlift.drift.protocol.TSet;
+import io.airlift.drift.protocol.TType;
 
 import javax.annotation.concurrent.NotThreadSafe;
 
@@ -42,17 +42,12 @@ import static com.google.common.base.Preconditions.checkState;
 @NotThreadSafe
 public class ProtocolReader
 {
-    private final TProtocol protocol;
+    private final TProtocolReader protocol;
     private TField currentField;
 
-    public ProtocolReader(TProtocol protocol)
+    public ProtocolReader(TProtocolReader protocol)
     {
         this.protocol = protocol;
-    }
-
-    public TProtocol getProtocol()
-    {
-        return protocol;
     }
 
     public void readStructBegin()
@@ -65,7 +60,7 @@ public class ProtocolReader
     public void readStructEnd()
             throws TException
     {
-        if (currentField == null || currentField.id != TType.STOP) {
+        if (currentField == null || currentField.getId() != TType.STOP) {
             throw new IllegalStateException("Some fields have not been consumed");
         }
 
@@ -77,7 +72,7 @@ public class ProtocolReader
             throws TException
     {
         // if the current field is a stop record, the caller must call readStructEnd.
-        if (currentField != null && currentField.id == TType.STOP) {
+        if (currentField != null && currentField.getId() == TType.STOP) {
             throw new NoSuchElementException();
         }
         checkState(currentField == null, "Current field was not read");
@@ -85,25 +80,25 @@ public class ProtocolReader
         // advance to the next field
         currentField = protocol.readFieldBegin();
 
-        return currentField.type != TType.STOP;
+        return currentField.getType() != TType.STOP;
     }
 
     public short getFieldId()
     {
         checkState(currentField != null, "No current field");
-        return currentField.id;
+        return currentField.getId();
     }
 
     public byte getFieldType()
     {
         checkState(currentField != null, "No current field");
-        return currentField.type;
+        return currentField.getType();
     }
 
     public void skipFieldData()
             throws TException
     {
-        TProtocolUtil.skip(protocol, currentField.type);
+        TProtocolUtil.skip(protocol, currentField.getType());
         protocol.readFieldEnd();
         currentField = null;
     }
@@ -394,8 +389,8 @@ public class ProtocolReader
             throws TException
     {
         TList list = protocol.readListBegin();
-        boolean[] array = new boolean[list.size];
-        for (int i = 0; i < list.size; i++) {
+        boolean[] array = new boolean[list.getSize()];
+        for (int i = 0; i < list.getSize(); i++) {
             array[i] = readBool();
         }
         protocol.readListEnd();
@@ -406,8 +401,8 @@ public class ProtocolReader
             throws TException
     {
         TList list = protocol.readListBegin();
-        short[] array = new short[list.size];
-        for (int i = 0; i < list.size; i++) {
+        short[] array = new short[list.getSize()];
+        for (int i = 0; i < list.getSize(); i++) {
             array[i] = readI16();
         }
         protocol.readListEnd();
@@ -418,8 +413,8 @@ public class ProtocolReader
             throws TException
     {
         TList list = protocol.readListBegin();
-        int[] array = new int[list.size];
-        for (int i = 0; i < list.size; i++) {
+        int[] array = new int[list.getSize()];
+        for (int i = 0; i < list.getSize(); i++) {
             array[i] = readI32();
         }
         protocol.readListEnd();
@@ -430,8 +425,8 @@ public class ProtocolReader
             throws TException
     {
         TList list = protocol.readListBegin();
-        long[] array = new long[list.size];
-        for (int i = 0; i < list.size; i++) {
+        long[] array = new long[list.getSize()];
+        for (int i = 0; i < list.getSize(); i++) {
             array[i] = readI64();
         }
         protocol.readListEnd();
@@ -442,8 +437,8 @@ public class ProtocolReader
             throws TException
     {
         TList list = protocol.readListBegin();
-        double[] array = new double[list.size];
-        for (int i = 0; i < list.size; i++) {
+        double[] array = new double[list.getSize()];
+        for (int i = 0; i < list.getSize(); i++) {
             array[i] = readDouble();
         }
         protocol.readListEnd();
@@ -455,7 +450,7 @@ public class ProtocolReader
     {
         TSet tSet = protocol.readSetBegin();
         Set<E> set = new HashSet<>();
-        for (int i = 0; i < tSet.size; i++) {
+        for (int i = 0; i < tSet.getSize(); i++) {
             try {
                 E element = elementCodec.read(protocol);
                 set.add(element);
@@ -473,7 +468,7 @@ public class ProtocolReader
     {
         TList tList = protocol.readListBegin();
         List<E> list = new ArrayList<>();
-        for (int i = 0; i < tList.size; i++) {
+        for (int i = 0; i < tList.getSize(); i++) {
             try {
                 E element = elementCodec.read(protocol);
                 list.add(element);
@@ -491,7 +486,7 @@ public class ProtocolReader
     {
         TMap tMap = protocol.readMapBegin();
         Map<K, V> map = new HashMap<>();
-        for (int i = 0; i < tMap.size; i++) {
+        for (int i = 0; i < tMap.getSize(); i++) {
             try {
                 K key = keyCodec.read(protocol);
                 V value = valueCodec.read(protocol);
@@ -510,8 +505,8 @@ public class ProtocolReader
     {
         checkState(currentField != null, "No current field");
 
-        if (currentField.type != expectedType) {
-            TProtocolUtil.skip(protocol, currentField.type);
+        if (currentField.getType() != expectedType) {
+            TProtocolUtil.skip(protocol, currentField.getType());
             protocol.readFieldEnd();
             currentField = null;
             return false;

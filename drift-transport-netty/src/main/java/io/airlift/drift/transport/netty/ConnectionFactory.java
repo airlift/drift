@@ -16,6 +16,7 @@
 package io.airlift.drift.transport.netty;
 
 import com.google.common.net.HostAndPort;
+import io.airlift.drift.transport.TTransportException;
 import io.airlift.units.Duration;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
@@ -26,7 +27,6 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.ssl.SslContext;
 import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.Promise;
-import org.apache.thrift.transport.TTransportException;
 
 import java.net.InetSocketAddress;
 import java.util.Optional;
@@ -34,7 +34,6 @@ import java.util.Optional;
 import static com.google.common.primitives.Ints.saturatedCast;
 import static io.netty.channel.ChannelOption.CONNECT_TIMEOUT_MILLIS;
 import static java.util.Objects.requireNonNull;
-import static org.apache.thrift.transport.TTransportException.NOT_OPEN;
 
 class ConnectionFactory
         implements ConnectionManager
@@ -87,7 +86,7 @@ class ConnectionFactory
             return promise;
         }
         catch (Throwable e) {
-            return group.next().newFailedFuture(new TTransportException(NOT_OPEN, e));
+            return group.next().newFailedFuture(new TTransportException(e));
         }
     }
 

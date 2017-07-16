@@ -16,6 +16,9 @@
 package io.airlift.drift.transport.netty;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import io.airlift.drift.protocol.TBinaryProtocol;
+import io.airlift.drift.protocol.TCompactProtocol;
+import io.airlift.drift.protocol.TProtocolFactory;
 import io.airlift.drift.transport.AddressSelector;
 import io.airlift.drift.transport.MethodInvoker;
 import io.airlift.drift.transport.MethodInvokerFactory;
@@ -25,9 +28,6 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslContextBuilder;
 import io.netty.util.concurrent.Future;
-import org.apache.thrift.protocol.TBinaryProtocol;
-import org.apache.thrift.protocol.TCompactProtocol;
-import org.apache.thrift.protocol.TProtocolFactory;
 
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;

@@ -19,7 +19,8 @@ import com.google.common.base.Preconditions;
 import io.airlift.drift.codec.internal.ProtocolReader;
 import io.airlift.drift.codec.internal.ProtocolWriter;
 import io.airlift.drift.codec.metadata.ThriftType;
-import org.apache.thrift.protocol.TProtocol;
+import io.airlift.drift.protocol.TProtocolReader;
+import io.airlift.drift.protocol.TProtocolWriter;
 
 public class UnionFieldThriftCodec
         implements ThriftCodec<UnionField>
@@ -40,7 +41,7 @@ public class UnionFieldThriftCodec
     }
 
     @Override
-    public UnionField read(TProtocol protocol)
+    public UnionField read(TProtocolReader protocol)
             throws Exception
     {
         ProtocolReader reader = new ProtocolReader(protocol);
@@ -77,7 +78,7 @@ public class UnionFieldThriftCodec
     }
 
     @Override
-    public void write(UnionField value, TProtocol protocol)
+    public void write(UnionField value, TProtocolWriter protocol)
             throws Exception
     {
         ProtocolWriter writer = new ProtocolWriter(protocol);

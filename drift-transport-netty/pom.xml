@@ -23,6 +23,11 @@
     <dependencies>
         <dependency>
             <groupId>io.airlift.drift</groupId>
+            <artifactId>drift-core</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>io.airlift.drift</groupId>
             <artifactId>drift-codec</artifactId>
         </dependency>
 
@@ -74,11 +79,6 @@
             <optional>true</optional>
         </dependency>
 
-        <dependency>
-            <groupId>org.apache.thrift</groupId>
-            <artifactId>libthrift</artifactId>
-        </dependency>
-
         <!-- for testing -->
         <dependency>
             <groupId>io.airlift.drift</groupId>
@@ -102,6 +102,18 @@
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
             <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.thrift</groupId>
+            <artifactId>libthrift</artifactId>
+            <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.httpcomponents</groupId>
+                    <artifactId>httpclient</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
     </dependencies>
 </project>

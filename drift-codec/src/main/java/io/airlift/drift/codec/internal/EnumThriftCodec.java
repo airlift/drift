@@ -18,7 +18,8 @@ package io.airlift.drift.codec.internal;
 import io.airlift.drift.codec.ThriftCodec;
 import io.airlift.drift.codec.metadata.ThriftEnumMetadata;
 import io.airlift.drift.codec.metadata.ThriftType;
-import org.apache.thrift.protocol.TProtocol;
+import io.airlift.drift.protocol.TProtocolReader;
+import io.airlift.drift.protocol.TProtocolWriter;
 
 import javax.annotation.concurrent.Immutable;
 
@@ -48,7 +49,7 @@ public class EnumThriftCodec<T extends Enum<T>>
     }
 
     @Override
-    public T read(TProtocol protocol)
+    public T read(TProtocolReader protocol)
             throws Exception
     {
         int enumValue = protocol.readI32();
@@ -75,7 +76,7 @@ public class EnumThriftCodec<T extends Enum<T>>
     }
 
     @Override
-    public void write(T enumConstant, TProtocol protocol)
+    public void write(T enumConstant, TProtocolWriter protocol)
             throws Exception
     {
         requireNonNull(enumConstant, "enumConstant is null");

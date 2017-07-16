@@ -15,12 +15,12 @@
  */
 package io.airlift.drift.transport.netty;
 
+import io.airlift.drift.protocol.TMessage;
+import io.airlift.drift.protocol.TProtocolFactory;
 import io.airlift.drift.transport.MethodMetadata;
+import io.airlift.drift.transport.TTransport;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
-import org.apache.thrift.protocol.TMessage;
-import org.apache.thrift.protocol.TProtocolFactory;
-import org.apache.thrift.transport.TTransport;
 
 import javax.annotation.concurrent.ThreadSafe;
 
@@ -56,7 +56,7 @@ class SimpleMessageEncoding
         try {
             TTransport inputTransport = new TChannelBufferInputTransport(buffer.duplicate());
             TMessage message = protocolFactory.getProtocol(inputTransport).readMessageBegin();
-            return OptionalInt.of(message.seqid);
+            return OptionalInt.of(message.getSequenceId());
         }
         catch (Throwable ignored) {
         }

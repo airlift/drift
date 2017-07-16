@@ -15,16 +15,16 @@
  */
 package io.airlift.drift.transport.netty;
 
+import io.airlift.drift.protocol.TProtocolFactory;
+import io.airlift.drift.protocol.TProtocolReader;
+import io.airlift.drift.protocol.TProtocolUtil;
+import io.airlift.drift.protocol.TType;
+import io.airlift.drift.transport.TTransport;
 import io.airlift.units.DataSize;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.handler.codec.TooLongFrameException;
-import org.apache.thrift.protocol.TProtocol;
-import org.apache.thrift.protocol.TProtocolFactory;
-import org.apache.thrift.protocol.TProtocolUtil;
-import org.apache.thrift.protocol.TType;
-import org.apache.thrift.transport.TTransport;
 
 import java.util.List;
 
@@ -57,7 +57,7 @@ class ThriftUnframedDecoder
         int frameOffset = buffer.readerIndex();
         try {
             TTransport transport = new TChannelBufferInputTransport(buffer);
-            TProtocol protocol = protocolFactory.getProtocol(transport);
+            TProtocolReader protocol = protocolFactory.getProtocol(transport);
 
             protocol.readMessageBegin();
             TProtocolUtil.skip(protocol, TType.STRUCT);

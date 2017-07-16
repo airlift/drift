@@ -47,7 +47,8 @@ import io.airlift.drift.codec.metadata.ThriftCatalog;
 import io.airlift.drift.codec.metadata.ThriftType;
 import io.airlift.drift.codec.metadata.ThriftTypeReference;
 import io.airlift.drift.codec.metadata.TypeCoercion;
-import org.apache.thrift.protocol.TProtocol;
+import io.airlift.drift.protocol.TProtocolReader;
+import io.airlift.drift.protocol.TProtocolWriter;
 
 import javax.annotation.concurrent.ThreadSafe;
 
@@ -275,26 +276,26 @@ public class ThriftCodecManager
         return catalog;
     }
 
-    public <T> T read(Class<T> type, TProtocol protocol)
+    public <T> T read(Class<T> type, TProtocolReader protocol)
             throws Exception
     {
         return getCodec(type).read(protocol);
     }
 
-    public Object read(ThriftType type, TProtocol protocol)
+    public Object read(ThriftType type, TProtocolReader protocol)
             throws Exception
     {
         ThriftCodec<?> codec = getCodec(type);
         return codec.read(protocol);
     }
 
-    public <T> void write(Class<T> type, T value, TProtocol protocol)
+    public <T> void write(Class<T> type, T value, TProtocolWriter protocol)
             throws Exception
     {
         getCodec(type).write(value, protocol);
     }
 
-    public void write(ThriftType type, Object value, TProtocol protocol)
+    public void write(ThriftType type, Object value, TProtocolWriter protocol)
             throws Exception
     {
         ThriftCodec<Object> codec = (ThriftCodec<Object>) getCodec(type);

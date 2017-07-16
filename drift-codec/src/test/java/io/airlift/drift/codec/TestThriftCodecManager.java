@@ -24,11 +24,11 @@ import io.airlift.drift.codec.metadata.ThriftCatalog;
 import io.airlift.drift.codec.metadata.ThriftEnumMetadata;
 import io.airlift.drift.codec.metadata.ThriftEnumMetadataBuilder;
 import io.airlift.drift.codec.metadata.ThriftType;
-import org.apache.thrift.protocol.TBinaryProtocol;
-import org.apache.thrift.protocol.TCompactProtocol;
-import org.apache.thrift.protocol.TProtocol;
-import org.apache.thrift.protocol.TProtocolFactory;
-import org.apache.thrift.transport.TMemoryBuffer;
+import io.airlift.drift.protocol.TBinaryProtocol;
+import io.airlift.drift.protocol.TCompactProtocol;
+import io.airlift.drift.protocol.TProtocol;
+import io.airlift.drift.protocol.TProtocolFactory;
+import io.airlift.drift.transport.TMemoryBuffer;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 

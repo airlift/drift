@@ -15,8 +15,8 @@
  */
 package io.airlift.drift.transport.netty;
 
+import io.airlift.drift.transport.TTransport;
 import io.netty.buffer.ByteBuf;
-import org.apache.thrift.transport.TTransport;
 
 import javax.annotation.concurrent.NotThreadSafe;
 
@@ -24,7 +24,7 @@ import static java.util.Objects.requireNonNull;
 
 @NotThreadSafe
 class TChannelBufferInputTransport
-        extends TTransport
+        implements TTransport
 {
     private final ByteBuf buffer;
 
@@ -34,22 +34,9 @@ class TChannelBufferInputTransport
     }
 
     @Override
-    public boolean isOpen()
-    {
-        return true;
-    }
-
-    @Override
-    public void open() {}
-
-    @Override
-    public void close() {}
-
-    @Override
-    public int read(byte[] buf, int off, int len)
+    public void read(byte[] buf, int off, int len)
     {
         buffer.readBytes(buf, off, len);
-        return len;
     }
 
     @Override

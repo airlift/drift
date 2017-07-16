@@ -15,15 +15,15 @@
  */
 package io.airlift.drift.codec.internal;
 
+import io.airlift.drift.TException;
 import io.airlift.drift.codec.ThriftCodec;
-import org.apache.thrift.TException;
-import org.apache.thrift.protocol.TField;
-import org.apache.thrift.protocol.TList;
-import org.apache.thrift.protocol.TMap;
-import org.apache.thrift.protocol.TProtocol;
-import org.apache.thrift.protocol.TSet;
-import org.apache.thrift.protocol.TStruct;
-import org.apache.thrift.protocol.TType;
+import io.airlift.drift.protocol.TField;
+import io.airlift.drift.protocol.TList;
+import io.airlift.drift.protocol.TMap;
+import io.airlift.drift.protocol.TProtocolWriter;
+import io.airlift.drift.protocol.TSet;
+import io.airlift.drift.protocol.TStruct;
+import io.airlift.drift.protocol.TType;
 
 import javax.annotation.concurrent.NotThreadSafe;
 
@@ -35,9 +35,9 @@ import java.util.Set;
 @NotThreadSafe
 public class ProtocolWriter
 {
-    private final TProtocol protocol;
+    private final TProtocolWriter protocol;
 
-    public ProtocolWriter(TProtocol protocol)
+    public ProtocolWriter(TProtocolWriter protocol)
     {
         this.protocol = protocol;
     }

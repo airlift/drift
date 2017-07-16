@@ -27,7 +27,8 @@ import io.airlift.drift.codec.metadata.ThriftFieldMetadata;
 import io.airlift.drift.codec.metadata.ThriftInjection;
 import io.airlift.drift.codec.metadata.ThriftMethodInjection;
 import io.airlift.drift.codec.metadata.ThriftStructMetadata;
-import org.apache.thrift.protocol.TProtocol;
+import io.airlift.drift.protocol.TProtocolReader;
+import io.airlift.drift.protocol.TProtocolWriter;
 
 import javax.annotation.concurrent.Immutable;
 
@@ -63,7 +64,7 @@ public class ReflectionThriftUnionCodec<T>
     }
 
     @Override
-    public T read(TProtocol protocol)
+    public T read(TProtocolReader protocol)
             throws Exception
     {
         ProtocolReader reader = new ProtocolReader(protocol);
@@ -105,7 +106,7 @@ public class ReflectionThriftUnionCodec<T>
     }
 
     @Override
-    public void write(T instance, TProtocol protocol)
+    public void write(T instance, TProtocolWriter protocol)
             throws Exception
     {
         ProtocolWriter writer = new ProtocolWriter(protocol);

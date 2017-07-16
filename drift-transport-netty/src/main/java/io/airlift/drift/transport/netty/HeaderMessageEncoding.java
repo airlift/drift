@@ -17,15 +17,15 @@ package io.airlift.drift.transport.netty;
 
 import com.google.common.collect.ImmutableMap;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import io.airlift.drift.TApplicationException;
+import io.airlift.drift.protocol.TBinaryProtocol;
+import io.airlift.drift.protocol.TCompactProtocol;
+import io.airlift.drift.protocol.TProtocolFactory;
 import io.airlift.drift.transport.MethodMetadata;
+import io.airlift.drift.transport.TTransportException;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.buffer.Unpooled;
-import org.apache.thrift.TApplicationException;
-import org.apache.thrift.protocol.TBinaryProtocol;
-import org.apache.thrift.protocol.TCompactProtocol;
-import org.apache.thrift.protocol.TProtocolFactory;
-import org.apache.thrift.transport.TTransportException;
 
 import javax.annotation.concurrent.ThreadSafe;
 
@@ -35,8 +35,8 @@ import java.util.Map.Entry;
 import java.util.OptionalInt;
 
 import static com.google.common.base.Verify.verify;
+import static io.airlift.drift.TApplicationException.Type.BAD_SEQUENCE_ID;
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static org.apache.thrift.TApplicationException.BAD_SEQUENCE_ID;
 
 @ThreadSafe
 class HeaderMessageEncoding

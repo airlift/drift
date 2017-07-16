@@ -17,7 +17,8 @@ package io.airlift.drift.codec.internal.builtin;
 
 import io.airlift.drift.codec.ThriftCodec;
 import io.airlift.drift.codec.metadata.ThriftType;
-import org.apache.thrift.protocol.TProtocol;
+import io.airlift.drift.protocol.TProtocolReader;
+import io.airlift.drift.protocol.TProtocolWriter;
 
 import javax.annotation.concurrent.Immutable;
 
@@ -38,9 +39,10 @@ public class VoidThriftCodec
 
     /**
      * Always returns null without reading anything from the stream.
+     * @param protocol
      */
     @Override
-    public Void read(TProtocol protocol)
+    public Void read(TProtocolReader protocol)
             throws Exception
     {
         requireNonNull(protocol, "protocol is null");
@@ -51,7 +53,7 @@ public class VoidThriftCodec
      * Always returns without writing to the stream.
      */
     @Override
-    public void write(Void value, TProtocol protocol)
+    public void write(Void value, TProtocolWriter protocol)
             throws Exception
     {
         requireNonNull(protocol, "protocol is null");

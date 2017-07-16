@@ -15,9 +15,9 @@
  */
 package io.airlift.drift.transport.netty;
 
+import io.airlift.drift.protocol.TProtocolFactory;
 import io.airlift.units.DataSize;
 import io.netty.channel.ChannelPipeline;
-import org.apache.thrift.protocol.TProtocolFactory;
 
 import static java.util.Objects.requireNonNull;
 

@@ -17,7 +17,9 @@ package io.airlift.drift.transport.netty;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.util.concurrent.AbstractFuture;
+import io.airlift.drift.TException;
 import io.airlift.drift.transport.MethodMetadata;
+import io.airlift.drift.transport.TTransportException;
 import io.airlift.units.Duration;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
@@ -27,8 +29,6 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPromise;
 import io.netty.util.concurrent.EventExecutor;
 import io.netty.util.concurrent.ScheduledFuture;
-import org.apache.thrift.TException;
-import org.apache.thrift.transport.TTransportException;
 
 import javax.annotation.concurrent.ThreadSafe;
 
@@ -42,7 +42,6 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import static java.util.Objects.requireNonNull;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
-import static org.apache.thrift.transport.TTransportException.TIMED_OUT;
 
 @ThreadSafe
 class ThriftClientHandler
@@ -253,7 +252,7 @@ class ThriftClientHandler
         {
             try {
                 timeout.set(executor.schedule(
-                        () -> onChannelError(new TTransportException(TIMED_OUT, "Timed out waiting " + requestTimeout + " to receive response")),
+                        () -> onChannelError(new TTransportException("Timed out waiting " + requestTimeout + " to receive response")),
                         requestTimeout.toMillis(),
                         MILLISECONDS));
             }

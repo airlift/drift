@@ -17,7 +17,8 @@ package io.airlift.drift.codec.internal.builtin;
 
 import io.airlift.drift.codec.ThriftCodec;
 import io.airlift.drift.codec.metadata.ThriftType;
-import org.apache.thrift.protocol.TProtocol;
+import io.airlift.drift.protocol.TProtocolReader;
+import io.airlift.drift.protocol.TProtocolWriter;
 
 import javax.annotation.concurrent.Immutable;
 
@@ -34,7 +35,7 @@ public class LongThriftCodec
     }
 
     @Override
-    public Long read(TProtocol protocol)
+    public Long read(TProtocolReader protocol)
             throws Exception
     {
         requireNonNull(protocol, "protocol is null");
@@ -42,7 +43,7 @@ public class LongThriftCodec
     }
 
     @Override
-    public void write(Long value, TProtocol protocol)
+    public void write(Long value, TProtocolWriter protocol)
             throws Exception
     {
         requireNonNull(value, "value is null");

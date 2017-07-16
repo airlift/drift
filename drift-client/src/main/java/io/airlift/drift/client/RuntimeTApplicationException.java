@@ -15,7 +15,7 @@
  */
 package io.airlift.drift.client;
 
-import org.apache.thrift.TApplicationException;
+import io.airlift.drift.TApplicationException;
 
 /**
  * Runtime equivalent of TApplicationException.  If a Drift client receives a

@@ -17,7 +17,8 @@ package io.airlift.drift.codec;
 
 import com.google.common.reflect.TypeToken;
 import io.airlift.drift.codec.metadata.ThriftType;
-import org.apache.thrift.protocol.TProtocol;
+import io.airlift.drift.protocol.TProtocolReader;
+import io.airlift.drift.protocol.TProtocolWriter;
 
 import java.lang.reflect.Type;
 
@@ -47,14 +48,14 @@ public class DelegateCodec<T>
     }
 
     @Override
-    public T read(TProtocol protocol)
+    public T read(TProtocolReader protocol)
             throws Exception
     {
         return getCodec().read(protocol);
     }
 
     @Override
-    public void write(T value, TProtocol protocol)
+    public void write(T value, TProtocolWriter protocol)
             throws Exception
     {
         getCodec().write(value, protocol);

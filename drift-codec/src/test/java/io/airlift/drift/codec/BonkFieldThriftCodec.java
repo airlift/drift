@@ -18,7 +18,8 @@ package io.airlift.drift.codec;
 import io.airlift.drift.codec.internal.ProtocolReader;
 import io.airlift.drift.codec.internal.ProtocolWriter;
 import io.airlift.drift.codec.metadata.ThriftType;
-import org.apache.thrift.protocol.TProtocol;
+import io.airlift.drift.protocol.TProtocolReader;
+import io.airlift.drift.protocol.TProtocolWriter;
 
 public class BonkFieldThriftCodec
         implements ThriftCodec<BonkField>
@@ -37,7 +38,7 @@ public class BonkFieldThriftCodec
     }
 
     @Override
-    public BonkField read(TProtocol protocol)
+    public BonkField read(TProtocolReader protocol)
             throws Exception
     {
         ProtocolReader reader = new ProtocolReader(protocol);
@@ -71,7 +72,7 @@ public class BonkFieldThriftCodec
     }
 
     @Override
-    public void write(BonkField value, TProtocol protocol)
+    public void write(BonkField value, TProtocolWriter protocol)
             throws Exception
     {
         ProtocolWriter writer = new ProtocolWriter(protocol);

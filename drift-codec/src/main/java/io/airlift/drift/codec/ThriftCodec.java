@@ -16,7 +16,8 @@
 package io.airlift.drift.codec;
 
 import io.airlift.drift.codec.metadata.ThriftType;
-import org.apache.thrift.protocol.TProtocol;
+import io.airlift.drift.protocol.TProtocolReader;
+import io.airlift.drift.protocol.TProtocolWriter;
 
 /**
  * <p>A single type codec for reading and writing in Thrift format.  Each codec is symmetric and
@@ -41,7 +42,7 @@ public interface ThriftCodec<T>
      * @return the value; not null
      * @throws Exception if any problems occurred when reading or coercing the value
      */
-    T read(TProtocol protocol)
+    T read(TProtocolReader protocol)
             throws Exception;
 
     /**
@@ -51,6 +52,6 @@ public interface ThriftCodec<T>
      * @param protocol the protocol to write to
      * @throws Exception if any problems occurred when writing or coercing the value
      */
-    void write(T value, TProtocol protocol)
+    void write(T value, TProtocolWriter protocol)
             throws Exception;
 }

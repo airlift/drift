@@ -19,7 +19,8 @@ import io.airlift.drift.codec.ThriftCodec;
 import io.airlift.drift.codec.internal.ProtocolReader;
 import io.airlift.drift.codec.internal.ProtocolWriter;
 import io.airlift.drift.codec.metadata.ThriftType;
-import org.apache.thrift.protocol.TProtocol;
+import io.airlift.drift.protocol.TProtocolReader;
+import io.airlift.drift.protocol.TProtocolWriter;
 
 import javax.annotation.concurrent.Immutable;
 
@@ -47,7 +48,7 @@ public class SetThriftCodec<T>
     }
 
     @Override
-    public Set<T> read(TProtocol protocol)
+    public Set<T> read(TProtocolReader protocol)
             throws Exception
     {
         requireNonNull(protocol, "protocol is null");
@@ -55,7 +56,7 @@ public class SetThriftCodec<T>
     }
 
     @Override
-    public void write(Set<T> value, TProtocol protocol)
+    public void write(Set<T> value, TProtocolWriter protocol)
             throws Exception
     {
         requireNonNull(value, "value is null");

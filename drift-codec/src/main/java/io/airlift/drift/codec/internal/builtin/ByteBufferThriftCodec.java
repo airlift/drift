@@ -17,7 +17,8 @@ package io.airlift.drift.codec.internal.builtin;
 
 import io.airlift.drift.codec.ThriftCodec;
 import io.airlift.drift.codec.metadata.ThriftType;
-import org.apache.thrift.protocol.TProtocol;
+import io.airlift.drift.protocol.TProtocolReader;
+import io.airlift.drift.protocol.TProtocolWriter;
 
 import javax.annotation.concurrent.Immutable;
 
@@ -36,7 +37,7 @@ public class ByteBufferThriftCodec
     }
 
     @Override
-    public ByteBuffer read(TProtocol protocol)
+    public ByteBuffer read(TProtocolReader protocol)
             throws Exception
     {
         requireNonNull(protocol, "protocol is null");
@@ -44,7 +45,7 @@ public class ByteBufferThriftCodec
     }
 
     @Override
-    public void write(ByteBuffer value, TProtocol protocol)
+    public void write(ByteBuffer value, TProtocolWriter protocol)
             throws Exception
     {
         requireNonNull(value, "value is null");

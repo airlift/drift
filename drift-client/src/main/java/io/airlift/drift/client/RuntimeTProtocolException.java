@@ -15,7 +15,7 @@
  */
 package io.airlift.drift.client;
 
-import org.apache.thrift.protocol.TProtocolException;
+import io.airlift.drift.protocol.TProtocolException;
 
 /**
  * Runtime equivalent of TProtocolException.  If a Drift client receives a

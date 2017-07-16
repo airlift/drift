@@ -18,7 +18,8 @@ package io.airlift.drift.codec;
 import io.airlift.drift.codec.internal.ProtocolReader;
 import io.airlift.drift.codec.internal.ProtocolWriter;
 import io.airlift.drift.codec.metadata.ThriftType;
-import org.apache.thrift.protocol.TProtocol;
+import io.airlift.drift.protocol.TProtocolReader;
+import io.airlift.drift.protocol.TProtocolWriter;
 
 public class OneOfEverythingThriftCodec
         implements ThriftCodec<OneOfEverything>
@@ -46,7 +47,7 @@ public class OneOfEverythingThriftCodec
     }
 
     @Override
-    public OneOfEverything read(TProtocol protocol)
+    public OneOfEverything read(TProtocolReader protocol)
             throws Exception
     {
         ProtocolReader reader = new ProtocolReader(protocol);
@@ -117,7 +118,7 @@ public class OneOfEverythingThriftCodec
     }
 
     @Override
-    public void write(OneOfEverything oneOfEverything, TProtocol protocol)
+    public void write(OneOfEverything oneOfEverything, TProtocolWriter protocol)
             throws Exception
     {
         ProtocolWriter writer = new ProtocolWriter(protocol);

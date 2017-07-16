@@ -15,23 +15,25 @@
  */
 package io.airlift.drift.transport.netty;
 
-import org.apache.thrift.ShortStack;
-import org.apache.thrift.TException;
-import org.apache.thrift.protocol.TField;
-import org.apache.thrift.protocol.TList;
-import org.apache.thrift.protocol.TMap;
-import org.apache.thrift.protocol.TMessage;
-import org.apache.thrift.protocol.TProtocol;
-import org.apache.thrift.protocol.TProtocolException;
-import org.apache.thrift.protocol.TProtocolFactory;
-import org.apache.thrift.protocol.TSet;
-import org.apache.thrift.protocol.TStruct;
-import org.apache.thrift.protocol.TType;
-import org.apache.thrift.transport.TTransport;
+import io.airlift.drift.TException;
+import io.airlift.drift.protocol.TField;
+import io.airlift.drift.protocol.TList;
+import io.airlift.drift.protocol.TMap;
+import io.airlift.drift.protocol.TMessage;
+import io.airlift.drift.protocol.TProtocol;
+import io.airlift.drift.protocol.TProtocolException;
+import io.airlift.drift.protocol.TProtocolFactory;
+import io.airlift.drift.protocol.TSet;
+import io.airlift.drift.protocol.TStruct;
+import io.airlift.drift.protocol.TType;
+import io.airlift.drift.transport.TTransport;
 
 import java.nio.ByteBuffer;
+import java.util.ArrayDeque;
+import java.util.Deque;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.util.Objects.requireNonNull;
 
 /**
  * TCompactProtocol2 is the Java implementation of the compact protocol specified
@@ -43,7 +45,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  * and i64 fields you have, the more benefit you'll see.
  */
 public class TFacebookCompactProtocol
-        extends TProtocol
+        implements TProtocol
 {
     private static final TStruct ANONYMOUS_STRUCT = new TStruct("");
     private static final TField TSTOP = new TField("", TType.STOP, (short) 0);
@@ -119,7 +121,7 @@ public class TFacebookCompactProtocol
      * Used to keep track of the last field for the current and previous structs,
      * so we can do the delta stuff.
      */
-    private final ShortStack lastField = new ShortStack(15);
+    private final Deque<Short> lastField = new ArrayDeque<>();
 
     private short lastFieldId;
 
@@ -134,6 +136,11 @@ public class TFacebookCompactProtocol
      * value here so that readBool can use it.
      */
     private Boolean booleanValue;
+
+    /**
+     * The transport for reading from or writing to.
+     */
+    private final TTransport transport;
 
     /**
      * The maximum number of bytes to read from the network for
@@ -151,15 +158,8 @@ public class TFacebookCompactProtocol
      */
     public TFacebookCompactProtocol(TTransport transport, long maxNetworkBytes)
     {
-        super(transport);
+        this.transport = requireNonNull(transport, "transport is null");
         this.maxNetworkBytes = maxNetworkBytes;
-    }
-
-    @Override
-    public void reset()
-    {
-        lastField.clear();
-        lastFieldId = 0;
     }
 
     //
@@ -175,9 +175,9 @@ public class TFacebookCompactProtocol
             throws TException
     {
         writeByteDirect(PROTOCOL_ID);
-        writeByteDirect((VERSION & VERSION_MASK) | ((message.type << TYPE_SHIFT_AMOUNT) & TYPE_MASK));
-        writeVarint32(message.seqid);
-        writeString(message.name);
+        writeByteDirect((VERSION & VERSION_MASK) | ((message.getType() << TYPE_SHIFT_AMOUNT) & TYPE_MASK));
+        writeVarint32(message.getSequenceId());
+        writeString(message.getName());
     }
 
     /**
@@ -215,7 +215,7 @@ public class TFacebookCompactProtocol
     public void writeFieldBegin(TField field)
             throws TException
     {
-        if (field.type == TType.BOOL) {
+        if (field.getType() == TType.BOOL) {
             // we want to possibly include the value, so we'll wait.
             booleanField = field;
         }
@@ -235,21 +235,20 @@ public class TFacebookCompactProtocol
         // short lastField = lastField_.pop();
 
         // if there's a type override, use that.
-        byte typeToWrite = typeOverride == -1 ? getCompactType(field.type) : typeOverride;
+        byte typeToWrite = typeOverride == -1 ? getCompactType(field.getType()) : typeOverride;
 
         // check if we can use delta encoding for the field id
-        if (field.id > lastFieldId && field.id - lastFieldId <= 15) {
+        if (field.getId() > lastFieldId && field.getId() - lastFieldId <= 15) {
             // write them together
-            writeByteDirect((field.id - lastFieldId) << 4 | typeToWrite);
+            writeByteDirect((field.getId() - lastFieldId) << 4 | typeToWrite);
         }
         else {
             // write them separate
             writeByteDirect(typeToWrite);
-            writeI16(field.id);
+            writeI16(field.getId());
         }
 
-        lastFieldId = field.id;
-        // lastField_.push(field.id);
+        lastFieldId = field.getId();
     }
 
     /**
@@ -270,12 +269,12 @@ public class TFacebookCompactProtocol
     public void writeMapBegin(TMap map)
             throws TException
     {
-        if (map.size == 0) {
+        if (map.getSize() == 0) {
             writeByteDirect(0);
         }
         else {
-            writeVarint32(map.size);
-            writeByteDirect(getCompactType(map.keyType) << 4 | getCompactType(map.valueType));
+            writeVarint32(map.getSize());
+            writeByteDirect(getCompactType(map.getKeyType()) << 4 | getCompactType(map.getValueType()));
         }
     }
 
@@ -286,7 +285,7 @@ public class TFacebookCompactProtocol
     public void writeListBegin(TList list)
             throws TException
     {
-        writeCollectionBegin(list.elemType, list.size);
+        writeCollectionBegin(list.getType(), list.getSize());
     }
 
     /**
@@ -296,7 +295,7 @@ public class TFacebookCompactProtocol
     public void writeSetBegin(TSet set)
             throws TException
     {
-        writeCollectionBegin(set.elemType, set.size);
+        writeCollectionBegin(set.getType(), set.getSize());
     }
 
     /**
@@ -306,17 +305,17 @@ public class TFacebookCompactProtocol
      * Otherwise, write a single byte.
      */
     @Override
-    public void writeBool(boolean b)
+    public void writeBool(boolean value)
             throws TException
     {
         if (booleanField != null) {
             // we haven't written the field header yet
-            writeFieldBeginInternal(booleanField, b ? Types.BOOLEAN_TRUE : Types.BOOLEAN_FALSE);
+            writeFieldBeginInternal(booleanField, value ? Types.BOOLEAN_TRUE : Types.BOOLEAN_FALSE);
             booleanField = null;
         }
         else {
             // we're not part of a field, so just write the value.
-            writeByteDirect(b ? Types.BOOLEAN_TRUE : Types.BOOLEAN_FALSE);
+            writeByteDirect(value ? Types.BOOLEAN_TRUE : Types.BOOLEAN_FALSE);
         }
     }
 
@@ -324,62 +323,62 @@ public class TFacebookCompactProtocol
      * Write a byte. Nothing to see here!
      */
     @Override
-    public void writeByte(byte b)
+    public void writeByte(byte value)
             throws TException
     {
-        writeByteDirect(b);
+        writeByteDirect(value);
     }
 
     /**
      * Write an I16 as a zigzag varint.
      */
     @Override
-    public void writeI16(short i16)
+    public void writeI16(short value)
             throws TException
     {
-        writeVarint32(intToZigZag(i16));
+        writeVarint32(intToZigZag(value));
     }
 
     /**
      * Write an i32 as a zigzag varint.
      */
     @Override
-    public void writeI32(int i32)
+    public void writeI32(int value)
             throws TException
     {
-        writeVarint32(intToZigZag(i32));
+        writeVarint32(intToZigZag(value));
     }
 
     /**
      * Write an i64 as a zigzag varint.
      */
     @Override
-    public void writeI64(long i64)
+    public void writeI64(long value)
             throws TException
     {
-        writeVarint64(longToZigzag(i64));
+        writeVarint64(longToZigzag(value));
     }
 
     /**
      * Write a double to the wire as 8 bytes.
      */
     @Override
-    public void writeDouble(double dub)
+    public void writeDouble(double value)
             throws TException
     {
         byte[] data = new byte[] {0, 0, 0, 0, 0, 0, 0, 0};
-        fixedLongToBytes(Double.doubleToLongBits(dub), data);
-        trans_.write(data);
+        fixedLongToBytes(Double.doubleToLongBits(value), data);
+        transport.write(data);
     }
 
     /**
      * Write a string to the wire with a varint size preceding.
      */
     @Override
-    public void writeString(String str)
+    public void writeString(String value)
             throws TException
     {
-        byte[] bytes = str.getBytes(UTF_8);
+        byte[] bytes = value.getBytes(UTF_8);
         writeBinary(bytes, 0, bytes.length);
     }
 
@@ -387,18 +386,18 @@ public class TFacebookCompactProtocol
      * Write a byte array, using a varint for the size.
      */
     @Override
-    public void writeBinary(ByteBuffer bin)
+    public void writeBinary(ByteBuffer value)
             throws TException
     {
-        int length = bin.limit() - bin.position();
-        writeBinary(bin.array(), bin.position() + bin.arrayOffset(), length);
+        int length = value.limit() - value.position();
+        writeBinary(value.array(), value.position() + value.arrayOffset(), length);
     }
 
     private void writeBinary(byte[] buf, int offset, int length)
             throws TException
     {
         writeVarint32(length);
-        trans_.write(buf, offset, length);
+        transport.write(buf, offset, length);
     }
 
     //
@@ -479,7 +478,7 @@ public class TFacebookCompactProtocol
                 n >>>= 7;
             }
         }
-        trans_.write(i32buf, 0, idx);
+        transport.write(i32buf, 0, idx);
     }
 
     /**
@@ -501,7 +500,7 @@ public class TFacebookCompactProtocol
                 n >>>= 7;
             }
         }
-        trans_.write(varint64out, 0, idx);
+        transport.write(varint64out, 0, idx);
     }
 
     /**
@@ -547,7 +546,7 @@ public class TFacebookCompactProtocol
             throws TException
     {
         byteDirectBuffer[0] = b;
-        trans_.write(byteDirectBuffer);
+        transport.write(byteDirectBuffer);
     }
 
     /**
@@ -646,7 +645,7 @@ public class TFacebookCompactProtocol
         }
 
         // push the new field onto the field stack so we can keep the deltas going.
-        lastFieldId = field.id;
+        lastFieldId = field.getId();
         return field;
     }
 
@@ -722,16 +721,8 @@ public class TFacebookCompactProtocol
     public byte readByte()
             throws TException
     {
-        byte b;
-        if (trans_.getBytesRemainingInBuffer() > 0) {
-            b = trans_.getBuffer()[trans_.getBufferPosition()];
-            trans_.consumeBuffer(1);
-        }
-        else {
-            trans_.readAll(byteRawBuf, 0, 1);
-            b = byteRawBuf[0];
-        }
-        return b;
+        transport.read(byteRawBuf, 0, 1);
+        return byteRawBuf[0];
     }
 
     /**
@@ -772,7 +763,7 @@ public class TFacebookCompactProtocol
             throws TException
     {
         byte[] longBits = new byte[8];
-        trans_.readAll(longBits, 0, 8);
+        transport.read(longBits, 0, 8);
         return Double.longBitsToDouble(bytesToLong(longBits));
     }
 
@@ -790,14 +781,7 @@ public class TFacebookCompactProtocol
             return "";
         }
 
-        if (trans_.getBytesRemainingInBuffer() >= length) {
-            String str = new String(trans_.getBuffer(), trans_.getBufferPosition(), length, UTF_8);
-            trans_.consumeBuffer(length);
-            return str;
-        }
-        else {
-            return new String(readBinary(length), UTF_8);
-        }
+        return new String(readBinary(length), UTF_8);
     }
 
     /**
@@ -814,7 +798,7 @@ public class TFacebookCompactProtocol
         }
 
         byte[] buf = new byte[length];
-        trans_.readAll(buf, 0, length);
+        transport.read(buf, 0, length);
         return ByteBuffer.wrap(buf);
     }
 
@@ -829,7 +813,7 @@ public class TFacebookCompactProtocol
         }
 
         byte[] buf = new byte[length];
-        trans_.readAll(buf, 0, length);
+        transport.read(buf, 0, length);
         return buf;
     }
 
@@ -891,30 +875,13 @@ public class TFacebookCompactProtocol
     {
         int result = 0;
         int shift = 0;
-        if (trans_.getBytesRemainingInBuffer() >= 5) {
-            byte[] buf = trans_.getBuffer();
-            int pos = trans_.getBufferPosition();
-            int off = 0;
-            while (true) {
-                byte b = buf[pos + off];
-                result |= (b & 0x7f) << shift;
-                if ((b & 0x80) != 0x80) {
-                    break;
-                }
-                shift += 7;
-                off++;
+        while (true) {
+            byte b = readByte();
+            result |= (b & 0x7f) << shift;
+            if ((b & 0x80) != 0x80) {
+                break;
             }
-            trans_.consumeBuffer(off + 1);
-        }
-        else {
-            while (true) {
-                byte b = readByte();
-                result |= (b & 0x7f) << shift;
-                if ((b & 0x80) != 0x80) {
-                    break;
-                }
-                shift += 7;
-            }
+            shift += 7;
         }
         return result;
     }
@@ -928,30 +895,13 @@ public class TFacebookCompactProtocol
     {
         int shift = 0;
         long result = 0;
-        if (trans_.getBytesRemainingInBuffer() >= 10) {
-            byte[] buf = trans_.getBuffer();
-            int pos = trans_.getBufferPosition();
-            int off = 0;
-            while (true) {
-                byte b = buf[pos + off];
-                result |= (long) (b & 0x7f) << shift;
-                if ((b & 0x80) != 0x80) {
-                    break;
-                }
-                shift += 7;
-                off++;
+        while (true) {
+            byte b = readByte();
+            result |= (long) (b & 0x7f) << shift;
+            if ((b & 0x80) != 0x80) {
+                break;
             }
-            trans_.consumeBuffer(off + 1);
-        }
-        else {
-            while (true) {
-                byte b = readByte();
-                result |= (long) (b & 0x7f) << shift;
-                if ((b & 0x80) != 0x80) {
-                    break;
-                }
-                shift += 7;
-            }
+            shift += 7;
         }
         return result;
     }

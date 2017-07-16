@@ -15,7 +15,7 @@
  */
 package io.airlift.drift.codec;
 
-import org.apache.thrift.protocol.TType;
+import io.airlift.drift.protocol.TType;
 
 public enum ThriftProtocolType
 {

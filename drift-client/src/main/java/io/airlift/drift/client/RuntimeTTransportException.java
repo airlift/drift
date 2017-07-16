@@ -15,7 +15,7 @@
  */
 package io.airlift.drift.client;
 
-import org.apache.thrift.transport.TTransportException;
+import io.airlift.drift.transport.TTransportException;
 
 /**
  * Runtime equivalent of TTransportException.  If a Drift client receives a

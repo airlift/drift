@@ -15,14 +15,14 @@
  */
 package io.airlift.drift.transport.netty;
 
+import io.airlift.drift.transport.TTransport;
 import io.netty.buffer.ByteBuf;
-import org.apache.thrift.transport.TTransport;
 
 import javax.annotation.concurrent.NotThreadSafe;
 
 @NotThreadSafe
 class TChannelBufferOutputTransport
-        extends TTransport
+        implements TTransport
 {
     private final ByteBuf outputBuffer;
 
@@ -43,25 +43,7 @@ class TChannelBufferOutputTransport
     }
 
     @Override
-    public boolean isOpen()
-    {
-        return true;
-    }
-
-    @Override
-    public void open()
-    {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void close()
-    {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public int read(byte[] buf, int off, int len)
+    public void read(byte[] buf, int off, int len)
     {
         throw new UnsupportedOperationException();
     }
