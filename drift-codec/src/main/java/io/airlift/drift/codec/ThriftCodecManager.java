@@ -48,13 +48,9 @@ import io.airlift.drift.codec.metadata.ThriftType;
 import io.airlift.drift.codec.metadata.ThriftTypeReference;
 import io.airlift.drift.codec.metadata.TypeCoercion;
 import org.apache.thrift.protocol.TProtocol;
-import org.apache.thrift.protocol.TProtocolFactory;
-import org.apache.thrift.transport.TIOStreamTransport;
 
 import javax.annotation.concurrent.ThreadSafe;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.lang.reflect.Type;
 import java.util.ArrayDeque;
 import java.util.Deque;
@@ -292,39 +288,10 @@ public class ThriftCodecManager
         return codec.read(protocol);
     }
 
-    public <T> T read(byte[] serializedStruct, Class<T> clazz, TProtocolFactory protocolFactory)
-    {
-        requireNonNull(serializedStruct, "ttype is null");
-        requireNonNull(clazz, "clazz is null");
-        try {
-            ByteArrayInputStream inputStream = new ByteArrayInputStream(serializedStruct);
-            TProtocol resultProtocolBuffer = protocolFactory.getProtocol(new TIOStreamTransport(inputStream));
-            return read(clazz, resultProtocolBuffer);
-        }
-        catch (Exception e) {
-            throwIfUnchecked(e);
-            throw new RuntimeException(e);
-        }
-    }
-
     public <T> void write(Class<T> type, T value, TProtocol protocol)
             throws Exception
     {
         getCodec(type).write(value, protocol);
-    }
-
-    public <T> void write(T type, ByteArrayOutputStream outputStream, TProtocolFactory protocolFactory)
-    {
-        requireNonNull(type, "type is null");
-        requireNonNull(protocolFactory, "protocolFactory is null");
-        try {
-            TProtocol resultProtocolBuffer = protocolFactory.getProtocol(new TIOStreamTransport(outputStream));
-            write((Class<T>) type.getClass(), type, resultProtocolBuffer);
-        }
-        catch (Exception e) {
-            throwIfUnchecked(e);
-            throw new RuntimeException(e);
-        }
     }
 
     public void write(ThriftType type, Object value, TProtocol protocol)
