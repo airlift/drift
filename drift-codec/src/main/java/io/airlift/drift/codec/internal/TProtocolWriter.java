@@ -326,8 +326,8 @@ public class TProtocolWriter
             throws TException
     {
         protocol.writeListBegin(new TList(TType.I16, array.length));
-        for (int i16 : array) {
-            writeI32(i16);
+        for (short i16 : array) {
+            writeI16(i16);
         }
         protocol.writeListEnd();
     }
