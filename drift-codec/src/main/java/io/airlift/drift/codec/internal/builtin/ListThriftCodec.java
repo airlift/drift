@@ -16,8 +16,8 @@
 package io.airlift.drift.codec.internal.builtin;
 
 import io.airlift.drift.codec.ThriftCodec;
-import io.airlift.drift.codec.internal.TProtocolReader;
-import io.airlift.drift.codec.internal.TProtocolWriter;
+import io.airlift.drift.codec.internal.ProtocolReader;
+import io.airlift.drift.codec.internal.ProtocolWriter;
 import io.airlift.drift.codec.metadata.ThriftType;
 import org.apache.thrift.protocol.TProtocol;
 
@@ -51,7 +51,7 @@ public class ListThriftCodec<T>
             throws Exception
     {
         requireNonNull(protocol, "protocol is null");
-        return new TProtocolReader(protocol).readList(elementCodec);
+        return new ProtocolReader(protocol).readList(elementCodec);
     }
 
     @Override
@@ -60,6 +60,6 @@ public class ListThriftCodec<T>
     {
         requireNonNull(value, "value is null");
         requireNonNull(protocol, "protocol is null");
-        new TProtocolWriter(protocol).writeList(elementCodec, value);
+        new ProtocolWriter(protocol).writeList(elementCodec, value);
     }
 }

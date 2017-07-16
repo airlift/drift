@@ -16,8 +16,8 @@
 package io.airlift.drift.transport.netty;
 
 import io.airlift.drift.codec.ThriftCodec;
-import io.airlift.drift.codec.internal.TProtocolReader;
-import io.airlift.drift.codec.internal.TProtocolWriter;
+import io.airlift.drift.codec.internal.ProtocolReader;
+import io.airlift.drift.codec.internal.ProtocolWriter;
 import io.airlift.drift.codec.metadata.ThriftType;
 import io.airlift.drift.transport.DriftApplicationException;
 import io.airlift.drift.transport.MethodMetadata;
@@ -65,7 +65,7 @@ interface MessageEncoding
         protocol.writeMessageBegin(new TMessage(method.getName(), method.isOneway() ? ONEWAY : CALL, sequenceId));
 
         // write the parameters
-        TProtocolWriter writer = new TProtocolWriter(protocol);
+        ProtocolWriter writer = new ProtocolWriter(protocol);
         writer.writeStructBegin(method.getName() + "_args");
         for (int i = 0; i < parameters.size(); i++) {
             Object value = parameters.get(i);
@@ -103,7 +103,7 @@ interface MessageEncoding
         }
 
         // read response struct
-        TProtocolReader reader = new TProtocolReader(protocol);
+        ProtocolReader reader = new ProtocolReader(protocol);
         reader.readStructBegin();
 
         Object results = null;

@@ -18,8 +18,8 @@ package io.airlift.drift.codec.internal.reflection;
 import com.google.common.collect.Maps;
 import io.airlift.drift.codec.ThriftCodec;
 import io.airlift.drift.codec.ThriftCodecManager;
-import io.airlift.drift.codec.internal.TProtocolReader;
-import io.airlift.drift.codec.internal.TProtocolWriter;
+import io.airlift.drift.codec.internal.ProtocolReader;
+import io.airlift.drift.codec.internal.ProtocolWriter;
 import io.airlift.drift.codec.metadata.FieldKind;
 import io.airlift.drift.codec.metadata.ThriftConstructorInjection;
 import io.airlift.drift.codec.metadata.ThriftFieldInjection;
@@ -66,7 +66,7 @@ public class ReflectionThriftUnionCodec<T>
     public T read(TProtocol protocol)
             throws Exception
     {
-        TProtocolReader reader = new TProtocolReader(protocol);
+        ProtocolReader reader = new ProtocolReader(protocol);
         reader.readStructBegin();
 
         Map.Entry<Short, Object> data = null;
@@ -108,7 +108,7 @@ public class ReflectionThriftUnionCodec<T>
     public void write(T instance, TProtocol protocol)
             throws Exception
     {
-        TProtocolWriter writer = new TProtocolWriter(protocol);
+        ProtocolWriter writer = new ProtocolWriter(protocol);
 
         Short idValue = (Short) getFieldValue(instance, idField.getKey());
 

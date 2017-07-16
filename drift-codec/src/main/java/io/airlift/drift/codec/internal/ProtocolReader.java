@@ -40,12 +40,12 @@ import static com.google.common.base.MoreObjects.toStringHelper;
 import static com.google.common.base.Preconditions.checkState;
 
 @NotThreadSafe
-public class TProtocolReader
+public class ProtocolReader
 {
     private final TProtocol protocol;
     private TField currentField;
 
-    public TProtocolReader(TProtocol protocol)
+    public ProtocolReader(TProtocol protocol)
     {
         this.protocol = protocol;
     }

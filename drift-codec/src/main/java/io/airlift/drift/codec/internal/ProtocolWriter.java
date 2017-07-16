@@ -33,11 +33,11 @@ import java.util.Map;
 import java.util.Set;
 
 @NotThreadSafe
-public class TProtocolWriter
+public class ProtocolWriter
 {
     private final TProtocol protocol;
 
-    public TProtocolWriter(TProtocol protocol)
+    public ProtocolWriter(TProtocol protocol)
     {
         this.protocol = protocol;
     }

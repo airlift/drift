@@ -16,8 +16,8 @@
 package io.airlift.drift.codec.internal.builtin;
 
 import io.airlift.drift.codec.ThriftCodec;
-import io.airlift.drift.codec.internal.TProtocolReader;
-import io.airlift.drift.codec.internal.TProtocolWriter;
+import io.airlift.drift.codec.internal.ProtocolReader;
+import io.airlift.drift.codec.internal.ProtocolWriter;
 import io.airlift.drift.codec.metadata.ThriftType;
 import org.apache.thrift.protocol.TProtocol;
 
@@ -40,7 +40,7 @@ public class DoubleArrayThriftCodec
             throws Exception
     {
         requireNonNull(protocol, "protocol is null");
-        return new TProtocolReader(protocol).readDoubleArray();
+        return new ProtocolReader(protocol).readDoubleArray();
     }
 
     @Override
@@ -49,6 +49,6 @@ public class DoubleArrayThriftCodec
     {
         requireNonNull(value, "value is null");
         requireNonNull(protocol, "protocol is null");
-        new TProtocolWriter(protocol).writeDoubleArray(value);
+        new ProtocolWriter(protocol).writeDoubleArray(value);
     }
 }

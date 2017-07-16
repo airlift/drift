@@ -20,8 +20,8 @@ import com.google.common.primitives.Ints;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListeningExecutorService;
 import io.airlift.drift.codec.ThriftCodec;
-import io.airlift.drift.codec.internal.TProtocolReader;
-import io.airlift.drift.codec.internal.TProtocolWriter;
+import io.airlift.drift.codec.internal.ProtocolReader;
+import io.airlift.drift.codec.internal.ProtocolWriter;
 import io.airlift.drift.codec.metadata.ThriftType;
 import io.airlift.drift.transport.AddressSelector;
 import io.airlift.drift.transport.DriftApplicationException;
@@ -209,7 +209,7 @@ public class ApacheThriftMethodInvoker
         protocol.writeMessageBegin(requestMessage);
 
         // write the parameters
-        TProtocolWriter writer = new TProtocolWriter(protocol);
+        ProtocolWriter writer = new ProtocolWriter(protocol);
         writer.writeStructBegin(method.getName() + "_args");
         for (int i = 0; i < parameters.size(); i++) {
             Object value = parameters.get(i);
@@ -244,7 +244,7 @@ public class ApacheThriftMethodInvoker
         }
 
         // read response struct
-        TProtocolReader reader = new TProtocolReader(responseProtocol);
+        ProtocolReader reader = new ProtocolReader(responseProtocol);
         reader.readStructBegin();
 
         Object results = null;

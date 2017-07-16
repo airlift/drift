@@ -21,8 +21,8 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.airlift.drift.codec.ThriftCodec;
 import io.airlift.drift.codec.ThriftCodecManager;
 import io.airlift.drift.codec.ThriftProtocolType;
-import io.airlift.drift.codec.internal.TProtocolReader;
-import io.airlift.drift.codec.internal.TProtocolWriter;
+import io.airlift.drift.codec.internal.ProtocolReader;
+import io.airlift.drift.codec.internal.ProtocolWriter;
 import io.airlift.drift.codec.internal.compiler.byteCode.CaseStatement;
 import io.airlift.drift.codec.internal.compiler.byteCode.ClassDefinition;
 import io.airlift.drift.codec.internal.compiler.byteCode.FieldDefinition;
@@ -282,11 +282,11 @@ public class ThriftCodecByteCodeGenerator<T>
         ).addException(Exception.class);
 
         // TProtocolReader reader = new TProtocolReader(protocol);
-        read.addLocalVariable(type(TProtocolReader.class), "reader");
-        read.newObject(TProtocolReader.class);
+        read.addLocalVariable(type(ProtocolReader.class), "reader");
+        read.newObject(ProtocolReader.class);
         read.dup();
         read.loadVariable("protocol");
-        read.invokeConstructor(type(TProtocolReader.class), type(TProtocol.class));
+        read.invokeConstructor(type(ProtocolReader.class), type(TProtocol.class));
         read.storeVariable("reader");
 
         // read all of the data in to local variables
@@ -319,17 +319,17 @@ public class ThriftCodecByteCodeGenerator<T>
 
         // protocol.readStructBegin();
         read.loadVariable(protocol).invokeVirtual(
-                TProtocolReader.class,
+                ProtocolReader.class,
                 "readStructBegin",
                 void.class);
 
         // while (protocol.nextField())
         read.visitLabel("while-begin");
-        read.loadVariable(protocol).invokeVirtual(TProtocolReader.class, "nextField", boolean.class);
+        read.loadVariable(protocol).invokeVirtual(ProtocolReader.class, "nextField", boolean.class);
         read.ifZeroGoto("while-end");
 
         // switch (protocol.getFieldId())
-        read.loadVariable(protocol).invokeVirtual(TProtocolReader.class, "getFieldId", short.class);
+        read.loadVariable(protocol).invokeVirtual(ProtocolReader.class, "getFieldId", short.class);
         List<CaseStatement> cases = new ArrayList<>();
         for (ThriftFieldMetadata field : metadata.getFields(THRIFT_FIELD)) {
             cases.add(caseStatement(field.getId(), field.getName() + "-field"));
@@ -377,7 +377,7 @@ public class ThriftCodecByteCodeGenerator<T>
         // default case
         read.visitLabel("default")
                 .loadVariable(protocol)
-                .invokeVirtual(TProtocolReader.class, "skipFieldData", void.class)
+                .invokeVirtual(ProtocolReader.class, "skipFieldData", void.class)
                 .gotoLabel("while-begin");
 
         // end of while loop
@@ -385,7 +385,7 @@ public class ThriftCodecByteCodeGenerator<T>
 
         // protocol.readStructEnd();
         read.loadVariable(protocol)
-                .invokeVirtual(TProtocolReader.class, "readStructEnd", void.class);
+                .invokeVirtual(ProtocolReader.class, "readStructEnd", void.class);
         return structData;
     }
 
@@ -470,11 +470,11 @@ public class ThriftCodecByteCodeGenerator<T>
         ).addException(Exception.class);
 
         // TProtocolReader reader = new TProtocolReader(protocol);
-        read.addLocalVariable(type(TProtocolReader.class), "reader");
-        read.newObject(TProtocolReader.class);
+        read.addLocalVariable(type(ProtocolReader.class), "reader");
+        read.newObject(ProtocolReader.class);
         read.dup();
         read.loadVariable("protocol");
-        read.invokeConstructor(type(TProtocolReader.class), type(TProtocol.class));
+        read.invokeConstructor(type(ProtocolReader.class), type(TProtocol.class));
         read.storeVariable("reader");
 
         // field id field.
@@ -510,17 +510,17 @@ public class ThriftCodecByteCodeGenerator<T>
 
         // protocol.readStructBegin();
         read.loadVariable(protocol).invokeVirtual(
-                TProtocolReader.class,
+                ProtocolReader.class,
                 "readStructBegin",
                 void.class);
 
         // while (protocol.nextField())
         read.visitLabel("while-begin");
-        read.loadVariable(protocol).invokeVirtual(TProtocolReader.class, "nextField", boolean.class);
+        read.loadVariable(protocol).invokeVirtual(ProtocolReader.class, "nextField", boolean.class);
         read.ifZeroGoto("while-end");
 
         // fieldId = protocol.getFieldId()
-        read.loadVariable(protocol).invokeVirtual(TProtocolReader.class, "getFieldId", short.class);
+        read.loadVariable(protocol).invokeVirtual(ProtocolReader.class, "getFieldId", short.class);
         read.storeVariable("fieldId");
 
         // switch (fieldId)
@@ -573,7 +573,7 @@ public class ThriftCodecByteCodeGenerator<T>
         // default case
         read.visitLabel("default")
                 .loadVariable(protocol)
-                .invokeVirtual(TProtocolReader.class, "skipFieldData", void.class)
+                .invokeVirtual(ProtocolReader.class, "skipFieldData", void.class)
                 .gotoLabel("while-begin");
 
         // end of while loop
@@ -581,7 +581,7 @@ public class ThriftCodecByteCodeGenerator<T>
 
         // protocol.readStructEnd();
         read.loadVariable(protocol)
-                .invokeVirtual(TProtocolReader.class, "readStructEnd", void.class);
+                .invokeVirtual(ProtocolReader.class, "readStructEnd", void.class);
 
         return unionData;
     }
@@ -812,11 +812,11 @@ public class ThriftCodecByteCodeGenerator<T>
         classDefinition.addMethod(write);
 
         // TProtocolReader reader = new TProtocolReader(protocol);
-        write.addLocalVariable(type(TProtocolWriter.class), "writer");
-        write.newObject(TProtocolWriter.class);
+        write.addLocalVariable(type(ProtocolWriter.class), "writer");
+        write.newObject(ProtocolWriter.class);
         write.dup();
         write.loadVariable("protocol");
-        write.invokeConstructor(type(TProtocolWriter.class), type(TProtocol.class));
+        write.invokeConstructor(type(ProtocolWriter.class), type(TProtocol.class));
         write.storeVariable("writer");
 
         LocalVariableDefinition protocol = write.getLocalVariable("writer");
@@ -824,7 +824,7 @@ public class ThriftCodecByteCodeGenerator<T>
         // protocol.writeStructBegin("bonk");
         write.loadVariable(protocol)
                 .loadConstant(metadata.getStructName())
-                .invokeVirtual(TProtocolWriter.class, "writeStructBegin", void.class, String.class);
+                .invokeVirtual(ProtocolWriter.class, "writeStructBegin", void.class, String.class);
 
         // write fields
         for (ThriftFieldMetadata field : metadata.getFields(THRIFT_FIELD)) {
@@ -832,7 +832,7 @@ public class ThriftCodecByteCodeGenerator<T>
         }
 
         write.loadVariable(protocol)
-                .invokeVirtual(TProtocolWriter.class, "writeStructEnd", void.class);
+                .invokeVirtual(ProtocolWriter.class, "writeStructEnd", void.class);
 
         write.ret();
     }
@@ -852,11 +852,11 @@ public class ThriftCodecByteCodeGenerator<T>
         classDefinition.addMethod(write);
 
         // TProtocolWriter writer = new TProtocolWriter(protocol);
-        write.addLocalVariable(type(TProtocolWriter.class), "writer");
-        write.newObject(TProtocolWriter.class);
+        write.addLocalVariable(type(ProtocolWriter.class), "writer");
+        write.newObject(ProtocolWriter.class);
         write.dup();
         write.loadVariable("protocol");
-        write.invokeConstructor(type(TProtocolWriter.class), type(TProtocol.class));
+        write.invokeConstructor(type(ProtocolWriter.class), type(TProtocol.class));
         write.storeVariable("writer");
 
         LocalVariableDefinition protocol = write.getLocalVariable("writer");
@@ -864,7 +864,7 @@ public class ThriftCodecByteCodeGenerator<T>
         // protocol.writeStructBegin("bonk");
         write.loadVariable(protocol)
                 .loadConstant(metadata.getStructName())
-                .invokeVirtual(TProtocolWriter.class, "writeStructBegin", void.class, String.class);
+                .invokeVirtual(ProtocolWriter.class, "writeStructBegin", void.class, String.class);
 
         // find the @ThriftUnionId field
         ThriftFieldMetadata idField = getOnlyElement(metadata.getFields(THRIFT_UNION_ID));
@@ -888,7 +888,7 @@ public class ThriftCodecByteCodeGenerator<T>
 
         write.visitLabel("default-write")
                 .loadVariable(protocol)
-                .invokeVirtual(TProtocolWriter.class, "writeStructEnd", void.class);
+                .invokeVirtual(ProtocolWriter.class, "writeStructEnd", void.class);
 
         write.ret();
     }
@@ -1169,33 +1169,33 @@ public class ThriftCodecByteCodeGenerator<T>
         ImmutableMap.Builder<ThriftProtocolType, Method> readBuilder = ImmutableMap.builder();
 
         try {
-            writeBuilder.put(BOOL, TProtocolWriter.class.getMethod("writeBoolField", String.class, short.class, boolean.class));
-            writeBuilder.put(BYTE, TProtocolWriter.class.getMethod("writeByteField", String.class, short.class, byte.class));
-            writeBuilder.put(DOUBLE, TProtocolWriter.class.getMethod("writeDoubleField", String.class, short.class, double.class));
-            writeBuilder.put(I16, TProtocolWriter.class.getMethod("writeI16Field", String.class, short.class, short.class));
-            writeBuilder.put(I32, TProtocolWriter.class.getMethod("writeI32Field", String.class, short.class, int.class));
-            writeBuilder.put(I64, TProtocolWriter.class.getMethod("writeI64Field", String.class, short.class, long.class));
-            writeBuilder.put(STRING, TProtocolWriter.class.getMethod("writeStringField", String.class, short.class, String.class));
-            writeBuilder.put(BINARY, TProtocolWriter.class.getMethod("writeBinaryField", String.class, short.class, ByteBuffer.class));
-            writeBuilder.put(STRUCT, TProtocolWriter.class.getMethod("writeStructField", String.class, short.class, ThriftCodec.class, Object.class));
-            writeBuilder.put(MAP, TProtocolWriter.class.getMethod("writeMapField", String.class, short.class, ThriftCodec.class, Map.class));
-            writeBuilder.put(SET, TProtocolWriter.class.getMethod("writeSetField", String.class, short.class, ThriftCodec.class, Set.class));
-            writeBuilder.put(LIST, TProtocolWriter.class.getMethod("writeListField", String.class, short.class, ThriftCodec.class, List.class));
-            writeBuilder.put(ENUM, TProtocolWriter.class.getMethod("writeEnumField", String.class, short.class, ThriftCodec.class, Enum.class));
+            writeBuilder.put(BOOL, ProtocolWriter.class.getMethod("writeBoolField", String.class, short.class, boolean.class));
+            writeBuilder.put(BYTE, ProtocolWriter.class.getMethod("writeByteField", String.class, short.class, byte.class));
+            writeBuilder.put(DOUBLE, ProtocolWriter.class.getMethod("writeDoubleField", String.class, short.class, double.class));
+            writeBuilder.put(I16, ProtocolWriter.class.getMethod("writeI16Field", String.class, short.class, short.class));
+            writeBuilder.put(I32, ProtocolWriter.class.getMethod("writeI32Field", String.class, short.class, int.class));
+            writeBuilder.put(I64, ProtocolWriter.class.getMethod("writeI64Field", String.class, short.class, long.class));
+            writeBuilder.put(STRING, ProtocolWriter.class.getMethod("writeStringField", String.class, short.class, String.class));
+            writeBuilder.put(BINARY, ProtocolWriter.class.getMethod("writeBinaryField", String.class, short.class, ByteBuffer.class));
+            writeBuilder.put(STRUCT, ProtocolWriter.class.getMethod("writeStructField", String.class, short.class, ThriftCodec.class, Object.class));
+            writeBuilder.put(MAP, ProtocolWriter.class.getMethod("writeMapField", String.class, short.class, ThriftCodec.class, Map.class));
+            writeBuilder.put(SET, ProtocolWriter.class.getMethod("writeSetField", String.class, short.class, ThriftCodec.class, Set.class));
+            writeBuilder.put(LIST, ProtocolWriter.class.getMethod("writeListField", String.class, short.class, ThriftCodec.class, List.class));
+            writeBuilder.put(ENUM, ProtocolWriter.class.getMethod("writeEnumField", String.class, short.class, ThriftCodec.class, Enum.class));
 
-            readBuilder.put(BOOL, TProtocolReader.class.getMethod("readBoolField"));
-            readBuilder.put(BYTE, TProtocolReader.class.getMethod("readByteField"));
-            readBuilder.put(DOUBLE, TProtocolReader.class.getMethod("readDoubleField"));
-            readBuilder.put(I16, TProtocolReader.class.getMethod("readI16Field"));
-            readBuilder.put(I32, TProtocolReader.class.getMethod("readI32Field"));
-            readBuilder.put(I64, TProtocolReader.class.getMethod("readI64Field"));
-            readBuilder.put(STRING, TProtocolReader.class.getMethod("readStringField"));
-            readBuilder.put(BINARY, TProtocolReader.class.getMethod("readBinaryField"));
-            readBuilder.put(STRUCT, TProtocolReader.class.getMethod("readStructField", ThriftCodec.class));
-            readBuilder.put(MAP, TProtocolReader.class.getMethod("readMapField", ThriftCodec.class));
-            readBuilder.put(SET, TProtocolReader.class.getMethod("readSetField", ThriftCodec.class));
-            readBuilder.put(LIST, TProtocolReader.class.getMethod("readListField", ThriftCodec.class));
-            readBuilder.put(ENUM, TProtocolReader.class.getMethod("readEnumField", ThriftCodec.class));
+            readBuilder.put(BOOL, ProtocolReader.class.getMethod("readBoolField"));
+            readBuilder.put(BYTE, ProtocolReader.class.getMethod("readByteField"));
+            readBuilder.put(DOUBLE, ProtocolReader.class.getMethod("readDoubleField"));
+            readBuilder.put(I16, ProtocolReader.class.getMethod("readI16Field"));
+            readBuilder.put(I32, ProtocolReader.class.getMethod("readI32Field"));
+            readBuilder.put(I64, ProtocolReader.class.getMethod("readI64Field"));
+            readBuilder.put(STRING, ProtocolReader.class.getMethod("readStringField"));
+            readBuilder.put(BINARY, ProtocolReader.class.getMethod("readBinaryField"));
+            readBuilder.put(STRUCT, ProtocolReader.class.getMethod("readStructField", ThriftCodec.class));
+            readBuilder.put(MAP, ProtocolReader.class.getMethod("readMapField", ThriftCodec.class));
+            readBuilder.put(SET, ProtocolReader.class.getMethod("readSetField", ThriftCodec.class));
+            readBuilder.put(LIST, ProtocolReader.class.getMethod("readListField", ThriftCodec.class));
+            readBuilder.put(ENUM, ProtocolReader.class.getMethod("readEnumField", ThriftCodec.class));
         }
         catch (NoSuchMethodException e) {
             throw new AssertionError(e);
@@ -1207,22 +1207,22 @@ public class ThriftCodecByteCodeGenerator<T>
         ImmutableMap.Builder<Type, Method> arrayReadBuilder = ImmutableMap.builder();
 
         try {
-            arrayWriteBuilder.put(boolean[].class, TProtocolWriter.class.getMethod("writeBoolArrayField", String.class, short.class, boolean[].class));
-            arrayWriteBuilder.put(short[].class, TProtocolWriter.class.getMethod("writeI16ArrayField", String.class, short.class, short[].class));
-            arrayWriteBuilder.put(int[].class, TProtocolWriter.class.getMethod("writeI32ArrayField", String.class, short.class, int[].class));
-            arrayWriteBuilder.put(long[].class, TProtocolWriter.class.getMethod("writeI64ArrayField", String.class, short.class, long[].class));
-            arrayWriteBuilder.put(double[].class, TProtocolWriter.class.getMethod("writeDoubleArrayField", String.class, short.class, double[].class));
+            arrayWriteBuilder.put(boolean[].class, ProtocolWriter.class.getMethod("writeBoolArrayField", String.class, short.class, boolean[].class));
+            arrayWriteBuilder.put(short[].class, ProtocolWriter.class.getMethod("writeI16ArrayField", String.class, short.class, short[].class));
+            arrayWriteBuilder.put(int[].class, ProtocolWriter.class.getMethod("writeI32ArrayField", String.class, short.class, int[].class));
+            arrayWriteBuilder.put(long[].class, ProtocolWriter.class.getMethod("writeI64ArrayField", String.class, short.class, long[].class));
+            arrayWriteBuilder.put(double[].class, ProtocolWriter.class.getMethod("writeDoubleArrayField", String.class, short.class, double[].class));
 
-            arrayReadBuilder.put(boolean[].class, TProtocolReader.class.getMethod("readBoolArrayField"));
-            arrayReadBuilder.put(short[].class, TProtocolReader.class.getMethod("readI16ArrayField"));
-            arrayReadBuilder.put(int[].class, TProtocolReader.class.getMethod("readI32ArrayField"));
-            arrayReadBuilder.put(long[].class, TProtocolReader.class.getMethod("readI64ArrayField"));
-            arrayReadBuilder.put(double[].class, TProtocolReader.class.getMethod("readDoubleArrayField"));
+            arrayReadBuilder.put(boolean[].class, ProtocolReader.class.getMethod("readBoolArrayField"));
+            arrayReadBuilder.put(short[].class, ProtocolReader.class.getMethod("readI16ArrayField"));
+            arrayReadBuilder.put(int[].class, ProtocolReader.class.getMethod("readI32ArrayField"));
+            arrayReadBuilder.put(long[].class, ProtocolReader.class.getMethod("readI64ArrayField"));
+            arrayReadBuilder.put(double[].class, ProtocolReader.class.getMethod("readDoubleArrayField"));
 
             // byte[] is encoded as BINARY which should use the normal rules above, but it
             // simpler to add explicit handling here
-            arrayWriteBuilder.put(byte[].class, TProtocolWriter.class.getMethod("writeBinaryField", String.class, short.class, ByteBuffer.class));
-            arrayReadBuilder.put(byte[].class, TProtocolReader.class.getMethod("readBinaryField"));
+            arrayWriteBuilder.put(byte[].class, ProtocolWriter.class.getMethod("writeBinaryField", String.class, short.class, ByteBuffer.class));
+            arrayReadBuilder.put(byte[].class, ProtocolReader.class.getMethod("readBinaryField"));
         }
         catch (NoSuchMethodException e) {
             throw new AssertionError(e);
