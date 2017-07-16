@@ -24,6 +24,7 @@ import io.airlift.drift.codec.metadata.ThriftCatalog;
 import io.airlift.drift.codec.metadata.ThriftEnumMetadata;
 import io.airlift.drift.codec.metadata.ThriftEnumMetadataBuilder;
 import io.airlift.drift.codec.metadata.ThriftType;
+import org.apache.thrift.protocol.TBinaryProtocol;
 import org.apache.thrift.protocol.TCompactProtocol;
 import org.apache.thrift.protocol.TProtocol;
 import org.apache.thrift.protocol.TProtocolFactory;
@@ -187,6 +188,7 @@ public class TestThriftCodecManager
     private <T> void testRoundTripSerialize(T value)
             throws Exception
     {
+        testRoundTripSerialize(value, new TBinaryProtocol.Factory());
         testRoundTripSerialize(value, new TCompactProtocol.Factory());
     }
 
@@ -199,6 +201,7 @@ public class TestThriftCodecManager
     private <T> void testRoundTripSerialize(ThriftType type, T value)
             throws Exception
     {
+        testRoundTripSerialize(type, value, new TBinaryProtocol.Factory());
         testRoundTripSerialize(type, value, new TCompactProtocol.Factory());
     }
 

@@ -45,6 +45,7 @@ import io.airlift.drift.codec.recursion.ViaNestedListElementType;
 import io.airlift.drift.codec.recursion.WithDriftRecursiveAnnotation;
 import io.airlift.drift.codec.recursion.WithIdlRecursiveAnnotation;
 import io.airlift.drift.codec.recursion.WithoutRecursiveAnnotation;
+import org.apache.thrift.protocol.TBinaryProtocol;
 import org.apache.thrift.protocol.TCompactProtocol;
 import org.apache.thrift.protocol.TProtocol;
 import org.apache.thrift.protocol.TProtocolFactory;
@@ -93,19 +94,19 @@ public abstract class AbstractThriftCodecManagerTest
         unionField.id = 1;
         unionField.stringValue = "Hello, World";
 
-        testRoundTripSerialize(unionFieldCodec, unionFieldCodec, unionField, new TCompactProtocol.Factory());
+        testRoundTripSerialize(unionFieldCodec, unionFieldCodec, unionField);
 
         unionField = new UnionField();
         unionField.id = 2;
         unionField.longValue = 4815162342L;
 
-        testRoundTripSerialize(unionFieldCodec, unionFieldCodec, unionField, new TCompactProtocol.Factory());
+        testRoundTripSerialize(unionFieldCodec, unionFieldCodec, unionField);
 
         unionField = new UnionField();
         unionField.id = 3;
         unionField.fruitValue = Fruit.APPLE; // The best fruit!
 
-        testRoundTripSerialize(unionFieldCodec, unionFieldCodec, unionField, new TCompactProtocol.Factory());
+        testRoundTripSerialize(unionFieldCodec, unionFieldCodec, unionField);
     }
 
     @Test
@@ -116,19 +117,19 @@ public abstract class AbstractThriftCodecManagerTest
         unionField.id = 1;
         unionField.stringValue = "Hello, World";
 
-        testRoundTripSerialize(unionField, new TCompactProtocol.Factory());
+        testRoundTripSerialize(unionField);
 
         unionField = new UnionField();
         unionField.id = 2;
         unionField.longValue = 4815162342L;
 
-        testRoundTripSerialize(unionField, new TCompactProtocol.Factory());
+        testRoundTripSerialize(unionField);
 
         unionField = new UnionField();
         unionField.id = 3;
         unionField.fruitValue = Fruit.APPLE; // The best fruit!
 
-        testRoundTripSerialize(unionField, new TCompactProtocol.Factory());
+        testRoundTripSerialize(unionField);
     }
 
     @Test
@@ -137,15 +138,15 @@ public abstract class AbstractThriftCodecManagerTest
     {
         UnionBean unionBean = new UnionBean();
         unionBean.setStringValue("Hello, World");
-        testRoundTripSerialize(unionBean, new TCompactProtocol.Factory());
+        testRoundTripSerialize(unionBean);
 
         unionBean = new UnionBean();
         unionBean.setLongValue(4815162342L);
-        testRoundTripSerialize(unionBean, new TCompactProtocol.Factory());
+        testRoundTripSerialize(unionBean);
 
         unionBean = new UnionBean();
         unionBean.setFruitValue(Fruit.CHERRY);
-        testRoundTripSerialize(unionBean, new TCompactProtocol.Factory());
+        testRoundTripSerialize(unionBean);
     }
 
     @Test
@@ -153,16 +154,16 @@ public abstract class AbstractThriftCodecManagerTest
             throws Exception
     {
         UnionConstructor unionConstructor = new UnionConstructor("Hello, World");
-        testRoundTripSerialize(unionConstructor, new TCompactProtocol.Factory());
+        testRoundTripSerialize(unionConstructor);
 
         unionConstructor = new UnionConstructor(4815162342L);
-        testRoundTripSerialize(unionConstructor, new TCompactProtocol.Factory());
+        testRoundTripSerialize(unionConstructor);
 
         unionConstructor = new UnionConstructor(Fruit.APPLE);
-        testRoundTripSerialize(unionConstructor, new TCompactProtocol.Factory());
+        testRoundTripSerialize(unionConstructor);
 
         unionConstructor = new UnionConstructor();
-        testRoundTripSerialize(unionConstructor, new TCompactProtocol.Factory());
+        testRoundTripSerialize(unionConstructor);
     }
 
     @Test
@@ -171,11 +172,11 @@ public abstract class AbstractThriftCodecManagerTest
     {
         UnionConstructorDuplicateTypes unionConstructor = new UnionConstructorDuplicateTypes();
         unionConstructor.setFirstIntValue(1);
-        testRoundTripSerialize(unionConstructor, new TCompactProtocol.Factory());
+        testRoundTripSerialize(unionConstructor);
 
         unionConstructor = new UnionConstructorDuplicateTypes();
         unionConstructor.setSecondIntValue(2);
-        testRoundTripSerialize(unionConstructor, new TCompactProtocol.Factory());
+        testRoundTripSerialize(unionConstructor);
     }
 
     @Test
@@ -187,7 +188,7 @@ public abstract class AbstractThriftCodecManagerTest
         BonkFieldThriftCodec bonkFieldCodec = new BonkFieldThriftCodec(bonkFieldType);
 
         BonkField bonkField = new BonkField("message", 42);
-        testRoundTripSerialize(bonkFieldCodec, bonkFieldCodec, bonkField, new TCompactProtocol.Factory());
+        testRoundTripSerialize(bonkFieldCodec, bonkFieldCodec, bonkField);
     }
 
     @Test
@@ -195,7 +196,7 @@ public abstract class AbstractThriftCodecManagerTest
             throws Exception
     {
         BonkField bonkField = new BonkField("message", 42);
-        testRoundTripSerialize(bonkField, new TCompactProtocol.Factory());
+        testRoundTripSerialize(bonkField);
     }
 
     @Test
@@ -203,7 +204,7 @@ public abstract class AbstractThriftCodecManagerTest
             throws Exception
     {
         BonkBean bonkBean = new BonkBean("message", 42);
-        testRoundTripSerialize(bonkBean, new TCompactProtocol.Factory());
+        testRoundTripSerialize(bonkBean);
     }
 
     @Test
@@ -211,7 +212,7 @@ public abstract class AbstractThriftCodecManagerTest
             throws Exception
     {
         BonkMethod bonkMethod = new BonkMethod("message", 42);
-        testRoundTripSerialize(bonkMethod, new TCompactProtocol.Factory());
+        testRoundTripSerialize(bonkMethod);
     }
 
     @Test
@@ -219,7 +220,7 @@ public abstract class AbstractThriftCodecManagerTest
             throws Exception
     {
         BonkConstructor bonkConstructor = new BonkConstructor("message", 42);
-        testRoundTripSerialize(bonkConstructor, new TCompactProtocol.Factory());
+        testRoundTripSerialize(bonkConstructor);
     }
 
     @Test
@@ -233,7 +234,7 @@ public abstract class AbstractThriftCodecManagerTest
         assertEquals(structMetadata.getField(2).getName(), "myType");
 
         BonkConstructorNameOverride bonk = new BonkConstructorNameOverride("message", 42);
-        testRoundTripSerialize(bonk, new TCompactProtocol.Factory());
+        testRoundTripSerialize(bonk);
     }
 
     @Test
@@ -241,7 +242,7 @@ public abstract class AbstractThriftCodecManagerTest
             throws Exception
     {
         BonkBuilder bonkBuilder = new BonkBuilder("message", 42);
-        testRoundTripSerialize(bonkBuilder, new TCompactProtocol.Factory());
+        testRoundTripSerialize(bonkBuilder);
     }
 
     @Test
@@ -260,7 +261,7 @@ public abstract class AbstractThriftCodecManagerTest
                 new long[] {20, Long.MAX_VALUE, Long.MIN_VALUE},
                 new double[] {3.0, Double.MAX_VALUE, Double.MIN_VALUE},
                 "hello".getBytes(UTF_8));
-        testRoundTripSerialize(arrayFieldCodec, arrayFieldCodec, arrayField, new TCompactProtocol.Factory());
+        testRoundTripSerialize(arrayFieldCodec, arrayFieldCodec, arrayField);
     }
 
     @Test
@@ -280,7 +281,7 @@ public abstract class AbstractThriftCodecManagerTest
                 ImmutableMap.of((short) 1, new long[] {30, 31, 32, 33}, (short) 2, new long[] {35, 36, 37, 38}),
                 ImmutableMap.of((short) 1, new double[] {40, 41, 42, 43}, (short) 2, new double[] {45, 46, 47, 48}));
 
-        testRoundTripSerialize(arrayField, new TCompactProtocol.Factory());
+        testRoundTripSerialize(arrayField);
     }
 
     @Test
@@ -288,7 +289,7 @@ public abstract class AbstractThriftCodecManagerTest
             throws Exception
     {
         OneOfEverything one = createOneOfEverything();
-        testRoundTripSerialize(one, new TCompactProtocol.Factory());
+        testRoundTripSerialize(one);
     }
 
     @Test
@@ -324,7 +325,7 @@ public abstract class AbstractThriftCodecManagerTest
         one.aEnum = Fruit.CHERRY;
         one.aStruct = new BonkField("struct", 66);
 
-        testRoundTripSerialize(codec, codec, one, new TCompactProtocol.Factory());
+        testRoundTripSerialize(codec, codec, one);
     }
 
     @Test
@@ -332,7 +333,7 @@ public abstract class AbstractThriftCodecManagerTest
             throws Exception
     {
         OneOfEverything one = new OneOfEverything();
-        testRoundTripSerialize(one, new TCompactProtocol.Factory());
+        testRoundTripSerialize(one);
     }
 
     @Test
@@ -350,7 +351,7 @@ public abstract class AbstractThriftCodecManagerTest
                 7.7f,
                 ImmutableList.of(1.1f, 2.2f, 3.3f));
 
-        testRoundTripSerialize(coercion, new TCompactProtocol.Factory());
+        testRoundTripSerialize(coercion);
     }
 
     @Test
@@ -361,12 +362,12 @@ public abstract class AbstractThriftCodecManagerTest
         assertAllFieldsSet(full, false);
         // manually set full bean
         full.field = ByteBuffer.wrap("full".getBytes(UTF_8));
-        full = testRoundTripSerialize(full, new TCompactProtocol.Factory());
+        full = testRoundTripSerialize(full);
         assertAllFieldsSet(full, true);
 
         IsSetBean empty = IsSetBean.createEmpty();
         assertAllFieldsSet(empty, false);
-        empty = testRoundTripSerialize(empty, new TCompactProtocol.Factory());
+        empty = testRoundTripSerialize(empty);
         assertAllFieldsSet(empty, false);
     }
 
@@ -377,7 +378,7 @@ public abstract class AbstractThriftCodecManagerTest
         GenericThriftStructBean<String> bean = new GenericThriftStructBean<>();
         bean.setGenericProperty("genericValue");
 
-        testRoundTripSerialize(new TypeToken<GenericThriftStructBean<String>>() {}, bean, new TCompactProtocol.Factory());
+        testRoundTripSerialize(new TypeToken<GenericThriftStructBean<String>>() {}, bean);
     }
 
     @Test
@@ -388,7 +389,7 @@ public abstract class AbstractThriftCodecManagerTest
         bean.setGenericProperty("generic");
         bean.setConcreteField("concrete");
 
-        testRoundTripSerialize(bean, new TCompactProtocol.Factory());
+        testRoundTripSerialize(bean);
     }
 
     @Test
@@ -397,7 +398,7 @@ public abstract class AbstractThriftCodecManagerTest
     {
         GenericThriftStruct<Double> immutable = new GenericThriftStruct<>(Math.PI);
 
-        testRoundTripSerialize(new TypeToken<GenericThriftStruct<Double>>() {}, immutable, new TCompactProtocol.Factory());
+        testRoundTripSerialize(new TypeToken<GenericThriftStruct<Double>>() {}, immutable);
     }
 
     @Test
@@ -406,7 +407,7 @@ public abstract class AbstractThriftCodecManagerTest
     {
         ConcreteDerivedFromGeneric immutable = new ConcreteDerivedFromGeneric(Math.E, Math.PI);
 
-        testRoundTripSerialize(immutable, new TCompactProtocol.Factory());
+        testRoundTripSerialize(immutable);
     }
 
     @Test
@@ -419,10 +420,7 @@ public abstract class AbstractThriftCodecManagerTest
                         .setSecondGenericProperty(1.2345)
                         .build();
 
-        testRoundTripSerialize(
-                new TypeToken<GenericThriftStructFromBuilder<Integer, Double>>() {},
-                builderObject,
-                new TCompactProtocol.Factory());
+        testRoundTripSerialize(new TypeToken<GenericThriftStructFromBuilder<Integer, Double>>() {}, builderObject);
     }
 
     @Test
@@ -432,10 +430,7 @@ public abstract class AbstractThriftCodecManagerTest
         GenericThriftStructField<Integer> fieldObject = new GenericThriftStructField<>();
         fieldObject.genericField = 5757;
 
-        testRoundTripSerialize(
-                new TypeToken<GenericThriftStructField<Integer>>() {},
-                fieldObject,
-                new TCompactProtocol.Factory());
+        testRoundTripSerialize(new TypeToken<GenericThriftStructField<Integer>>() {}, fieldObject);
     }
 
     @Test
@@ -446,7 +441,7 @@ public abstract class AbstractThriftCodecManagerTest
         fieldObject.genericField = "genericValue";
         fieldObject.concreteField = "concreteValue";
 
-        testRoundTripSerialize(fieldObject, new TCompactProtocol.Factory());
+        testRoundTripSerialize(fieldObject);
     }
 
     @Test
@@ -459,7 +454,7 @@ public abstract class AbstractThriftCodecManagerTest
         recursiveObject.child.data = "child";
         recursiveObject.child.child = new WithDriftRecursiveAnnotation();
         recursiveObject.child.child.data = "grandchild";
-        testRoundTripSerialize(recursiveObject, new TCompactProtocol.Factory());
+        testRoundTripSerialize(recursiveObject);
     }
 
     @Test
@@ -472,7 +467,7 @@ public abstract class AbstractThriftCodecManagerTest
         recursiveObject.child.data = "child";
         recursiveObject.child.child = new WithIdlRecursiveAnnotation();
         recursiveObject.child.child.data = "grandchild";
-        testRoundTripSerialize(recursiveObject, new TCompactProtocol.Factory());
+        testRoundTripSerialize(recursiveObject);
     }
 
     @Test(expectedExceptions = {IllegalArgumentException.class})
@@ -485,7 +480,7 @@ public abstract class AbstractThriftCodecManagerTest
         recursiveObject.child.data = "child";
         recursiveObject.child.child = new WithoutRecursiveAnnotation();
         recursiveObject.child.child.data = "grandchild";
-        testRoundTripSerialize(recursiveObject, new TCompactProtocol.Factory());
+        testRoundTripSerialize(recursiveObject);
     }
 
     @Test
@@ -498,7 +493,7 @@ public abstract class AbstractThriftCodecManagerTest
         recursiveObject.children.get(0).data = "child";
         recursiveObject.children.get(0).children = Lists.newArrayList(new ViaListElementType());
         recursiveObject.children.get(0).children.get(0).data = "grandchild";
-        testRoundTripSerialize(recursiveObject, new TCompactProtocol.Factory());
+        testRoundTripSerialize(recursiveObject);
     }
 
     @Test
@@ -518,7 +513,7 @@ public abstract class AbstractThriftCodecManagerTest
         grandChild.data = "grandchild";
         child.children.get(0).add(grandChild);
 
-        testRoundTripSerialize(recursiveObject, new TCompactProtocol.Factory());
+        testRoundTripSerialize(recursiveObject);
     }
 
     @Test
@@ -532,7 +527,7 @@ public abstract class AbstractThriftCodecManagerTest
         ViaMapKeyAndValueTypes valueChild = new ViaMapKeyAndValueTypes();
         valueChild.data = "valuechild";
         recursiveObject.children = ImmutableMap.of(keyChild, valueChild);
-        testRoundTripSerialize(recursiveObject, new TCompactProtocol.Factory());
+        testRoundTripSerialize(recursiveObject);
     }
 
     @Test
@@ -545,7 +540,7 @@ public abstract class AbstractThriftCodecManagerTest
         recursiveObject.child.data = "child";
         recursiveObject.child.child = new CoRecursive();
         recursiveObject.child.child.data = "grandchild";
-        testRoundTripSerialize(recursiveObject, new TCompactProtocol.Factory());
+        testRoundTripSerialize(recursiveObject);
     }
 
     @Test
@@ -558,7 +553,7 @@ public abstract class AbstractThriftCodecManagerTest
         recursiveObject.child.data = "child";
         recursiveObject.child.child = new CoRecursiveHelper();
         recursiveObject.child.child.data = "grandchild";
-        testRoundTripSerialize(recursiveObject, new TCompactProtocol.Factory());
+        testRoundTripSerialize(recursiveObject);
     }
 
     @Test
@@ -574,7 +569,7 @@ public abstract class AbstractThriftCodecManagerTest
             CoRecursiveTree recursiveRoot = new CoRecursiveTree();
             recursiveRoot.data = "root";
             recursiveRoot.children = Lists.newArrayList(recursiveNode);
-            testRoundTripSerialize(recursiveRoot, new TCompactProtocol.Factory());
+            testRoundTripSerialize(recursiveRoot);
         }
 
         {
@@ -586,7 +581,7 @@ public abstract class AbstractThriftCodecManagerTest
             CoRecursiveTreeHelper recursiveRoot = new CoRecursiveTreeHelper();
             recursiveRoot.data = "root";
             recursiveRoot.child = recursiveNode;
-            testRoundTripSerialize(recursiveRoot, new TCompactProtocol.Factory());
+            testRoundTripSerialize(recursiveRoot);
         }
     }
 
@@ -595,7 +590,7 @@ public abstract class AbstractThriftCodecManagerTest
             throws Exception
     {
         RecursiveUnion recursiveUnion = new RecursiveUnion(new RecursiveUnion("child"));
-        testRoundTripSerialize(recursiveUnion, new TCompactProtocol.Factory());
+        testRoundTripSerialize(recursiveUnion);
     }
 
     @Test
@@ -603,7 +598,7 @@ public abstract class AbstractThriftCodecManagerTest
             throws Exception
     {
         RecursiveDefaultUnion recursiveDefaultUnion = new RecursiveDefaultUnion(new RecursiveDefaultUnion("child"));
-        testRoundTripSerialize(recursiveDefaultUnion, new TCompactProtocol.Factory());
+        testRoundTripSerialize(recursiveDefaultUnion);
     }
 
     private void assertAllFieldsSet(IsSetBean isSetBean, boolean expected)
@@ -622,6 +617,13 @@ public abstract class AbstractThriftCodecManagerTest
         assertEquals(!ByteBuffer.wrap("empty".getBytes(UTF_8)).equals(isSetBean.field), expected);
     }
 
+    private <T> T testRoundTripSerialize(T value)
+            throws Exception
+    {
+        testRoundTripSerialize(value, new TBinaryProtocol.Factory());
+        return testRoundTripSerialize(value, new TCompactProtocol.Factory());
+    }
+
     private <T> T testRoundTripSerialize(T value, TProtocolFactory protocolFactory)
             throws Exception
     {
@@ -631,6 +633,13 @@ public abstract class AbstractThriftCodecManagerTest
         return testRoundTripSerialize(readCodec, writeCodec, value, protocolFactory);
     }
 
+    private <T> T testRoundTripSerialize(TypeToken<T> typeToken, T value)
+            throws Exception
+    {
+        testRoundTripSerialize(typeToken, value, new TBinaryProtocol.Factory());
+        return testRoundTripSerialize(typeToken, value, new TCompactProtocol.Factory());
+    }
+
     private <T> T testRoundTripSerialize(TypeToken<T> typeToken, T value, TProtocolFactory protocolFactory)
             throws Exception
     {
@@ -638,6 +647,13 @@ public abstract class AbstractThriftCodecManagerTest
         ThriftCodec<T> writeCodec = (ThriftCodec<T>) writeCodecManager.getCodec(typeToken.getType());
 
         return testRoundTripSerialize(readCodec, writeCodec, typeToken.getType(), value, protocolFactory);
+    }
+
+    private <T> T testRoundTripSerialize(ThriftCodec<T> readCodec, ThriftCodec<T> writeCodec, T structInstance)
+            throws Exception
+    {
+        testRoundTripSerialize(readCodec, writeCodec, structInstance, new TBinaryProtocol.Factory());
+        return testRoundTripSerialize(readCodec, writeCodec, structInstance, new TCompactProtocol.Factory());
     }
 
     private <T> T testRoundTripSerialize(ThriftCodec<T> readCodec, ThriftCodec<T> writeCodec, T structInstance, TProtocolFactory protocolFactory)
