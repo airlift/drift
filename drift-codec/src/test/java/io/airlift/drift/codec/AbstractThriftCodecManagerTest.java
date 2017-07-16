@@ -46,7 +46,6 @@ import io.airlift.drift.codec.recursion.WithDriftRecursiveAnnotation;
 import io.airlift.drift.codec.recursion.WithIdlRecursiveAnnotation;
 import io.airlift.drift.codec.recursion.WithoutRecursiveAnnotation;
 import org.apache.thrift.protocol.TCompactProtocol;
-import org.apache.thrift.protocol.TJSONProtocol;
 import org.apache.thrift.protocol.TProtocol;
 import org.apache.thrift.protocol.TProtocolFactory;
 import org.apache.thrift.transport.TMemoryBuffer;
@@ -282,7 +281,6 @@ public abstract class AbstractThriftCodecManagerTest
                 ImmutableMap.of((short) 1, new double[] {40, 41, 42, 43}, (short) 2, new double[] {45, 46, 47, 48}));
 
         testRoundTripSerialize(arrayField, new TCompactProtocol.Factory());
-        testRoundTripSerialize(arrayField, new TJSONProtocol.Factory());
     }
 
     @Test
@@ -291,7 +289,6 @@ public abstract class AbstractThriftCodecManagerTest
     {
         OneOfEverything one = createOneOfEverything();
         testRoundTripSerialize(one, new TCompactProtocol.Factory());
-        testRoundTripSerialize(one, new TJSONProtocol.Factory());
     }
 
     @Test
@@ -328,7 +325,6 @@ public abstract class AbstractThriftCodecManagerTest
         one.aStruct = new BonkField("struct", 66);
 
         testRoundTripSerialize(codec, codec, one, new TCompactProtocol.Factory());
-        testRoundTripSerialize(codec, codec, one, new TJSONProtocol.Factory());
     }
 
     @Test
@@ -337,7 +333,6 @@ public abstract class AbstractThriftCodecManagerTest
     {
         OneOfEverything one = new OneOfEverything();
         testRoundTripSerialize(one, new TCompactProtocol.Factory());
-        testRoundTripSerialize(one, new TJSONProtocol.Factory());
     }
 
     @Test

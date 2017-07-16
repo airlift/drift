@@ -25,7 +25,6 @@ import io.airlift.drift.codec.metadata.ThriftEnumMetadata;
 import io.airlift.drift.codec.metadata.ThriftEnumMetadataBuilder;
 import io.airlift.drift.codec.metadata.ThriftType;
 import org.apache.thrift.protocol.TCompactProtocol;
-import org.apache.thrift.protocol.TJSONProtocol;
 import org.apache.thrift.protocol.TProtocol;
 import org.apache.thrift.protocol.TProtocolFactory;
 import org.apache.thrift.transport.TMemoryBuffer;
@@ -78,9 +77,6 @@ public class TestThriftCodecManager
         testRoundTripSerialize(42.42d);
         testRoundTripSerialize("some string");
         testRoundTripSerialize(UTF8_TEST_STRING);
-
-        testRoundTripSerialize("some string", new TJSONProtocol.Factory());
-        testRoundTripSerialize(UTF8_TEST_STRING, new TJSONProtocol.Factory());
     }
 
     @Test
@@ -96,9 +92,6 @@ public class TestThriftCodecManager
         testRoundTripSerialize(DOUBLE, 42.42d);
         testRoundTripSerialize(STRING, "some string");
         testRoundTripSerialize(STRING, UTF8_TEST_STRING);
-
-        testRoundTripSerialize(STRING, "some string", new TJSONProtocol.Factory());
-        testRoundTripSerialize(STRING, UTF8_TEST_STRING, new TJSONProtocol.Factory());
     }
 
     @Test
@@ -153,7 +146,6 @@ public class TestThriftCodecManager
 
         // try again
         testRoundTripSerialize(bonk);
-        testRoundTripSerialize(bonk, new TJSONProtocol.Factory());
     }
 
     @Test
@@ -190,7 +182,6 @@ public class TestThriftCodecManager
         union.fruitValue = Fruit.BANANA;
 
         testRoundTripSerialize(union);
-        testRoundTripSerialize(union, new TJSONProtocol.Factory());
     }
 
     private <T> void testRoundTripSerialize(T value)
@@ -202,7 +193,7 @@ public class TestThriftCodecManager
     private <T> void testRoundTripSerialize(T value, TProtocolFactory protocolFactory)
             throws Exception
     {
-        testRoundTripSerialize(codecManager.getCatalog().getThriftType(value.getClass()), value, new TCompactProtocol.Factory());
+        testRoundTripSerialize(codecManager.getCatalog().getThriftType(value.getClass()), value, protocolFactory);
     }
 
     private <T> void testRoundTripSerialize(ThriftType type, T value)
