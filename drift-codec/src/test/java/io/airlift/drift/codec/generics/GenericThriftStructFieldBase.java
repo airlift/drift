@@ -25,15 +25,21 @@ public class GenericThriftStructFieldBase<T>
     public T genericField;
 
     @Override
-    public boolean equals(Object obj)
+    public boolean equals(Object o)
     {
-        if (obj == this) {
+        if (this == o) {
             return true;
         }
-        if (obj == null || getClass() != obj.getClass()) {
+        if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        GenericThriftStructFieldBase<?> other = (GenericThriftStructFieldBase<?>) obj;
-        return Objects.equals(genericField, other.genericField);
+        GenericThriftStructFieldBase<?> that = (GenericThriftStructFieldBase<?>) o;
+        return Objects.equals(genericField, that.genericField);
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return Objects.hash(genericField);
     }
 }

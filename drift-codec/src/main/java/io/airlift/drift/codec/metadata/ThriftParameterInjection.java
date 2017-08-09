@@ -38,7 +38,6 @@ public class ThriftParameterInjection
             int parameterIndex,
             Type javaType)
     {
-
         checkArgument(parameterIndex >= 0, "parameterIndex is negative");
 
         this.javaType = requireNonNull(javaType, "javaType is null");

@@ -85,4 +85,3 @@ public enum Access
         return modifier;
     }
 }
-

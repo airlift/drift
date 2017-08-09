@@ -31,8 +31,7 @@ public final class BasicThriftStruct
             @ThriftField(value = 1, name = "foo") final String foo,
             @ThriftField(value = 2, name = "bar") final String bar,
             @ThriftField(value = 3, name = "baz") final String baz,
-            @ThriftField(value = 4, name = "qux") final Long qux
-    )
+            @ThriftField(value = 4, name = "qux") final Long qux)
     {
         this.foo = foo;
         this.bar = bar;
@@ -43,22 +42,34 @@ public final class BasicThriftStruct
     private final String foo;
 
     @ThriftField(value = 1, name = "foo")
-    public String getFoo() { return foo; }
+    public String getFoo()
+    {
+        return foo;
+    }
 
     private final String bar;
 
     @ThriftField(value = 2, name = "bar")
-    public String getBar() { return bar; }
+    public String getBar()
+    {
+        return bar;
+    }
 
     private final String baz;
 
     @ThriftField(value = 3, name = "baz")
-    public String getBaz() { return baz; }
+    public String getBaz()
+    {
+        return baz;
+    }
 
     private final Long qux;
 
     @ThriftField(value = 4, name = "qux")
-    public Long getQux() { return qux; }
+    public Long getQux()
+    {
+        return qux;
+    }
 
     @Override
     public boolean equals(Object o)

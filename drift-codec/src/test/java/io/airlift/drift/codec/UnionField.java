@@ -36,7 +36,7 @@ public final class UnionField
     public Fruit fruitValue;
 
     @ThriftUnionId
-    public short _id;
+    public short id;
 
     public UnionField()
     {
@@ -44,19 +44,19 @@ public final class UnionField
 
     public UnionField(String stringValue)
     {
-        this._id = 1;
+        this.id = 1;
         this.stringValue = stringValue;
     }
 
     public UnionField(Long longValue)
     {
-        this._id = 2;
+        this.id = 2;
         this.longValue = longValue;
     }
 
     public UnionField(Fruit fruitValue)
     {
-        this._id = 3;
+        this.id = 3;
         this.fruitValue = fruitValue;
     }
 
@@ -70,7 +70,7 @@ public final class UnionField
             return false;
         }
         UnionField that = (UnionField) o;
-        return _id == that._id &&
+        return id == that.id &&
                 Objects.equals(stringValue, that.stringValue) &&
                 Objects.equals(longValue, that.longValue) &&
                 fruitValue == that.fruitValue;
@@ -79,14 +79,14 @@ public final class UnionField
     @Override
     public int hashCode()
     {
-        return Objects.hash(stringValue, longValue, fruitValue, _id);
+        return Objects.hash(stringValue, longValue, fruitValue, id);
     }
 
     @Override
     public String toString()
     {
         return toStringHelper(this)
-                .add("_id", _id)
+                .add("id", id)
                 .add("stringValue", stringValue)
                 .add("longValue", longValue)
                 .add("fruitValue", fruitValue)

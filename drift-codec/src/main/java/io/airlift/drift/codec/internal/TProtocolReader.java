@@ -489,7 +489,6 @@ public class TProtocolReader
     public <K, V> Map<K, V> readMap(ThriftCodec<K> keyCodec, ThriftCodec<V> valueCodec)
             throws Exception
     {
-
         TMap tMap = protocol.readMapBegin();
         Map<K, V> map = new HashMap<>();
         for (int i = 0; i < tMap.size; i++) {

@@ -198,8 +198,7 @@ public class ThriftUnionMetadataBuilder
                 ImmutableList.copyOf(documentation),
                 ImmutableList.copyOf(fieldsMetadata),
                 Optional.ofNullable(constructorInjection),
-                methodInjections
-        );
+                methodInjections);
     }
 
     private ThriftConstructorInjection buildConstructorInjection()
@@ -261,8 +260,7 @@ public class ThriftUnionMetadataBuilder
                         parameterInjection.getId(),
                         parameterInjection.getName(),
                         parameterInjection.getParameterIndex(),
-                        fieldMetadata.getJavaType()
-                );
+                        fieldMetadata.getJavaType());
                 injections.add(thriftParameterInjection);
 
                 for (ConstructorInjection constructorInjection : constructorInjections) {
@@ -317,7 +315,6 @@ public class ThriftUnionMetadataBuilder
                 Optional.ofNullable(thriftConstructorInjection),
                 Optional.ofNullable(thriftMethodInjection),
                 Optional.ofNullable(extraction),
-                Optional.ofNullable(coercion)
-        );
+                Optional.ofNullable(coercion));
     }
 }

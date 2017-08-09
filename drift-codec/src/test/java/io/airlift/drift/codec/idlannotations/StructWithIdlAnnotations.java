@@ -19,12 +19,9 @@ import io.airlift.drift.annotations.ThriftField;
 import io.airlift.drift.annotations.ThriftIdlAnnotation;
 import io.airlift.drift.annotations.ThriftStruct;
 
-@ThriftStruct(
-        idlAnnotations = {
-                @ThriftIdlAnnotation(key = "testkey1", value = "testvalue1"),
-                @ThriftIdlAnnotation(key = "testkey2", value = "testvalue2"),
-        }
-)
+@ThriftStruct(idlAnnotations = {
+        @ThriftIdlAnnotation(key = "testkey1", value = "testvalue1"),
+        @ThriftIdlAnnotation(key = "testkey2", value = "testvalue2")})
 public class StructWithIdlAnnotations
 {
     @ThriftField(1)

@@ -65,8 +65,7 @@ public class ThriftFieldMetadata
             Optional<ThriftConstructorInjection> constructorInjection,
             Optional<ThriftMethodInjection> methodInjection,
             Optional<ThriftExtraction> extraction,
-            Optional<TypeCoercion> coercion
-    )
+            Optional<TypeCoercion> coercion)
     {
         this.isRecursiveReference = isRecursiveReference;
         this.requiredness = requiredness;
@@ -133,7 +132,10 @@ public class ThriftFieldMetadata
         return thriftTypeReference.get();
     }
 
-    public Requiredness getRequiredness() { return requiredness; }
+    public Requiredness getRequiredness()
+    {
+        return requiredness;
+    }
 
     public String getName()
     {

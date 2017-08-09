@@ -43,15 +43,24 @@ public final class ConcreteDerivedFromGeneric
     }
 
     @Override
-    public boolean equals(Object obj)
+    public boolean equals(Object o)
     {
-        if (obj == this) {
+        if (this == o) {
             return true;
         }
-        if (obj == null || getClass() != obj.getClass()) {
+        if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        ConcreteDerivedFromGeneric other = (ConcreteDerivedFromGeneric) obj;
-        return Objects.equals(this.concreteProperty, other.concreteProperty) && super.equals(obj);
+        if (!super.equals(o)) {
+            return false;
+        }
+        ConcreteDerivedFromGeneric that = (ConcreteDerivedFromGeneric) o;
+        return Objects.equals(concreteProperty, that.concreteProperty);
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return Objects.hash(super.hashCode(), concreteProperty);
     }
 }

@@ -57,4 +57,3 @@ public class ThriftCodecModule
                 .toInstance(parent);
     }
 }
-

@@ -46,18 +46,23 @@ public final class GenericThriftStructFromBuilder<S, T>
     }
 
     @Override
-    public boolean equals(Object obj)
+    public boolean equals(Object o)
     {
-        if (obj == this) {
+        if (this == o) {
             return true;
         }
-        if (obj == null || getClass() != obj.getClass()) {
+        if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        GenericThriftStructFromBuilder<?, ?> other = (GenericThriftStructFromBuilder<?, ?>) obj;
-        return
-                Objects.equals(firstGenericProperty, other.firstGenericProperty) &&
-                        Objects.equals(secondGenericProperty, other.secondGenericProperty);
+        GenericThriftStructFromBuilder<?, ?> that = (GenericThriftStructFromBuilder<?, ?>) o;
+        return Objects.equals(firstGenericProperty, that.firstGenericProperty) &&
+                Objects.equals(secondGenericProperty, that.secondGenericProperty);
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return Objects.hash(firstGenericProperty, secondGenericProperty);
     }
 
     public static class Builder<X, Y>

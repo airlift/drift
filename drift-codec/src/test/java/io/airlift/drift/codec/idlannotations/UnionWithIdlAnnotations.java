@@ -23,9 +23,7 @@ import io.airlift.drift.annotations.ThriftUnionId;
 @ThriftUnion(
         idlAnnotations = {
                 @ThriftIdlAnnotation(key = "testkey1", value = "testvalue1"),
-                @ThriftIdlAnnotation(key = "testkey2", value = "testvalue2"),
-        }
-)
+                @ThriftIdlAnnotation(key = "testkey2", value = "testvalue2")})
 public class UnionWithIdlAnnotations
 {
     private short unionType;

@@ -82,7 +82,6 @@ public class ReflectionThriftUnionCodec<T>
                 reader.skipFieldData();
             }
             else {
-
                 // is this field readable
                 ThriftFieldMetadata field = metadata.getField(fieldId);
                 if (field.isWriteOnly() || field.getType() != THRIFT_FIELD) {

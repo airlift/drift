@@ -20,11 +20,7 @@ import io.airlift.drift.annotations.ThriftField;
 import io.airlift.drift.annotations.ThriftIdlAnnotation;
 import io.airlift.drift.annotations.ThriftStruct;
 
-@ThriftStruct(
-        idlAnnotations = {
-                @ThriftIdlAnnotation(key = "message", value = "message")
-        }
-)
+@ThriftStruct(idlAnnotations = {@ThriftIdlAnnotation(key = "message", value = "message")})
 public class ExceptionWithIdlAnnotations
         extends Exception
 {

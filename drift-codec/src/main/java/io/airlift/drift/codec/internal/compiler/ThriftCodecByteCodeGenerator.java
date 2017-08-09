@@ -123,8 +123,7 @@ public class ThriftCodecByteCodeGenerator<T>
             ThriftCodecManager codecManager,
             ThriftStructMetadata metadata,
             DynamicClassLoader classLoader,
-            boolean debug
-    )
+            boolean debug)
     {
         this.codecManager = codecManager;
         this.metadata = metadata;
@@ -136,8 +135,7 @@ public class ThriftCodecByteCodeGenerator<T>
                 a(PUBLIC, SUPER),
                 codecType.getClassName(),
                 type(Object.class),
-                type(ThriftCodec.class, structType)
-        );
+                type(ThriftCodec.class, structType));
 
         // declare the class fields
         typeField = declareTypeField();
@@ -216,7 +214,6 @@ public class ThriftCodecByteCodeGenerator<T>
         Map<Short, FieldDefinition> codecFields = new TreeMap<>();
         for (ThriftFieldMetadata fieldMetadata : metadata.getFields()) {
             if (needsCodec(fieldMetadata)) {
-
                 ThriftCodec<?> codec = codecManager.getCodec(fieldMetadata.getThriftType());
                 String fieldName = fieldMetadata.getName() + "Codec";
 
@@ -242,8 +239,7 @@ public class ThriftCodecByteCodeGenerator<T>
                 a(PUBLIC),
                 "<init>",
                 type(void.class),
-                parameters.getParameters()
-        );
+                parameters.getParameters());
 
         // invoke super (Object) constructor
         constructor.loadThis().invokeConstructor(type(Object.class));
@@ -270,8 +266,7 @@ public class ThriftCodecByteCodeGenerator<T>
                 new MethodDefinition(a(PUBLIC), "getType", type(ThriftType.class))
                         .loadThis()
                         .getField(codecType, typeField)
-                        .retObject()
-        );
+                        .retObject());
     }
 
     /**
@@ -318,8 +313,7 @@ public class ThriftCodecByteCodeGenerator<T>
         for (ThriftFieldMetadata field : metadata.getFields(FieldKind.THRIFT_FIELD)) {
             LocalVariableDefinition variable = read.addInitializedLocalVariable(
                     toParameterizedType(field.getThriftType()),
-                    "f_" + field.getName()
-            );
+                    "f_" + field.getName());
             structData.put(field.getId(), variable);
         }
 
@@ -327,8 +321,7 @@ public class ThriftCodecByteCodeGenerator<T>
         read.loadVariable(protocol).invokeVirtual(
                 TProtocolReader.class,
                 "readStructBegin",
-                void.class
-        );
+                void.class);
 
         // while (protocol.nextField())
         read.visitLabel("while-begin");
@@ -511,8 +504,7 @@ public class ThriftCodecByteCodeGenerator<T>
         for (ThriftFieldMetadata field : metadata.getFields(THRIFT_FIELD)) {
             LocalVariableDefinition variable = read.addInitializedLocalVariable(
                     toParameterizedType(field.getThriftType()),
-                    "f_" + field.getName()
-            );
+                    "f_" + field.getName());
             unionData.put(field.getId(), variable);
         }
 
@@ -520,8 +512,7 @@ public class ThriftCodecByteCodeGenerator<T>
         read.loadVariable(protocol).invokeVirtual(
                 TProtocolReader.class,
                 "readStructBegin",
-                void.class
-        );
+                void.class);
 
         // while (protocol.nextField())
         read.visitLabel("while-begin");
@@ -816,8 +807,7 @@ public class ThriftCodecByteCodeGenerator<T>
                 "write",
                 null,
                 arg("struct", structType),
-                arg("protocol", TProtocol.class)
-        );
+                arg("protocol", TProtocol.class));
 
         classDefinition.addMethod(write);
 
@@ -857,8 +847,7 @@ public class ThriftCodecByteCodeGenerator<T>
                 "write",
                 null,
                 arg("struct", structType),
-                arg("protocol", TProtocol.class)
-        );
+                arg("protocol", TProtocol.class));
 
         classDefinition.addMethod(write);
 
@@ -952,7 +941,6 @@ public class ThriftCodecByteCodeGenerator<T>
         //
         // If not written because of a null, clean-up the stack
         if (!isProtocolTypeJavaPrimitive(field) || !isFieldTypeJavaPrimitive(field)) {
-
             // value was written so skip cleanup
             write.gotoLabel("field_end_" + field.getName());
 
@@ -1008,8 +996,7 @@ public class ThriftCodecByteCodeGenerator<T>
                         .loadThis()
                         .loadVariable("protocol")
                         .invokeVirtual(codecType, "read", structType, type(TProtocol.class))
-                        .retObject()
-        );
+                        .retObject());
     }
 
     /**
@@ -1028,10 +1015,8 @@ public class ThriftCodecByteCodeGenerator<T>
                                 "write",
                                 type(void.class),
                                 structType,
-                                type(TProtocol.class)
-                        )
-                        .ret()
-        );
+                                type(TProtocol.class))
+                        .ret());
     }
 
     private boolean isParameterTypeJavaPrimitive(ThriftParameterInjection parameter)

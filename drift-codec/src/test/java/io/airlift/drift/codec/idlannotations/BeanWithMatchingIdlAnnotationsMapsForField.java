@@ -29,8 +29,7 @@ public class BeanWithMatchingIdlAnnotationsMapsForField
 
     @ThriftField(value = 2, idlAnnotations = {
             @ThriftIdlAnnotation(key = "testkey1", value = "testvalue1"),
-            @ThriftIdlAnnotation(key = "testkey2", value = "testvalue2")
-    })
+            @ThriftIdlAnnotation(key = "testkey2", value = "testvalue2")})
     public int getType()
     {
         return type;
@@ -38,8 +37,7 @@ public class BeanWithMatchingIdlAnnotationsMapsForField
 
     @ThriftField(value = 2, idlAnnotations = {
             @ThriftIdlAnnotation(key = "testkey1", value = "testvalue1"),
-            @ThriftIdlAnnotation(key = "testkey2", value = "testvalue2")
-    })
+            @ThriftIdlAnnotation(key = "testkey2", value = "testvalue2")})
     public void setType(int type)
     {
         this.type = type;

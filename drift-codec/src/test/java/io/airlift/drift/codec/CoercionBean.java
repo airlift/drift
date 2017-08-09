@@ -50,8 +50,7 @@ public final class CoercionBean
             Float floatValue,
             Double doubleValue,
             float primitiveFloat,
-            List<Float> floatList
-    )
+            List<Float> floatList)
     {
         this.booleanValue = booleanValue;
         this.byteValue = byteValue;

@@ -51,7 +51,7 @@ public class TestThriftStructMetadataBuilder
     }
 
     @ThriftStruct
-    public final static class NoId
+    public static final class NoId
     {
         @ThriftField
         public String getField1()
@@ -87,7 +87,7 @@ public class TestThriftStructMetadataBuilder
     }
 
     @ThriftStruct
-    public final static class MultipleIds
+    public static final class MultipleIds
     {
         @ThriftField(name = "foo", value = 1)
         public void setField1(String value)
@@ -134,7 +134,7 @@ public class TestThriftStructMetadataBuilder
     }
 
     @ThriftStruct
-    public final static class MultipleNames
+    public static final class MultipleNames
     {
         @ThriftField(value = 1, name = "foo")
         public String getFoo()
@@ -170,7 +170,7 @@ public class TestThriftStructMetadataBuilder
     }
 
     @ThriftStruct
-    public final static class UnsupportedJavaType
+    public static final class UnsupportedJavaType
     {
         @ThriftField(1)
         public Lock unsupportedJavaType;
@@ -198,7 +198,7 @@ public class TestThriftStructMetadataBuilder
     }
 
     @ThriftStruct
-    public final static class MultipleTypes
+    public static final class MultipleTypes
     {
         @ThriftField(1)
         public int getFoo()
@@ -221,7 +221,7 @@ public class TestThriftStructMetadataBuilder
     }
 
     @ThriftStruct(builder = GenericStruct.GenericBuilder.class)
-    public final static class GenericStruct<T>
+    public static final class GenericStruct<T>
     {
         private final T fieldValue;
 

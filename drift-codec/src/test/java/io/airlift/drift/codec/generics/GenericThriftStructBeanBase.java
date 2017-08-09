@@ -36,15 +36,21 @@ public class GenericThriftStructBeanBase<T>
     }
 
     @Override
-    public boolean equals(Object obj)
+    public boolean equals(Object o)
     {
-        if (obj == this) {
+        if (this == o) {
             return true;
         }
-        if (obj == null || getClass() != obj.getClass()) {
+        if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        GenericThriftStructBeanBase<?> other = (GenericThriftStructBeanBase<?>) obj;
-        return Objects.equals(this.genericProperty, other.genericProperty);
+        GenericThriftStructBeanBase<?> that = (GenericThriftStructBeanBase<?>) o;
+        return Objects.equals(genericProperty, that.genericProperty);
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return Objects.hash(genericProperty);
     }
 }

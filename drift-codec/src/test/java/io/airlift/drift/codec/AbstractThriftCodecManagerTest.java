@@ -91,19 +91,19 @@ public abstract class AbstractThriftCodecManagerTest
         UnionFieldThriftCodec unionFieldCodec = new UnionFieldThriftCodec(unionFieldType, fruitCodec);
 
         UnionField unionField = new UnionField();
-        unionField._id = 1;
+        unionField.id = 1;
         unionField.stringValue = "Hello, World";
 
         testRoundTripSerialize(unionFieldCodec, unionFieldCodec, unionField, new TCompactProtocol.Factory());
 
         unionField = new UnionField();
-        unionField._id = 2;
+        unionField.id = 2;
         unionField.longValue = 4815162342L;
 
         testRoundTripSerialize(unionFieldCodec, unionFieldCodec, unionField, new TCompactProtocol.Factory());
 
         unionField = new UnionField();
-        unionField._id = 3;
+        unionField.id = 3;
         unionField.fruitValue = Fruit.APPLE; // The best fruit!
 
         testRoundTripSerialize(unionFieldCodec, unionFieldCodec, unionField, new TCompactProtocol.Factory());
@@ -114,19 +114,19 @@ public abstract class AbstractThriftCodecManagerTest
             throws Exception
     {
         UnionField unionField = new UnionField();
-        unionField._id = 1;
+        unionField.id = 1;
         unionField.stringValue = "Hello, World";
 
         testRoundTripSerialize(unionField, new TCompactProtocol.Factory());
 
         unionField = new UnionField();
-        unionField._id = 2;
+        unionField.id = 2;
         unionField.longValue = 4815162342L;
 
         testRoundTripSerialize(unionField, new TCompactProtocol.Factory());
 
         unionField = new UnionField();
-        unionField._id = 3;
+        unionField.id = 3;
         unionField.fruitValue = Fruit.APPLE; // The best fruit!
 
         testRoundTripSerialize(unionField, new TCompactProtocol.Factory());
@@ -736,37 +736,27 @@ public abstract class AbstractThriftCodecManagerTest
                 ImmutableList.of(
                         ImmutableMap.of(
                                 "1: main", new BonkField("message", 42),
-                                "1: other", new BonkField("other", 11)
-                        ),
+                                "1: other", new BonkField("other", 11)),
                         ImmutableMap.of(
                                 "1: main", new BonkField("message", 42),
-                                "1: other", new BonkField("other", 11)
-                        )
-                ),
+                                "1: other", new BonkField("other", 11))),
                 ImmutableList.of(
                         ImmutableMap.of(
                                 "2: main", new BonkField("message", 42),
-                                "2: other", new BonkField("other", 11)
-                        ),
+                                "2: other", new BonkField("other", 11)),
                         ImmutableMap.of(
                                 "2: main", new BonkField("message", 42),
-                                "2: other", new BonkField("other", 11)
-                        )
-                )
-        );
+                                "2: other", new BonkField("other", 11))));
 
         one.aMapOfListToSet = ImmutableMap.of(
                 ImmutableList.of("a", "b"),
                 ImmutableSet.of(
                         new BonkField("1: message", 42),
-                        new BonkField("1: other", 11)
-                ),
+                        new BonkField("1: other", 11)),
                 ImmutableList.of("c", "d"),
                 ImmutableSet.of(
                         new BonkField("2: message", 42),
-                        new BonkField("2: other", 11)
-                )
-        );
+                        new BonkField("2: other", 11)));
 
         one.aUnion = new UnionField("Hello, World");
 

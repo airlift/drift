@@ -137,8 +137,7 @@ public class ThriftStructMetadataBuilder
                 ImmutableList.copyOf(documentation),
                 ImmutableList.copyOf(fieldsMetadata),
                 Optional.of(constructorInjections),
-                methodInjections
-        );
+                methodInjections);
     }
 
     private ThriftConstructorInjection buildConstructorInjection()
@@ -180,8 +179,7 @@ public class ThriftStructMetadataBuilder
                         parameterInjection.getId(),
                         parameterInjection.getName(),
                         parameterInjection.getParameterIndex(),
-                        fieldMetadata.getJavaType()
-                ));
+                        fieldMetadata.getJavaType()));
             }
             else if (fieldMetadata instanceof FieldExtractor) {
                 FieldExtractor fieldExtractor = (FieldExtractor) fieldMetadata;
@@ -226,7 +224,6 @@ public class ThriftStructMetadataBuilder
                 Optional.empty(),
                 Optional.empty(),
                 Optional.ofNullable(extraction),
-                Optional.ofNullable(coercion)
-        );
+                Optional.ofNullable(coercion));
     }
 }

@@ -249,7 +249,6 @@ public class TProtocolWriter
     public <T extends Enum<T>> void writeEnumField(String name, short id, ThriftCodec<T> codec, T enumValue)
             throws Exception
     {
-
         if (enumValue == null) {
             return;
         }
@@ -398,7 +397,6 @@ public class TProtocolWriter
     public <K, V> void writeMap(ThriftCodec<K> keyCodec, ThriftCodec<V> valueCodec, Map<K, V> map)
             throws Exception
     {
-
         if (map == null) {
             return;
         }

@@ -30,7 +30,6 @@ import org.apache.thrift.protocol.TJSONProtocol;
 import org.apache.thrift.protocol.TProtocol;
 import org.apache.thrift.protocol.TProtocolFactory;
 import org.apache.thrift.transport.TMemoryBuffer;
-import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -167,7 +166,7 @@ public class TestThriftCodecManager
             throws Exception
     {
         UnionField union = new UnionField();
-        union._id = 1;
+        union.id = 1;
         union.stringValue = "Hello, World";
 
         // no codec for UnionField so this will fail
@@ -186,13 +185,13 @@ public class TestThriftCodecManager
         testRoundTripSerialize(union);
 
         union = new UnionField();
-        union._id = 2;
+        union.id = 2;
         union.longValue = 4815162342L;
 
         testRoundTripSerialize(union);
 
         union = new UnionField();
-        union._id = 3;
+        union.id = 3;
         union.fruitValue = Fruit.BANANA;
 
         testRoundTripSerialize(union);
@@ -250,6 +249,6 @@ public class TestThriftCodecManager
                 BasicThriftStruct.class,
                 protocolFactory);
 
-        Assert.assertEquals(tstruct, tstructCopy);
+        assertEquals(tstruct, tstructCopy);
     }
 }

@@ -71,9 +71,7 @@ public class EnumThriftCodec<T extends Enum<T>>
                 String.format(
                         "Enum %s does not have a value for %s",
                         enumMetadata.getEnumClass(),
-                        enumValue
-                )
-        );
+                        enumValue));
     }
 
     @Override

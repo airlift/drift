@@ -61,8 +61,7 @@ public class CompilerThriftCodecFactory
                 codecManager,
                 metadata,
                 classLoader,
-                debug
-        );
+                debug);
         return generator.getThriftCodec();
     }
 

@@ -25,7 +25,6 @@ public enum Letter
 
     Letter(int asciiValue)
     {
-
         this.asciiValue = asciiValue;
     }
 

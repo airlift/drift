@@ -100,20 +100,14 @@ public class ClassDefinition
         return this;
     }
 
-    public static String genericClassSignature(
-            ParameterizedType classType,
-            ParameterizedType... interfaceTypes
-    )
+    public static String genericClassSignature(ParameterizedType classType, ParameterizedType... interfaceTypes)
     {
-        return Joiner.on("").join(
-                concat(ImmutableList.of(classType), ImmutableList.copyOf(interfaceTypes))
-        );
+        return Joiner.on("").join(concat(ImmutableList.of(classType), ImmutableList.copyOf(interfaceTypes)));
     }
 
     public static String genericClassSignature(
             ParameterizedType classType,
-            List<ParameterizedType> interfaceTypes
-    )
+            List<ParameterizedType> interfaceTypes)
     {
         return Joiner.on("").join(concat(ImmutableList.of(classType), interfaceTypes));
     }

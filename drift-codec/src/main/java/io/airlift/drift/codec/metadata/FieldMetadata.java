@@ -25,6 +25,7 @@ import java.lang.reflect.Type;
 import java.util.Map;
 import java.util.Optional;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static io.airlift.drift.annotations.ThriftField.Requiredness;
 import static io.airlift.drift.annotations.ThriftIdlAnnotation.RECURSIVE_REFERENCE_ANNOTATION_KEY;
 import static java.util.Objects.requireNonNull;
@@ -79,7 +80,7 @@ abstract class FieldMetadata
                 }
                 break;
             case THRIFT_UNION_ID:
-                assert annotation == null : "ThriftStruct annotation shouldn't be present for THRIFT_UNION_ID";
+                checkArgument(annotation == null, "ThriftStruct annotation not allowed in union");
                 id = Short.MIN_VALUE;
                 isLegacyId = true; // preserve `negative field ID <=> isLegacyId`
                 name = "_union_id";

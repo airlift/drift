@@ -93,8 +93,7 @@ public class ThriftEnumMetadata<T extends Enum<T>>
                         value != null,
                         "Enum class %s element %s returned null for enum value: %s",
                         enumClass.getName(),
-                        enumConstant
-                );
+                        enumConstant);
 
                 byEnumValue.put(value, enumConstant);
                 byEnumConstant.put(enumConstant, value);

@@ -351,8 +351,7 @@ public class MethodDefinition
             ParameterizedType type,
             String name,
             ParameterizedType returnType,
-            List<ParameterizedType> parameterTypes
-    )
+            List<ParameterizedType> parameterTypes)
     {
         instructionList.add(
                 new MethodInsnNode(
@@ -392,8 +391,7 @@ public class MethodDefinition
             Class<?> type,
             String name,
             Class<?> returnType,
-            Class<?>... parameterTypes
-    )
+            Class<?>... parameterTypes)
     {
         instructionList.add(
                 new MethodInsnNode(
@@ -409,8 +407,7 @@ public class MethodDefinition
             ParameterizedType type,
             String name,
             ParameterizedType returnType,
-            ParameterizedType... parameterTypes
-    )
+            ParameterizedType... parameterTypes)
     {
         instructionList.add(
                 new MethodInsnNode(
@@ -500,9 +497,7 @@ public class MethodDefinition
                         GETFIELD,
                         target.getClassName(),
                         fieldName,
-                        fieldType.getType()
-                )
-        );
+                        fieldType.getType()));
         return this;
     }
 
@@ -520,9 +515,7 @@ public class MethodDefinition
                         GETSTATIC,
                         target.getClassName(),
                         fieldName,
-                        fieldType.getType()
-                )
-        );
+                        fieldType.getType()));
         return this;
     }
 
@@ -540,9 +533,7 @@ public class MethodDefinition
                         PUTSTATIC,
                         target.getClassName(),
                         fieldName,
-                        fieldType.getType()
-                )
-        );
+                        fieldType.getType()));
         return this;
     }
 
@@ -571,9 +562,7 @@ public class MethodDefinition
                         PUTFIELD,
                         target.getClassName(),
                         field.getName(),
-                        field.getType().getType()
-                )
-        );
+                        field.getType().getType()));
         return this;
     }
 
@@ -584,9 +573,7 @@ public class MethodDefinition
                         PUTFIELD,
                         target.getClassName(),
                         fieldName,
-                        fieldType.getType()
-                )
-        );
+                        fieldType.getType()));
         return this;
     }
 
@@ -688,7 +675,7 @@ public class MethodDefinition
                     instructionList.add(new InsnNode(LCONST_0));
                     break;
                 default:
-                    checkArgument(false, "Unknown type '%s'", variable.getType());
+                    throw new IllegalArgumentException(String.format("Unknown type '%s'", variable.getType()));
             }
         }
         else {

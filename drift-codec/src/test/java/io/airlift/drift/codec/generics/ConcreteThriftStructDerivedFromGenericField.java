@@ -28,15 +28,24 @@ public final class ConcreteThriftStructDerivedFromGenericField
     public String concreteField;
 
     @Override
-    public boolean equals(Object obj)
+    public boolean equals(Object o)
     {
-        if (obj == this) {
+        if (this == o) {
             return true;
         }
-        if (obj == null || getClass() != obj.getClass()) {
+        if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        ConcreteThriftStructDerivedFromGenericField other = (ConcreteThriftStructDerivedFromGenericField) obj;
-        return Objects.equals(concreteField, other.concreteField) && super.equals(obj);
+        if (!super.equals(o)) {
+            return false;
+        }
+        ConcreteThriftStructDerivedFromGenericField that = (ConcreteThriftStructDerivedFromGenericField) o;
+        return Objects.equals(concreteField, that.concreteField);
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return Objects.hash(concreteField);
     }
 }

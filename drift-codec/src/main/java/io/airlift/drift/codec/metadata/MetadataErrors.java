@@ -75,8 +75,7 @@ public class MetadataErrors
             MetadataErrorException exception = new MetadataErrorException(
                     "Metadata extraction encountered %s errors and %s warnings",
                     errors.size(),
-                    warnings.size()
-            );
+                    warnings.size());
             for (MetadataErrorException error : errors) {
                 exception.addSuppressed(error);
             }

@@ -52,8 +52,8 @@ public class UnionFieldThriftCodec
         while (reader.nextField()) {
             Preconditions.checkState(!consumed, "already consumed");
 
-            field._id = reader.getFieldId();
-            switch (field._id) {
+            field.id = reader.getFieldId();
+            switch (field.id) {
                 case 1:
                     field.stringValue = reader.readStringField();
                     consumed = true;
@@ -67,7 +67,7 @@ public class UnionFieldThriftCodec
                     consumed = true;
                     break;
                 default:
-                    field._id = -1;
+                    field.id = -1;
                     reader.skipFieldData();
             }
         }
@@ -84,7 +84,7 @@ public class UnionFieldThriftCodec
 
         writer.writeStructBegin("union");
 
-        switch (value._id) {
+        switch (value.id) {
             case 1:
                 writer.writeStringField("stringValue", (short) 1, value.stringValue);
                 break;

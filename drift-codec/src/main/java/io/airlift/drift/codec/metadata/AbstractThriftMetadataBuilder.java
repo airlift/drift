@@ -464,8 +464,7 @@ public abstract class AbstractThriftMetadataBuilder
                     parameterIndex,
                     thriftField,
                     parameterNames.get(parameterIndex),
-                    parameterType
-            );
+                    parameterType);
 
             parameters.add(parameterInjection);
         }

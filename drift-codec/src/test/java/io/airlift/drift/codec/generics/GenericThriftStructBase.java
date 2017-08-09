@@ -35,15 +35,21 @@ public class GenericThriftStructBase<T>
     }
 
     @Override
-    public boolean equals(Object obj)
+    public boolean equals(Object o)
     {
-        if (obj == this) {
+        if (this == o) {
             return true;
         }
-        if (obj == null || getClass() != obj.getClass()) {
+        if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        GenericThriftStructBase<?> other = (GenericThriftStructBase<?>) obj;
-        return Objects.equals(this.genericProperty, other.genericProperty);
+        GenericThriftStructBase<?> that = (GenericThriftStructBase<?>) o;
+        return Objects.equals(genericProperty, that.genericProperty);
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return Objects.hash(genericProperty);
     }
 }

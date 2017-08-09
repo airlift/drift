@@ -48,7 +48,7 @@ public class TestThriftUnionMetadataBuilder
     }
 
     @ThriftUnion
-    public final static class NoId
+    public static final class NoId
     {
         @ThriftUnionId
         public short id;
@@ -87,7 +87,7 @@ public class TestThriftUnionMetadataBuilder
     }
 
     @ThriftUnion
-    public final static class MultipleIds
+    public static final class MultipleIds
     {
         @ThriftUnionId
         public void setId(short id)
@@ -139,7 +139,7 @@ public class TestThriftUnionMetadataBuilder
     }
 
     @ThriftUnion
-    public final static class MultipleNames
+    public static final class MultipleNames
     {
         @ThriftUnionId
         public void setId(short id)
@@ -180,7 +180,7 @@ public class TestThriftUnionMetadataBuilder
     }
 
     @ThriftUnion
-    public final static class UnsupportedJavaType
+    public static final class UnsupportedJavaType
     {
         @ThriftUnionId
         public void setId(short id)
@@ -213,7 +213,7 @@ public class TestThriftUnionMetadataBuilder
     }
 
     @ThriftUnion
-    public final static class MultipleTypes
+    public static final class MultipleTypes
     {
         @ThriftUnionId
         public void setId(short id)

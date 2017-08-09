@@ -24,7 +24,6 @@ import static org.testng.Assert.assertEquals;
 
 public class TestReflectionHelper
 {
-
     @Test
     public void testExtractParameterNamesNoAnnotations()
             throws Exception
