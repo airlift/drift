@@ -28,6 +28,7 @@
     <modules>
         <module>drift-annotations</module>
         <module>drift-codec</module>
+        <module>drift-client</module>
         <module>drift-transport-spi</module>
     </modules>
 
@@ -63,8 +64,26 @@
             </dependency>
 
             <dependency>
+                <groupId>io.airlift.drift</groupId>
+                <artifactId>drift-transport-spi</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.airlift</groupId>
+                <artifactId>bootstrap</artifactId>
+                <version>${dep.airlift.version}</version>
+            </dependency>
+
+            <dependency>
                 <groupId>io.airlift</groupId>
                 <artifactId>configuration</artifactId>
+                <version>${dep.airlift.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.airlift</groupId>
+                <artifactId>jmx</artifactId>
                 <version>${dep.airlift.version}</version>
             </dependency>
 
@@ -76,14 +95,36 @@
 
             <dependency>
                 <groupId>io.airlift</groupId>
+                <artifactId>stats</artifactId>
+                <version>${dep.airlift.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.airlift</groupId>
                 <artifactId>testing</artifactId>
                 <version>${dep.airlift.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.airlift</groupId>
+                <artifactId>units</artifactId>
+                <version>1.0</version>
             </dependency>
 
             <dependency>
                 <groupId>org.apache.thrift</groupId>
                 <artifactId>libthrift</artifactId>
                 <version>0.9.3</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.apache.httpcomponents</groupId>
+                        <artifactId>httpcore</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.apache.httpcomponents</groupId>
+                        <artifactId>httpclient</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
 
             <dependency>
