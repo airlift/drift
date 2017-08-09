@@ -29,6 +29,7 @@
         <module>drift-annotations</module>
         <module>drift-codec</module>
         <module>drift-client</module>
+        <module>drift-integration-tests</module>
         <module>drift-transport-apache</module>
         <module>drift-transport-netty</module>
         <module>drift-transport-spi</module>
@@ -62,6 +63,24 @@
             <dependency>
                 <groupId>io.airlift.drift</groupId>
                 <artifactId>drift-codec</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.airlift.drift</groupId>
+                <artifactId>drift-client</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.airlift.drift</groupId>
+                <artifactId>drift-transport-apache</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.airlift.drift</groupId>
+                <artifactId>drift-transport-netty</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
