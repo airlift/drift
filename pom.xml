@@ -28,6 +28,7 @@
     <modules>
         <module>drift-annotations</module>
         <module>drift-codec</module>
+        <module>drift-transport-spi</module>
     </modules>
 
     <inceptionYear>2012</inceptionYear>
@@ -63,8 +64,20 @@
 
             <dependency>
                 <groupId>io.airlift</groupId>
+                <artifactId>configuration</artifactId>
+                <version>${dep.airlift.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.airlift</groupId>
                 <artifactId>parameternames</artifactId>
                 <version>1.0</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.airlift</groupId>
+                <artifactId>testing</artifactId>
+                <version>${dep.airlift.version}</version>
             </dependency>
 
             <dependency>
