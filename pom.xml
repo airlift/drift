@@ -29,6 +29,7 @@
         <module>drift-annotations</module>
         <module>drift-codec</module>
         <module>drift-client</module>
+        <module>drift-transport-apache</module>
         <module>drift-transport-spi</module>
     </modules>
 
@@ -78,6 +79,12 @@
             <dependency>
                 <groupId>io.airlift</groupId>
                 <artifactId>configuration</artifactId>
+                <version>${dep.airlift.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.airlift</groupId>
+                <artifactId>concurrent</artifactId>
                 <version>${dep.airlift.version}</version>
             </dependency>
 
