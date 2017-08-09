@@ -61,24 +61,21 @@ public class DefaultThriftTypeReference
     }
 
     @Override
-    public int hashCode()
+    public boolean equals(Object o)
     {
-        return Objects.hash(thriftType.hashCode());
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        DefaultThriftTypeReference that = (DefaultThriftTypeReference) o;
+        return Objects.equals(thriftType, that.thriftType);
     }
 
     @Override
-    public boolean equals(Object obj)
+    public int hashCode()
     {
-        if (this == obj) {
-            return true;
-        }
-
-        if (obj == null || obj.getClass() != DefaultThriftTypeReference.class) {
-            return false;
-        }
-
-        DefaultThriftTypeReference that = (DefaultThriftTypeReference) obj;
-
-        return Objects.equals(this.thriftType, that.thriftType);
+        return Objects.hash(thriftType);
     }
 }

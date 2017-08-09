@@ -7,7 +7,7 @@
     <parent>
         <groupId>io.airlift</groupId>
         <artifactId>airbase</artifactId>
-        <version>62</version>
+        <version>66</version>
     </parent>
 
     <groupId>io.airlift.drift</groupId>
@@ -38,11 +38,10 @@
 
     <properties>
         <!-- This actually wants to be fixed -->
-        <air.check.skip-findbugs>true</air.check.skip-findbugs>
         <air.check.skip-pmd>true</air.check.skip-pmd>
         <air.check.skip-jacoco>true</air.check.skip-jacoco>
 
-        <dep.airlift.version>0.145</dep.airlift.version>
+        <dep.airlift.version>0.149</dep.airlift.version>
     </properties>
 
     <dependencyManagement>

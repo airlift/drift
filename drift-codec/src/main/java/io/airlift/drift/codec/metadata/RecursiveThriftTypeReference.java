@@ -78,25 +78,23 @@ public class RecursiveThriftTypeReference
     }
 
     @Override
-    public int hashCode()
+    public boolean equals(Object o)
     {
-        return Objects.hash(catalog, javaType);
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        RecursiveThriftTypeReference that = (RecursiveThriftTypeReference) o;
+        return Objects.equals(catalog, that.catalog) &&
+                Objects.equals(javaType, that.javaType);
     }
 
     @Override
-    public boolean equals(Object obj)
+    public int hashCode()
     {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null || obj.getClass() != RecursiveThriftTypeReference.class) {
-            return false;
-        }
-
-        RecursiveThriftTypeReference that = (RecursiveThriftTypeReference) obj;
-
-        return Objects.equals(this.catalog, that.catalog) &&
-                Objects.equals(this.javaType, that.javaType);
+        return Objects.hash(catalog, javaType);
     }
 
     private boolean isResolved()
