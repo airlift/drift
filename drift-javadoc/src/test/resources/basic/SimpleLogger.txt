@@ -1,0 +1,20 @@
+package its;
+
+import io.airlift.drift.annotations.ThriftDocumentation;
+import io.airlift.drift.annotations.ThriftOrder;
+
+@ThriftDocumentation({
+    "Simple logging service.",
+    "",
+    "Use this for logging."
+})
+class SimpleLogger$DriftMeta {
+  @ThriftDocumentation({
+      "Log a message",
+      "",
+      "@param message the string to log"
+  })
+  @ThriftOrder(10000)
+  void log() {
+  }
+}

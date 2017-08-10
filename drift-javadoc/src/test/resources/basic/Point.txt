@@ -1,0 +1,15 @@
+package its;
+
+import io.airlift.drift.annotations.ThriftDocumentation;
+import io.airlift.drift.annotations.ThriftOrder;
+
+@ThriftDocumentation("Two dimensional point.")
+class Point$DriftMeta {
+  @ThriftDocumentation
+  @ThriftOrder(10000)
+  int x;
+
+  @ThriftDocumentation
+  @ThriftOrder(10001)
+  int y;
+}

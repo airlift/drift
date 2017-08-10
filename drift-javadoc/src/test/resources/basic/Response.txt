@@ -1,0 +1,17 @@
+package its;
+
+import io.airlift.drift.annotations.ThriftDocumentation;
+import io.airlift.drift.annotations.ThriftOrder;
+
+@ThriftDocumentation
+class Response$DriftMeta {
+  @ThriftDocumentation("Get response type")
+  @ThriftOrder(10000)
+  void getType() {
+  }
+
+  @ThriftDocumentation("Set response type")
+  @ThriftOrder(10001)
+  void setType() {
+  }
+}

@@ -21,10 +21,10 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Sets;
 import com.google.common.reflect.TypeToken;
 import com.google.common.util.concurrent.ListenableFuture;
+import io.airlift.drift.annotations.ThriftDocumentation;
+import io.airlift.drift.annotations.ThriftOrder;
 import io.airlift.drift.annotations.ThriftStruct;
 import io.airlift.drift.annotations.ThriftUnion;
-import io.airlift.drift.codec.ThriftDocumentation;
-import io.airlift.drift.codec.ThriftOrder;
 import io.airlift.drift.codec.ThriftProtocolType;
 import io.airlift.drift.codec.internal.coercion.DefaultJavaCoercions;
 import io.airlift.drift.codec.internal.coercion.FromThrift;
@@ -553,7 +553,7 @@ public class ThriftCatalog
         if (loader == null) {
             throw new ClassNotFoundException("null class loader");
         }
-        return loader.loadClass(cls.getName() + "$drift_meta");
+        return loader.loadClass(cls.getName() + "$DriftMeta");
     }
 
     @SuppressWarnings("PMD.EmptyCatchBlock")

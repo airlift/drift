@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
-package io.airlift.drift.codec;
+package io.airlift.drift.annotations;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
@@ -27,7 +27,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Documented
 @Retention(RUNTIME)
 @Target({TYPE, METHOD, FIELD})
-public @interface ThriftDocumentation
+public @interface ThriftOrder
 {
-    String[] value() default {};
+    int value();
 }

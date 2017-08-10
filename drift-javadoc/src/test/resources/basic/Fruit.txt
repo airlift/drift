@@ -1,0 +1,19 @@
+package its;
+
+import io.airlift.drift.annotations.ThriftDocumentation;
+import io.airlift.drift.annotations.ThriftOrder;
+
+@ThriftDocumentation("Type of fruit")
+class Fruit$DriftMeta {
+  @ThriftDocumentation("Large and sweet")
+  @ThriftOrder(10000)
+  int APPLE;
+
+  @ThriftDocumentation("Yellow")
+  @ThriftOrder(10001)
+  int BANANA;
+
+  @ThriftDocumentation("Small and tart")
+  @ThriftOrder(10002)
+  int CHERRY;
+}

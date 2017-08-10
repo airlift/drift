@@ -31,6 +31,7 @@
         <module>drift-codec</module>
         <module>drift-client</module>
         <module>drift-integration-tests</module>
+        <module>drift-javadoc</module>
         <module>drift-transport-apache</module>
         <module>drift-transport-netty</module>
         <module>drift-transport-spi</module>
@@ -51,6 +52,7 @@
         <air.check.skip-jacoco>true</air.check.skip-jacoco>
 
         <dep.airlift.version>0.149</dep.airlift.version>
+        <dep.takari-plugin.version>2.9.1</dep.takari-plugin.version>
     </properties>
 
     <dependencyManagement>
@@ -174,9 +176,34 @@
             </dependency>
 
             <dependency>
+                <groupId>com.squareup</groupId>
+                <artifactId>javapoet</artifactId>
+                <version>1.9.0</version>
+            </dependency>
+
+            <dependency>
                 <groupId>org.easytesting</groupId>
                 <artifactId>fest-assert</artifactId>
                 <version>1.4</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.takari.maven.plugins</groupId>
+                <artifactId>takari-plugin-testing</artifactId>
+                <version>${dep.takari-plugin.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.takari.maven.plugins</groupId>
+                <artifactId>takari-plugin-integration-testing</artifactId>
+                <version>${dep.takari-plugin.version}</version>
+                <type>pom</type>
+            </dependency>
+
+            <dependency>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <version>4.12</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -267,7 +294,7 @@
                 <plugin>
                     <groupId>io.takari.maven.plugins</groupId>
                     <artifactId>takari-lifecycle-plugin</artifactId>
-                    <version>1.11.3</version>
+                    <version>1.13.1</version>
                 </plugin>
 
                 <plugin>
