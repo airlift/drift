@@ -1,0 +1,19 @@
+/**
+ * Type of fruit
+ */
+enum Fruit {
+  /**
+   * Large and sweet
+   */
+  APPLE = 2;
+
+  /**
+   * Yellow
+   */
+  BANANA = 3;
+
+  /**
+   * Small and tart
+   */
+  CHERRY = 5;
+}

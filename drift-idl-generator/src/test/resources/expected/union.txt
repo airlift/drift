@@ -1,0 +1,7 @@
+include "types.thrift"
+
+union Combined {
+  1: string stringValue;
+  2: i64 longValue;
+  3: types.Fruit fruitValue;
+}

@@ -1,0 +1,55 @@
+enum Result {
+  OK, TRY_LATER
+}
+
+struct DriftLogEntry {
+  1: string category;
+  2: string message;
+}
+
+exception ScribeDataException {
+  1: string message;
+}
+
+exception ScribeTransportException {
+  1: string message;
+}
+
+exception ScribeMessageException {
+  1: string message;
+}
+
+/**
+ * Scribe logging service
+ */
+service Scribe {
+  /**
+   * Send a message to Scribe.
+   *
+   * @param messages the list of messages to send
+   */
+  Result log(1: list<DriftLogEntry> arg0)
+    throws (1: ScribeDataException ex1, 2: ScribeTransportException ex2);
+
+  /**
+   * Send a formatted message to Scribe.
+   */
+  Result logFormattedMessage(
+      1: string arg0,
+      2: map<string, DriftLogEntry> arg1,
+      3: i32 arg2)
+    throws (
+      1: ScribeDataException ex1,
+      2: ScribeTransportException ex2,
+      3: ScribeMessageException ex3);
+
+  /**
+   * Check if service is up
+   */
+  void ping();
+
+  /**
+   * Shutdown the service
+   */
+  oneway void shutdown();
+}

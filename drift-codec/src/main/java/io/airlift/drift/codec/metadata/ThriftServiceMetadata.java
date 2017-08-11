@@ -15,7 +15,6 @@
  */
 package io.airlift.drift.codec.metadata;
 
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Ordering;
 import com.google.common.collect.TreeMultimap;
@@ -25,20 +24,26 @@ import io.airlift.drift.annotations.ThriftService;
 import javax.annotation.concurrent.Immutable;
 
 import java.lang.reflect.Method;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static io.airlift.drift.codec.metadata.ReflectionHelper.findAnnotatedMethods;
 import static io.airlift.drift.codec.metadata.ReflectionHelper.getEffectiveClassAnnotations;
+import static io.airlift.drift.codec.metadata.ThriftCatalog.getMethodOrder;
+import static io.airlift.drift.codec.metadata.ThriftCatalog.getThriftDocumentation;
 import static java.util.Objects.requireNonNull;
+import static java.util.function.Function.identity;
 
 @Immutable
 public class ThriftServiceMetadata
 {
     private final String name;
     private final Map<String, ThriftMethodMetadata> methods;
+    private final List<String> documentation;
 
     public ThriftServiceMetadata(Class<?> serviceClass, ThriftCatalog catalog)
     {
@@ -52,23 +57,20 @@ public class ThriftServiceMetadata
             name = thriftService.value();
         }
 
-        ImmutableMap.Builder<String, ThriftMethodMetadata> builder = ImmutableMap.builder();
-
         // A multimap from order to method name. Sorted by key (order), with nulls (i.e. no order) last.
         // Within each key, values (ThriftMethodMetadata) are sorted by method name.
-        TreeMultimap<Integer, ThriftMethodMetadata> declaredMethods = TreeMultimap.create(
+        TreeMultimap<Integer, ThriftMethodMetadata> builder = TreeMultimap.create(
                 Ordering.natural().nullsLast(),
                 Ordering.natural().onResultOf(ThriftMethodMetadata::getName));
         for (Method method : findAnnotatedMethods(serviceClass, ThriftMethod.class)) {
             if (method.isAnnotationPresent(ThriftMethod.class)) {
-                ThriftMethodMetadata methodMetadata = new ThriftMethodMetadata(method, catalog);
-                builder.put(methodMetadata.getName(), methodMetadata);
-                if (method.getDeclaringClass().equals(serviceClass)) {
-                    declaredMethods.put(ThriftCatalog.getMethodOrder(method), methodMetadata);
-                }
+                builder.put(getMethodOrder(method), new ThriftMethodMetadata(method, catalog));
             }
         }
-        methods = builder.build();
+        methods = builder.values().stream()
+                .collect(toImmutableMap(ThriftMethodMetadata::getName, identity()));
+
+        documentation = getThriftDocumentation(serviceClass);
     }
 
     public String getName()
@@ -79,6 +81,11 @@ public class ThriftServiceMetadata
     public Map<String, ThriftMethodMetadata> getMethods()
     {
         return methods;
+    }
+
+    public List<String> getDocumentation()
+    {
+        return documentation;
     }
 
     public static ThriftService getThriftServiceAnnotation(Class<?> serviceClass)

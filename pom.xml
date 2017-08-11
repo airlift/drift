@@ -28,6 +28,7 @@
         <module>drift-protocol</module>
         <module>drift-codec</module>
         <module>drift-client</module>
+        <module>drift-idl-generator</module>
         <module>drift-integration-tests</module>
         <module>drift-javadoc</module>
         <module>drift-transport-apache</module>

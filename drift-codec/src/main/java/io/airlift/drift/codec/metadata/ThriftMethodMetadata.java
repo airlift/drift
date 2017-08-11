@@ -46,6 +46,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static io.airlift.drift.annotations.ThriftField.Requiredness;
 import static io.airlift.drift.codec.metadata.FieldKind.THRIFT_FIELD;
 import static io.airlift.drift.codec.metadata.ReflectionHelper.extractParameterNames;
+import static io.airlift.drift.codec.metadata.ThriftCatalog.getThriftDocumentation;
 import static java.util.Objects.requireNonNull;
 
 @Immutable
@@ -58,6 +59,7 @@ public class ThriftMethodMetadata
     private final Method method;
     private final ImmutableMap<Short, ThriftType> exceptions;
     private final boolean oneway;
+    private final List<String> documentation;
 
     public ThriftMethodMetadata(Method method, ThriftCatalog catalog)
     {
@@ -185,6 +187,8 @@ public class ThriftMethodMetadata
         exceptions = buildExceptionMap(catalog, thriftMethod);
 
         this.oneway = thriftMethod.oneway();
+
+        documentation = getThriftDocumentation(method);
     }
 
     public String getName()
@@ -220,6 +224,11 @@ public class ThriftMethodMetadata
     public boolean getOneway()
     {
         return oneway;
+    }
+
+    public List<String> getDocumentation()
+    {
+        return documentation;
     }
 
     private ImmutableMap<Short, ThriftType> buildExceptionMap(ThriftCatalog catalog, ThriftMethod thriftMethod)

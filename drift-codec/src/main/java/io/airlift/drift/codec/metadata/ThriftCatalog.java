@@ -104,7 +104,6 @@ public class ThriftCatalog
         this(MetadataErrors.NULL_MONITOR);
     }
 
-    @VisibleForTesting
     public ThriftCatalog(Monitor monitor)
     {
         this.monitor = monitor;

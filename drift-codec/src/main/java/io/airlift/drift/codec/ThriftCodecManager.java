@@ -86,6 +86,11 @@ public class ThriftCodecManager
      */
     private final ThreadLocal<Deque<ThriftType>> deferredTypesWorkList = ThreadLocal.withInitial(ArrayDeque::new);
 
+    public ThriftCodecManager(ThriftCatalog catalog)
+    {
+        this(new CompilerThriftCodecFactory(ThriftCodecManager.class.getClassLoader()), catalog, ImmutableSet.of());
+    }
+
     public ThriftCodecManager(ThriftCodec<?>... codecs)
     {
         this(new CompilerThriftCodecFactory(ThriftCodecManager.class.getClassLoader()), ImmutableSet.copyOf(codecs));

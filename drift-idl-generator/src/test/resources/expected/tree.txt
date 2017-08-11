@@ -1,0 +1,5 @@
+struct TreeNode {
+  1: TreeNode left;
+  2: TreeNode right;
+  3: string data;
+}
