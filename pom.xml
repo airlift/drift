@@ -27,6 +27,7 @@
 
     <modules>
         <module>drift-annotations</module>
+        <module>drift-core</module>
         <module>drift-codec</module>
         <module>drift-client</module>
         <module>drift-integration-tests</module>
@@ -57,6 +58,12 @@
             <dependency>
                 <groupId>io.airlift.drift</groupId>
                 <artifactId>drift-annotations</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.airlift.drift</groupId>
+                <artifactId>drift-core</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
