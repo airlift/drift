@@ -306,10 +306,11 @@ public class ThriftType
     @Override
     public String toString()
     {
+        String structMetadataName = (structMetadata != null) ? structMetadata.getStructClass().getName() : null;
         return toStringHelper(this).omitNullValues()
                 .add("protocolType", protocolType)
                 .add("javaType", javaType)
-                .add("structMetadata", structMetadata)
+                .add("structMetadata", structMetadataName)
                 .add("keyTypeReference", keyTypeReference)
                 .add("valueTypeReference", valueTypeReference)
                 .toString();
