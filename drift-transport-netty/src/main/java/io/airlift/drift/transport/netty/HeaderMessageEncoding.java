@@ -20,6 +20,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.airlift.drift.TApplicationException;
 import io.airlift.drift.protocol.TBinaryProtocol;
 import io.airlift.drift.protocol.TCompactProtocol;
+import io.airlift.drift.protocol.TFacebookCompactProtocol;
 import io.airlift.drift.protocol.TProtocolFactory;
 import io.airlift.drift.transport.MethodMetadata;
 import io.airlift.drift.transport.TTransportException;

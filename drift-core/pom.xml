@@ -41,6 +41,7 @@
                     <excludes combine.children="append">
                         <exclude>src/main/java/io/airlift/drift/protocol/TBinaryProtocol.java</exclude>
                         <exclude>src/main/java/io/airlift/drift/protocol/TCompactProtocol.java</exclude>
+                        <exclude>src/main/java/io/airlift/drift/protocol/TFacebookCompactProtocol.java</exclude>
                     </excludes>
                 </configuration>
             </plugin>

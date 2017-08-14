@@ -1,31 +1,24 @@
 /*
- * Copyright (C) 2012 Facebook, Inc.
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
  *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may
- * not use this file except in compliance with the License. You may obtain
- * a copy of the License at
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
- * License for the specific language governing permissions and limitations
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
  * under the License.
  */
-package io.airlift.drift.transport.netty;
+package io.airlift.drift.protocol;
 
 import io.airlift.drift.TException;
-import io.airlift.drift.protocol.TField;
-import io.airlift.drift.protocol.TList;
-import io.airlift.drift.protocol.TMap;
-import io.airlift.drift.protocol.TMessage;
-import io.airlift.drift.protocol.TProtocol;
-import io.airlift.drift.protocol.TProtocolException;
-import io.airlift.drift.protocol.TProtocolFactory;
-import io.airlift.drift.protocol.TSet;
-import io.airlift.drift.protocol.TStruct;
-import io.airlift.drift.protocol.TType;
 import io.airlift.drift.transport.TTransport;
 
 import java.nio.ByteBuffer;

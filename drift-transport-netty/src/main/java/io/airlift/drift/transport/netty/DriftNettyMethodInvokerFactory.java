@@ -18,6 +18,7 @@ package io.airlift.drift.transport.netty;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import io.airlift.drift.protocol.TBinaryProtocol;
 import io.airlift.drift.protocol.TCompactProtocol;
+import io.airlift.drift.protocol.TFacebookCompactProtocol;
 import io.airlift.drift.protocol.TProtocolFactory;
 import io.airlift.drift.transport.AddressSelector;
 import io.airlift.drift.transport.MethodInvoker;
