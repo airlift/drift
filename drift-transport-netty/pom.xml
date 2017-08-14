@@ -82,7 +82,7 @@
         <!-- for testing -->
         <dependency>
             <groupId>io.airlift.drift</groupId>
-            <artifactId>drift-annotations</artifactId>
+            <artifactId>drift-api</artifactId>
             <scope>test</scope>
         </dependency>
 

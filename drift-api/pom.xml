@@ -10,8 +10,8 @@
         <version>1.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>drift-annotations</artifactId>
-    <description>Annotations for use in Drift interfaces and types</description>
+    <artifactId>drift-api</artifactId>
+    <description>Drift annotations and exceptions for use in Thrift interfaces and types</description>
     <packaging>jar</packaging>
 
     <properties>
@@ -19,6 +19,6 @@
     </properties>
 
     <dependencies>
-        <!-- no dependencies for annotations -->
+        <!-- no dependencies for API -->
     </dependencies>
 </project>

@@ -21,7 +21,7 @@
     <dependencies>
         <dependency>
             <groupId>io.airlift.drift</groupId>
-            <artifactId>drift-annotations</artifactId>
+            <artifactId>drift-api</artifactId>
         </dependency>
 
         <!-- for testing -->
