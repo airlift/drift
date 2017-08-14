@@ -32,6 +32,7 @@
         <module>drift-integration-tests</module>
         <module>drift-javadoc</module>
         <module>drift-maven-plugin</module>
+        <module>drift-server</module>
         <module>drift-transport-apache</module>
         <module>drift-transport-netty</module>
         <module>drift-transport-spi</module>

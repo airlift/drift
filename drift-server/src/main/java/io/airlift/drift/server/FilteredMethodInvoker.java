@@ -13,22 +13,18 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
-package io.airlift.drift.client;
+package io.airlift.drift.server;
 
 import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.ListenableFuture;
-import io.airlift.drift.transport.InvokeRequest;
-import io.airlift.drift.transport.MethodInvoker;
-import io.airlift.units.Duration;
+import io.airlift.drift.transport.server.ServerInvokeRequest;
 
 import java.util.List;
 
-import static java.util.Objects.requireNonNull;
-
 class FilteredMethodInvoker
-        implements MethodInvoker
+        implements ServerMethodInvoker
 {
-    public static MethodInvoker createFilteredMethodInvoker(List<MethodInvocationFilter> filters, MethodInvoker methodInvoker)
+    public static ServerMethodInvoker createFilteredMethodInvoker(List<MethodInvocationFilter> filters, ServerMethodInvoker methodInvoker)
     {
         for (MethodInvocationFilter filter : Lists.reverse(filters)) {
             methodInvoker = new FilteredMethodInvoker(filter, methodInvoker);
@@ -37,23 +33,17 @@ class FilteredMethodInvoker
     }
 
     private final MethodInvocationFilter filter;
-    private final MethodInvoker next;
+    private final ServerMethodInvoker next;
 
-    private FilteredMethodInvoker(MethodInvocationFilter filter, MethodInvoker next)
+    private FilteredMethodInvoker(MethodInvocationFilter filter, ServerMethodInvoker next)
     {
-        this.filter = requireNonNull(filter, "filter is null");
-        this.next = requireNonNull(next, "next is null");
+        this.filter = filter;
+        this.next = next;
     }
 
     @Override
-    public ListenableFuture<Object> invoke(InvokeRequest request)
+    public ListenableFuture<Object> invoke(ServerInvokeRequest request)
     {
         return filter.invoke(request, next);
-    }
-
-    @Override
-    public ListenableFuture<?> delay(Duration duration)
-    {
-        return next.delay(duration);
     }
 }
