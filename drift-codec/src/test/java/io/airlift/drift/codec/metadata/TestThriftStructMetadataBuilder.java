@@ -25,7 +25,7 @@ import java.lang.reflect.Type;
 import java.util.concurrent.locks.Lock;
 
 import static io.airlift.drift.annotations.ThriftField.Requiredness;
-import static org.fest.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class TestThriftStructMetadataBuilder
 {

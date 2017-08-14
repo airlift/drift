@@ -23,7 +23,7 @@ import io.airlift.drift.codec.UnionMethod;
 import io.airlift.drift.codec.metadata.ThriftStructMetadata.MetadataType;
 import org.testng.annotations.Test;
 
-import static org.fest.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertNotNull;

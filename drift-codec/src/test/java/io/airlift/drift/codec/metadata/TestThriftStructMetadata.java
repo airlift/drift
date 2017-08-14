@@ -33,7 +33,7 @@ import java.util.Map;
 
 import static io.airlift.drift.codec.metadata.ThriftStructMetadata.MetadataType.STRUCT;
 import static io.airlift.drift.codec.metadata.ThriftStructMetadata.MetadataType.UNION;
-import static org.fest.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertNotNull;

@@ -22,7 +22,7 @@ import org.testng.annotations.Test;
 
 import java.util.concurrent.locks.Lock;
 
-import static org.fest.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class TestThriftUnionMetadataBuilder
 {
