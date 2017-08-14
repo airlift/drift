@@ -142,7 +142,7 @@ public class TCompactProtocol
      * If we read a field header, and it's a boolean field, save the boolean
      * value here so that readBool can use it.
      */
-    private Boolean boolValue;
+    private Boolean booleanValue;
 
     /**
      * The transport for reading from or writing to.
@@ -233,7 +233,7 @@ public class TCompactProtocol
 
     /**
      * Write a field header containing the field id and field type. If the
-     * difference between the current field id and the last one is small (< 15),
+     * difference between the current field id and the last one is small (&lt; 15),
      * then the field id will be encoded in the 4 MSB as a delta. Otherwise, the
      * field id will follow the type header as a zigzag varint.
      */
@@ -275,7 +275,6 @@ public class TCompactProtocol
         }
 
         lastFieldId = field.getId();
-        // lastField_.push(field.getId());
     }
 
     /**
@@ -455,7 +454,7 @@ public class TCompactProtocol
      * Abstract method for writing the start of lists and sets. List and sets on
      * the wire differ only by the type indicator.
      */
-    protected void writeCollectionBegin(byte elemType, int size)
+    private void writeCollectionBegin(byte elemType, int size)
             throws TException
     {
         if (size <= 14) {
@@ -528,8 +527,7 @@ public class TCompactProtocol
     }
 
     /**
-     * Convert a long into little-endian bytes in buf starting at off and going
-     * until off+7.
+     * Convert a long into little-endian bytes in buf
      */
     private static void fixedLongToBytes(long n, byte[] buf)
     {
@@ -648,7 +646,7 @@ public class TCompactProtocol
         // if this happens to be a boolean field, the value is encoded in the type
         if (isBoolType(type)) {
             // save the boolean value in a special instance variable.
-            boolValue = (byte) (type & 0x0f) == Types.BOOLEAN_TRUE ? Boolean.TRUE : Boolean.FALSE;
+            booleanValue = (byte) (type & 0x0f) == Types.BOOLEAN_TRUE ? Boolean.TRUE : Boolean.FALSE;
         }
 
         // push the new field onto the field stack so we can keep the deltas going.
@@ -713,9 +711,9 @@ public class TCompactProtocol
     public boolean readBool()
             throws TException
     {
-        if (boolValue != null) {
-            boolean result = boolValue;
-            boolValue = null;
+        if (booleanValue != null) {
+            boolean result = booleanValue;
+            booleanValue = null;
             return result;
         }
         return readByte() == Types.BOOLEAN_TRUE;

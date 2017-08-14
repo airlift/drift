@@ -25,6 +25,8 @@ import java.nio.ByteBuffer;
 import java.util.ArrayDeque;
 import java.util.Deque;
 
+import static java.lang.Double.doubleToLongBits;
+import static java.lang.Double.longBitsToDouble;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Objects.requireNonNull;
 
@@ -40,24 +42,28 @@ import static java.util.Objects.requireNonNull;
 public class TFacebookCompactProtocol
         implements TProtocol
 {
+    private static final long NO_LENGTH_LIMIT = -1;
+
+    private static final byte[] EMPTY_BYTE_ARRAY = new byte[0];
+
     private static final TStruct ANONYMOUS_STRUCT = new TStruct("");
     private static final TField TSTOP = new TField("", TType.STOP, (short) 0);
 
-    private static final byte[] ttypeToCompactType = new byte[16];
+    private static final byte[] TTYPE_TO_COMPACT_TYPE = new byte[16];
 
     static {
-        ttypeToCompactType[TType.STOP] = TType.STOP;
-        ttypeToCompactType[TType.BOOL] = Types.BOOLEAN_TRUE;
-        ttypeToCompactType[TType.BYTE] = Types.BYTE;
-        ttypeToCompactType[TType.I16] = Types.I16;
-        ttypeToCompactType[TType.I32] = Types.I32;
-        ttypeToCompactType[TType.I64] = Types.I64;
-        ttypeToCompactType[TType.DOUBLE] = Types.DOUBLE;
-        ttypeToCompactType[TType.STRING] = Types.BINARY;
-        ttypeToCompactType[TType.LIST] = Types.LIST;
-        ttypeToCompactType[TType.SET] = Types.SET;
-        ttypeToCompactType[TType.MAP] = Types.MAP;
-        ttypeToCompactType[TType.STRUCT] = Types.STRUCT;
+        TTYPE_TO_COMPACT_TYPE[TType.STOP] = TType.STOP;
+        TTYPE_TO_COMPACT_TYPE[TType.BOOL] = Types.BOOLEAN_TRUE;
+        TTYPE_TO_COMPACT_TYPE[TType.BYTE] = Types.BYTE;
+        TTYPE_TO_COMPACT_TYPE[TType.I16] = Types.I16;
+        TTYPE_TO_COMPACT_TYPE[TType.I32] = Types.I32;
+        TTYPE_TO_COMPACT_TYPE[TType.I64] = Types.I64;
+        TTYPE_TO_COMPACT_TYPE[TType.DOUBLE] = Types.DOUBLE;
+        TTYPE_TO_COMPACT_TYPE[TType.STRING] = Types.BINARY;
+        TTYPE_TO_COMPACT_TYPE[TType.LIST] = Types.LIST;
+        TTYPE_TO_COMPACT_TYPE[TType.SET] = Types.SET;
+        TTYPE_TO_COMPACT_TYPE[TType.MAP] = Types.MAP;
+        TTYPE_TO_COMPACT_TYPE[TType.STRUCT] = Types.STRUCT;
     }
 
     /**
@@ -70,10 +76,10 @@ public class TFacebookCompactProtocol
 
         public Factory()
         {
-            maxNetworkBytes = -1;
+            this(NO_LENGTH_LIMIT);
         }
 
-        public Factory(int maxNetworkBytes)
+        public Factory(long maxNetworkBytes)
         {
             this.maxNetworkBytes = maxNetworkBytes;
         }
@@ -89,6 +95,7 @@ public class TFacebookCompactProtocol
     private static final byte VERSION = 2;
     private static final byte VERSION_MASK = 0x1f; // 0001 1111
     private static final byte TYPE_MASK = (byte) 0xE0; // 1110 0000
+    private static final byte TYPE_BITS = 0x03; // 0000 0011
     private static final int TYPE_SHIFT_AMOUNT = 5;
 
     /**
@@ -359,8 +366,8 @@ public class TFacebookCompactProtocol
     public void writeDouble(double value)
             throws TException
     {
-        byte[] data = new byte[] {0, 0, 0, 0, 0, 0, 0, 0};
-        fixedLongToBytes(Double.doubleToLongBits(value), data);
+        byte[] data = {0, 0, 0, 0, 0, 0, 0, 0};
+        fixedLongToBytes(doubleToLongBits(value), data);
         transport.write(data);
     }
 
@@ -399,34 +406,19 @@ public class TFacebookCompactProtocol
     //
 
     @Override
-    public void writeMessageEnd()
-            throws TException
-    {
-    }
+    public void writeMessageEnd() {}
 
     @Override
-    public void writeMapEnd()
-            throws TException
-    {
-    }
+    public void writeMapEnd() {}
 
     @Override
-    public void writeListEnd()
-            throws TException
-    {
-    }
+    public void writeListEnd() {}
 
     @Override
-    public void writeSetEnd()
-            throws TException
-    {
-    }
+    public void writeSetEnd() {}
 
     @Override
-    public void writeFieldEnd()
-            throws TException
-    {
-    }
+    public void writeFieldEnd() {}
 
     //
     // Internal writing methods
@@ -448,12 +440,12 @@ public class TFacebookCompactProtocol
         }
     }
 
-    /**
-     * Write an i32 as a varint. Results in 1-5 bytes on the wire.
-     * TODO: make a permanent buffer like writeVarint64?
-     */
     private final byte[] i32buf = new byte[5];
 
+    /**
+     * Write an i32 as a varint. Results in 1-5 bytes on the wire.
+     */
+    @SuppressWarnings("ValueOfIncrementOrDecrementUsed")
     private void writeVarint32(int n)
             throws TException
     {
@@ -461,24 +453,20 @@ public class TFacebookCompactProtocol
         while (true) {
             if ((n & ~0x7F) == 0) {
                 i32buf[idx++] = (byte) n;
-                // writeByteDirect((byte)n);
                 break;
-                // return;
             }
-            else {
-                i32buf[idx++] = (byte) ((n & 0x7F) | 0x80);
-                // writeByteDirect((byte)((n & 0x7F) | 0x80));
-                n >>>= 7;
-            }
+            i32buf[idx++] = (byte) ((n & 0x7F) | 0x80);
+            n >>>= 7;
         }
         transport.write(i32buf, 0, idx);
     }
 
+    private final byte[] varint64out = new byte[10];
+
     /**
      * Write an i64 as a varint. Results in 1-10 bytes on the wire.
      */
-    private final byte[] varint64out = new byte[10];
-
+    @SuppressWarnings("ValueOfIncrementOrDecrementUsed")
     private void writeVarint64(long n)
             throws TException
     {
@@ -488,10 +476,8 @@ public class TFacebookCompactProtocol
                 varint64out[idx++] = (byte) n;
                 break;
             }
-            else {
-                varint64out[idx++] = ((byte) ((n & 0x7F) | 0x80));
-                n >>>= 7;
-            }
+            varint64out[idx++] = ((byte) ((n & 0x7F) | 0x80));
+            n >>>= 7;
         }
         transport.write(varint64out, 0, idx);
     }
@@ -529,12 +515,12 @@ public class TFacebookCompactProtocol
         buf[7] = (byte) (n & 0xff);
     }
 
+    private final byte[] byteDirectBuffer = new byte[1];
+
     /**
      * Writes a byte without any possibility of all that field header nonsense.
      * Used internally by other writing methods that know they need to write a byte.
      */
-    private final byte[] byteDirectBuffer = new byte[1];
-
     private void writeByteDirect(byte b)
             throws TException
     {
@@ -571,7 +557,7 @@ public class TFacebookCompactProtocol
         if (version != VERSION) {
             throw new TProtocolException("Expected version " + VERSION + " but got " + version);
         }
-        byte type = (byte) ((versionAndType >> TYPE_SHIFT_AMOUNT) & 0x03);
+        byte type = (byte) ((versionAndType >> TYPE_SHIFT_AMOUNT) & TYPE_BITS);
         int seqid = readVarint32();
         String messageName = readString();
         return new TMessage(messageName, type, seqid);
@@ -748,6 +734,8 @@ public class TFacebookCompactProtocol
         return zigzagToLong(readVarint64());
     }
 
+    private final byte[] doubleBuf = new byte[8];
+
     /**
      * No magic here - just read a double off the wire.
      */
@@ -755,9 +743,8 @@ public class TFacebookCompactProtocol
     public double readDouble()
             throws TException
     {
-        byte[] longBits = new byte[8];
-        transport.read(longBits, 0, 8);
-        return Double.longBitsToDouble(bytesToLong(longBits));
+        transport.read(doubleBuf, 0, 8);
+        return longBitsToDouble(bytesToLong(doubleBuf));
     }
 
     /**
@@ -768,7 +755,7 @@ public class TFacebookCompactProtocol
             throws TException
     {
         int length = readVarint32();
-        checkReadLength(length);
+        checkStringReadLength(length);
 
         if (length == 0) {
             return "";
@@ -785,9 +772,9 @@ public class TFacebookCompactProtocol
             throws TException
     {
         int length = readVarint32();
-        checkReadLength(length);
+        checkStringReadLength(length);
         if (length == 0) {
-            return ByteBuffer.wrap(new byte[0]);
+            return ByteBuffer.wrap(EMPTY_BYTE_ARRAY);
         }
 
         byte[] buf = new byte[length];
@@ -802,7 +789,7 @@ public class TFacebookCompactProtocol
             throws TException
     {
         if (length == 0) {
-            return new byte[0];
+            return EMPTY_BYTE_ARRAY;
         }
 
         byte[] buf = new byte[length];
@@ -810,13 +797,13 @@ public class TFacebookCompactProtocol
         return buf;
     }
 
-    private void checkReadLength(int length)
+    private void checkStringReadLength(int length)
             throws TProtocolException
     {
         if (length < 0) {
             throw new TProtocolException("Negative length: " + length);
         }
-        if (maxNetworkBytes != -1 && length > maxNetworkBytes) {
+        if (maxNetworkBytes != NO_LENGTH_LIMIT && length > maxNetworkBytes) {
             throw new TProtocolException("Length exceeded max allowed: " + length);
         }
     }
@@ -826,34 +813,19 @@ public class TFacebookCompactProtocol
     // encoding.
     //
     @Override
-    public void readMessageEnd()
-            throws TException
-    {
-    }
+    public void readMessageEnd() {}
 
     @Override
-    public void readFieldEnd()
-            throws TException
-    {
-    }
+    public void readFieldEnd() {}
 
     @Override
-    public void readMapEnd()
-            throws TException
-    {
-    }
+    public void readMapEnd() {}
 
     @Override
-    public void readListEnd()
-            throws TException
-    {
-    }
+    public void readListEnd() {}
 
     @Override
-    public void readSetEnd()
-            throws TException
-    {
-    }
+    public void readSetEnd() {}
 
     //
     // Internal reading methods
@@ -926,15 +898,14 @@ public class TFacebookCompactProtocol
      */
     private static long bytesToLong(byte[] bytes)
     {
-        return
-                ((bytes[0] & 0xffL) << 56) |
-                        ((bytes[1] & 0xffL) << 48) |
-                        ((bytes[2] & 0xffL) << 40) |
-                        ((bytes[3] & 0xffL) << 32) |
-                        ((bytes[4] & 0xffL) << 24) |
-                        ((bytes[5] & 0xffL) << 16) |
-                        ((bytes[6] & 0xffL) << 8) |
-                        (bytes[7] & 0xffL);
+        return ((bytes[0] & 0xffL) << 56) |
+                ((bytes[1] & 0xffL) << 48) |
+                ((bytes[2] & 0xffL) << 40) |
+                ((bytes[3] & 0xffL) << 32) |
+                ((bytes[4] & 0xffL) << 24) |
+                ((bytes[5] & 0xffL) << 16) |
+                ((bytes[6] & 0xffL) << 8) |
+                (bytes[7] & 0xffL);
     }
 
     //
@@ -990,6 +961,6 @@ public class TFacebookCompactProtocol
      */
     private static byte getCompactType(byte ttype)
     {
-        return ttypeToCompactType[ttype];
+        return TTYPE_TO_COMPACT_TYPE[ttype];
     }
 }
