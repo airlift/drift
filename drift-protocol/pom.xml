@@ -10,7 +10,7 @@
         <version>1.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>drift-core</artifactId>
+    <artifactId>drift-protocol</artifactId>
     <description>Core classes for Drift</description>
     <packaging>jar</packaging>
 

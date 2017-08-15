@@ -27,7 +27,7 @@
 
     <modules>
         <module>drift-api</module>
-        <module>drift-core</module>
+        <module>drift-protocol</module>
         <module>drift-codec</module>
         <module>drift-client</module>
         <module>drift-integration-tests</module>
@@ -65,12 +65,6 @@
 
             <dependency>
                 <groupId>io.airlift.drift</groupId>
-                <artifactId>drift-core</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>io.airlift.drift</groupId>
                 <artifactId>drift-codec</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -78,6 +72,12 @@
             <dependency>
                 <groupId>io.airlift.drift</groupId>
                 <artifactId>drift-client</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.airlift.drift</groupId>
+                <artifactId>drift-protocol</artifactId>
                 <version>${project.version}</version>
             </dependency>
 

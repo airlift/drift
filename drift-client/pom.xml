@@ -33,7 +33,7 @@
 
         <dependency>
             <groupId>io.airlift.drift</groupId>
-            <artifactId>drift-core</artifactId>
+            <artifactId>drift-protocol</artifactId>
         </dependency>
 
         <dependency>
