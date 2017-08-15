@@ -38,7 +38,6 @@
                 <groupId>com.mycila</groupId>
                 <artifactId>license-maven-plugin</artifactId>
                 <configuration>
-                    <header>${project.basedir}/src/license/LICENSE-HEADER.txt</header>
                     <excludes combine.children="append">
                         <exclude>src/main/java/io/airlift/drift/protocol/TBinaryProtocol.java</exclude>
                         <exclude>src/main/java/io/airlift/drift/protocol/TCompactProtocol.java</exclude>
