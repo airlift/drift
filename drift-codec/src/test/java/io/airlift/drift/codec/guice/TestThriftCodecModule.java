@@ -26,9 +26,9 @@ import io.airlift.drift.codec.BonkConstructor;
 import io.airlift.drift.codec.ThriftCodec;
 import io.airlift.drift.codec.metadata.ThriftType;
 import io.airlift.drift.protocol.TCompactProtocol;
+import io.airlift.drift.protocol.TMemoryBuffer;
 import io.airlift.drift.protocol.TProtocolReader;
 import io.airlift.drift.protocol.TProtocolWriter;
-import io.airlift.drift.transport.TMemoryBuffer;
 import org.testng.annotations.Test;
 
 import java.util.List;

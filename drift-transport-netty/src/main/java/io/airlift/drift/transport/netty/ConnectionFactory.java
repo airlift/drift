@@ -16,7 +16,7 @@
 package io.airlift.drift.transport.netty;
 
 import com.google.common.net.HostAndPort;
-import io.airlift.drift.transport.TTransportException;
+import io.airlift.drift.protocol.TTransportException;
 import io.airlift.units.Duration;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;

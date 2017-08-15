@@ -19,7 +19,6 @@
 package io.airlift.drift.protocol;
 
 import io.airlift.drift.TException;
-import io.airlift.drift.transport.TTransport;
 
 import java.nio.ByteBuffer;
 

@@ -26,9 +26,9 @@ import io.airlift.drift.codec.metadata.ThriftEnumMetadataBuilder;
 import io.airlift.drift.codec.metadata.ThriftType;
 import io.airlift.drift.protocol.TBinaryProtocol;
 import io.airlift.drift.protocol.TCompactProtocol;
+import io.airlift.drift.protocol.TMemoryBuffer;
 import io.airlift.drift.protocol.TProtocol;
 import io.airlift.drift.protocol.TProtocolFactory;
-import io.airlift.drift.transport.TMemoryBuffer;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 

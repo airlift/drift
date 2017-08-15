@@ -33,10 +33,10 @@ import io.airlift.drift.client.stats.MethodInvocationStatsFactory;
 import io.airlift.drift.codec.ThriftCodecManager;
 import io.airlift.drift.codec.guice.ThriftCodecModule;
 import io.airlift.drift.protocol.TProtocolException;
+import io.airlift.drift.protocol.TTransportException;
 import io.airlift.drift.transport.DriftClientConfig;
 import io.airlift.drift.transport.InvokeRequest;
 import io.airlift.drift.transport.MethodInvokerFactory;
-import io.airlift.drift.transport.TTransportException;
 import org.testng.annotations.Test;
 
 import javax.inject.Qualifier;

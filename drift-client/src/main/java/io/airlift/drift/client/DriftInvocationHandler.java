@@ -23,8 +23,8 @@ import com.google.common.util.concurrent.SettableFuture;
 import io.airlift.drift.TApplicationException;
 import io.airlift.drift.TException;
 import io.airlift.drift.protocol.TProtocolException;
+import io.airlift.drift.protocol.TTransportException;
 import io.airlift.drift.transport.DriftApplicationException;
-import io.airlift.drift.transport.TTransportException;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;

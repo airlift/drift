@@ -13,19 +13,27 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
-package io.airlift.drift.transport;
+package io.airlift.drift.protocol;
 
-public interface TTransport
+import io.airlift.drift.TException;
+
+public class TTransportException
+        extends TException
 {
-    void read(byte[] buf, int off, int len)
-            throws TTransportException;
+    public TTransportException() {}
 
-    void write(byte[] buf, int off, int len)
-            throws TTransportException;
-
-    default void write(byte[] buf)
-            throws TTransportException
+    public TTransportException(String message)
     {
-        write(buf, 0, buf.length);
+        super(message);
+    }
+
+    public TTransportException(String message, Throwable cause)
+    {
+        super(message, cause);
+    }
+
+    public TTransportException(Throwable cause)
+    {
+        super(cause);
     }
 }

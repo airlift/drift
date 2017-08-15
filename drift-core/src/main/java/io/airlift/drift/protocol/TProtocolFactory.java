@@ -15,8 +15,6 @@
  */
 package io.airlift.drift.protocol;
 
-import io.airlift.drift.transport.TTransport;
-
 @FunctionalInterface
 public interface TProtocolFactory
 {

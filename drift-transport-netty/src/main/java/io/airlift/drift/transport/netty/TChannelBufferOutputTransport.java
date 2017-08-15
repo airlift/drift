@@ -15,7 +15,7 @@
  */
 package io.airlift.drift.transport.netty;
 
-import io.airlift.drift.transport.TTransport;
+import io.airlift.drift.protocol.TTransport;
 import io.netty.buffer.ByteBuf;
 
 import javax.annotation.concurrent.NotThreadSafe;

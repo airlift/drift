@@ -17,8 +17,8 @@ package io.airlift.drift.transport.netty;
 
 import io.airlift.drift.protocol.TMessage;
 import io.airlift.drift.protocol.TProtocolFactory;
+import io.airlift.drift.protocol.TTransport;
 import io.airlift.drift.transport.MethodMetadata;
-import io.airlift.drift.transport.TTransport;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 
