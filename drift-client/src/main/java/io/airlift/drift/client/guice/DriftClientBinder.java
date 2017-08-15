@@ -50,9 +50,9 @@ import java.util.Set;
 
 import static com.google.inject.multibindings.OptionalBinder.newOptionalBinder;
 import static io.airlift.configuration.ConfigBinder.configBinder;
-import static io.airlift.drift.client.ThriftServiceMetadata.getThriftServiceAnnotation;
 import static io.airlift.drift.client.guice.DriftClientAnnotationFactory.extractDriftClientBindingAnnotation;
 import static io.airlift.drift.client.guice.DriftClientAnnotationFactory.getDriftClientAnnotation;
+import static io.airlift.drift.codec.metadata.ThriftServiceMetadata.getThriftServiceAnnotation;
 import static java.util.Objects.requireNonNull;
 
 public class DriftClientBinder

@@ -1,8 +1,6 @@
 package its;
 
 import io.airlift.drift.annotations.ThriftField;
-import io.airlift.drift.annotations.ThriftMethod;
-import io.airlift.drift.annotations.ThriftService;
 import io.airlift.drift.annotations.ThriftStruct;
 
 /**

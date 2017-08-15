@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
-package io.airlift.drift.client;
+package io.airlift.drift.codec.metadata;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
@@ -22,7 +22,6 @@ import com.google.common.collect.Ordering;
 import com.google.common.collect.TreeMultimap;
 import io.airlift.drift.annotations.ThriftMethod;
 import io.airlift.drift.annotations.ThriftService;
-import io.airlift.drift.codec.metadata.ThriftCatalog;
 
 import javax.annotation.concurrent.Immutable;
 
@@ -41,7 +40,7 @@ public class ThriftServiceMetadata
     private final String name;
     private final Map<String, ThriftMethodMetadata> methods;
 
-    ThriftServiceMetadata(Class<?> serviceClass, ThriftCatalog catalog)
+    public ThriftServiceMetadata(Class<?> serviceClass, ThriftCatalog catalog)
     {
         requireNonNull(serviceClass, "serviceClass is null");
         ThriftService thriftService = getThriftServiceAnnotation(serviceClass);

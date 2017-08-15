@@ -15,7 +15,7 @@
  */
 package io.airlift.drift.client.stats;
 
-import io.airlift.drift.client.ThriftServiceMetadata;
+import io.airlift.drift.codec.metadata.ThriftServiceMetadata;
 import io.airlift.drift.transport.MethodMetadata;
 
 import java.util.Optional;

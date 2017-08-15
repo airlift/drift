@@ -23,6 +23,8 @@ import io.airlift.drift.client.stats.NullMethodInvocationStat;
 import io.airlift.drift.client.stats.NullMethodInvocationStatsFactory;
 import io.airlift.drift.codec.ThriftCodec;
 import io.airlift.drift.codec.ThriftCodecManager;
+import io.airlift.drift.codec.metadata.ThriftMethodMetadata;
+import io.airlift.drift.codec.metadata.ThriftServiceMetadata;
 import io.airlift.drift.codec.metadata.ThriftType;
 import io.airlift.drift.transport.AddressSelector;
 import io.airlift.drift.transport.DriftClientConfig;

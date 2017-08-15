@@ -13,16 +13,13 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
-package io.airlift.drift.client;
+package io.airlift.drift.codec.metadata;
 
 import io.airlift.drift.TException;
 import io.airlift.drift.annotations.ThriftException;
 import io.airlift.drift.annotations.ThriftField;
 import io.airlift.drift.annotations.ThriftMethod;
 import io.airlift.drift.annotations.ThriftStruct;
-import io.airlift.drift.codec.metadata.ThriftCatalog;
-import io.airlift.drift.codec.metadata.ThriftFieldMetadata;
-import io.airlift.drift.codec.metadata.ThriftType;
 import org.testng.annotations.Test;
 
 import java.lang.reflect.Method;

@@ -16,6 +16,7 @@
 package io.airlift.drift.client;
 
 import io.airlift.drift.client.stats.MethodInvocationStatsFactory;
+import io.airlift.drift.codec.metadata.ThriftServiceMetadata;
 import io.airlift.drift.transport.MethodMetadata;
 
 import java.util.Objects;
