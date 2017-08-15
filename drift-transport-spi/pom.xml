@@ -23,12 +23,12 @@
     <dependencies>
         <dependency>
             <groupId>io.airlift.drift</groupId>
-            <artifactId>drift-codec</artifactId>
+            <artifactId>drift-api</artifactId>
         </dependency>
 
         <dependency>
             <groupId>io.airlift.drift</groupId>
-            <artifactId>drift-core</artifactId>
+            <artifactId>drift-codec</artifactId>
         </dependency>
 
         <dependency>

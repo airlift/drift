@@ -23,6 +23,11 @@
     <dependencies>
         <dependency>
             <groupId>io.airlift.drift</groupId>
+            <artifactId>drift-api</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>io.airlift.drift</groupId>
             <artifactId>drift-core</artifactId>
         </dependency>
 
@@ -80,12 +85,6 @@
         </dependency>
 
         <!-- for testing -->
-        <dependency>
-            <groupId>io.airlift.drift</groupId>
-            <artifactId>drift-api</artifactId>
-            <scope>test</scope>
-        </dependency>
-
         <dependency>
             <groupId>io.airlift</groupId>
             <artifactId>bootstrap</artifactId>
