@@ -1,0 +1,15 @@
+include "common/response.thrift"
+
+/**
+ * Simple logging service.
+ *
+ * Use this for logging.
+ */
+service SimpleLogger {
+  /**
+   * Log a message
+   *
+   * @param message the string to log
+   */
+  response.Response log(1: string message);
+}

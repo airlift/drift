@@ -41,6 +41,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
@@ -82,8 +83,8 @@ public class ThriftIdlGenerator
 
     private Set<ThriftType> knownTypes = new HashSet<>(BUILT_IN_TYPES);
     private ThriftTypeRenderer typeRenderer = new ThriftTypeRenderer(ImmutableMap.of());
-    private List<ThriftType> thriftTypes = new ArrayList<>();
-    private List<ThriftServiceMetadata> thriftServices = new ArrayList<>();
+    private List<ThriftType> thriftTypes = new CopyOnWriteArrayList<>();
+    private List<ThriftServiceMetadata> thriftServices = new CopyOnWriteArrayList<>();
     private boolean recursive;
 
     public ThriftIdlGenerator(ThriftIdlGeneratorConfig config)
@@ -165,7 +166,7 @@ public class ThriftIdlGenerator
                 for (ThriftType type : thriftTypes) {
                     verifyStruct(type, true);
                 }
-                if (size != thriftTypes.size()) {
+                if (size == thriftTypes.size()) {
                     break;
                 }
             }
@@ -175,7 +176,7 @@ public class ThriftIdlGenerator
                 for (ThriftServiceMetadata service : thriftServices) {
                     verifyService(service, true);
                 }
-                if (size != thriftServices.size()) {
+                if (size == thriftServices.size()) {
                     break;
                 }
             }

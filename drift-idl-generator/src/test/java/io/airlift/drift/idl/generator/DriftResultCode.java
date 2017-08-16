@@ -16,10 +16,16 @@
 package io.airlift.drift.idl.generator;
 
 import io.airlift.drift.annotations.ThriftEnum;
+import io.airlift.drift.annotations.ThriftEnumValue;
 
 @ThriftEnum("Result")
 public enum DriftResultCode
 {
-    OK,
-    TRY_LATER
+    OK, TRY_LATER;
+
+    @ThriftEnumValue
+    public int value()
+    {
+        return ordinal();
+    }
 }

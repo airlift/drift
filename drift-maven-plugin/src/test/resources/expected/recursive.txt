@@ -1,0 +1,23 @@
+namespace java com.example.logger
+namespace py example.Logger
+
+struct Response {
+  /**
+   * Get response type
+   */
+  1: i32 type;
+}
+
+/**
+ * Simple logging service.
+ *
+ * Use this for logging.
+ */
+service SimpleLogger {
+  /**
+   * Log a message
+   *
+   * @param message the string to log
+   */
+  Response log(1: string message);
+}

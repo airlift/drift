@@ -1,5 +1,6 @@
 enum Result {
-  OK, TRY_LATER
+  OK = 0;
+  TRY_LATER = 1;
 }
 
 struct DriftLogEntry {
@@ -28,16 +29,16 @@ service Scribe {
    *
    * @param messages the list of messages to send
    */
-  Result log(1: list<DriftLogEntry> arg0)
+  Result log(1: list<DriftLogEntry> messages)
     throws (1: ScribeDataException ex1, 2: ScribeTransportException ex2);
 
   /**
    * Send a formatted message to Scribe.
    */
   Result logFormattedMessage(
-      1: string arg0,
-      2: map<string, DriftLogEntry> arg1,
-      3: i32 arg2)
+      1: string format,
+      2: map<string, DriftLogEntry> messages,
+      3: i32 maxSize)
     throws (
       1: ScribeDataException ex1,
       2: ScribeTransportException ex2,
