@@ -38,7 +38,7 @@ public class UnionConstructorDuplicateTypes
     }
 
     @ThriftField
-    public void setFirstIntValue(final int firstIntValue)
+    public void setFirstIntValue(int firstIntValue)
     {
         this.value = firstIntValue;
         this.id = 1;
@@ -46,7 +46,7 @@ public class UnionConstructorDuplicateTypes
     }
 
     @ThriftField
-    public void setSecondIntValue(final int secondIntValue)
+    public void setSecondIntValue(int secondIntValue)
     {
         this.value = secondIntValue;
         this.id = 2;

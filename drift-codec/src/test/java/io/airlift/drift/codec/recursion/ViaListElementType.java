@@ -24,7 +24,7 @@ import java.util.Objects;
 @ThriftStruct
 public class ViaListElementType
 {
-    @ThriftField(value = 1)
+    @ThriftField(1)
     public List<ViaListElementType> children;
 
     @ThriftField(2)

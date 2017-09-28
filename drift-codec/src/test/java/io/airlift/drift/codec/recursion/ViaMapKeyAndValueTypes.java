@@ -24,7 +24,7 @@ import java.util.Objects;
 @ThriftStruct
 public class ViaMapKeyAndValueTypes
 {
-    @ThriftField(value = 1)
+    @ThriftField(1)
     public Map<ViaMapKeyAndValueTypes, ViaMapKeyAndValueTypes> children;
 
     @ThriftField(2)

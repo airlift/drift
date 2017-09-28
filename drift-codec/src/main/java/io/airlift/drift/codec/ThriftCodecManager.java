@@ -107,13 +107,14 @@ public class ThriftCodecManager
     }
 
     @Inject
-    public ThriftCodecManager(final ThriftCodecFactory factory, final ThriftCatalog catalog, @InternalThriftCodec Set<ThriftCodec<?>> codecs)
+    public ThriftCodecManager(ThriftCodecFactory factory, ThriftCatalog catalog, @InternalThriftCodec Set<ThriftCodec<?>> codecs)
     {
         requireNonNull(factory, "factory is null");
         this.catalog = requireNonNull(catalog, "catalog is null");
 
         typeCodecs = CacheBuilder.newBuilder().build(new CacheLoader<ThriftType, ThriftCodec<?>>()
         {
+            @Override
             public ThriftCodec<?> load(ThriftType type)
                     throws Exception
             {
@@ -124,21 +125,16 @@ public class ThriftCodecManager
                     stack.get().push(type);
 
                     switch (type.getProtocolType()) {
-                        case STRUCT: {
+                        case STRUCT:
                             return factory.generateThriftTypeCodec(ThriftCodecManager.this, type.getStructMetadata());
-                        }
-                        case MAP: {
+                        case MAP:
                             return new MapThriftCodec<>(type, getElementCodec(type.getKeyTypeReference()), getElementCodec(type.getValueTypeReference()));
-                        }
-                        case SET: {
+                        case SET:
                             return new SetThriftCodec<>(type, getElementCodec(type.getValueTypeReference()));
-                        }
-                        case LIST: {
+                        case LIST:
                             return new ListThriftCodec<>(type, getElementCodec(type.getValueTypeReference()));
-                        }
-                        case ENUM: {
+                        case ENUM:
                             return new EnumThriftCodec<>(type);
-                        }
                         default:
                             if (type.isCoerced()) {
                                 ThriftCodec<?> codec = getCodec(type.getUncoercedType());

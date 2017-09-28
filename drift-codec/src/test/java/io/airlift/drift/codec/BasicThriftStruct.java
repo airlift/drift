@@ -28,10 +28,10 @@ public final class BasicThriftStruct
 {
     @ThriftConstructor
     public BasicThriftStruct(
-            @ThriftField(value = 1, name = "foo") final String foo,
-            @ThriftField(value = 2, name = "bar") final String bar,
-            @ThriftField(value = 3, name = "baz") final String baz,
-            @ThriftField(value = 4, name = "qux") final Long qux)
+            @ThriftField(value = 1, name = "foo") String foo,
+            @ThriftField(value = 2, name = "bar") String bar,
+            @ThriftField(value = 3, name = "baz") String baz,
+            @ThriftField(value = 4, name = "qux") Long qux)
     {
         this.foo = foo;
         this.bar = bar;

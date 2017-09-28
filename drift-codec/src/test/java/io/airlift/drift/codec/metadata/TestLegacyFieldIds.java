@@ -96,11 +96,11 @@ public class TestLegacyFieldIds
     {
         private static final Set<Integer> IDS = ImmutableSet.of(-4, -3, -2, -1, 0, 1, 2);
 
-        @ThriftField(value = 0)
+        @ThriftField(0)
         public boolean notLegacyId0;
-        @ThriftField(value = 1)
+        @ThriftField(1)
         public boolean notLegacyId1;
-        @ThriftField(value = 2)
+        @ThriftField(2)
         public boolean notLegacyId2;
         @ThriftField(value = -1, isLegacyId = true)
         public boolean legacyIdOnField;
@@ -203,7 +203,7 @@ public class TestLegacyFieldIds
     @ThriftStruct
     public static final class LegacyIdIncorrectlyMissing
     {
-        @ThriftField(value = -4)
+        @ThriftField(-4)
         public boolean field;
     }
 
@@ -224,7 +224,7 @@ public class TestLegacyFieldIds
             return false;
         }
 
-        @ThriftField(value = -4)
+        @ThriftField(-4)
         public void setField(boolean value)
         {
         }
@@ -234,7 +234,7 @@ public class TestLegacyFieldIds
     @ThriftStruct
     public static final class LegacyIdInconsistent2
     {
-        @ThriftField(value = -4)
+        @ThriftField(-4)
         public boolean getField()
         {
             return false;
@@ -256,7 +256,7 @@ public class TestLegacyFieldIds
             return false;
         }
 
-        @ThriftField(value = 4)
+        @ThriftField(4)
         public void setField(boolean value)
         {
         }
@@ -266,7 +266,7 @@ public class TestLegacyFieldIds
     @ThriftStruct
     public static final class LegacyIdInconsistent4
     {
-        @ThriftField(value = 4)
+        @ThriftField(4)
         public boolean getField()
         {
             return false;
@@ -297,7 +297,7 @@ public class TestLegacyFieldIds
         };
 
         for (Field f : ReflectionHelper.findAnnotatedFields(SomeThriftFields.class, ThriftField.class)) {
-            final Optional<Boolean> expected;
+            Optional<Boolean> expected;
             if (f.getName().startsWith("expectTrue")) {
                 expected = Optional.of(true);
             }
@@ -322,11 +322,11 @@ public class TestLegacyFieldIds
 
     private static class SomeThriftFields
     {
-        @ThriftField(value = +1)
+        @ThriftField(+1)
         boolean expectFalse1;
-        @ThriftField(value = -1)
+        @ThriftField(-1)
         boolean expectFalse2;
-        @ThriftField()
+        @ThriftField
         boolean broken;  // see comments in impl.
 
         @ThriftField(value = +1, isLegacyId = true)

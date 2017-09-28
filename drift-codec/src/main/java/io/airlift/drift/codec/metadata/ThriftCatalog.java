@@ -177,7 +177,7 @@ public class ThriftCatalog
             Method toThriftMethod = entry.getValue();
             Method fromThriftMethod = fromThriftCoercions.get(type);
             // this should never happen due to the difference check above, but be careful
-            Preconditions.checkState(
+            checkState(
                     fromThriftMethod != null,
                     "Coercion class %s does not have matched @ToThrift and @FromThrift methods for type %s",
                     coercionsClass.getName(),

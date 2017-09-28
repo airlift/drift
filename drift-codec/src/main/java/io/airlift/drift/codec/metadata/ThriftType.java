@@ -15,7 +15,6 @@
  */
 package io.airlift.drift.codec.metadata;
 
-import com.google.common.base.Preconditions;
 import com.google.common.reflect.TypeParameter;
 import com.google.common.reflect.TypeToken;
 import io.airlift.drift.codec.ThriftProtocolType;
@@ -31,8 +30,6 @@ import java.util.Set;
 
 import static com.google.common.base.MoreObjects.toStringHelper;
 import static com.google.common.base.Preconditions.checkState;
-import static io.airlift.drift.codec.ThriftProtocolType.ENUM;
-import static io.airlift.drift.codec.ThriftProtocolType.STRUCT;
 import static java.util.Objects.requireNonNull;
 
 /**
@@ -189,7 +186,7 @@ public class ThriftType
     {
         requireNonNull(structMetadata, "structMetadata is null");
 
-        this.protocolType = STRUCT;
+        this.protocolType = ThriftProtocolType.STRUCT;
         this.javaType = structMetadata.getStructClass();
         keyTypeReference = null;
         valueTypeReference = null;
@@ -202,7 +199,7 @@ public class ThriftType
     {
         requireNonNull(enumMetadata, "enumMetadata is null");
 
-        this.protocolType = ENUM;
+        this.protocolType = ThriftProtocolType.ENUM;
         this.javaType = enumMetadata.getEnumClass();
         keyTypeReference = null;
         valueTypeReference = null;
@@ -268,7 +265,7 @@ public class ThriftType
             return this;
         }
 
-        Preconditions.checkState(
+        checkState(
                 protocolType != ThriftProtocolType.STRUCT &&
                         protocolType != ThriftProtocolType.SET &&
                         protocolType != ThriftProtocolType.LIST &&

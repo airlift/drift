@@ -98,7 +98,7 @@ public class ParameterizedType
 
     public String getGenericSignature()
     {
-        final StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder();
         sb.append('L').append(className);
         if (!parameters.isEmpty()) {
             sb.append("<");

@@ -31,7 +31,6 @@ import io.airlift.drift.codec.internal.compiler.byteCode.MethodDefinition;
 import io.airlift.drift.codec.internal.compiler.byteCode.NamedParameterDefinition;
 import io.airlift.drift.codec.internal.compiler.byteCode.ParameterizedType;
 import io.airlift.drift.codec.metadata.DefaultThriftTypeReference;
-import io.airlift.drift.codec.metadata.FieldKind;
 import io.airlift.drift.codec.metadata.ReflectionHelper;
 import io.airlift.drift.codec.metadata.ThriftConstructorInjection;
 import io.airlift.drift.codec.metadata.ThriftExtraction;
@@ -311,7 +310,7 @@ public class ThriftCodecByteCodeGenerator<T>
 
         // declare and init local variables here
         Map<Short, LocalVariableDefinition> structData = new TreeMap<>();
-        for (ThriftFieldMetadata field : metadata.getFields(FieldKind.THRIFT_FIELD)) {
+        for (ThriftFieldMetadata field : metadata.getFields(THRIFT_FIELD)) {
             LocalVariableDefinition variable = read.addInitializedLocalVariable(
                     toParameterizedType(field.getThriftType()),
                     "f_" + field.getName());

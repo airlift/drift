@@ -255,7 +255,7 @@ public class TestThriftStructMetadataBuilder
         }
     }
 
-    @Test(expectedExceptions = {MetadataErrorException.class})
+    @Test(expectedExceptions = MetadataErrorException.class)
     public void testGenericBuilderForNonGenericStruct()
     {
         Type structType = new TypeToken<NonGenericStruct>() {}.getType();

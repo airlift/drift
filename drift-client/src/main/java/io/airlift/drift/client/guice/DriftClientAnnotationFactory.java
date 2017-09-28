@@ -92,6 +92,7 @@ public final class DriftClientAnnotationFactory
             return DriftClientAnnotation.class;
         }
 
+        @Override
         public int hashCode()
         {
             // This is specified in java.lang.Annotation.
@@ -99,6 +100,7 @@ public final class DriftClientAnnotationFactory
                     (127 * "qualifier".hashCode()) ^ qualifier.hashCode();
         }
 
+        @Override
         public boolean equals(Object o)
         {
             if (!(o instanceof DriftClientAnnotation)) {

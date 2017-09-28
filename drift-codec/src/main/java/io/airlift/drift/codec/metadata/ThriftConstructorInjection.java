@@ -57,7 +57,7 @@ public class ThriftConstructorInjection
     @Override
     public String toString()
     {
-        final StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder();
         sb.append(constructor.getName());
         sb.append('(');
         Joiner.on(", ").appendTo(sb, parameters);

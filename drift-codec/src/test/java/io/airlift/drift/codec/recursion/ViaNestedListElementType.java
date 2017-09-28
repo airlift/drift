@@ -24,7 +24,7 @@ import java.util.Objects;
 @ThriftStruct
 public class ViaNestedListElementType
 {
-    @ThriftField(value = 1)
+    @ThriftField(1)
     public List<List<ViaNestedListElementType>> children;
 
     @ThriftField(2)

@@ -472,7 +472,7 @@ public abstract class AbstractThriftCodecManagerTest
         testRoundTripSerialize(recursiveObject);
     }
 
-    @Test(expectedExceptions = {IllegalArgumentException.class})
+    @Test(expectedExceptions = IllegalArgumentException.class)
     public void testRecursiveStructWithoutRecursiveAnnotation()
             throws Exception
     {

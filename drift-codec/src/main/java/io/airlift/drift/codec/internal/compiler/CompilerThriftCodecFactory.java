@@ -65,7 +65,7 @@ public class CompilerThriftCodecFactory
         return generator.getThriftCodec();
     }
 
-    private static DynamicClassLoader getPrivilegedClassLoader(final ClassLoader parent)
+    private static DynamicClassLoader getPrivilegedClassLoader(ClassLoader parent)
     {
         return AccessController.doPrivileged((PrivilegedAction<DynamicClassLoader>) () -> new DynamicClassLoader(parent));
     }

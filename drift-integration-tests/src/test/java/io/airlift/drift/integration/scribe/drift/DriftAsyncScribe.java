@@ -26,7 +26,7 @@ import java.util.List;
 public interface DriftAsyncScribe
         extends AutoCloseable
 {
-    @ThriftMethod(value = "Log")
+    @ThriftMethod("Log")
     ListenableFuture<DriftResultCode> log(List<DriftLogEntry> logEntries)
             throws TException;
 }

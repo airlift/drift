@@ -56,7 +56,7 @@ public final class DriftLogEntry
             return false;
         }
 
-        final DriftLogEntry logEntry = (DriftLogEntry) o;
+        DriftLogEntry logEntry = (DriftLogEntry) o;
 
         if (category != null ? !category.equals(logEntry.category) : logEntry.category != null) {
             return false;
@@ -79,7 +79,7 @@ public final class DriftLogEntry
     @Override
     public String toString()
     {
-        final StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder();
         sb.append("LogEntryStruct");
         sb.append("{category='").append(category).append('\'');
         sb.append(", message='").append(message).append('\'');

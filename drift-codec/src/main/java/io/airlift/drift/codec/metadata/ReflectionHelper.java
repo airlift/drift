@@ -309,7 +309,7 @@ public final class ReflectionHelper
         return TypeToken.of(structType).resolveType(genericType).getType();
     }
 
-    public static Type[] resolveFieldTypes(final Type structType, Type[] genericTypes)
+    public static Type[] resolveFieldTypes(Type structType, Type[] genericTypes)
     {
         return Arrays.stream(genericTypes)
                 .map(type -> resolveFieldType(structType, type))

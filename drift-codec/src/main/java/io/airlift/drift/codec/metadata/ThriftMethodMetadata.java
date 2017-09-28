@@ -15,7 +15,6 @@
  */
 package io.airlift.drift.codec.metadata;
 
-import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.reflect.TypeToken;
@@ -64,9 +63,9 @@ public class ThriftMethodMetadata
         this.method = method;
 
         ThriftMethod thriftMethod = method.getAnnotation(ThriftMethod.class);
-        Preconditions.checkArgument(thriftMethod != null, "Method is not annotated with @ThriftMethod");
+        checkArgument(thriftMethod != null, "Method is not annotated with @ThriftMethod");
 
-        Preconditions.checkArgument(!Modifier.isStatic(method.getModifiers()), "Method %s is static", method.toGenericString());
+        checkArgument(!Modifier.isStatic(method.getModifiers()), "Method %s is static", method.toGenericString());
 
         if (thriftMethod.value().isEmpty()) {
             name = method.getName();

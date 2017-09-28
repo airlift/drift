@@ -16,7 +16,6 @@
 package io.airlift.drift.codec.internal.compiler.byteCode;
 
 import com.google.common.base.Joiner;
-import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.Type;
@@ -170,7 +169,7 @@ public class MethodDefinition
     public LocalVariableDefinition getLocalVariable(String name)
     {
         LocalVariableDefinition localVariableDefinition = localVariables.get(name);
-        Preconditions.checkArgument(localVariableDefinition != null, "No local variable %s", name);
+        checkArgument(localVariableDefinition != null, "No local variable %s", name);
         return localVariableDefinition;
     }
 
