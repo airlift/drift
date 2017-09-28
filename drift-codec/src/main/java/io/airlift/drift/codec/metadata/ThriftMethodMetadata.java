@@ -189,7 +189,7 @@ public class ThriftMethodMetadata
         if (thriftMethod.exception().length > 0) {
             for (ThriftException thriftException : thriftMethod.exception()) {
                 exceptions.put(thriftException.id(), catalog.getThriftType(thriftException.type()));
-                checkArgument(exceptionTypes.add(thriftException.type()), "ThriftMethod exception list contains more than one value for %s", thriftException.type());
+                checkArgument(exceptionTypes.add(thriftException.type()), "ThriftMethod [%s] exception list contains more than one value for %s", methodName(method), thriftException.type());
             }
         }
 
@@ -205,7 +205,7 @@ public class ThriftMethodMetadata
                 if (!exceptionTypes.contains(exceptionClass)) {
                     // there is no ordering guarantee for exception types,
                     // so we can only infer the id if there is a single custom exception
-                    checkArgument(customExceptionCount <= 1, "ThriftMethod annotation must declare exception mapping when more than one custom exception is thrown");
+                    checkArgument(customExceptionCount <= 1, "ThriftMethod [%s] annotation must declare exception mapping when more than one custom exception is thrown", methodName(method));
                     exceptions.put((short) 1, catalog.getThriftType(exceptionClass));
                 }
             }
@@ -243,5 +243,10 @@ public class ThriftMethodMetadata
     public int hashCode()
     {
         return Objects.hash(name, returnType, parameters, method, exceptions, oneway);
+    }
+
+    private static String methodName(Method method)
+    {
+        return method.getDeclaringClass().getName() + "." + method.getName();
     }
 }

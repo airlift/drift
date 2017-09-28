@@ -115,7 +115,7 @@ public class TestThriftMethodMetadata
         assertExceptions("inferredExceptionWithRuntimeAndTException", ExceptionA.class);
     }
 
-    @Test(expectedExceptions = IllegalArgumentException.class, expectedExceptionsMessageRegExp = "ThriftMethod annotation must declare exception mapping when more than one custom exception is thrown")
+    @Test(expectedExceptions = IllegalArgumentException.class, expectedExceptionsMessageRegExp = "ThriftMethod \\[.*\\.invalidInferredException] annotation must declare exception mapping when more than one custom exception is thrown")
     public void testInvalidInferredException()
             throws Exception
     {
