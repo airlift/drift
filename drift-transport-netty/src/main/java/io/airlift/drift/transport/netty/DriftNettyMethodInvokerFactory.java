@@ -115,7 +115,7 @@ public class DriftNettyMethodInvokerFactory<I>
             try {
                 SslContextBuilder sslContextBuilder = SslContextBuilder.forClient()
                         .trustManager(clientConfig.getTrustCertificate())
-                        .keyManager(clientConfig.getKey(), null, clientConfig.getKeyPassword())
+                        .keyManager(clientConfig.getKey(), clientConfig.getKey(), clientConfig.getKeyPassword())
                         .sessionCacheSize(clientConfig.getSessionCacheSize())
                         .sessionTimeout(clientConfig.getSessionTimeout().roundTo(SECONDS));
                 if (!clientConfig.getCiphers().isEmpty()) {
