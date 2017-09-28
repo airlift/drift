@@ -36,13 +36,11 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
-import java.security.Security;
 import java.util.Optional;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
-import static com.google.common.base.MoreObjects.firstNonNull;
 import static com.google.common.util.concurrent.MoreExecutors.listeningDecorator;
 import static com.google.common.util.concurrent.MoreExecutors.shutdownAndAwaitTermination;
 import static io.airlift.concurrent.Threads.daemonThreadsNamed;
@@ -143,8 +141,7 @@ public class ApacheThriftMethodInvokerFactory<I>
             if (config.getKey() != null) {
                 Optional<String> keyPassword = Optional.ofNullable(config.getKeyPassword());
                 KeyStore keyStore = loadKeyStore(config.getTrustCertificate(), config.getKey(), keyPassword);
-                String algorithm = firstNonNull(Security.getProperty("ssl.KeyManagerFactory.algorithm"), "SunX509");
-                KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance(algorithm);
+                KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
                 keyManagerFactory.init(keyStore, new char[0]);
                 keyManagers = keyManagerFactory.getKeyManagers();
             }

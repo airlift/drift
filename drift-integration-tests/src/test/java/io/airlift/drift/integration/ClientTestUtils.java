@@ -50,7 +50,6 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 import java.net.URL;
 import java.security.GeneralSecurityException;
-import java.security.Security;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -171,11 +170,7 @@ final class ClientTestUtils
         TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
         trustManagerFactory.init(loadTrustStore(getCertificateChainFile()));
 
-        String algorithm = Security.getProperty("ssl.KeyManagerFactory.algorithm");
-        if (algorithm == null) {
-            algorithm = "SunX509";
-        }
-        KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance(algorithm);
+        KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
         keyManagerFactory.init(PemReader.loadKeyStore(getCertificateChainFile(), getPrivateKeyFile(), Optional.empty()), new char[0]);
 
         SSLContext sslContext = SSLContext.getInstance("TLS");
