@@ -16,9 +16,9 @@
 package io.airlift.drift.integration.scribe.drift;
 
 import com.google.common.util.concurrent.ListenableFuture;
+import io.airlift.drift.TException;
 import io.airlift.drift.annotations.ThriftMethod;
 import io.airlift.drift.annotations.ThriftService;
-import org.apache.thrift.TException;
 
 import java.util.List;
 

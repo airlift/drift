@@ -15,9 +15,9 @@
  */
 package io.airlift.drift.integration.scribe.drift;
 
+import io.airlift.drift.TException;
 import io.airlift.drift.annotations.ThriftMethod;
 import io.airlift.drift.annotations.ThriftService;
-import org.apache.thrift.TException;
 
 import java.io.Closeable;
 import java.util.List;
