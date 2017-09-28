@@ -199,15 +199,15 @@ public class ThriftMethodMetadata
                 continue;
             }
 
-            if (exceptionClass.isAnnotationPresent(ThriftStruct.class)) {
-                customExceptionCount++;
+            checkArgument(exceptionClass.isAnnotationPresent(ThriftStruct.class), "ThriftMethod [%s] exception [%s] is not annotated with @ThriftStruct", methodName(method), exceptionClass.getSimpleName());
 
-                if (!exceptionTypes.contains(exceptionClass)) {
-                    // there is no ordering guarantee for exception types,
-                    // so we can only infer the id if there is a single custom exception
-                    checkArgument(customExceptionCount <= 1, "ThriftMethod [%s] annotation must declare exception mapping when more than one custom exception is thrown", methodName(method));
-                    exceptions.put((short) 1, catalog.getThriftType(exceptionClass));
-                }
+            customExceptionCount++;
+
+            if (!exceptionTypes.contains(exceptionClass)) {
+                // there is no ordering guarantee for exception types,
+                // so we can only infer the id if there is a single custom exception
+                checkArgument(customExceptionCount <= 1, "ThriftMethod [%s] annotation must declare exception mapping when more than one custom exception is thrown", methodName(method));
+                exceptions.put((short) 1, catalog.getThriftType(exceptionClass));
             }
         }
 
