@@ -25,9 +25,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.ThreadLocalRandom;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static java.util.Collections.shuffle;
 
 public class SimpleAddressSelector
         implements AddressSelector
@@ -48,7 +48,7 @@ public class SimpleAddressSelector
     }
 
     @Override
-    public List<HostAndPort> getAddresses(Optional<String> addressSelectionContext)
+    public Optional<HostAndPort> selectAddress(Optional<String> addressSelectionContext)
     {
         checkArgument(!addressSelectionContext.isPresent(), "addressSelectionContext should not be set");
         List<HostAndPort> result = new ArrayList<>();
@@ -61,8 +61,10 @@ public class SimpleAddressSelector
             catch (UnknownHostException ignored) {
             }
         }
-        shuffle(result);
-        return result;
+        if (result.isEmpty()) {
+            return Optional.empty();
+        }
+        return Optional.of(result.get(ThreadLocalRandom.current().nextInt(result.size())));
     }
 
     @Override

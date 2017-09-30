@@ -16,7 +16,6 @@
 package io.airlift.drift.transport.apache;
 
 import com.google.common.util.concurrent.ListeningExecutorService;
-import io.airlift.drift.transport.AddressSelector;
 import io.airlift.drift.transport.MethodInvoker;
 import io.airlift.drift.transport.MethodInvokerFactory;
 import org.apache.thrift.protocol.TBinaryProtocol;
@@ -86,7 +85,7 @@ public class ApacheThriftMethodInvokerFactory<I>
     }
 
     @Override
-    public MethodInvoker createMethodInvoker(AddressSelector addressSelector, I clientIdentity)
+    public MethodInvoker createMethodInvoker(I clientIdentity)
     {
         ApacheThriftClientConfig config = clientConfigurationProvider.apply(clientIdentity);
 
@@ -123,7 +122,6 @@ public class ApacheThriftMethodInvokerFactory<I>
                 executorService,
                 transportFactory,
                 protocolFactory,
-                addressSelector,
                 config.getConnectTimeout(),
                 config.getRequestTimeout(),
                 Optional.ofNullable(config.getSocksProxy()),

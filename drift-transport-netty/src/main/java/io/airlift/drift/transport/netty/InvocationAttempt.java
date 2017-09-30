@@ -15,64 +15,50 @@
  */
 package io.airlift.drift.transport.netty;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.net.HostAndPort;
 import com.google.common.util.concurrent.AbstractFuture;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
-import io.airlift.drift.TApplicationException;
 import io.airlift.drift.TException;
-import io.airlift.drift.protocol.TTransportException;
-import io.airlift.drift.transport.ResultClassification;
+import io.airlift.drift.transport.ConnectionFailedException;
 import io.netty.channel.Channel;
 import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.GenericFutureListener;
 
 import javax.annotation.Nullable;
 
-import java.util.Iterator;
-import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Consumer;
-
-import static io.airlift.drift.TApplicationException.Type.INTERNAL_ERROR;
-import static java.lang.Boolean.FALSE;
-import static java.lang.Boolean.TRUE;
 
 class InvocationAttempt
 {
-    private final Iterator<HostAndPort> addresses;
+    private final HostAndPort address;
     private final ConnectionManager connectionManager;
     private final InvocationFunction<Channel> invocationFunction;
-    private final Consumer<HostAndPort> onConnectionFailed;
 
     private final InvocationResponseFuture future = new InvocationResponseFuture();
 
     private final AtomicBoolean started = new AtomicBoolean();
-    private final AtomicReference<Throwable> lastException = new AtomicReference<>();
 
     // current outstanding task for debugging
     private final AtomicReference<java.util.concurrent.Future<?>> currentTask = new AtomicReference<>();
 
     InvocationAttempt(
-            List<HostAndPort> addresses,
+            HostAndPort address,
             ConnectionManager connectionManager,
-            InvocationFunction<Channel> invocationFunction,
-            Consumer<HostAndPort> onConnectionFailed)
+            InvocationFunction<Channel> invocationFunction)
     {
-        this.addresses = ImmutableList.copyOf(addresses).iterator();
+        this.address = address;
         this.connectionManager = connectionManager;
         this.invocationFunction = invocationFunction;
-        this.onConnectionFailed = onConnectionFailed;
     }
 
     ListenableFuture<Object> getFuture()
     {
         if (started.compareAndSet(false, true)) {
             try {
-                tryNextAddress();
+                tryConnect();
             }
             catch (Throwable throwable) {
                 future.fatalError(throwable);
@@ -82,25 +68,13 @@ class InvocationAttempt
         return future;
     }
 
-    private void tryNextAddress()
+    private void tryConnect()
     {
         // request was already canceled
         if (future.isCancelled()) {
             return;
         }
 
-        if (!addresses.hasNext()) {
-            Throwable cause = lastException.get();
-            if (cause != null) {
-                future.fatalError(cause);
-            }
-            else {
-                future.fatalError(new TTransportException("No hosts available"));
-            }
-            return;
-        }
-
-        HostAndPort address = addresses.next();
         Future<Channel> channelFuture = connectionManager.getConnection(address);
         currentTask.set(channelFuture);
         channelFuture.addListener(new SafeFutureCallback<Channel>()
@@ -108,22 +82,18 @@ class InvocationAttempt
             @Override
             public void safeOnSuccess(Channel channel)
             {
-                tryInvocation(channel, address);
+                tryInvocation(channel);
             }
 
             @Override
             public void safeOnFailure(Throwable t)
             {
-                lastException.set(t);
-
-                onConnectionFailed.accept(address);
-
-                tryNextAddress();
+                future.fatalError(new ConnectionFailedException(address, t));
             }
         });
     }
 
-    private void tryInvocation(Channel channel, HostAndPort address)
+    private void tryInvocation(Channel channel)
     {
         try {
             ListenableFuture<Object> invocationFuture = invocationFunction.invokeOn(channel);
@@ -133,38 +103,15 @@ class InvocationAttempt
                 @Override
                 public void safeOnSuccess(Object result)
                 {
-                    ResultClassification classification = invocationFunction.classifyResult(result);
-                    if (classification.isHostDown()) {
-                        onConnectionFailed.accept(address);
-                    }
                     connectionManager.returnConnection(channel);
-
-                    if (classification.isRetry().orElse(FALSE)) {
-                        // todo message???
-                        lastException.set(new TApplicationException(INTERNAL_ERROR, "Retry of successful result was requested"));
-                        tryNextAddress();
-                    }
-                    else {
-                        future.success(result);
-                    }
+                    future.success(result);
                 }
 
                 @Override
                 public void safeOnFailure(Throwable t)
                 {
-                    ResultClassification classification = invocationFunction.classifyException(t);
-                    if (classification.isHostDown()) {
-                        onConnectionFailed.accept(address);
-                    }
                     connectionManager.returnConnection(channel);
-
-                    if (classification.isRetry().orElse(TRUE)) {
-                        lastException.set(t);
-                        tryNextAddress();
-                    }
-                    else {
-                        future.fatalError(t);
-                    }
+                    future.fatalError(t);
                 }
             });
         }

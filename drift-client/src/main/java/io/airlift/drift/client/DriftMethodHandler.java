@@ -15,6 +15,7 @@
  */
 package io.airlift.drift.client;
 
+import com.google.common.net.HostAndPort;
 import com.google.common.util.concurrent.ListenableFuture;
 import io.airlift.drift.client.stats.MethodInvocationStat;
 import io.airlift.drift.transport.InvokeRequest;
@@ -23,7 +24,6 @@ import io.airlift.drift.transport.MethodMetadata;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import static java.util.Objects.requireNonNull;
 
@@ -47,10 +47,10 @@ class DriftMethodHandler
         return async;
     }
 
-    public ListenableFuture<Object> invoke(Optional<String> addressSelectionContext, Map<String, String> headers, List<Object> parameters)
+    public ListenableFuture<Object> invoke(HostAndPort address, Map<String, String> headers, List<Object> parameters)
     {
         long startTime = System.nanoTime();
-        ListenableFuture<Object> result = invoker.invoke(new InvokeRequest(metadata, addressSelectionContext, headers, parameters));
+        ListenableFuture<Object> result = invoker.invoke(new InvokeRequest(metadata, address, headers, parameters));
         stat.recordResult(startTime, result);
         return result;
     }

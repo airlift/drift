@@ -27,7 +27,7 @@ import io.airlift.drift.codec.internal.ProtocolWriter;
 import io.airlift.drift.codec.metadata.ThriftType;
 import io.airlift.drift.protocol.TProtocolException;
 import io.airlift.drift.protocol.TTransportException;
-import io.airlift.drift.transport.AddressSelector;
+import io.airlift.drift.transport.ConnectionFailedException;
 import io.airlift.drift.transport.DriftApplicationException;
 import io.airlift.drift.transport.InvokeRequest;
 import io.airlift.drift.transport.MethodInvoker;
@@ -78,7 +78,6 @@ public class ApacheThriftMethodInvoker
     private static final int SEQUENCE_ID = 77;
 
     private final ListeningExecutorService executorService;
-    private final AddressSelector addressSelector;
     private final TTransportFactory transportFactory;
     private final TProtocolFactory protocolFactory;
 
@@ -91,14 +90,12 @@ public class ApacheThriftMethodInvoker
             ListeningExecutorService executorService,
             TTransportFactory transportFactory,
             TProtocolFactory protocolFactory,
-            AddressSelector addressSelector,
             Duration connectTimeout,
             Duration requestTimeout,
             Optional<HostAndPort> socksProxy,
             Optional<SSLContext> sslContext)
     {
         this.executorService = requireNonNull(executorService, "executorService is null");
-        this.addressSelector = requireNonNull(addressSelector, "addressSelector is null");
         this.transportFactory = requireNonNull(transportFactory, "transportFactory is null");
         this.protocolFactory = requireNonNull(protocolFactory, "protocolFactory is null");
         this.connectTimeoutMillis = Ints.saturatedCast(requireNonNull(connectTimeout, "connectTimeout is null").toMillis());
@@ -111,59 +108,39 @@ public class ApacheThriftMethodInvoker
     public ListenableFuture<Object> invoke(InvokeRequest request)
     {
         try {
-            return executorService.submit(() -> invokeSynchronous(request, new ResultHandler() {}));
+            return executorService.submit(() -> invokeSynchronous(request));
         }
         catch (Exception e) {
             return immediateFailedFuture(toDriftException(e));
         }
     }
 
-    private Object invokeSynchronous(InvokeRequest request, ResultHandler resultHandler)
+    private Object invokeSynchronous(InvokeRequest request)
             throws Exception
     {
-        List<HostAndPort> addresses = addressSelector.getAddresses(request.getAddressSelectionContext());
-        if (addresses.isEmpty()) {
-            throw new TTransportException("No hosts available");
-        }
+        HostAndPort address = request.getAddress();
 
-        Exception lastException = null;
-        for (HostAndPort address : addresses) {
-            TSocket socket = createTSocket(address);
-            if (!socket.isOpen()) {
-                try {
-                    socket.open();
-                }
-                catch (org.apache.thrift.transport.TTransportException e) {
-                    addressSelector.markdown(address);
-                    continue;
-                }
-            }
-
+        TSocket socket = createTSocket(address);
+        if (!socket.isOpen()) {
             try {
-                TTransport transport = transportFactory.getTransport(socket);
-                TProtocol protocol = protocolFactory.getProtocol(transport);
-
-                writeRequest(request.getMethod(), request.getParameters(), protocol);
-
-                return readResponse(request.getMethod(), protocol);
+                socket.open();
             }
-            catch (Exception e) {
-                if (resultHandler.isHostDownException(e)) {
-                    addressSelector.markdown(address);
-                }
-                if (!resultHandler.isRetryable(e)) {
-                    throw e;
-                }
-                lastException = e;
-            }
-            finally {
-                socket.close();
+            catch (org.apache.thrift.transport.TTransportException e) {
+                throw new ConnectionFailedException(address, e);
             }
         }
-        if (lastException == null) {
-            throw new TTransportException("Unable to connect to any hosts");
+
+        try {
+            TTransport transport = transportFactory.getTransport(socket);
+            TProtocol protocol = protocolFactory.getProtocol(transport);
+
+            writeRequest(request.getMethod(), request.getParameters(), protocol);
+
+            return readResponse(request.getMethod(), protocol);
         }
-        throw lastException;
+        finally {
+            socket.close();
+        }
     }
 
     private TSocket createTSocket(HostAndPort address)

@@ -93,7 +93,7 @@ final class ClientTestUtils
             return 0;
         }
 
-        AddressSelector addressSelector = context -> ImmutableList.of(address);
+        AddressSelector addressSelector = context -> Optional.of(address);
 
         Bootstrap app = new Bootstrap(
                 new MBeanModule(),

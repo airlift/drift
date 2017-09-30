@@ -20,7 +20,6 @@ import io.airlift.drift.protocol.TBinaryProtocol;
 import io.airlift.drift.protocol.TCompactProtocol;
 import io.airlift.drift.protocol.TFacebookCompactProtocol;
 import io.airlift.drift.protocol.TProtocolFactory;
-import io.airlift.drift.transport.AddressSelector;
 import io.airlift.drift.transport.MethodInvoker;
 import io.airlift.drift.transport.MethodInvokerFactory;
 import io.airlift.drift.transport.netty.DriftNettyClientConfig.Transport;
@@ -69,7 +68,7 @@ public class DriftNettyMethodInvokerFactory<I>
     }
 
     @Override
-    public MethodInvoker createMethodInvoker(AddressSelector addressSelector, I clientIdentity)
+    public MethodInvoker createMethodInvoker(I clientIdentity)
     {
         DriftNettyClientConfig clientConfig = clientConfigurationProvider.apply(clientIdentity);
 
@@ -140,7 +139,7 @@ public class DriftNettyMethodInvokerFactory<I>
         if (clientConfig.isPoolEnabled()) {
             connectionManager = new ConnectionPool(connectionManager, group, clientConfig);
         }
-        return new DriftNettyMethodInvoker(connectionManager, addressSelector);
+        return new DriftNettyMethodInvoker(connectionManager);
     }
 
     @PreDestroy

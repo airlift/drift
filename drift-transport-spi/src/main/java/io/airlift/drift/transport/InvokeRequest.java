@@ -15,9 +15,10 @@
  */
 package io.airlift.drift.transport;
 
+import com.google.common.net.HostAndPort;
+
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import static com.google.common.base.MoreObjects.toStringHelper;
 import static java.util.Objects.requireNonNull;
@@ -25,16 +26,19 @@ import static java.util.Objects.requireNonNull;
 public final class InvokeRequest
 {
     private final MethodMetadata method;
-    private final Optional<String> addressSelectionContext;
+    private final HostAndPort address;
     private final Map<String, String> headers;
     private final List<Object> parameters;
 
-    public InvokeRequest(MethodMetadata method, Optional<String> addressSelectionContext, Map<String, String> headers, List<Object> parameters)
+    public InvokeRequest(MethodMetadata method,
+            HostAndPort address,
+            Map<String, String> headers,
+            List<Object> parameters)
     {
         this.method = requireNonNull(method, "method is null");
-        this.addressSelectionContext = requireNonNull(addressSelectionContext, "addressSelectionContext is null");
         this.headers = requireNonNull(headers, "headers is null");
         this.parameters = requireNonNull(parameters, "parameters is null");
+        this.address = requireNonNull(address, "address is null");
     }
 
     public MethodMetadata getMethod()
@@ -42,9 +46,9 @@ public final class InvokeRequest
         return method;
     }
 
-    public Optional<String> getAddressSelectionContext()
+    public HostAndPort getAddress()
     {
-        return addressSelectionContext;
+        return address;
     }
 
     public Map<String, String> getHeaders()
@@ -63,7 +67,7 @@ public final class InvokeRequest
         return toStringHelper(this)
                 .omitNullValues()
                 .add("method", method)
-                .add("addressSelectionContext", addressSelectionContext.orElse(null))
+                .add("address", address)
                 .add("headers", headers.isEmpty() ? null : headers)
                 .toString();
     }

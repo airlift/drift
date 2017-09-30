@@ -53,19 +53,29 @@ public class DriftClientFactory
 {
     private final ThriftCodecManager codecManager;
     private final Supplier<MethodInvoker> methodInvokerSupplier;
+    private final AddressSelector addressSelector;
     private final ConcurrentMap<Class<?>, ThriftServiceMetadata> serviceMetadataCache = new ConcurrentHashMap<>();
     private final MethodInvocationStatsFactory methodInvocationStatsFactory;
 
-    public DriftClientFactory(ThriftCodecManager codecManager, Supplier<MethodInvoker> methodInvokerSupplier, MethodInvocationStatsFactory methodInvocationStatsFactory)
+    public DriftClientFactory(
+            ThriftCodecManager codecManager,
+            Supplier<MethodInvoker> methodInvokerSupplier,
+            AddressSelector addressSelector,
+            MethodInvocationStatsFactory methodInvocationStatsFactory)
     {
         this.codecManager = requireNonNull(codecManager, "codecManager is null");
         this.methodInvokerSupplier = requireNonNull(methodInvokerSupplier, "methodInvokerSupplier is null");
+        this.addressSelector = requireNonNull(addressSelector, "addressSelector is null");
         this.methodInvocationStatsFactory = requireNonNull(methodInvocationStatsFactory, "methodInvocationStatsFactory is null");
     }
 
     public DriftClientFactory(ThriftCodecManager codecManager, MethodInvokerFactory<?> invokerFactory, AddressSelector addressSelector)
     {
-        this(codecManager, () -> invokerFactory.createMethodInvoker(addressSelector, null), new NullMethodInvocationStatsFactory());
+        this(
+                codecManager,
+                () -> invokerFactory.createMethodInvoker(null),
+                addressSelector,
+                new NullMethodInvocationStatsFactory());
     }
 
     public <T> DriftClient<T> createDriftClient(Class<T> clientInterface)
@@ -102,7 +112,7 @@ public class DriftClientFactory
         }
         Map<Method, DriftMethodHandler> methods = builder.build();
 
-        return (context, headers) -> newProxy(clientInterface, new DriftInvocationHandler(serviceMetadata.getName(), methods, context, headers));
+        return (context, headers) -> newProxy(clientInterface, new DriftInvocationHandler(serviceMetadata.getName(), methods, addressSelector, context, headers));
     }
 
     private MethodMetadata getMethodMetadata(ThriftMethodMetadata metadata)

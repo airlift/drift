@@ -17,12 +17,11 @@ package io.airlift.drift.transport;
 
 import com.google.common.net.HostAndPort;
 
-import java.util.List;
 import java.util.Optional;
 
 public interface AddressSelector
 {
-    List<HostAndPort> getAddresses(Optional<String> addressSelectionContext);
+    Optional<HostAndPort> selectAddress(Optional<String> addressSelectionContext);
 
     default void markdown(HostAndPort address) {}
 }

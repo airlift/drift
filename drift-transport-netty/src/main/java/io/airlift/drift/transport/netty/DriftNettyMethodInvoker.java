@@ -15,9 +15,7 @@
  */
 package io.airlift.drift.transport.netty;
 
-import com.google.common.net.HostAndPort;
 import com.google.common.util.concurrent.ListenableFuture;
-import io.airlift.drift.transport.AddressSelector;
 import io.airlift.drift.transport.InvokeRequest;
 import io.airlift.drift.transport.MethodInvoker;
 import io.airlift.drift.transport.MethodMetadata;
@@ -35,13 +33,11 @@ import static java.util.Objects.requireNonNull;
 class DriftNettyMethodInvoker
         implements MethodInvoker
 {
-    private final AddressSelector addressSelector;
     private final ConnectionManager connectionManager;
     private final ResultsClassifier globalResultsClassifier = new ResultsClassifier() {};
 
-    public DriftNettyMethodInvoker(ConnectionManager connectionManager, AddressSelector addressSelector)
+    public DriftNettyMethodInvoker(ConnectionManager connectionManager)
     {
-        this.addressSelector = requireNonNull(addressSelector, "addressSelector is null");
         this.connectionManager = requireNonNull(connectionManager, "connectionManager is null");
     }
 
@@ -49,12 +45,10 @@ class DriftNettyMethodInvoker
     public ListenableFuture<Object> invoke(InvokeRequest request)
     {
         try {
-            List<HostAndPort> addresses = addressSelector.getAddresses(request.getAddressSelectionContext());
             InvocationAttempt invocationAttempt = new InvocationAttempt(
-                    addresses,
+                    request.getAddress(),
                     connectionManager,
-                    new MethodInvocationFunction(request.getMethod(), request.getParameters(), globalResultsClassifier),
-                    addressSelector::markdown);
+                    new MethodInvocationFunction(request.getMethod(), request.getParameters(), globalResultsClassifier));
             return invocationAttempt.getFuture();
         }
         catch (Exception e) {

@@ -63,7 +63,7 @@ final class DriftNettyTesterUtil
             Protocol protocol,
             boolean secure)
     {
-        AddressSelector addressSelector = context -> ImmutableList.of(address);
+        AddressSelector addressSelector = context -> Optional.of(address);
         DriftNettyClientConfig config = new DriftNettyClientConfig()
                 .setTransport(transport)
                 .setProtocol(protocol)
@@ -94,7 +94,7 @@ final class DriftNettyTesterUtil
             Protocol protocol,
             boolean secure)
     {
-        AddressSelector addressSelector = context -> ImmutableList.of(address);
+        AddressSelector addressSelector = context -> Optional.of(address);
         DriftNettyClientConfig config = new DriftNettyClientConfig()
                 .setTransport(transport)
                 .setProtocol(protocol)
@@ -122,7 +122,7 @@ final class DriftNettyTesterUtil
             Protocol protocol,
             boolean secure)
     {
-        AddressSelector addressSelector = context -> ImmutableList.of(address);
+        AddressSelector addressSelector = context -> Optional.of(address);
         DriftNettyClientConfig config = new DriftNettyClientConfig()
                 .setTransport(transport)
                 .setProtocol(protocol)

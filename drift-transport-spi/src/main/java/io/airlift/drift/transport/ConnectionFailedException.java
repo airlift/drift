@@ -13,17 +13,25 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
-package io.airlift.drift.transport.apache;
+package io.airlift.drift.transport;
 
-public interface ResultHandler
+import com.google.common.net.HostAndPort;
+
+import static java.util.Objects.requireNonNull;
+
+public class ConnectionFailedException
+        extends Exception
 {
-    default boolean isRetryable(Throwable throwable)
+    private final HostAndPort address;
+
+    public ConnectionFailedException(HostAndPort address, Throwable cause)
     {
-        return false;
+        super("Failed to connect to " + address, requireNonNull(cause, "cause is null"));
+        this.address = requireNonNull(address, "address is null");
     }
 
-    default boolean isHostDownException(Throwable throwable)
+    public HostAndPort getAddress()
     {
-        return false;
+        return address;
     }
 }

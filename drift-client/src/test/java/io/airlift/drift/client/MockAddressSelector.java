@@ -27,22 +27,22 @@ public class MockAddressSelector
         implements AddressSelector
 {
     private final List<HostAndPort> markdownHosts = new CopyOnWriteArrayList<>();
-    private List<HostAndPort> addresses = ImmutableList.of(HostAndPort.fromParts("localhost", 9999));
+    private Optional<HostAndPort> address = Optional.of(HostAndPort.fromParts("localhost", 9999));
 
     public List<HostAndPort> getMarkdownHosts()
     {
         return ImmutableList.copyOf(markdownHosts);
     }
 
-    public void setAddresses(List<HostAndPort> addresses)
+    public void setAddress(Optional<HostAndPort> address)
     {
-        this.addresses = ImmutableList.copyOf(addresses);
+        this.address = address;
     }
 
     @Override
-    public List<HostAndPort> getAddresses(Optional<String> addressSelectionContext)
+    public Optional<HostAndPort> selectAddress(Optional<String> addressSelectionContext)
     {
-        return addresses;
+        return address;
     }
 
     @Override

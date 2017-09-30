@@ -22,7 +22,6 @@ import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.SettableFuture;
 import io.airlift.drift.codec.ThriftCodec;
 import io.airlift.drift.codec.ThriftCodecManager;
-import io.airlift.drift.transport.AddressSelector;
 import io.airlift.drift.transport.InvokeRequest;
 import io.airlift.drift.transport.MethodInvoker;
 import io.airlift.drift.transport.MethodMetadata;
@@ -50,7 +49,6 @@ import org.apache.thrift.transport.TTransportFactory;
 import org.testng.annotations.Test;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.function.ToIntFunction;
 import java.util.stream.Collectors;
 
@@ -185,11 +183,10 @@ public class TestDriftNettyMethodInvoker
 
     private static int logNiftyInvocationHandler1(HostAndPort address, List<io.airlift.drift.transport.netty.scribe.drift.LogEntry> entries)
     {
-        AddressSelector addressSelector = context -> ImmutableList.of(address);
         DriftNettyClientConfig config = new DriftNettyClientConfig()
                 .setPoolEnabled(true);
         try (DriftNettyMethodInvokerFactory<Void> methodInvokerFactory = new DriftNettyMethodInvokerFactory<>(new DriftNettyConnectionFactoryConfig(), clientIdentity -> config)) {
-            MethodInvoker methodInvoker = methodInvokerFactory.createMethodInvoker(addressSelector, null);
+            MethodInvoker methodInvoker = methodInvokerFactory.createMethodInvoker(null);
 
             ParameterMetadata parameter = new ParameterMetadata(
                     (short) 1,
@@ -204,7 +201,7 @@ public class TestDriftNettyMethodInvoker
                     false,
                     new ResultsClassifier() {});
 
-            ListenableFuture<Object> future = methodInvoker.invoke(new InvokeRequest(methodMetadata, Optional.empty(), ImmutableMap.of(), ImmutableList.of(entries)));
+            ListenableFuture<Object> future = methodInvoker.invoke(new InvokeRequest(methodMetadata, address, ImmutableMap.of(), ImmutableList.of(entries)));
             assertEquals(future.get(), DRIFT_OK);
 
             return 1;

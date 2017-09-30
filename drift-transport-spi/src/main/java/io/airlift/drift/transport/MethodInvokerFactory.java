@@ -17,5 +17,5 @@ package io.airlift.drift.transport;
 
 public interface MethodInvokerFactory<I>
 {
-    MethodInvoker createMethodInvoker(AddressSelector addressSelector, I clientIdentity);
+    MethodInvoker createMethodInvoker(I clientIdentity);
 }

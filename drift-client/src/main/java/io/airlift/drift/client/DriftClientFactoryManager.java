@@ -45,6 +45,6 @@ public class DriftClientFactoryManager<I>
 
     public DriftClientFactory createDriftClientFactory(I clientIdentity, AddressSelector addressSelector)
     {
-        return new DriftClientFactory(codecManager, () -> methodInvokerFactory.createMethodInvoker(addressSelector, clientIdentity), methodInvocationStatsFactory);
+        return new DriftClientFactory(codecManager, () -> methodInvokerFactory.createMethodInvoker(clientIdentity), addressSelector, methodInvocationStatsFactory);
     }
 }

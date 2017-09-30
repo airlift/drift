@@ -403,7 +403,6 @@ public class TestDriftClient
             assertEquals(invokeRequest.getMethod().getName(), methodName);
             assertEquals(invokeRequest.getParameters(), ImmutableList.of(id, name));
             assertEquals(invokeRequest.getHeaders(), HEADERS);
-            assertEquals(invokeRequest.getAddressSelectionContext(), ADDRESS_SELECTION_CONTEXT);
         }
     }
 

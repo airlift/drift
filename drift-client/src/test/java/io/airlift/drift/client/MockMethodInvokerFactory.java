@@ -16,7 +16,6 @@
 package io.airlift.drift.client;
 
 import com.google.common.util.concurrent.ListenableFuture;
-import io.airlift.drift.transport.AddressSelector;
 import io.airlift.drift.transport.MethodInvokerFactory;
 
 import java.util.function.Supplier;
@@ -43,7 +42,7 @@ public class MockMethodInvokerFactory<I>
     }
 
     @Override
-    public MockMethodInvoker createMethodInvoker(AddressSelector addressSelector, I clientIdentity)
+    public MockMethodInvoker createMethodInvoker(I clientIdentity)
     {
         this.clientIdentity = clientIdentity;
         return methodInvoker;
