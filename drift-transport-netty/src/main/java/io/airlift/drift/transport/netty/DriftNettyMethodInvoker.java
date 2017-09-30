@@ -17,7 +17,6 @@ package io.airlift.drift.transport.netty;
 
 import com.google.common.net.HostAndPort;
 import com.google.common.util.concurrent.ListenableFuture;
-import com.google.inject.Inject;
 import io.airlift.drift.transport.AddressSelector;
 import io.airlift.drift.transport.InvokeRequest;
 import io.airlift.drift.transport.MethodInvoker;
@@ -40,7 +39,6 @@ class DriftNettyMethodInvoker
     private final ConnectionManager connectionManager;
     private final ResultsClassifier globalResultsClassifier = new ResultsClassifier() {};
 
-    @Inject
     public DriftNettyMethodInvoker(ConnectionManager connectionManager, AddressSelector addressSelector)
     {
         this.addressSelector = requireNonNull(addressSelector, "addressSelector is null");
