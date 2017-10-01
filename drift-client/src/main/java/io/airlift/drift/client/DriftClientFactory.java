@@ -32,7 +32,6 @@ import io.airlift.drift.transport.MethodInvoker;
 import io.airlift.drift.transport.MethodInvokerFactory;
 import io.airlift.drift.transport.MethodMetadata;
 import io.airlift.drift.transport.ParameterMetadata;
-import io.airlift.drift.transport.ResultsClassifier;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
@@ -129,16 +128,12 @@ public class DriftClientFactory
         Map<Short, ThriftCodec<Object>> exceptionCodecs = ImmutableMap.copyOf(
                 transformEntries(metadata.getExceptions(), (key, value) -> getCodec(value)));
 
-        // todo finish support for result set classification
-        ResultsClassifier resultsClassifier = new ResultsClassifier() {};
-
         return new MethodMetadata(
                 metadata.getName(),
                 parameters,
                 resultCodec,
                 exceptionCodecs,
-                metadata.getOneway(),
-                resultsClassifier);
+                metadata.getOneway());
     }
 
     @SuppressWarnings("unchecked")

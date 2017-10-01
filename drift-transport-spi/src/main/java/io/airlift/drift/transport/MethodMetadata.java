@@ -32,22 +32,19 @@ public final class MethodMetadata
     private final ThriftCodec<Object> resultCodec;
     private final Map<Short, ThriftCodec<Object>> exceptionCodecs;
     private final boolean oneway;
-    private final ResultsClassifier resultsClassifier;
 
     public MethodMetadata(
             String name,
             List<ParameterMetadata> parameters,
             ThriftCodec<Object> resultCodec,
             Map<Short, ThriftCodec<Object>> exceptionCodecs,
-            boolean oneway,
-            ResultsClassifier resultsClassifier)
+            boolean oneway)
     {
         this.name = requireNonNull(name, "name is null");
         this.parameters = ImmutableList.copyOf(requireNonNull(parameters, "parameters is null"));
         this.resultCodec = requireNonNull(resultCodec, "resultCodec is null");
         this.exceptionCodecs = ImmutableMap.copyOf(requireNonNull(exceptionCodecs, "exceptionCodecs is null"));
         this.oneway = oneway;
-        this.resultsClassifier = requireNonNull(resultsClassifier, "resultsClassifier is null");
     }
 
     public String getName()
@@ -73,11 +70,6 @@ public final class MethodMetadata
     public boolean isOneway()
     {
         return oneway;
-    }
-
-    public ResultsClassifier getResultsClassifier()
-    {
-        return resultsClassifier;
     }
 
     @Override

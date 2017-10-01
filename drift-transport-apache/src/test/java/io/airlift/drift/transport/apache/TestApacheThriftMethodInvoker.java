@@ -27,7 +27,6 @@ import io.airlift.drift.transport.InvokeRequest;
 import io.airlift.drift.transport.MethodInvoker;
 import io.airlift.drift.transport.MethodMetadata;
 import io.airlift.drift.transport.ParameterMetadata;
-import io.airlift.drift.transport.ResultsClassifier;
 import io.airlift.drift.transport.apache.scribe.apache.LogEntry;
 import io.airlift.drift.transport.apache.scribe.apache.ResultCode;
 import io.airlift.drift.transport.apache.scribe.apache.ScribeService;
@@ -202,8 +201,7 @@ public class TestApacheThriftMethodInvoker
                     ImmutableList.of(parameter),
                     (ThriftCodec<Object>) (Object) codecManager.getCodec(io.airlift.drift.transport.apache.scribe.drift.ResultCode.class),
                     ImmutableMap.of(),
-                    false,
-                    new ResultsClassifier() {});
+                    false);
 
             ListenableFuture<Object> future = methodInvoker.invoke(new InvokeRequest(methodMetadata, address, ImmutableMap.of(), ImmutableList.of(entries)));
             assertEquals(future.get(), DRIFT_OK);

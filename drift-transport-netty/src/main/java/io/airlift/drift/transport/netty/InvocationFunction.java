@@ -16,21 +16,8 @@
 package io.airlift.drift.transport.netty;
 
 import com.google.common.util.concurrent.ListenableFuture;
-import io.airlift.drift.transport.ResultClassification;
-
-import java.util.Optional;
 
 interface InvocationFunction<C>
 {
     ListenableFuture<Object> invokeOn(C connection);
-
-    default ResultClassification classifyResult(Object result)
-    {
-        return new ResultClassification(Optional.empty(), false);
-    }
-
-    default ResultClassification classifyException(Throwable throwable)
-    {
-        return new ResultClassification(Optional.empty(), false);
-    }
 }

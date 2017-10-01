@@ -19,13 +19,10 @@ import com.google.common.util.concurrent.ListenableFuture;
 import io.airlift.drift.transport.InvokeRequest;
 import io.airlift.drift.transport.MethodInvoker;
 import io.airlift.drift.transport.MethodMetadata;
-import io.airlift.drift.transport.ResultClassification;
-import io.airlift.drift.transport.ResultsClassifier;
 import io.airlift.drift.transport.netty.ThriftClientHandler.ThriftRequest;
 import io.netty.channel.Channel;
 
 import java.util.List;
-import java.util.Optional;
 
 import static com.google.common.util.concurrent.Futures.immediateFailedFuture;
 import static java.util.Objects.requireNonNull;
@@ -34,7 +31,6 @@ class DriftNettyMethodInvoker
         implements MethodInvoker
 {
     private final ConnectionManager connectionManager;
-    private final ResultsClassifier globalResultsClassifier = new ResultsClassifier() {};
 
     public DriftNettyMethodInvoker(ConnectionManager connectionManager)
     {
@@ -48,7 +44,7 @@ class DriftNettyMethodInvoker
             InvocationAttempt invocationAttempt = new InvocationAttempt(
                     request.getAddress(),
                     connectionManager,
-                    new MethodInvocationFunction(request.getMethod(), request.getParameters(), globalResultsClassifier));
+                    new MethodInvocationFunction(request.getMethod(), request.getParameters()));
             return invocationAttempt.getFuture();
         }
         catch (Exception e) {
@@ -61,13 +57,11 @@ class DriftNettyMethodInvoker
     {
         private final MethodMetadata method;
         private final List<Object> parameters;
-        private final ResultsClassifier globalResultsClassifier;
 
-        public MethodInvocationFunction(MethodMetadata method, List<Object> parameters, ResultsClassifier globalResultsClassifier)
+        public MethodInvocationFunction(MethodMetadata method, List<Object> parameters)
         {
             this.method = method;
             this.parameters = parameters;
-            this.globalResultsClassifier = globalResultsClassifier;
         }
 
         @Override
@@ -81,32 +75,6 @@ class DriftNettyMethodInvoker
             catch (Throwable throwable) {
                 return immediateFailedFuture(throwable);
             }
-        }
-
-        @Override
-        public ResultClassification classifyResult(Object result)
-        {
-            ResultClassification methodClassification = method.getResultsClassifier().classifyResult(result);
-            ResultClassification globalClassification = globalResultsClassifier.classifyResult(result);
-            return merge(methodClassification, globalClassification);
-        }
-
-        @Override
-        public ResultClassification classifyException(Throwable throwable)
-        {
-            ResultClassification methodClassification = method.getResultsClassifier().classifyException(throwable);
-            ResultClassification globalClassification = globalResultsClassifier.classifyException(throwable);
-            return merge(methodClassification, globalClassification);
-        }
-
-        private static ResultClassification merge(ResultClassification methodClassification, ResultClassification globalClassification)
-        {
-            Optional<Boolean> retry = methodClassification.isRetry();
-            if (!retry.isPresent()) {
-                retry = globalClassification.isRetry();
-            }
-            boolean hostDown = globalClassification.isHostDown() || methodClassification.isHostDown();
-            return new ResultClassification(retry, hostDown);
         }
     }
 }
