@@ -18,13 +18,9 @@ package io.airlift.drift.transport.netty;
 import com.google.common.util.concurrent.ListenableFuture;
 import io.airlift.drift.transport.InvokeRequest;
 import io.airlift.drift.transport.MethodInvoker;
-import io.airlift.drift.transport.MethodMetadata;
-import io.airlift.drift.transport.netty.ThriftClientHandler.ThriftRequest;
-import io.netty.channel.Channel;
-
-import java.util.List;
 
 import static com.google.common.util.concurrent.Futures.immediateFailedFuture;
+import static io.airlift.drift.transport.netty.InvocationResponseFuture.createInvocationResponseFuture;
 import static java.util.Objects.requireNonNull;
 
 class DriftNettyMethodInvoker
@@ -41,40 +37,10 @@ class DriftNettyMethodInvoker
     public ListenableFuture<Object> invoke(InvokeRequest request)
     {
         try {
-            InvocationAttempt invocationAttempt = new InvocationAttempt(
-                    request.getAddress(),
-                    connectionManager,
-                    new MethodInvocationFunction(request.getMethod(), request.getParameters()));
-            return invocationAttempt.getFuture();
+            return createInvocationResponseFuture(request, connectionManager);
         }
         catch (Exception e) {
             return immediateFailedFuture(e);
-        }
-    }
-
-    private static class MethodInvocationFunction
-            implements InvocationFunction<Channel>
-    {
-        private final MethodMetadata method;
-        private final List<Object> parameters;
-
-        public MethodInvocationFunction(MethodMetadata method, List<Object> parameters)
-        {
-            this.method = method;
-            this.parameters = parameters;
-        }
-
-        @Override
-        public ListenableFuture<Object> invokeOn(Channel channel)
-        {
-            try {
-                ThriftRequest thriftRequest = new ThriftRequest(method, parameters);
-                channel.writeAndFlush(thriftRequest);
-                return thriftRequest;
-            }
-            catch (Throwable throwable) {
-                return immediateFailedFuture(throwable);
-            }
         }
     }
 }
