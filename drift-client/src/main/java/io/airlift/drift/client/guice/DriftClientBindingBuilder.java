@@ -18,7 +18,7 @@ package io.airlift.drift.client.guice;
 import com.google.inject.Binder;
 import com.google.inject.multibindings.Multibinder;
 import io.airlift.drift.client.MethodInvocationFilter;
-import io.airlift.drift.transport.AddressSelector;
+import io.airlift.drift.client.address.AddressSelector;
 
 import java.lang.annotation.Annotation;
 

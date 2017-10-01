@@ -20,7 +20,6 @@ import com.google.inject.Injector;
 import com.google.inject.Key;
 import io.airlift.drift.client.guice.AbstractAnnotatedProvider;
 import io.airlift.drift.client.guice.AddressSelectorBinder;
-import io.airlift.drift.transport.AddressSelector;
 
 import java.lang.annotation.Annotation;
 

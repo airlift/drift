@@ -29,6 +29,7 @@ import io.airlift.drift.annotations.ThriftException;
 import io.airlift.drift.annotations.ThriftMethod;
 import io.airlift.drift.annotations.ThriftService;
 import io.airlift.drift.annotations.ThriftStruct;
+import io.airlift.drift.client.address.MockAddressSelector;
 import io.airlift.drift.client.stats.MethodInvocationStatsFactory;
 import io.airlift.drift.codec.ThriftCodecManager;
 import io.airlift.drift.codec.guice.ThriftCodecModule;

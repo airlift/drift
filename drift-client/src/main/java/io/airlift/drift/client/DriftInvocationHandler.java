@@ -23,9 +23,9 @@ import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.SettableFuture;
 import io.airlift.drift.TApplicationException;
 import io.airlift.drift.TException;
+import io.airlift.drift.client.address.AddressSelector;
 import io.airlift.drift.protocol.TProtocolException;
 import io.airlift.drift.protocol.TTransportException;
-import io.airlift.drift.transport.AddressSelector;
 import io.airlift.drift.transport.ConnectionFailedException;
 import io.airlift.drift.transport.DriftApplicationException;
 

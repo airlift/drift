@@ -13,11 +13,10 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
-package io.airlift.drift.client;
+package io.airlift.drift.client.address;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.net.HostAndPort;
-import io.airlift.drift.transport.AddressSelector;
 
 import java.util.List;
 import java.util.Optional;

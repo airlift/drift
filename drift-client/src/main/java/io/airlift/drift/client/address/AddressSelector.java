@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
-package io.airlift.drift.transport;
+package io.airlift.drift.client.address;
 
 import com.google.common.net.HostAndPort;
 

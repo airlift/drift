@@ -15,10 +15,10 @@
  */
 package io.airlift.drift.client;
 
+import io.airlift.drift.client.address.AddressSelector;
 import io.airlift.drift.client.stats.MethodInvocationStatsFactory;
 import io.airlift.drift.client.stats.NullMethodInvocationStatsFactory;
 import io.airlift.drift.codec.ThriftCodecManager;
-import io.airlift.drift.transport.AddressSelector;
 import io.airlift.drift.transport.MethodInvokerFactory;
 
 import static java.util.Objects.requireNonNull;

@@ -17,7 +17,6 @@ package io.airlift.drift.client.address;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.net.HostAndPort;
-import io.airlift.drift.transport.AddressSelector;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;

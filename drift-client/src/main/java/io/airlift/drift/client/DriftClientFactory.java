@@ -17,6 +17,7 @@ package io.airlift.drift.client;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import io.airlift.drift.client.address.AddressSelector;
 import io.airlift.drift.client.stats.MethodInvocationStat;
 import io.airlift.drift.client.stats.MethodInvocationStatsFactory;
 import io.airlift.drift.client.stats.NullMethodInvocationStat;
@@ -26,7 +27,6 @@ import io.airlift.drift.codec.ThriftCodecManager;
 import io.airlift.drift.codec.metadata.ThriftMethodMetadata;
 import io.airlift.drift.codec.metadata.ThriftServiceMetadata;
 import io.airlift.drift.codec.metadata.ThriftType;
-import io.airlift.drift.transport.AddressSelector;
 import io.airlift.drift.transport.DriftClientConfig;
 import io.airlift.drift.transport.MethodInvoker;
 import io.airlift.drift.transport.MethodInvokerFactory;
