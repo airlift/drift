@@ -16,21 +16,29 @@
 package io.airlift.drift.transport.netty;
 
 import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.ListeningScheduledExecutorService;
 import io.airlift.drift.transport.InvokeRequest;
 import io.airlift.drift.transport.MethodInvoker;
+import io.airlift.units.Duration;
+
+import java.util.concurrent.ScheduledExecutorService;
 
 import static com.google.common.util.concurrent.Futures.immediateFailedFuture;
+import static com.google.common.util.concurrent.MoreExecutors.listeningDecorator;
 import static io.airlift.drift.transport.netty.InvocationResponseFuture.createInvocationResponseFuture;
 import static java.util.Objects.requireNonNull;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 class DriftNettyMethodInvoker
         implements MethodInvoker
 {
     private final ConnectionManager connectionManager;
+    private final ListeningScheduledExecutorService delayService;
 
-    public DriftNettyMethodInvoker(ConnectionManager connectionManager)
+    public DriftNettyMethodInvoker(ConnectionManager connectionManager, ScheduledExecutorService delayService)
     {
         this.connectionManager = requireNonNull(connectionManager, "connectionManager is null");
+        this.delayService = listeningDecorator(requireNonNull(delayService, "delayService is null"));
     }
 
     @Override
@@ -42,5 +50,11 @@ class DriftNettyMethodInvoker
         catch (Exception e) {
             return immediateFailedFuture(e);
         }
+    }
+
+    @Override
+    public ListenableFuture<?> delay(Duration duration)
+    {
+        return delayService.schedule(() -> null, duration.toMillis(), MILLISECONDS);
     }
 }

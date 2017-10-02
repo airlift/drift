@@ -19,6 +19,7 @@ import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.ListenableFuture;
 import io.airlift.drift.transport.InvokeRequest;
 import io.airlift.drift.transport.MethodInvoker;
+import io.airlift.units.Duration;
 
 import java.util.List;
 
@@ -46,5 +47,11 @@ class FilteredMethodInvoker
     public ListenableFuture<Object> invoke(InvokeRequest request)
     {
         return filter.invoke(request, next);
+    }
+
+    @Override
+    public ListenableFuture<?> delay(Duration duration)
+    {
+        return next.delay(duration);
     }
 }

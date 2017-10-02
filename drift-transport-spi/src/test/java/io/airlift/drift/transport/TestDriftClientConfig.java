@@ -16,6 +16,7 @@
 package io.airlift.drift.transport;
 
 import com.google.common.collect.ImmutableMap;
+import io.airlift.units.Duration;
 import org.testng.annotations.Test;
 
 import java.util.Map;
@@ -23,6 +24,9 @@ import java.util.Map;
 import static io.airlift.configuration.testing.ConfigAssertions.assertFullMapping;
 import static io.airlift.configuration.testing.ConfigAssertions.assertRecordedDefaults;
 import static io.airlift.configuration.testing.ConfigAssertions.recordDefaults;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static java.util.concurrent.TimeUnit.MINUTES;
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 public class TestDriftClientConfig
 {
@@ -30,6 +34,11 @@ public class TestDriftClientConfig
     public void testDefaults()
     {
         assertRecordedDefaults(recordDefaults(DriftClientConfig.class)
+                .setMaxRetries(5)
+                .setMinBackoffDelay(new Duration(100, MILLISECONDS))
+                .setMaxBackoffDelay(new Duration(30, SECONDS))
+                .setBackoffScaleFactor(2.0)
+                .setMaxRetryTime(new Duration(1, MINUTES))
                 .setStatsEnabled(true));
     }
 
@@ -37,10 +46,20 @@ public class TestDriftClientConfig
     public void testExplicitPropertyMappings()
     {
         Map<String, String> properties = new ImmutableMap.Builder<String, String>()
+                .put("thrift.client.max-retries", "99")
+                .put("thrift.client.min-backoff-delay", "11ms")
+                .put("thrift.client.max-backoff-delay", "22m")
+                .put("thrift.client.backoff-scale-factor", "2.2")
+                .put("thrift.client.max-retry-time", "33m")
                 .put("thrift.client.stats-enabled", "false")
                 .build();
 
         DriftClientConfig expected = new DriftClientConfig()
+                .setMaxRetries(99)
+                .setMinBackoffDelay(new Duration(11, MILLISECONDS))
+                .setMaxBackoffDelay(new Duration(22, MINUTES))
+                .setBackoffScaleFactor(2.2)
+                .setMaxRetryTime(new Duration(33, MINUTES))
                 .setStatsEnabled(false);
 
         assertFullMapping(properties, expected);

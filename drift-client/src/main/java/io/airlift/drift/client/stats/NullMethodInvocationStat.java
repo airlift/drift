@@ -22,4 +22,7 @@ public final class NullMethodInvocationStat
 {
     @Override
     public void recordResult(long startTime, ListenableFuture<Object> result) {}
+
+    @Override
+    public void recordRetry() {}
 }

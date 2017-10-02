@@ -300,14 +300,14 @@ public class TestDriftClient
         int invocationId = ThreadLocalRandom.current().nextInt();
         assertEquals(client.test(invocationId, "normal"), "result");
         verifyMethodInvocation(targets, "test", invocationId, "normal");
-        stat.assertSuccess();
+        stat.assertSuccess(0);
 
         stat = statsFactory.getStat("clientService", qualifier, "testAsync");
         stat.clear();
         invocationId = ThreadLocalRandom.current().nextInt();
         assertEquals(client.testAsync(invocationId, "normal").get(), "result");
         verifyMethodInvocation(targets, "testAsync", invocationId, "normal");
-        stat.assertSuccess();
+        stat.assertSuccess(0);
     }
 
     @SafeVarargs
@@ -334,7 +334,7 @@ public class TestDriftClient
             assertExceptionChain(e, testException, expectedWrapperTypes);
         }
         verifyMethodInvocation(targets, "test", invocationId, name);
-        stat.assertFailure();
+        stat.assertFailure(0);
 
         stat = statsFactory.getStat("clientService", qualifier, "testAsync");
         stat.clear();
@@ -347,7 +347,7 @@ public class TestDriftClient
             assertExceptionChain(e.getCause(), testException, expectedWrapperTypes);
         }
         verifyMethodInvocation(targets, "testAsync", invocationId, name);
-        stat.assertFailure();
+        stat.assertFailure(0);
     }
 
     @SafeVarargs
@@ -373,7 +373,7 @@ public class TestDriftClient
             assertExceptionChain(e, testException, expectedWrapperTypes);
         }
         verifyMethodInvocation(targets, "testNoTException", invocationId, name);
-        stat.assertFailure();
+        stat.assertFailure(0);
     }
 
     private static void assertExceptionChain(Throwable actualException, Throwable expectedException, Class<? extends Throwable>[] expectedWrapperTypes)

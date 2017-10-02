@@ -22,7 +22,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
 import static com.google.common.util.concurrent.MoreExecutors.directExecutor;
-import static io.airlift.testing.Assertions.assertGreaterThan;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotEquals;
 
@@ -32,6 +31,7 @@ public class TestingMethodInvocationStat
     private final AtomicInteger invocations = new AtomicInteger();
     private final AtomicInteger successes = new AtomicInteger();
     private final AtomicInteger failures = new AtomicInteger();
+    private final AtomicInteger retries = new AtomicInteger();
     private final AtomicLong lastStartTime = new AtomicLong();
 
     public void clear()
@@ -39,22 +39,34 @@ public class TestingMethodInvocationStat
         invocations.set(0);
         successes.set(0);
         failures.set(0);
+        retries.set(0);
         lastStartTime.set(0);
     }
 
-    public void assertSuccess()
+    public void assertSuccess(int expectedRetries)
     {
-        assertGreaterThan(invocations.get(), 0);
-        assertGreaterThan(successes.get(), 0);
-        assertEquals(failures.get(), 0);
+        assertEquals(invocations.get(), expectedRetries + 1);
+        assertEquals(successes.get(), 1);
+        assertEquals(failures.get(), expectedRetries);
+        assertEquals(retries.get(), expectedRetries);
         assertNotEquals(lastStartTime.get(), 0);
     }
 
-    public void assertFailure()
+    public void assertFailure(int expectedRetries)
     {
-        assertGreaterThan(invocations.get(), 0);
+        assertEquals(invocations.get(), expectedRetries + 1);
         assertEquals(successes.get(), 0);
-        assertGreaterThan(failures.get(), 0);
+        assertEquals(failures.get(), expectedRetries + 1);
+        assertEquals(retries.get(), expectedRetries);
+        assertNotEquals(lastStartTime.get(), 0);
+    }
+
+    public void assertNoHostsAvailable(int expectedRetries)
+    {
+        assertEquals(invocations.get(), expectedRetries);
+        assertEquals(successes.get(), 0);
+        assertEquals(failures.get(), expectedRetries);
+        assertEquals(retries.get(), 0);
         assertNotEquals(lastStartTime.get(), 0);
     }
 
@@ -74,5 +86,11 @@ public class TestingMethodInvocationStat
                     }
                 },
                 directExecutor());
+    }
+
+    @Override
+    public void recordRetry()
+    {
+        retries.incrementAndGet();
     }
 }

@@ -16,11 +16,12 @@
 package io.airlift.drift.transport;
 
 import com.google.common.net.HostAndPort;
+import io.airlift.drift.protocol.TTransportException;
 
 import static java.util.Objects.requireNonNull;
 
 public class ConnectionFailedException
-        extends Exception
+        extends TTransportException
 {
     private final HostAndPort address;
 

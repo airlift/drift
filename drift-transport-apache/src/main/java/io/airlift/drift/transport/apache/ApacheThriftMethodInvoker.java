@@ -19,6 +19,7 @@ import com.google.common.net.HostAndPort;
 import com.google.common.primitives.Ints;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListeningExecutorService;
+import com.google.common.util.concurrent.ListeningScheduledExecutorService;
 import io.airlift.drift.TApplicationException;
 import io.airlift.drift.TException;
 import io.airlift.drift.codec.ThriftCodec;
@@ -67,6 +68,7 @@ import static io.airlift.drift.TApplicationException.Type.WRONG_METHOD_NAME;
 import static java.lang.String.format;
 import static java.net.Proxy.Type.SOCKS;
 import static java.util.Objects.requireNonNull;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.apache.thrift.protocol.TMessageType.CALL;
 import static org.apache.thrift.protocol.TMessageType.EXCEPTION;
 import static org.apache.thrift.protocol.TMessageType.REPLY;
@@ -78,6 +80,7 @@ public class ApacheThriftMethodInvoker
     private static final int SEQUENCE_ID = 77;
 
     private final ListeningExecutorService executorService;
+    private final ListeningScheduledExecutorService delayService;
     private final TTransportFactory transportFactory;
     private final TProtocolFactory protocolFactory;
 
@@ -88,6 +91,7 @@ public class ApacheThriftMethodInvoker
 
     public ApacheThriftMethodInvoker(
             ListeningExecutorService executorService,
+            ListeningScheduledExecutorService delayService,
             TTransportFactory transportFactory,
             TProtocolFactory protocolFactory,
             Duration connectTimeout,
@@ -96,6 +100,7 @@ public class ApacheThriftMethodInvoker
             Optional<SSLContext> sslContext)
     {
         this.executorService = requireNonNull(executorService, "executorService is null");
+        this.delayService = requireNonNull(delayService, "delayService is null");
         this.transportFactory = requireNonNull(transportFactory, "transportFactory is null");
         this.protocolFactory = requireNonNull(protocolFactory, "protocolFactory is null");
         this.connectTimeoutMillis = Ints.saturatedCast(requireNonNull(connectTimeout, "connectTimeout is null").toMillis());
@@ -109,6 +114,17 @@ public class ApacheThriftMethodInvoker
     {
         try {
             return executorService.submit(() -> invokeSynchronous(request));
+        }
+        catch (Exception e) {
+            return immediateFailedFuture(toDriftException(e));
+        }
+    }
+
+    @Override
+    public ListenableFuture<?> delay(Duration duration)
+    {
+        try {
+            return delayService.schedule(() -> null, duration.toMillis(), MILLISECONDS);
         }
         catch (Exception e) {
             return immediateFailedFuture(toDriftException(e));

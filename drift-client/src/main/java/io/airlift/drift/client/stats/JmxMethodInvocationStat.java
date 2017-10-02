@@ -34,6 +34,7 @@ public class JmxMethodInvocationStat
     private final TimeStat time = new TimeStat(MILLISECONDS);
     private final CounterStat successes = new CounterStat();
     private final CounterStat failures = new CounterStat();
+    private final CounterStat retries = new CounterStat();
 
     public JmxMethodInvocationStat(String name)
     {
@@ -66,6 +67,13 @@ public class JmxMethodInvocationStat
         return failures;
     }
 
+    @Managed
+    @Nested
+    public CounterStat getRetries()
+    {
+        return retries;
+    }
+
     @Override
     public void recordResult(long startTime, ListenableFuture<Object> result)
     {
@@ -84,12 +92,19 @@ public class JmxMethodInvocationStat
     }
 
     @Override
+    public void recordRetry()
+    {
+        retries.update(1);
+    }
+
+    @Override
     public String toString()
     {
         return toStringHelper(this)
                 .add("name", name)
                 .add("successes", successes.getTotalCount())
                 .add("failures", failures.getTotalCount())
+                .add("retries", retries.getTotalCount())
                 .toString();
     }
 }

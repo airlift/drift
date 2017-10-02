@@ -99,6 +99,15 @@ public class DriftClientFactory
         ImmutableMap.Builder<Method, DriftMethodHandler> builder = ImmutableMap.builder();
         for (ThriftMethodMetadata method : serviceMetadata.getMethods().values()) {
             MethodMetadata metadata = getMethodMetadata(method);
+
+            RetryPolicy retryPolicy = new RetryPolicy(
+                    config.getMaxRetries(),
+                    config.getMinBackoffDelay(),
+                    config.getMaxBackoffDelay(),
+                    config.getBackoffScaleFactor(),
+                    config.getMaxRetryTime(),
+                    new ExceptionClassifier() {});
+
             MethodInvocationStat statHandler;
             if (config.isStatsEnabled()) {
                 statHandler = methodInvocationStatsFactory.getStat(serviceMetadata, qualifier, metadata);
@@ -106,12 +115,13 @@ public class DriftClientFactory
             else {
                 statHandler = new NullMethodInvocationStat();
             }
-            DriftMethodHandler handler = new DriftMethodHandler(metadata, invoker, method.isAsync(), statHandler);
+
+            DriftMethodHandler handler = new DriftMethodHandler(metadata, invoker, method.isAsync(), addressSelector, retryPolicy, statHandler);
             builder.put(method.getMethod(), handler);
         }
         Map<Method, DriftMethodHandler> methods = builder.build();
 
-        return (context, headers) -> newProxy(clientInterface, new DriftInvocationHandler(serviceMetadata.getName(), methods, addressSelector, context, headers));
+        return (context, headers) -> newProxy(clientInterface, new DriftInvocationHandler(serviceMetadata.getName(), methods, context, headers));
     }
 
     private MethodMetadata getMethodMetadata(ThriftMethodMetadata metadata)

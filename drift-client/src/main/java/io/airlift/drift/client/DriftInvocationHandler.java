@@ -16,17 +16,14 @@
 package io.airlift.drift.client;
 
 import com.google.common.collect.ImmutableMap;
-import com.google.common.net.HostAndPort;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.SettableFuture;
 import io.airlift.drift.TApplicationException;
 import io.airlift.drift.TException;
-import io.airlift.drift.client.address.AddressSelector;
 import io.airlift.drift.protocol.TProtocolException;
 import io.airlift.drift.protocol.TTransportException;
-import io.airlift.drift.transport.ConnectionFailedException;
 import io.airlift.drift.transport.DriftApplicationException;
 
 import java.lang.reflect.InvocationHandler;
@@ -47,20 +44,17 @@ class DriftInvocationHandler
 
     private final String serviceName;
     private final Map<Method, DriftMethodHandler> methods;
-    private final AddressSelector addressSelector;
     private final Optional<String> addressSelectionContext;
     private final Map<String, String> headers;
 
     public DriftInvocationHandler(
             String serviceName,
             Map<Method, DriftMethodHandler> methods,
-            AddressSelector addressSelector,
             Optional<String> addressSelectionContext,
             Map<String, String> headers)
     {
         this.serviceName = requireNonNull(serviceName, "serviceName is null");
         this.methods = ImmutableMap.copyOf(requireNonNull(methods, "methods is null"));
-        this.addressSelector = requireNonNull(addressSelector, "addressSelector is null");
         this.addressSelectionContext = requireNonNull(addressSelectionContext, "addressSelectionContext is null");
         this.headers = ImmutableMap.copyOf(requireNonNull(headers, "headers is null"));
     }
@@ -96,21 +90,17 @@ class DriftInvocationHandler
                 throw new TApplicationException(UNKNOWN_METHOD, "Unknown method: " + method);
             }
 
-            Optional<HostAndPort> address = addressSelector.selectAddress(addressSelectionContext);
-            if (!address.isPresent()) {
-                throw new TTransportException("No hosts available");
-            }
-            ListenableFuture<Object> future = methodHandler.invoke(address.get(), headers, asList(args));
+            ListenableFuture<Object> future = methodHandler.invoke(addressSelectionContext, headers, asList(args));
 
             if (methodHandler.isAsync()) {
-                return unwrapUserException(future, addressSelector);
+                return unwrapUserException(future);
             }
 
             try {
                 return future.get();
             }
             catch (ExecutionException e) {
-                throw unwrapUserException(e.getCause(), addressSelector);
+                throw unwrapUserException(e.getCause());
             }
         }
         catch (Exception e) {
@@ -155,7 +145,7 @@ class DriftInvocationHandler
         }
     }
 
-    private static ListenableFuture<Object> unwrapUserException(ListenableFuture<Object> future, AddressSelector addressSelector)
+    private static ListenableFuture<Object> unwrapUserException(ListenableFuture<Object> future)
     {
         SettableFuture<Object> result = SettableFuture.create();
         Futures.addCallback(future, new FutureCallback<Object>()
@@ -169,18 +159,14 @@ class DriftInvocationHandler
             @Override
             public void onFailure(Throwable t)
             {
-                result.setException(unwrapUserException(t, addressSelector));
+                result.setException(unwrapUserException(t));
             }
         });
         return result;
     }
 
-    private static Throwable unwrapUserException(Throwable t, AddressSelector addressSelector)
+    private static Throwable unwrapUserException(Throwable t)
     {
-        if (t instanceof ConnectionFailedException) {
-            addressSelector.markdown(((ConnectionFailedException) t).getAddress());
-        }
-
         // unwrap deserialized user exception
         return (t instanceof DriftApplicationException) ? t.getCause() : t;
     }

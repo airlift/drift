@@ -15,36 +15,69 @@
  */
 package io.airlift.drift.client;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import io.airlift.drift.transport.InvokeRequest;
 import io.airlift.drift.transport.MethodInvoker;
+import io.airlift.testing.TestingTicker;
+import io.airlift.units.Duration;
 
+import javax.annotation.concurrent.GuardedBy;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Supplier;
 
 import static java.util.Objects.requireNonNull;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 public class MockMethodInvoker
         implements MethodInvoker, Supplier<InvokeRequest>
 {
     private final Supplier<ListenableFuture<Object>> resultsSupplier;
+    private final TestingTicker ticker;
 
+    @GuardedBy("this")
     private InvokeRequest request;
+
+    @GuardedBy("this")
+    private final List<Duration> delays = new ArrayList<>();
 
     public MockMethodInvoker(Supplier<ListenableFuture<Object>> resultsSupplier)
     {
+        this(resultsSupplier, new TestingTicker());
+    }
+
+    public MockMethodInvoker(Supplier<ListenableFuture<Object>> resultsSupplier, TestingTicker ticker)
+    {
         this.resultsSupplier = requireNonNull(resultsSupplier, "resultsSupplier is null");
+        this.ticker = requireNonNull(ticker, "ticker is null");
     }
 
     @Override
-    public InvokeRequest get()
+    public synchronized InvokeRequest get()
     {
         return request;
     }
 
+    public synchronized List<Duration> getDelays()
+    {
+        return ImmutableList.copyOf(delays);
+    }
+
     @Override
-    public ListenableFuture<Object> invoke(InvokeRequest request)
+    public synchronized ListenableFuture<Object> invoke(InvokeRequest request)
     {
         this.request = request;
         return resultsSupplier.get();
+    }
+
+    @Override
+    public synchronized ListenableFuture<?> delay(Duration duration)
+    {
+        delays.add(duration);
+        ticker.increment(duration.toMillis(), MILLISECONDS);
+        return Futures.immediateFuture(null);
     }
 }

@@ -125,6 +125,12 @@
 
             <dependency>
                 <groupId>io.airlift</groupId>
+                <artifactId>log</artifactId>
+                <version>${dep.airlift.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.airlift</groupId>
                 <artifactId>parameternames</artifactId>
                 <version>1.0</version>
             </dependency>

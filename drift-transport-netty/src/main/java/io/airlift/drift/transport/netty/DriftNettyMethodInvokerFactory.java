@@ -139,7 +139,7 @@ public class DriftNettyMethodInvokerFactory<I>
         if (clientConfig.isPoolEnabled()) {
             connectionManager = new ConnectionPool(connectionManager, group, clientConfig);
         }
-        return new DriftNettyMethodInvoker(connectionManager);
+        return new DriftNettyMethodInvoker(connectionManager, group);
     }
 
     @PreDestroy

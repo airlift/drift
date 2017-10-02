@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012 Facebook, Inc.
+ * Copyright (C) 2013 Facebook, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may
  * not use this file except in compliance with the License. You may obtain
@@ -13,13 +13,16 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
-package io.airlift.drift.client.stats;
+package io.airlift.drift.client;
 
-import com.google.common.util.concurrent.ListenableFuture;
+import java.util.Optional;
 
-public interface MethodInvocationStat
+import static io.airlift.drift.client.ExceptionClassification.HostStatus.NORMAL;
+
+public interface ExceptionClassifier
 {
-    void recordResult(long startTime, ListenableFuture<Object> result);
-
-    void recordRetry();
+    default ExceptionClassification classifyException(Throwable throwable)
+    {
+        return new ExceptionClassification(Optional.empty(), NORMAL);
+    }
 }

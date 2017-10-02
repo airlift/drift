@@ -65,6 +65,11 @@
 
         <dependency>
             <groupId>io.airlift</groupId>
+            <artifactId>log</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>io.airlift</groupId>
             <artifactId>stats</artifactId>
         </dependency>
 
@@ -87,6 +92,12 @@
         <dependency>
             <groupId>javax.validation</groupId>
             <artifactId>validation-api</artifactId>
+        </dependency>
+        
+        <dependency>
+            <groupId>com.google.code.findbugs</groupId>
+            <artifactId>annotations</artifactId>
+            <optional>true</optional>
         </dependency>
 
         <!-- for testing -->

@@ -16,6 +16,7 @@
 package io.airlift.drift.transport.apache;
 
 import com.google.common.util.concurrent.ListeningExecutorService;
+import com.google.common.util.concurrent.ListeningScheduledExecutorService;
 import io.airlift.drift.transport.MethodInvoker;
 import io.airlift.drift.transport.MethodInvokerFactory;
 import org.apache.thrift.protocol.TBinaryProtocol;
@@ -47,7 +48,8 @@ import static io.airlift.drift.transport.apache.PemReader.loadKeyStore;
 import static io.airlift.drift.transport.apache.PemReader.loadTrustStore;
 import static java.util.Objects.requireNonNull;
 import static java.util.concurrent.Executors.newCachedThreadPool;
-import static java.util.concurrent.Executors.newFixedThreadPool;
+import static java.util.concurrent.Executors.newScheduledThreadPool;
+import static java.util.concurrent.Executors.newSingleThreadScheduledExecutor;
 
 public class ApacheThriftMethodInvokerFactory<I>
         implements MethodInvokerFactory<I>, Closeable
@@ -55,6 +57,7 @@ public class ApacheThriftMethodInvokerFactory<I>
     private final Function<I, ApacheThriftClientConfig> clientConfigurationProvider;
 
     private final ListeningExecutorService executorService;
+    private final ListeningScheduledExecutorService delayService;
 
     public static ApacheThriftMethodInvokerFactory<?> createStaticApacheThriftMethodInvokerFactory(ApacheThriftClientConfig clientConfig)
     {
@@ -77,9 +80,11 @@ public class ApacheThriftMethodInvokerFactory<I>
         ThreadFactory threadFactory = daemonThreadsNamed("drift-client-%s");
         if (factoryConfig.getThreadCount() == null) {
             executorService = listeningDecorator(newCachedThreadPool(threadFactory));
+            delayService = listeningDecorator(newSingleThreadScheduledExecutor(daemonThreadsNamed("drift-client-delay-%s")));
         }
         else {
-            executorService = listeningDecorator(newFixedThreadPool(factoryConfig.getThreadCount(), threadFactory));
+            delayService = listeningDecorator(newScheduledThreadPool(factoryConfig.getThreadCount(), threadFactory));
+            executorService = delayService;
         }
         this.clientConfigurationProvider = requireNonNull(clientConfigurationProvider, "clientConfigurationProvider is null");
     }
@@ -120,6 +125,7 @@ public class ApacheThriftMethodInvokerFactory<I>
 
         return new ApacheThriftMethodInvoker(
                 executorService,
+                delayService,
                 transportFactory,
                 protocolFactory,
                 config.getConnectTimeout(),

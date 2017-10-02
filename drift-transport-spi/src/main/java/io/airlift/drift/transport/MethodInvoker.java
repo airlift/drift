@@ -16,6 +16,7 @@
 package io.airlift.drift.transport;
 
 import com.google.common.util.concurrent.ListenableFuture;
+import io.airlift.units.Duration;
 
 public interface MethodInvoker
 {
@@ -26,4 +27,9 @@ public interface MethodInvoker
      * {@code DriftApplicationException} wrapper; otherwise, the future will contain the raw transport exception.
      */
     ListenableFuture<Object> invoke(InvokeRequest request);
+
+    /**
+     * Gets a future that completes after the specified delay.
+     */
+    ListenableFuture<?> delay(Duration duration);
 }
