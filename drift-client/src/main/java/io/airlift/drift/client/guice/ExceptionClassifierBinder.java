@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 Facebook, Inc.
+ * Copyright (C) 2012 Facebook, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may
  * not use this file except in compliance with the License. You may obtain
@@ -13,13 +13,14 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
-package io.airlift.drift.client;
+package io.airlift.drift.client.guice;
 
-import static io.airlift.drift.client.ExceptionClassification.NORMAL_EXCEPTION;
+import com.google.inject.Binder;
 
-public interface ExceptionClassifier
+import java.lang.annotation.Annotation;
+
+@FunctionalInterface
+public interface ExceptionClassifierBinder
 {
-    ExceptionClassifier NORMAL_RESULT = throwable -> NORMAL_EXCEPTION;
-
-    ExceptionClassification classifyException(Throwable throwable);
+    void bind(Binder binder, Annotation annotation, String prefix);
 }

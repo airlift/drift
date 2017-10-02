@@ -19,10 +19,13 @@ import java.util.Objects;
 import java.util.Optional;
 
 import static com.google.common.base.MoreObjects.toStringHelper;
+import static io.airlift.drift.client.ExceptionClassification.HostStatus.NORMAL;
 import static java.util.Objects.requireNonNull;
 
 public final class ExceptionClassification
 {
+    public static final ExceptionClassification NORMAL_EXCEPTION = new ExceptionClassification(Optional.empty(), NORMAL);
+
     public enum HostStatus
     {
         NORMAL, OVERLOADED, DOWN

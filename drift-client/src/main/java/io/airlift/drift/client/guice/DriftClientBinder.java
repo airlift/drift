@@ -28,6 +28,7 @@ import com.google.inject.TypeLiteral;
 import io.airlift.drift.client.DriftClient;
 import io.airlift.drift.client.DriftClientFactory;
 import io.airlift.drift.client.DriftClientFactoryManager;
+import io.airlift.drift.client.ExceptionClassifier;
 import io.airlift.drift.client.MethodInvocationFilter;
 import io.airlift.drift.client.address.AddressSelector;
 import io.airlift.drift.client.stats.JmxMethodInvocationStatsFactory;
@@ -50,6 +51,7 @@ import java.util.Set;
 
 import static com.google.inject.multibindings.OptionalBinder.newOptionalBinder;
 import static io.airlift.configuration.ConfigBinder.configBinder;
+import static io.airlift.drift.client.ExceptionClassifier.NORMAL_RESULT;
 import static io.airlift.drift.client.guice.DriftClientAnnotationFactory.extractDriftClientBindingAnnotation;
 import static io.airlift.drift.client.guice.DriftClientAnnotationFactory.getDriftClientAnnotation;
 import static io.airlift.drift.codec.metadata.ThriftServiceMetadata.getThriftServiceAnnotation;
@@ -162,9 +164,11 @@ public class DriftClientBinder
             DriftClientFactoryManager<Annotation> driftClientFactoryManager = injector.getInstance(Key.get(DRIFT_CLIENT_FACTORY_MANAGER_TYPE));
 
             AddressSelector addressSelector = injector.getInstance(Key.get(AddressSelector.class, clientAnnotation));
+            ExceptionClassifier exceptionClassifier = injector.getInstance(Key.get(new TypeLiteral<Optional<ExceptionClassifier>>(){}, clientAnnotation))
+                    .orElse(NORMAL_RESULT);
             List<MethodInvocationFilter> filters = ImmutableList.copyOf(injector.getInstance(Key.get(SET_METHOD_INVOCATION_FILTERS_TYPE, clientAnnotation)));
 
-            DriftClientFactory driftClientFactory = driftClientFactoryManager.createDriftClientFactory(clientAnnotation, addressSelector);
+            DriftClientFactory driftClientFactory = driftClientFactoryManager.createDriftClientFactory(clientAnnotation, addressSelector, exceptionClassifier);
             return driftClientFactory.createDriftClient(clientInterface, extractDriftClientBindingAnnotation(clientAnnotation), filters, config);
         }
     }

@@ -43,8 +43,13 @@ public class DriftClientFactoryManager<I>
         this.methodInvocationStatsFactory = methodInvocationStatsFactory;
     }
 
-    public DriftClientFactory createDriftClientFactory(I clientIdentity, AddressSelector addressSelector)
+    public DriftClientFactory createDriftClientFactory(I clientIdentity, AddressSelector addressSelector, ExceptionClassifier exceptionClassifier)
     {
-        return new DriftClientFactory(codecManager, () -> methodInvokerFactory.createMethodInvoker(clientIdentity), addressSelector, methodInvocationStatsFactory);
+        return new DriftClientFactory(
+                codecManager,
+                () -> methodInvokerFactory.createMethodInvoker(clientIdentity),
+                addressSelector,
+                exceptionClassifier,
+                methodInvocationStatsFactory);
     }
 }

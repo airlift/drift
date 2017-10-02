@@ -56,6 +56,7 @@ import java.util.stream.Collectors;
 import static com.google.common.base.Throwables.getCausalChain;
 import static com.google.common.base.Throwables.getRootCause;
 import static com.google.inject.multibindings.OptionalBinder.newOptionalBinder;
+import static io.airlift.drift.client.ExceptionClassifier.NORMAL_RESULT;
 import static io.airlift.drift.client.guice.DriftClientBinder.driftClientBinder;
 import static io.airlift.drift.client.guice.MethodInvocationFilterBinder.staticFilterBinder;
 import static java.lang.annotation.ElementType.FIELD;
@@ -85,7 +86,7 @@ public class TestDriftClient
         TestingMethodInvocationStatsFactory statsFactory = new TestingMethodInvocationStatsFactory();
 
         DriftClientFactoryManager<String> clientFactoryManager = new DriftClientFactoryManager<>(codecManager, methodInvokerFactory, statsFactory);
-        DriftClientFactory driftClientFactory = clientFactoryManager.createDriftClientFactory("clientIdentity", new MockAddressSelector());
+        DriftClientFactory driftClientFactory = clientFactoryManager.createDriftClientFactory("clientIdentity", new MockAddressSelector(), NORMAL_RESULT);
 
         DriftClient<Client> driftClient = driftClientFactory.createDriftClient(Client.class);
         Client client = driftClient.get(ADDRESS_SELECTION_CONTEXT, HEADERS);
@@ -105,7 +106,7 @@ public class TestDriftClient
         MockMethodInvokerFactory<String> invokerFactory = new MockMethodInvokerFactory<>(resultsSupplier);
         TestingMethodInvocationStatsFactory statsFactory = new TestingMethodInvocationStatsFactory();
         DriftClientFactoryManager<String> clientFactoryManager = new DriftClientFactoryManager<>(codecManager, invokerFactory, statsFactory);
-        DriftClientFactory driftClientFactory = clientFactoryManager.createDriftClientFactory("clientIdentity", new MockAddressSelector());
+        DriftClientFactory driftClientFactory = clientFactoryManager.createDriftClientFactory("clientIdentity", new MockAddressSelector(), NORMAL_RESULT);
 
         DriftClient<Client> driftClient = driftClientFactory.createDriftClient(
                 Client.class,

@@ -26,6 +26,7 @@ import static com.google.common.base.MoreObjects.toStringHelper;
 import static com.google.common.base.Preconditions.checkArgument;
 import static io.airlift.drift.client.ExceptionClassification.HostStatus.DOWN;
 import static io.airlift.drift.client.ExceptionClassification.HostStatus.NORMAL;
+import static io.airlift.drift.client.ExceptionClassifier.NORMAL_RESULT;
 import static java.lang.Boolean.TRUE;
 import static java.lang.Math.min;
 import static java.util.Objects.requireNonNull;
@@ -39,7 +40,7 @@ public class RetryPolicy
             new Duration(0, MILLISECONDS),
             1.0,
             new Duration(0, MILLISECONDS),
-            new ExceptionClassifier() {});
+            NORMAL_RESULT);
 
     private final int maxRetries;
     private final Duration minBackoffDelay;

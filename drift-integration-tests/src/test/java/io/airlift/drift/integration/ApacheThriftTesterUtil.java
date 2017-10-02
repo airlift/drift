@@ -36,6 +36,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.ToIntFunction;
 
+import static io.airlift.drift.client.ExceptionClassifier.NORMAL_RESULT;
 import static io.airlift.drift.integration.ClientTestUtils.CODEC_MANAGER;
 import static io.airlift.drift.integration.ClientTestUtils.DRIFT_MESSAGES;
 import static io.airlift.drift.integration.ClientTestUtils.DRIFT_OK;
@@ -78,7 +79,7 @@ final class ApacheThriftTesterUtil
         ApacheThriftConnectionFactoryConfig factoryConfig = new ApacheThriftConnectionFactoryConfig();
         try (ApacheThriftMethodInvokerFactory<String> methodInvokerFactory = new ApacheThriftMethodInvokerFactory<>(factoryConfig, clientIdentity -> config)) {
             DriftClientFactoryManager<String> clientFactoryManager = new DriftClientFactoryManager<>(CODEC_MANAGER, methodInvokerFactory);
-            DriftClientFactory proxyFactory = clientFactoryManager.createDriftClientFactory("clientIdentity", addressSelector);
+            DriftClientFactory proxyFactory = clientFactoryManager.createDriftClientFactory("clientIdentity", addressSelector, NORMAL_RESULT);
 
             DriftScribe scribe = proxyFactory.createDriftClient(DriftScribe.class, Optional.empty(), filters, new DriftClientConfig()).get();
 
@@ -110,7 +111,7 @@ final class ApacheThriftTesterUtil
                 .setSslEnabled(secure);
 
         try (ApacheThriftMethodInvokerFactory<?> methodInvokerFactory = createStaticApacheThriftMethodInvokerFactory(config)) {
-            DriftClientFactory proxyFactory = new DriftClientFactory(CODEC_MANAGER, methodInvokerFactory, addressSelector);
+            DriftClientFactory proxyFactory = new DriftClientFactory(CODEC_MANAGER, methodInvokerFactory, addressSelector, NORMAL_RESULT);
 
             DriftScribe scribe = proxyFactory.createDriftClient(DriftScribe.class, Optional.empty(), filters, new DriftClientConfig()).get();
 
@@ -143,7 +144,7 @@ final class ApacheThriftTesterUtil
         ApacheThriftConnectionFactoryConfig factoryConfig = new ApacheThriftConnectionFactoryConfig();
         try (ApacheThriftMethodInvokerFactory<String> methodInvokerFactory = new ApacheThriftMethodInvokerFactory<>(factoryConfig, clientIdentity -> config)) {
             DriftClientFactoryManager<String> proxyFactoryManager = new DriftClientFactoryManager<>(CODEC_MANAGER, methodInvokerFactory);
-            DriftClientFactory proxyFactory = proxyFactoryManager.createDriftClientFactory("myFactory", addressSelector);
+            DriftClientFactory proxyFactory = proxyFactoryManager.createDriftClientFactory("myFactory", addressSelector, NORMAL_RESULT);
 
             DriftAsyncScribe scribe = proxyFactory.createDriftClient(DriftAsyncScribe.class, Optional.empty(), filters, new DriftClientConfig()).get();
 

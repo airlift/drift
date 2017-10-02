@@ -53,6 +53,7 @@ public class DriftClientFactory
     private final ThriftCodecManager codecManager;
     private final Supplier<MethodInvoker> methodInvokerSupplier;
     private final AddressSelector addressSelector;
+    private final ExceptionClassifier exceptionClassifier;
     private final ConcurrentMap<Class<?>, ThriftServiceMetadata> serviceMetadataCache = new ConcurrentHashMap<>();
     private final MethodInvocationStatsFactory methodInvocationStatsFactory;
 
@@ -60,20 +61,23 @@ public class DriftClientFactory
             ThriftCodecManager codecManager,
             Supplier<MethodInvoker> methodInvokerSupplier,
             AddressSelector addressSelector,
+            ExceptionClassifier exceptionClassifier,
             MethodInvocationStatsFactory methodInvocationStatsFactory)
     {
         this.codecManager = requireNonNull(codecManager, "codecManager is null");
         this.methodInvokerSupplier = requireNonNull(methodInvokerSupplier, "methodInvokerSupplier is null");
         this.addressSelector = requireNonNull(addressSelector, "addressSelector is null");
+        this.exceptionClassifier = exceptionClassifier;
         this.methodInvocationStatsFactory = requireNonNull(methodInvocationStatsFactory, "methodInvocationStatsFactory is null");
     }
 
-    public DriftClientFactory(ThriftCodecManager codecManager, MethodInvokerFactory<?> invokerFactory, AddressSelector addressSelector)
+    public DriftClientFactory(ThriftCodecManager codecManager, MethodInvokerFactory<?> invokerFactory, AddressSelector addressSelector, ExceptionClassifier exceptionClassifier)
     {
         this(
                 codecManager,
                 () -> invokerFactory.createMethodInvoker(null),
                 addressSelector,
+                exceptionClassifier,
                 new NullMethodInvocationStatsFactory());
     }
 
@@ -100,13 +104,7 @@ public class DriftClientFactory
         for (ThriftMethodMetadata method : serviceMetadata.getMethods().values()) {
             MethodMetadata metadata = getMethodMetadata(method);
 
-            RetryPolicy retryPolicy = new RetryPolicy(
-                    config.getMaxRetries(),
-                    config.getMinBackoffDelay(),
-                    config.getMaxBackoffDelay(),
-                    config.getBackoffScaleFactor(),
-                    config.getMaxRetryTime(),
-                    new ExceptionClassifier() {});
+            RetryPolicy retryPolicy = new RetryPolicy(config, exceptionClassifier);
 
             MethodInvocationStat statHandler;
             if (config.isStatsEnabled()) {

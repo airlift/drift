@@ -16,13 +16,16 @@
 package io.airlift.drift.client.guice;
 
 import com.google.inject.Binder;
+import com.google.inject.Key;
 import com.google.inject.multibindings.Multibinder;
+import io.airlift.drift.client.ExceptionClassifier;
 import io.airlift.drift.client.MethodInvocationFilter;
 import io.airlift.drift.client.address.AddressSelector;
 
 import java.lang.annotation.Annotation;
 
 import static com.google.inject.multibindings.Multibinder.newSetBinder;
+import static com.google.inject.multibindings.OptionalBinder.newOptionalBinder;
 import static java.util.Objects.requireNonNull;
 
 public class DriftClientBindingBuilder
@@ -36,7 +39,10 @@ public class DriftClientBindingBuilder
         this.binder = binder.skipSources(getClass());
         this.annotation = requireNonNull(annotation, "annotation is null");
         this.prefix = requireNonNull(prefix, "prefix is null");
-        filterBinder(); // initialize binding
+        // add MethodInvocationFilter extension binding point
+        filterBinder();
+        // add ExceptionClassifier extension binding point
+        newOptionalBinder(binder, Key.get(ExceptionClassifier.class, annotation));
     }
 
     public DriftClientBindingBuilder withMethodInvocationFilter(MethodInvocationFilterBinder filterBinder)
@@ -54,6 +60,20 @@ public class DriftClientBindingBuilder
     }
 
     public DriftClientBindingBuilder withAddressSelector(AddressSelectorBinder selectorBinder)
+    {
+        selectorBinder.bind(binder, annotation, prefix);
+        return this;
+    }
+
+    public DriftClientBindingBuilder withExceptionClassifier(ExceptionClassifier exceptionClassifier)
+    {
+        binder.bind(ExceptionClassifier.class)
+                .annotatedWith(annotation)
+                .toInstance(exceptionClassifier);
+        return this;
+    }
+
+    public DriftClientBindingBuilder withExceptionClassifier(ExceptionClassifierBinder selectorBinder)
     {
         selectorBinder.bind(binder, annotation, prefix);
         return this;
