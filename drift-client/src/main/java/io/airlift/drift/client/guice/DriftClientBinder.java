@@ -49,9 +49,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import static com.google.inject.multibindings.Multibinder.newSetBinder;
 import static com.google.inject.multibindings.OptionalBinder.newOptionalBinder;
 import static io.airlift.configuration.ConfigBinder.configBinder;
-import static io.airlift.drift.client.ExceptionClassifier.NORMAL_RESULT;
+import static io.airlift.drift.client.ExceptionClassifier.mergeExceptionClassifiers;
 import static io.airlift.drift.client.guice.DriftClientAnnotationFactory.extractDriftClientBindingAnnotation;
 import static io.airlift.drift.client.guice.DriftClientAnnotationFactory.getDriftClientAnnotation;
 import static io.airlift.drift.codec.metadata.ThriftServiceMetadata.getThriftServiceAnnotation;
@@ -148,6 +149,7 @@ public class DriftClientBinder
     {
         private static final TypeLiteral<DriftClientFactoryManager<Annotation>> DRIFT_CLIENT_FACTORY_MANAGER_TYPE = new TypeLiteral<DriftClientFactoryManager<Annotation>>() {};
         private static final TypeLiteral<Set<MethodInvocationFilter>> SET_METHOD_INVOCATION_FILTERS_TYPE = new TypeLiteral<Set<MethodInvocationFilter>>() {};
+        private static final TypeLiteral<Set<ExceptionClassifier>> SET_EXCEPTION_CLASSIFIER_TYPE = new TypeLiteral<Set<ExceptionClassifier>>() {};
 
         private final Class<T> clientInterface;
 
@@ -164,8 +166,13 @@ public class DriftClientBinder
             DriftClientFactoryManager<Annotation> driftClientFactoryManager = injector.getInstance(Key.get(DRIFT_CLIENT_FACTORY_MANAGER_TYPE));
 
             AddressSelector addressSelector = injector.getInstance(Key.get(AddressSelector.class, clientAnnotation));
-            ExceptionClassifier exceptionClassifier = injector.getInstance(Key.get(new TypeLiteral<Optional<ExceptionClassifier>>(){}, clientAnnotation))
-                    .orElse(NORMAL_RESULT);
+
+            ImmutableList.Builder<ExceptionClassifier> exceptionClassifiers = ImmutableList.builder();
+            injector.getInstance(Key.get(new TypeLiteral<Optional<ExceptionClassifier>>(){}, clientAnnotation))
+                    .ifPresent(exceptionClassifiers::add);
+            exceptionClassifiers.addAll(injector.getInstance(Key.get(SET_EXCEPTION_CLASSIFIER_TYPE)));
+            ExceptionClassifier exceptionClassifier = mergeExceptionClassifiers(exceptionClassifiers.build());
+
             List<MethodInvocationFilter> filters = ImmutableList.copyOf(injector.getInstance(Key.get(SET_METHOD_INVOCATION_FILTERS_TYPE, clientAnnotation)));
 
             DriftClientFactory driftClientFactory = driftClientFactoryManager.createDriftClientFactory(clientAnnotation, addressSelector, exceptionClassifier);
@@ -200,6 +207,7 @@ public class DriftClientBinder
         @Override
         public void configure(Binder binder)
         {
+            newSetBinder(binder, ExceptionClassifier.class);
             newOptionalBinder(binder, MBeanExporter.class);
             newOptionalBinder(binder, MethodInvocationStatsFactory.class)
                     .setDefault()

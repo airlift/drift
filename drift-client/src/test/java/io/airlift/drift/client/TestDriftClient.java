@@ -50,13 +50,15 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import static com.google.common.base.Throwables.getCausalChain;
 import static com.google.common.base.Throwables.getRootCause;
+import static com.google.inject.multibindings.Multibinder.newSetBinder;
 import static com.google.inject.multibindings.OptionalBinder.newOptionalBinder;
-import static io.airlift.drift.client.ExceptionClassifier.NORMAL_RESULT;
+import static io.airlift.drift.client.ExceptionClassifier.mergeExceptionClassifiers;
 import static io.airlift.drift.client.guice.DriftClientBinder.driftClientBinder;
 import static io.airlift.drift.client.guice.MethodInvocationFilterBinder.staticFilterBinder;
 import static java.lang.annotation.ElementType.FIELD;
@@ -65,7 +67,9 @@ import static java.lang.annotation.ElementType.PARAMETER;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotSame;
+import static org.testng.Assert.assertNull;
 import static org.testng.Assert.assertSame;
+import static org.testng.Assert.fail;
 
 public class TestDriftClient
 {
@@ -84,15 +88,16 @@ public class TestDriftClient
         ResultsSupplier resultsSupplier = new ResultsSupplier();
         MockMethodInvokerFactory<String> methodInvokerFactory = new MockMethodInvokerFactory<>(resultsSupplier);
         TestingMethodInvocationStatsFactory statsFactory = new TestingMethodInvocationStatsFactory();
+        List<TestingExceptionClassifier> classifiers = ImmutableList.of(new TestingExceptionClassifier(), new TestingExceptionClassifier(), new TestingExceptionClassifier());
 
         DriftClientFactoryManager<String> clientFactoryManager = new DriftClientFactoryManager<>(codecManager, methodInvokerFactory, statsFactory);
-        DriftClientFactory driftClientFactory = clientFactoryManager.createDriftClientFactory("clientIdentity", new MockAddressSelector(), NORMAL_RESULT);
+        DriftClientFactory driftClientFactory = clientFactoryManager.createDriftClientFactory("clientIdentity", new MockAddressSelector(), mergeExceptionClassifiers(classifiers));
 
-        DriftClient<Client> driftClient = driftClientFactory.createDriftClient(Client.class);
+        DriftClient<Client> driftClient = driftClientFactory.createDriftClient(Client.class, Optional.empty(), ImmutableList.of(), new DriftClientConfig());
         Client client = driftClient.get(ADDRESS_SELECTION_CONTEXT, HEADERS);
         assertEquals(methodInvokerFactory.getClientIdentity(), "clientIdentity");
 
-        testClient(resultsSupplier, ImmutableList.of(methodInvokerFactory.getMethodInvoker()), statsFactory, client, Optional.empty());
+        testClient(resultsSupplier, ImmutableList.of(methodInvokerFactory.getMethodInvoker()), classifiers, statsFactory, client, Optional.empty());
     }
 
     @Test
@@ -105,8 +110,10 @@ public class TestDriftClient
 
         MockMethodInvokerFactory<String> invokerFactory = new MockMethodInvokerFactory<>(resultsSupplier);
         TestingMethodInvocationStatsFactory statsFactory = new TestingMethodInvocationStatsFactory();
+        List<TestingExceptionClassifier> classifiers = ImmutableList.of(new TestingExceptionClassifier(), new TestingExceptionClassifier(), new TestingExceptionClassifier());
+
         DriftClientFactoryManager<String> clientFactoryManager = new DriftClientFactoryManager<>(codecManager, invokerFactory, statsFactory);
-        DriftClientFactory driftClientFactory = clientFactoryManager.createDriftClientFactory("clientIdentity", new MockAddressSelector(), NORMAL_RESULT);
+        DriftClientFactory driftClientFactory = clientFactoryManager.createDriftClientFactory("clientIdentity", new MockAddressSelector(), mergeExceptionClassifiers(classifiers));
 
         DriftClient<Client> driftClient = driftClientFactory.createDriftClient(
                 Client.class,
@@ -116,7 +123,7 @@ public class TestDriftClient
         Client client = driftClient.get(ADDRESS_SELECTION_CONTEXT, HEADERS);
         assertEquals(invokerFactory.getClientIdentity(), "clientIdentity");
 
-        testClient(resultsSupplier, ImmutableList.of(passThroughFilter, shortCircuitFilter), statsFactory, client, Optional.empty());
+        testClient(resultsSupplier, ImmutableList.of(passThroughFilter, shortCircuitFilter), classifiers, statsFactory, client, Optional.empty());
     }
 
     @Test
@@ -127,8 +134,16 @@ public class TestDriftClient
         ResultsSupplier resultsSupplier = new ResultsSupplier();
         MockMethodInvokerFactory<Annotation> invokerFactory = new MockMethodInvokerFactory<>(resultsSupplier);
 
+        TestingExceptionClassifier globalClassifierOne = new TestingExceptionClassifier();
+        TestingExceptionClassifier globalClassifierTwo = new TestingExceptionClassifier();
+        TestingExceptionClassifier clientClassifier = new TestingExceptionClassifier();
+        TestingExceptionClassifier customClientClassifier = new TestingExceptionClassifier();
         Bootstrap app = new Bootstrap(
                 new ThriftCodecModule(),
+                binder -> newSetBinder(binder, ExceptionClassifier.class).addBinding()
+                        .toInstance(globalClassifierOne),
+                binder -> newSetBinder(binder, ExceptionClassifier.class).addBinding()
+                        .toInstance(globalClassifierTwo),
                 binder -> binder.bind(new TypeLiteral<MethodInvokerFactory<Annotation>>() {})
                         .toInstance(invokerFactory),
                 binder -> newOptionalBinder(binder, MethodInvocationStatsFactory.class)
@@ -136,10 +151,12 @@ public class TestDriftClient
                         .toInstance(statsFactory),
                 binder -> driftClientBinder(binder)
                         .bindDriftClient(Client.class)
-                        .withAddressSelector(new MockAddressSelector()),
+                        .withAddressSelector(new MockAddressSelector())
+                        .withExceptionClassifier(clientClassifier),
                 binder -> driftClientBinder(binder)
                         .bindDriftClient(Client.class, CustomClient.class)
-                        .withAddressSelector(new MockAddressSelector()));
+                        .withAddressSelector(new MockAddressSelector())
+                        .withExceptionClassifier(customClientClassifier));
 
         LifeCycleManager lifeCycleManager = null;
         try {
@@ -152,13 +169,23 @@ public class TestDriftClient
             DriftClient<Client> driftClient = injector.getInstance(DEFAULT_CLIENT_KEY);
             assertSame(injector.getInstance(DEFAULT_CLIENT_KEY), driftClient);
             Client client = driftClient.get(ADDRESS_SELECTION_CONTEXT, HEADERS);
-            testClient(resultsSupplier, ImmutableList.of(invokerFactory.getMethodInvoker()), statsFactory, client, Optional.empty());
+            testClient(resultsSupplier,
+                    ImmutableList.of(invokerFactory.getMethodInvoker()),
+                    ImmutableList.of(globalClassifierOne, globalClassifierTwo, clientClassifier),
+                    statsFactory,
+                    client,
+                    Optional.empty());
 
             DriftClient<Client> customDriftClient = injector.getInstance(CUSTOM_CLIENT_KEY);
             assertSame(injector.getInstance(CUSTOM_CLIENT_KEY), customDriftClient);
             assertNotSame(driftClient, customDriftClient);
             Client customClient = customDriftClient.get(ADDRESS_SELECTION_CONTEXT, HEADERS);
-            testClient(resultsSupplier, ImmutableList.of(invokerFactory.getMethodInvoker()), statsFactory, customClient, Optional.of(CustomClient.class.getSimpleName()));
+            testClient(resultsSupplier,
+                    ImmutableList.of(invokerFactory.getMethodInvoker()),
+                    ImmutableList.of(globalClassifierOne, globalClassifierTwo, customClientClassifier),
+                    statsFactory,
+                    customClient,
+                    Optional.of(CustomClient.class.getSimpleName()));
         }
         catch (Exception e) {
             throw new RuntimeException(e);
@@ -184,8 +211,16 @@ public class TestDriftClient
         ShortCircuitFilter shortCircuitFilter = new ShortCircuitFilter(resultsSupplier);
         MockMethodInvokerFactory<Annotation> invokerFactory = new MockMethodInvokerFactory<>(resultsSupplier);
 
+        TestingExceptionClassifier globalClassifierOne = new TestingExceptionClassifier();
+        TestingExceptionClassifier globalClassifierTwo = new TestingExceptionClassifier();
+        TestingExceptionClassifier clientClassifier = new TestingExceptionClassifier();
+        TestingExceptionClassifier customClientClassifier = new TestingExceptionClassifier();
         Bootstrap app = new Bootstrap(
                 new ThriftCodecModule(),
+                binder -> newSetBinder(binder, ExceptionClassifier.class).addBinding()
+                        .toInstance(globalClassifierOne),
+                binder -> newSetBinder(binder, ExceptionClassifier.class).addBinding()
+                        .toInstance(globalClassifierTwo),
                 binder -> binder.bind(new TypeLiteral<MethodInvokerFactory<Annotation>>() {})
                         .toInstance(invokerFactory),
                 binder -> newOptionalBinder(binder, MethodInvocationStatsFactory.class)
@@ -194,11 +229,13 @@ public class TestDriftClient
                 binder -> driftClientBinder(binder)
                         .bindDriftClient(Client.class)
                         .withAddressSelector(new MockAddressSelector())
-                        .withMethodInvocationFilter(staticFilterBinder(passThroughFilter, shortCircuitFilter)),
+                        .withMethodInvocationFilter(staticFilterBinder(passThroughFilter, shortCircuitFilter))
+                        .withExceptionClassifier(clientClassifier),
                 binder -> driftClientBinder(binder)
                         .bindDriftClient(Client.class, CustomClient.class)
                         .withAddressSelector(new MockAddressSelector())
-                        .withMethodInvocationFilter(staticFilterBinder(passThroughFilter, shortCircuitFilter)));
+                        .withMethodInvocationFilter(staticFilterBinder(passThroughFilter, shortCircuitFilter))
+                        .withExceptionClassifier(customClientClassifier));
 
         LifeCycleManager lifeCycleManager = null;
         try {
@@ -211,13 +248,23 @@ public class TestDriftClient
             DriftClient<Client> driftClient = injector.getInstance(DEFAULT_CLIENT_KEY);
             assertSame(injector.getInstance(DEFAULT_CLIENT_KEY), driftClient);
             Client client = driftClient.get(ADDRESS_SELECTION_CONTEXT, HEADERS);
-            testClient(resultsSupplier, ImmutableList.of(passThroughFilter, shortCircuitFilter), statsFactory, client, Optional.empty());
+            testClient(resultsSupplier,
+                    ImmutableList.of(passThroughFilter, shortCircuitFilter),
+                    ImmutableList.of(globalClassifierOne, globalClassifierTwo, clientClassifier),
+                    statsFactory,
+                    client,
+                    Optional.empty());
 
             DriftClient<Client> customDriftClient = injector.getInstance(CUSTOM_CLIENT_KEY);
             assertSame(injector.getInstance(CUSTOM_CLIENT_KEY), customDriftClient);
             assertNotSame(driftClient, customDriftClient);
             Client customClient = customDriftClient.get(ADDRESS_SELECTION_CONTEXT, HEADERS);
-            testClient(resultsSupplier, ImmutableList.of(passThroughFilter, shortCircuitFilter), statsFactory, customClient, Optional.of(CustomClient.class.getSimpleName()));
+            testClient(resultsSupplier,
+                    ImmutableList.of(passThroughFilter, shortCircuitFilter),
+                    ImmutableList.of(globalClassifierOne, globalClassifierTwo, customClientClassifier),
+                    statsFactory,
+                    customClient,
+                    Optional.of(CustomClient.class.getSimpleName()));
         }
         catch (Exception e) {
             throw new RuntimeException(e);
@@ -236,8 +283,10 @@ public class TestDriftClient
     private void testClient(
             ResultsSupplier resultsSupplier,
             List<Supplier<InvokeRequest>> targets,
+            List<TestingExceptionClassifier> classifiers,
             TestingMethodInvocationStatsFactory statsFactory,
-            Client client, Optional<String> empty)
+            Client client,
+            Optional<String> empty)
             throws Exception
     {
         // test built-in methods
@@ -247,49 +296,50 @@ public class TestDriftClient
         assertEquals(client.toString(), "clientService");
 
         // test normal invocation
-        assertNormalInvocation(resultsSupplier, targets, statsFactory, client, empty);
+        assertNormalInvocation(resultsSupplier, targets, statsFactory, classifiers, client, empty);
 
         // test method throws TException
-        assertExceptionInvocation(resultsSupplier, targets, statsFactory, client, empty, new ClientException());
-        assertExceptionInvocation(resultsSupplier, targets, statsFactory, client, empty, new TException());
-        assertExceptionInvocation(resultsSupplier, targets, statsFactory, client, empty, new TApplicationException());
-        assertExceptionInvocation(resultsSupplier, targets, statsFactory, client, empty, new TTransportException());
-        assertExceptionInvocation(resultsSupplier, targets, statsFactory, client, empty, new TProtocolException());
-        assertExceptionInvocation(resultsSupplier, targets, statsFactory, client, empty, new Error());
-        assertExceptionInvocation(resultsSupplier, targets, statsFactory, client, empty, new UnknownException(), TException.class);
-        assertExceptionInvocation(resultsSupplier, targets, statsFactory, client, empty, new RuntimeException(), TException.class);
-        assertExceptionInvocation(resultsSupplier, targets, statsFactory, client, empty, new InterruptedException(), TException.class);
+        assertExceptionInvocation(resultsSupplier, targets, statsFactory, classifiers, client, empty, new ClientException());
+        assertExceptionInvocation(resultsSupplier, targets, statsFactory, classifiers, client, empty, new TException());
+        assertExceptionInvocation(resultsSupplier, targets, statsFactory, classifiers, client, empty, new TApplicationException());
+        assertExceptionInvocation(resultsSupplier, targets, statsFactory, classifiers, client, empty, new TTransportException());
+        assertExceptionInvocation(resultsSupplier, targets, statsFactory, classifiers, client, empty, new TProtocolException());
+        assertExceptionInvocation(resultsSupplier, targets, statsFactory, classifiers, client, empty, new Error());
+        assertExceptionInvocation(resultsSupplier, targets, statsFactory, classifiers, client, empty, new UnknownException(), TException.class);
+        assertExceptionInvocation(resultsSupplier, targets, statsFactory, classifiers, client, empty, new RuntimeException(), TException.class);
+        assertExceptionInvocation(resultsSupplier, targets, statsFactory, classifiers, client, empty, new InterruptedException(), TException.class);
 
         // custom exception subclasses
-        assertExceptionInvocation(resultsSupplier, targets, statsFactory, client, empty, new ClientException() {});
-        assertExceptionInvocation(resultsSupplier, targets, statsFactory, client, empty, new TException() {});
-        assertExceptionInvocation(resultsSupplier, targets, statsFactory, client, empty, new TApplicationException() {});
-        assertExceptionInvocation(resultsSupplier, targets, statsFactory, client, empty, new TTransportException() {});
-        assertExceptionInvocation(resultsSupplier, targets, statsFactory, client, empty, new TProtocolException() {});
+        assertExceptionInvocation(resultsSupplier, targets, statsFactory, classifiers, client, empty, new ClientException() {});
+        assertExceptionInvocation(resultsSupplier, targets, statsFactory, classifiers, client, empty, new TException() {});
+        assertExceptionInvocation(resultsSupplier, targets, statsFactory, classifiers, client, empty, new TApplicationException() {});
+        assertExceptionInvocation(resultsSupplier, targets, statsFactory, classifiers, client, empty, new TTransportException() {});
+        assertExceptionInvocation(resultsSupplier, targets, statsFactory, classifiers, client, empty, new TProtocolException() {});
 
         // test method does not throw TException
-        assertNoTExceptionInvocation(resultsSupplier, targets, statsFactory, client, empty, new ClientException());
-        assertNoTExceptionInvocation(resultsSupplier, targets, statsFactory, client, empty, new TException(), RuntimeTException.class);
-        assertNoTExceptionInvocation(resultsSupplier, targets, statsFactory, client, empty, new TApplicationException(), RuntimeTApplicationException.class);
-        assertNoTExceptionInvocation(resultsSupplier, targets, statsFactory, client, empty, new TTransportException(), RuntimeTTransportException.class);
-        assertNoTExceptionInvocation(resultsSupplier, targets, statsFactory, client, empty, new TProtocolException(), RuntimeTProtocolException.class);
-        assertNoTExceptionInvocation(resultsSupplier, targets, statsFactory, client, empty, new Error());
-        assertNoTExceptionInvocation(resultsSupplier, targets, statsFactory, client, empty, new UnknownException(), RuntimeTException.class, TException.class);
-        assertNoTExceptionInvocation(resultsSupplier, targets, statsFactory, client, empty, new RuntimeException(), RuntimeTException.class, TException.class);
-        assertNoTExceptionInvocation(resultsSupplier, targets, statsFactory, client, empty, new InterruptedException(), RuntimeTException.class, TException.class);
+        assertNoTExceptionInvocation(resultsSupplier, targets, statsFactory, classifiers, client, empty, new ClientException());
+        assertNoTExceptionInvocation(resultsSupplier, targets, statsFactory, classifiers, client, empty, new TException(), RuntimeTException.class);
+        assertNoTExceptionInvocation(resultsSupplier, targets, statsFactory, classifiers, client, empty, new TApplicationException(), RuntimeTApplicationException.class);
+        assertNoTExceptionInvocation(resultsSupplier, targets, statsFactory, classifiers, client, empty, new TTransportException(), RuntimeTTransportException.class);
+        assertNoTExceptionInvocation(resultsSupplier, targets, statsFactory, classifiers, client, empty, new TProtocolException(), RuntimeTProtocolException.class);
+        assertNoTExceptionInvocation(resultsSupplier, targets, statsFactory, classifiers, client, empty, new Error());
+        assertNoTExceptionInvocation(resultsSupplier, targets, statsFactory, classifiers, client, empty, new UnknownException(), RuntimeTException.class, TException.class);
+        assertNoTExceptionInvocation(resultsSupplier, targets, statsFactory, classifiers, client, empty, new RuntimeException(), RuntimeTException.class, TException.class);
+        assertNoTExceptionInvocation(resultsSupplier, targets, statsFactory, classifiers, client, empty, new InterruptedException(), RuntimeTException.class, TException.class);
 
         // custom exception subclasses
-        assertNoTExceptionInvocation(resultsSupplier, targets, statsFactory, client, empty, new ClientException() {});
-        assertNoTExceptionInvocation(resultsSupplier, targets, statsFactory, client, empty, new TException() {}, RuntimeTException.class);
-        assertNoTExceptionInvocation(resultsSupplier, targets, statsFactory, client, empty, new TApplicationException() {}, RuntimeTApplicationException.class);
-        assertNoTExceptionInvocation(resultsSupplier, targets, statsFactory, client, empty, new TTransportException() {}, RuntimeTTransportException.class);
-        assertNoTExceptionInvocation(resultsSupplier, targets, statsFactory, client, empty, new TProtocolException() {}, RuntimeTProtocolException.class);
+        assertNoTExceptionInvocation(resultsSupplier, targets, statsFactory, classifiers, client, empty, new ClientException() {});
+        assertNoTExceptionInvocation(resultsSupplier, targets, statsFactory, classifiers, client, empty, new TException() {}, RuntimeTException.class);
+        assertNoTExceptionInvocation(resultsSupplier, targets, statsFactory, classifiers, client, empty, new TApplicationException() {}, RuntimeTApplicationException.class);
+        assertNoTExceptionInvocation(resultsSupplier, targets, statsFactory, classifiers, client, empty, new TTransportException() {}, RuntimeTTransportException.class);
+        assertNoTExceptionInvocation(resultsSupplier, targets, statsFactory, classifiers, client, empty, new TProtocolException() {}, RuntimeTProtocolException.class);
     }
 
     private static void assertNormalInvocation(
             ResultsSupplier resultsSupplier,
             Collection<Supplier<InvokeRequest>> targets,
             TestingMethodInvocationStatsFactory statsFactory,
+            List<TestingExceptionClassifier> classifiers,
             Client client,
             Optional<String> qualifier)
             throws Exception
@@ -301,6 +351,7 @@ public class TestDriftClient
         int invocationId = ThreadLocalRandom.current().nextInt();
         assertEquals(client.test(invocationId, "normal"), "result");
         verifyMethodInvocation(targets, "test", invocationId, "normal");
+        classifiers.forEach(TestingExceptionClassifier::assertNoException);
         stat.assertSuccess(0);
 
         stat = statsFactory.getStat("clientService", qualifier, "testAsync");
@@ -308,6 +359,7 @@ public class TestDriftClient
         invocationId = ThreadLocalRandom.current().nextInt();
         assertEquals(client.testAsync(invocationId, "normal").get(), "result");
         verifyMethodInvocation(targets, "testAsync", invocationId, "normal");
+        classifiers.forEach(TestingExceptionClassifier::assertNoException);
         stat.assertSuccess(0);
     }
 
@@ -316,6 +368,7 @@ public class TestDriftClient
             ResultsSupplier resultsSupplier,
             Collection<Supplier<InvokeRequest>> targets,
             TestingMethodInvocationStatsFactory statsFactory,
+            List<TestingExceptionClassifier> classifiers,
             Client client,
             Optional<String> qualifier,
             Throwable testException,
@@ -330,9 +383,11 @@ public class TestDriftClient
         resultsSupplier.setFailedResult(testException);
         try {
             client.test(invocationId, name);
+            fail("Expected exception");
         }
         catch (Throwable e) {
             assertExceptionChain(e, testException, expectedWrapperTypes);
+            classifiers.forEach(classifier -> classifier.assertLastException(testException));
         }
         verifyMethodInvocation(targets, "test", invocationId, name);
         stat.assertFailure(0);
@@ -343,9 +398,11 @@ public class TestDriftClient
         resultsSupplier.setFailedResult(testException);
         try {
             client.testAsync(invocationId, name).get();
+            fail("Expected exception");
         }
         catch (ExecutionException e) {
             assertExceptionChain(e.getCause(), testException, expectedWrapperTypes);
+            classifiers.forEach(classifier -> classifier.assertLastException(testException));
         }
         verifyMethodInvocation(targets, "testAsync", invocationId, name);
         stat.assertFailure(0);
@@ -356,6 +413,7 @@ public class TestDriftClient
             ResultsSupplier resultsSupplier,
             Collection<Supplier<InvokeRequest>> targets,
             TestingMethodInvocationStatsFactory statsFactory,
+            List<TestingExceptionClassifier> classifiers,
             Client client,
             Optional<String> qualifier,
             Throwable testException,
@@ -369,9 +427,11 @@ public class TestDriftClient
         try {
             invocationId++;
             client.testNoTException(invocationId, name);
+            fail("Expected exception");
         }
         catch (Throwable e) {
             assertExceptionChain(e, testException, expectedWrapperTypes);
+            classifiers.forEach(classifier -> classifier.assertLastException(testException));
         }
         verifyMethodInvocation(targets, "testNoTException", invocationId, name);
         stat.assertFailure(0);
@@ -437,5 +497,35 @@ public class TestDriftClient
     private static class UnknownException
             extends Exception
     {
+    }
+
+    private static class TestingExceptionClassifier
+            implements ExceptionClassifier
+    {
+        private final AtomicReference<Throwable> lastException = new AtomicReference<>();
+
+        public void assertLastException(Throwable expectedException)
+        {
+            if (expectedException instanceof InterruptedException) {
+                assertNull(lastException.get());
+            }
+            else {
+                assertSame(expectedException, lastException.get());
+            }
+            lastException.set(null);
+        }
+
+        public void assertNoException()
+        {
+            assertNull(lastException.get());
+            lastException.set(null);
+        }
+
+        @Override
+        public ExceptionClassification classifyException(Throwable throwable)
+        {
+            lastException.set(throwable);
+            return ExceptionClassification.NORMAL_EXCEPTION;
+        }
     }
 }

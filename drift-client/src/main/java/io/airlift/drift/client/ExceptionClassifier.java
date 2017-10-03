@@ -15,11 +15,25 @@
  */
 package io.airlift.drift.client;
 
+import com.google.common.collect.ImmutableList;
+
+import java.util.List;
+
 import static io.airlift.drift.client.ExceptionClassification.NORMAL_EXCEPTION;
+import static io.airlift.drift.client.ExceptionClassification.mergeExceptionClassifications;
+import static java.util.Objects.requireNonNull;
 
 public interface ExceptionClassifier
 {
     ExceptionClassifier NORMAL_RESULT = throwable -> NORMAL_EXCEPTION;
+
+    static ExceptionClassifier mergeExceptionClassifiers(Iterable<? extends ExceptionClassifier> classifiers)
+    {
+        List<ExceptionClassifier> exceptionClassifiers = ImmutableList.copyOf(requireNonNull(classifiers, "classifiers is null"));
+        return throwable -> exceptionClassifiers.stream()
+                .map(classifier -> classifier.classifyException(throwable))
+                .collect(mergeExceptionClassifications());
+    }
 
     ExceptionClassification classifyException(Throwable throwable);
 }
