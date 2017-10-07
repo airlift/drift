@@ -46,7 +46,7 @@ public final class SimpleAddressSelectorBinder
     }
 
     private static class SimpleAddressSelectorProvider
-            extends AbstractAnnotatedProvider<AddressSelector>
+            extends AbstractAnnotatedProvider<AddressSelector<?>>
     {
         public SimpleAddressSelectorProvider(Annotation annotation)
         {
@@ -54,7 +54,7 @@ public final class SimpleAddressSelectorBinder
         }
 
         @Override
-        protected AddressSelector get(Injector injector, Annotation annotation)
+        protected AddressSelector<?> get(Injector injector, Annotation annotation)
         {
             return new SimpleAddressSelector(
                     injector.getInstance(Key.get(SimpleAddressSelectorConfig.class, annotation)));

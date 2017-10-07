@@ -165,7 +165,7 @@ public class DriftClientBinder
             DriftClientConfig config = injector.getInstance(Key.get(DriftClientConfig.class, clientAnnotation));
             DriftClientFactoryManager<Annotation> driftClientFactoryManager = injector.getInstance(Key.get(DRIFT_CLIENT_FACTORY_MANAGER_TYPE));
 
-            AddressSelector addressSelector = injector.getInstance(Key.get(AddressSelector.class, clientAnnotation));
+            AddressSelector<?> addressSelector = injector.getInstance(Key.get(AddressSelector.class, clientAnnotation));
 
             ImmutableList.Builder<ExceptionClassifier> exceptionClassifiers = ImmutableList.builder();
             injector.getInstance(Key.get(new TypeLiteral<Optional<ExceptionClassifier>>(){}, clientAnnotation))

@@ -17,13 +17,14 @@ package io.airlift.drift.client.address;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.net.HostAndPort;
+import io.airlift.drift.transport.Address;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class MockAddressSelector
-        implements AddressSelector
+        implements AddressSelector<Address>
 {
     private final List<HostAndPort> markdownHosts = new CopyOnWriteArrayList<>();
     private Optional<HostAndPort> address = Optional.of(HostAndPort.fromParts("localhost", 9999));
@@ -39,14 +40,14 @@ public class MockAddressSelector
     }
 
     @Override
-    public Optional<HostAndPort> selectAddress(Optional<String> addressSelectionContext)
+    public Optional<Address> selectAddress(Optional<String> addressSelectionContext)
     {
-        return address;
+        return address.map(hostAndPort -> () -> hostAndPort);
     }
 
     @Override
-    public void markdown(HostAndPort address)
+    public void markdown(Address address)
     {
-        markdownHosts.add(address);
+        markdownHosts.add(address.getHostAndPort());
     }
 }

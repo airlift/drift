@@ -28,6 +28,7 @@ import io.airlift.drift.codec.internal.ProtocolWriter;
 import io.airlift.drift.codec.metadata.ThriftType;
 import io.airlift.drift.protocol.TProtocolException;
 import io.airlift.drift.protocol.TTransportException;
+import io.airlift.drift.transport.Address;
 import io.airlift.drift.transport.ConnectionFailedException;
 import io.airlift.drift.transport.DriftApplicationException;
 import io.airlift.drift.transport.InvokeRequest;
@@ -134,9 +135,9 @@ public class ApacheThriftMethodInvoker
     private Object invokeSynchronous(InvokeRequest request)
             throws Exception
     {
-        HostAndPort address = request.getAddress();
+        Address address = request.getAddress();
 
-        TSocket socket = createTSocket(address);
+        TSocket socket = createTSocket(address.getHostAndPort());
         if (!socket.isOpen()) {
             try {
                 socket.open();

@@ -199,7 +199,7 @@ public class TestDriftNettyMethodInvoker
                     ImmutableMap.of(),
                     false);
 
-            ListenableFuture<Object> future = methodInvoker.invoke(new InvokeRequest(methodMetadata, address, ImmutableMap.of(), ImmutableList.of(entries)));
+            ListenableFuture<Object> future = methodInvoker.invoke(new InvokeRequest(methodMetadata, () -> address, ImmutableMap.of(), ImmutableList.of(entries)));
             assertEquals(future.get(), DRIFT_OK);
 
             return 1;

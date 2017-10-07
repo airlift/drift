@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012 Facebook, Inc.
+ * Copyright (C) 2017 Facebook, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may
  * not use this file except in compliance with the License. You may obtain
@@ -15,23 +15,9 @@
  */
 package io.airlift.drift.transport;
 
-import io.airlift.drift.protocol.TTransportException;
+import com.google.common.net.HostAndPort;
 
-import static java.util.Objects.requireNonNull;
-
-public class ConnectionFailedException
-        extends TTransportException
+public interface Address
 {
-    private final Address address;
-
-    public ConnectionFailedException(Address address, Throwable cause)
-    {
-        super("Failed to connect to " + address, requireNonNull(cause, "cause is null"));
-        this.address = requireNonNull(address, "address is null");
-    }
-
-    public Address getAddress()
-    {
-        return address;
-    }
+    HostAndPort getHostAndPort();
 }

@@ -16,7 +16,6 @@
 package io.airlift.drift.client;
 
 import com.google.common.base.Ticker;
-import com.google.common.net.HostAndPort;
 import com.google.common.util.concurrent.AbstractFuture;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
@@ -25,6 +24,7 @@ import io.airlift.drift.TException;
 import io.airlift.drift.client.address.AddressSelector;
 import io.airlift.drift.client.stats.MethodInvocationStat;
 import io.airlift.drift.protocol.TTransportException;
+import io.airlift.drift.transport.Address;
 import io.airlift.drift.transport.DriftApplicationException;
 import io.airlift.drift.transport.InvokeRequest;
 import io.airlift.drift.transport.MethodInvoker;
@@ -48,7 +48,7 @@ import static java.lang.Boolean.FALSE;
 import static java.util.Objects.requireNonNull;
 
 @ThreadSafe
-class DriftMethodInvocation
+class DriftMethodInvocation<A extends Address>
         extends AbstractFuture<Object>
 {
     private static final Logger log = Logger.get(DriftMethodInvocation.class);
@@ -58,7 +58,7 @@ class DriftMethodInvocation
     private final Map<String, String> headers;
     private final List<Object> parameters;
     private final RetryPolicy retryPolicy;
-    private final AddressSelector addressSelector;
+    private final AddressSelector<A> addressSelector;
     private final Optional<String> addressSelectionContext;
     private final MethodInvocationStat stat;
     private final Ticker ticker;
@@ -76,18 +76,18 @@ class DriftMethodInvocation
     @GuardedBy("this")
     private ListenableFuture<?> currentTask;
 
-    static DriftMethodInvocation createDriftMethodInvocation(
+    static <A extends Address> DriftMethodInvocation<A> createDriftMethodInvocation(
             MethodInvoker invoker,
             MethodMetadata metadata,
             Map<String, String> headers,
             List<Object> parameters,
             RetryPolicy retryPolicy,
-            AddressSelector addressSelector,
+            AddressSelector<A> addressSelector,
             Optional<String> addressSelectionContext,
             MethodInvocationStat stat,
             Ticker ticker)
     {
-        DriftMethodInvocation invocation = new DriftMethodInvocation(
+        DriftMethodInvocation<A> invocation = new DriftMethodInvocation<>(
                 invoker,
                 metadata,
                 headers,
@@ -108,7 +108,7 @@ class DriftMethodInvocation
             Map<String, String> headers,
             List<Object> parameters,
             RetryPolicy retryPolicy,
-            AddressSelector addressSelector,
+            AddressSelector<A> addressSelector,
             Optional<String> addressSelectionContext,
             MethodInvocationStat stat,
             Ticker ticker)
@@ -140,7 +140,7 @@ class DriftMethodInvocation
                 return;
             }
 
-            Optional<HostAndPort> address = addressSelector.selectAddress(addressSelectionContext);
+            Optional<A> address = addressSelector.selectAddress(addressSelectionContext);
             if (!address.isPresent()) {
                 fail();
                 return;
@@ -178,7 +178,7 @@ class DriftMethodInvocation
         }
     }
 
-    private synchronized void handleFailure(HostAndPort address, Throwable throwable)
+    private synchronized void handleFailure(A address, Throwable throwable)
     {
         try {
             ExceptionClassification exceptionClassification = retryPolicy.classifyException(throwable);

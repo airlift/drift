@@ -27,6 +27,7 @@ import io.airlift.drift.codec.ThriftCodecManager;
 import io.airlift.drift.codec.metadata.ThriftMethodMetadata;
 import io.airlift.drift.codec.metadata.ThriftServiceMetadata;
 import io.airlift.drift.codec.metadata.ThriftType;
+import io.airlift.drift.transport.Address;
 import io.airlift.drift.transport.DriftClientConfig;
 import io.airlift.drift.transport.MethodInvoker;
 import io.airlift.drift.transport.MethodInvokerFactory;
@@ -52,7 +53,7 @@ public class DriftClientFactory
 {
     private final ThriftCodecManager codecManager;
     private final Supplier<MethodInvoker> methodInvokerSupplier;
-    private final AddressSelector addressSelector;
+    private final AddressSelector<? extends Address> addressSelector;
     private final ExceptionClassifier exceptionClassifier;
     private final ConcurrentMap<Class<?>, ThriftServiceMetadata> serviceMetadataCache = new ConcurrentHashMap<>();
     private final MethodInvocationStatsFactory methodInvocationStatsFactory;
@@ -60,7 +61,7 @@ public class DriftClientFactory
     public DriftClientFactory(
             ThriftCodecManager codecManager,
             Supplier<MethodInvoker> methodInvokerSupplier,
-            AddressSelector addressSelector,
+            AddressSelector<? extends Address> addressSelector,
             ExceptionClassifier exceptionClassifier,
             MethodInvocationStatsFactory methodInvocationStatsFactory)
     {
@@ -71,7 +72,11 @@ public class DriftClientFactory
         this.methodInvocationStatsFactory = requireNonNull(methodInvocationStatsFactory, "methodInvocationStatsFactory is null");
     }
 
-    public DriftClientFactory(ThriftCodecManager codecManager, MethodInvokerFactory<?> invokerFactory, AddressSelector addressSelector, ExceptionClassifier exceptionClassifier)
+    public DriftClientFactory(
+            ThriftCodecManager codecManager,
+            MethodInvokerFactory<?> invokerFactory,
+            AddressSelector<? extends Address> addressSelector,
+            ExceptionClassifier exceptionClassifier)
     {
         this(
                 codecManager,

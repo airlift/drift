@@ -15,13 +15,13 @@
  */
 package io.airlift.drift.client.address;
 
-import com.google.common.net.HostAndPort;
+import io.airlift.drift.transport.Address;
 
 import java.util.Optional;
 
-public interface AddressSelector
+public interface AddressSelector<A extends Address>
 {
-    Optional<HostAndPort> selectAddress(Optional<String> addressSelectionContext);
+    Optional<A> selectAddress(Optional<String> addressSelectionContext);
 
-    default void markdown(HostAndPort address) {}
+    default void markdown(A address) {}
 }

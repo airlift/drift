@@ -15,8 +15,6 @@
  */
 package io.airlift.drift.transport;
 
-import com.google.common.net.HostAndPort;
-
 import java.util.List;
 import java.util.Map;
 
@@ -26,12 +24,13 @@ import static java.util.Objects.requireNonNull;
 public final class InvokeRequest
 {
     private final MethodMetadata method;
-    private final HostAndPort address;
+    private final Address address;
     private final Map<String, String> headers;
     private final List<Object> parameters;
 
-    public InvokeRequest(MethodMetadata method,
-            HostAndPort address,
+    public InvokeRequest(
+            MethodMetadata method,
+            Address address,
             Map<String, String> headers,
             List<Object> parameters)
     {
@@ -46,7 +45,7 @@ public final class InvokeRequest
         return method;
     }
 
-    public HostAndPort getAddress()
+    public Address getAddress()
     {
         return address;
     }

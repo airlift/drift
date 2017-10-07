@@ -66,7 +66,7 @@ class InvocationResponseFuture
     private synchronized void tryConnect()
     {
         try {
-            connectionFuture = connectionManager.getConnection(request.getAddress());
+            connectionFuture = connectionManager.getConnection(request.getAddress().getHostAndPort());
             connectionFuture.addListener(channelFuture -> {
                 try {
                     if (channelFuture.isSuccess()) {

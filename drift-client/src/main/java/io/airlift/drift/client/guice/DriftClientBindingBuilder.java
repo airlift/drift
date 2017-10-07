@@ -51,7 +51,7 @@ public class DriftClientBindingBuilder
         return this;
     }
 
-    public DriftClientBindingBuilder withAddressSelector(AddressSelector addressSelector)
+    public DriftClientBindingBuilder withAddressSelector(AddressSelector<?> addressSelector)
     {
         binder.bind(AddressSelector.class)
                 .annotatedWith(annotation)

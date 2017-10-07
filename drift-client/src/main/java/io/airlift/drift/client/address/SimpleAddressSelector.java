@@ -17,6 +17,7 @@ package io.airlift.drift.client.address;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.net.HostAndPort;
+import io.airlift.drift.transport.Address;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -29,7 +30,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import static com.google.common.base.Preconditions.checkArgument;
 
 public class SimpleAddressSelector
-        implements AddressSelector
+        implements AddressSelector<Address>
 {
     private final Set<HostAndPort> addresses;
 
@@ -47,7 +48,7 @@ public class SimpleAddressSelector
     }
 
     @Override
-    public Optional<HostAndPort> selectAddress(Optional<String> addressSelectionContext)
+    public Optional<Address> selectAddress(Optional<String> addressSelectionContext)
     {
         checkArgument(!addressSelectionContext.isPresent(), "addressSelectionContext should not be set");
         List<HostAndPort> result = new ArrayList<>();
@@ -63,11 +64,12 @@ public class SimpleAddressSelector
         if (result.isEmpty()) {
             return Optional.empty();
         }
-        return Optional.of(result.get(ThreadLocalRandom.current().nextInt(result.size())));
+        HostAndPort hostAndPort = result.get(ThreadLocalRandom.current().nextInt(result.size()));
+        return Optional.of(() -> hostAndPort);
     }
 
     @Override
-    public void markdown(HostAndPort address)
+    public void markdown(Address address)
     {
         // TODO: implement some policy for blacklisting
     }

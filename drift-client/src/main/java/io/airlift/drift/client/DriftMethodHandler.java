@@ -19,6 +19,7 @@ import com.google.common.base.Ticker;
 import com.google.common.util.concurrent.ListenableFuture;
 import io.airlift.drift.client.address.AddressSelector;
 import io.airlift.drift.client.stats.MethodInvocationStat;
+import io.airlift.drift.transport.Address;
 import io.airlift.drift.transport.MethodInvoker;
 import io.airlift.drift.transport.MethodMetadata;
 
@@ -34,7 +35,7 @@ class DriftMethodHandler
     private final MethodMetadata metadata;
     private final MethodInvoker invoker;
     private final boolean async;
-    private final AddressSelector addressSelector;
+    private final AddressSelector<? extends Address> addressSelector;
     private final RetryPolicy retryPolicy;
     private final MethodInvocationStat stat;
 
@@ -42,7 +43,7 @@ class DriftMethodHandler
             MethodMetadata metadata,
             MethodInvoker invoker,
             boolean async,
-            AddressSelector addressSelector,
+            AddressSelector<? extends Address> addressSelector,
             RetryPolicy retryPolicy,
             MethodInvocationStat stat)
     {

@@ -27,6 +27,7 @@ import io.airlift.drift.client.address.AddressSelector;
 import io.airlift.drift.codec.ThriftCodec;
 import io.airlift.drift.codec.internal.builtin.ShortThriftCodec;
 import io.airlift.drift.protocol.TTransportException;
+import io.airlift.drift.transport.Address;
 import io.airlift.drift.transport.DriftApplicationException;
 import io.airlift.drift.transport.DriftClientConfig;
 import io.airlift.drift.transport.MethodMetadata;
@@ -45,6 +46,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
 import java.util.stream.IntStream;
 
+import static com.google.common.base.Ticker.systemTicker;
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.util.concurrent.Futures.immediateFailedFuture;
 import static com.google.common.util.concurrent.Futures.immediateFuture;
@@ -76,7 +78,7 @@ public class TestDriftMethodInvocation
             throws Exception
     {
         TestingMethodInvocationStat stat = new TestingMethodInvocationStat();
-        DriftMethodInvocation methodInvocation = createDriftMethodInvocation(RetryPolicy.NO_RETRY_POLICY, stat, () -> immediateFuture(SUCCESS));
+        DriftMethodInvocation<?> methodInvocation = createDriftMethodInvocation(RetryPolicy.NO_RETRY_POLICY, stat, () -> immediateFuture(SUCCESS));
 
         assertEquals(methodInvocation.get(), SUCCESS);
         stat.assertSuccess(0);
@@ -116,7 +118,7 @@ public class TestDriftMethodInvocation
             }
             return immediateFuture(SUCCESS);
         });
-        DriftMethodInvocation methodInvocation = createDriftMethodInvocation(retryPolicy, stat, invoker, new TestingAddressSelector(100), Ticker.systemTicker());
+        DriftMethodInvocation<?> methodInvocation = createDriftMethodInvocation(retryPolicy, stat, invoker, new TestingAddressSelector(100), systemTicker());
 
         assertEquals(methodInvocation.get(), SUCCESS);
         assertEquals(attempts.get(), expectedRetries + 1);
@@ -158,11 +160,12 @@ public class TestDriftMethodInvocation
             }
             return immediateFailedFuture(createClassifiedException(false, NORMAL, wrapWithApplicationException));
         });
-        DriftMethodInvocation methodInvocation = createDriftMethodInvocation(
+        DriftMethodInvocation<?> methodInvocation = createDriftMethodInvocation(
                 retryPolicy,
                 stat,
                 invoker,
-                new TestingAddressSelector(100), Ticker.systemTicker());
+                new TestingAddressSelector(100),
+                systemTicker());
 
         try {
             methodInvocation.get();
@@ -185,14 +188,15 @@ public class TestDriftMethodInvocation
         TestingMethodInvocationStat stat = new TestingMethodInvocationStat();
         AtomicInteger attempts = new AtomicInteger();
         int expectedRetries = 3;
-        DriftMethodInvocation methodInvocation = createDriftMethodInvocation(
+        DriftMethodInvocation<?> methodInvocation = createDriftMethodInvocation(
                 retryPolicy,
                 stat,
                 new MockMethodInvoker(() -> {
                     attempts.getAndIncrement();
                     return immediateFailedFuture(createClassifiedException(true, NORMAL));
                 }),
-                new TestingAddressSelector(expectedRetries + 1), Ticker.systemTicker());
+                new TestingAddressSelector(expectedRetries + 1),
+                systemTicker());
 
         try {
             methodInvocation.get();
@@ -214,7 +218,7 @@ public class TestDriftMethodInvocation
 
         TestingMethodInvocationStat stat = new TestingMethodInvocationStat();
         AtomicInteger attempts = new AtomicInteger();
-        DriftMethodInvocation methodInvocation = createDriftMethodInvocation(retryPolicy, stat, () -> {
+        DriftMethodInvocation<?> methodInvocation = createDriftMethodInvocation(retryPolicy, stat, () -> {
             attempts.getAndIncrement();
             return immediateFailedFuture(createClassifiedException(true, NORMAL));
         });
@@ -253,7 +257,7 @@ public class TestDriftMethodInvocation
                     return immediateFailedFuture(createClassifiedException(true, NORMAL));
                 },
                 ticker);
-        DriftMethodInvocation methodInvocation = createDriftMethodInvocation(retryPolicy, stat, invoker, new TestingAddressSelector(100), ticker);
+        DriftMethodInvocation<?> methodInvocation = createDriftMethodInvocation(retryPolicy, stat, invoker, new TestingAddressSelector(100), ticker);
 
         try {
             methodInvocation.get();
@@ -291,11 +295,12 @@ public class TestDriftMethodInvocation
             attempts.getAndIncrement();
             return immediateFailedFuture(createClassifiedException(true, overloaded ? OVERLOADED : DOWN));
         });
-        DriftMethodInvocation methodInvocation = createDriftMethodInvocation(
+        DriftMethodInvocation<?> methodInvocation = createDriftMethodInvocation(
                 retryPolicy,
                 stat,
                 invoker,
-                addressSelector, Ticker.systemTicker());
+                addressSelector,
+                systemTicker());
 
         try {
             methodInvocation.get();
@@ -330,7 +335,7 @@ public class TestDriftMethodInvocation
         TestingMethodInvocationStat stat = new TestingMethodInvocationStat();
 
         AtomicInteger attempts = new AtomicInteger();
-        DriftMethodInvocation methodInvocation = createDriftMethodInvocation(
+        DriftMethodInvocation<?> methodInvocation = createDriftMethodInvocation(
                 retryPolicy,
                 stat,
                 () -> {
@@ -371,7 +376,7 @@ public class TestDriftMethodInvocation
         TestingMethodInvocationStat stat = new TestingMethodInvocationStat();
 
         AtomicInteger attempts = new AtomicInteger();
-        DriftMethodInvocation methodInvocation = createDriftMethodInvocation(
+        DriftMethodInvocation<?> methodInvocation = createDriftMethodInvocation(
                 retryPolicy,
                 stat,
                 new MockMethodInvoker(() -> {
@@ -393,7 +398,8 @@ public class TestDriftMethodInvocation
                         return super.delay(duration);
                     }
                 },
-                new TestingAddressSelector(100), Ticker.systemTicker());
+                new TestingAddressSelector(100),
+                systemTicker());
 
         try {
             methodInvocation.get();
@@ -434,7 +440,7 @@ public class TestDriftMethodInvocation
 
         TestingMethodInvocationStat stat = new TestingMethodInvocationStat();
 
-        DriftMethodInvocation methodInvocation = createDriftMethodInvocation(
+        DriftMethodInvocation<?> methodInvocation = createDriftMethodInvocation(
                 retryPolicy,
                 stat,
                 () -> {
@@ -469,7 +475,7 @@ public class TestDriftMethodInvocation
         TestingMethodInvocationStat stat = new TestingMethodInvocationStat();
         AtomicInteger attempts = new AtomicInteger();
 
-        DriftMethodInvocation methodInvocation = createDriftMethodInvocation(
+        DriftMethodInvocation<?> methodInvocation = createDriftMethodInvocation(
                 retryPolicy,
                 stat,
                 new MockMethodInvoker(() -> {
@@ -479,14 +485,15 @@ public class TestDriftMethodInvocation
                 new TestingAddressSelector(100)
                 {
                     @Override
-                    public synchronized Optional<HostAndPort> selectAddress(Optional<String> addressSelectionContext)
+                    public synchronized Optional<Address> selectAddress(Optional<String> addressSelectionContext)
                     {
                         if (attempts.get() < expectedRetries) {
                             return super.selectAddress(addressSelectionContext);
                         }
                         throw UNEXPECTED_EXCEPTION;
                     }
-                }, Ticker.systemTicker());
+                },
+                systemTicker());
 
         try {
             methodInvocation.get();
@@ -514,7 +521,7 @@ public class TestDriftMethodInvocation
 
         TestingMethodInvocationStat stat = new TestingMethodInvocationStat();
         AtomicInteger attempts = new AtomicInteger();
-        DriftMethodInvocation methodInvocation = createDriftMethodInvocation(
+        DriftMethodInvocation<?> methodInvocation = createDriftMethodInvocation(
                 retryPolicy,
                 stat,
                 new MockMethodInvoker(() -> {
@@ -524,13 +531,14 @@ public class TestDriftMethodInvocation
                 new TestingAddressSelector(100)
                 {
                     @Override
-                    public synchronized void markdown(HostAndPort address)
+                    public synchronized void markdown(Address address)
                     {
                         if (attempts.get() > expectedRetries) {
                             throw UNEXPECTED_EXCEPTION;
                         }
                     }
-                }, Ticker.systemTicker());
+                },
+                systemTicker());
 
         try {
             methodInvocation.get();
@@ -563,7 +571,7 @@ public class TestDriftMethodInvocation
         AtomicInteger attempts = new AtomicInteger();
         TestFuture future = new TestFuture();
         CountDownLatch settableFutureFetched = new CountDownLatch(1);
-        DriftMethodInvocation methodInvocation = createDriftMethodInvocation(
+        DriftMethodInvocation<?> methodInvocation = createDriftMethodInvocation(
                 retryPolicy,
                 stat,
                 () -> {
@@ -582,16 +590,16 @@ public class TestDriftMethodInvocation
         assertEquals(attempts.get(), expectedRetries + 1);
     }
 
-    private static DriftMethodInvocation createDriftMethodInvocation(RetryPolicy retryPolicy, TestingMethodInvocationStat stat, Supplier<ListenableFuture<Object>> resultsSupplier)
+    private static DriftMethodInvocation<?> createDriftMethodInvocation(RetryPolicy retryPolicy, TestingMethodInvocationStat stat, Supplier<ListenableFuture<Object>> resultsSupplier)
     {
-        return createDriftMethodInvocation(retryPolicy, stat, new MockMethodInvoker(resultsSupplier), new TestingAddressSelector(100), Ticker.systemTicker());
+        return createDriftMethodInvocation(retryPolicy, stat, new MockMethodInvoker(resultsSupplier), new TestingAddressSelector(100), systemTicker());
     }
 
-    private static DriftMethodInvocation createDriftMethodInvocation(
+    private static DriftMethodInvocation<?> createDriftMethodInvocation(
             RetryPolicy retryPolicy,
             TestingMethodInvocationStat stat,
             MockMethodInvoker invoker,
-            AddressSelector addressSelector,
+            AddressSelector<?> addressSelector,
             Ticker ticker)
     {
         return DriftMethodInvocation.createDriftMethodInvocation(
@@ -696,7 +704,7 @@ public class TestDriftMethodInvocation
     }
 
     public static class TestingAddressSelector
-            implements AddressSelector
+            implements AddressSelector<Address>
     {
         private final int maxAddresses;
 
@@ -712,18 +720,19 @@ public class TestDriftMethodInvocation
         }
 
         @Override
-        public synchronized Optional<HostAndPort> selectAddress(Optional<String> addressSelectionContext)
+        public synchronized Optional<Address> selectAddress(Optional<String> addressSelectionContext)
         {
             if (addressCount >= maxAddresses) {
                 return Optional.empty();
             }
-            return Optional.of(HostAndPort.fromParts("localhost", 20_000 + addressCount++));
+            HostAndPort hostAndPort = HostAndPort.fromParts("localhost", 20_000 + addressCount++);
+            return Optional.of(() -> hostAndPort);
         }
 
         @Override
-        public synchronized void markdown(HostAndPort address)
+        public synchronized void markdown(Address address)
         {
-            markdownHosts.add(address);
+            markdownHosts.add(address.getHostAndPort());
         }
 
         public synchronized void assertAllDown()
