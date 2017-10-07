@@ -25,6 +25,7 @@ import io.netty.handler.ssl.SslContext;
 
 import java.net.InetSocketAddress;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 class ThriftClientInitializer
         extends ChannelInitializer<SocketChannel>
@@ -33,20 +34,20 @@ class ThriftClientInitializer
     private final Duration requestTimeout;
     private final MessageEncoding messageEncoding;
     private final Optional<HostAndPort> socksProxyAddress;
-    private final Optional<SslContext> sslContext;
+    private final Optional<Supplier<SslContext>> sslContextSupplier;
 
     public ThriftClientInitializer(
             MessageFraming messageFraming,
             MessageEncoding messageEncoding,
             Duration requestTimeout,
             Optional<HostAndPort> socksProxyAddress,
-            Optional<SslContext> sslContext)
+            Optional<Supplier<SslContext>> sslContextSupplier)
     {
         this.messageFraming = messageFraming;
         this.requestTimeout = requestTimeout;
         this.messageEncoding = messageEncoding;
         this.socksProxyAddress = socksProxyAddress;
-        this.sslContext = sslContext;
+        this.sslContextSupplier = sslContextSupplier;
     }
 
     @Override
@@ -58,7 +59,7 @@ class ThriftClientInitializer
 
         pipeline.addLast(new ThriftClientHandler(requestTimeout, messageEncoding));
 
-        sslContext.ifPresent(sslContext -> pipeline.addFirst(sslContext.newHandler(channel.alloc())));
+        sslContextSupplier.ifPresent(sslContext -> pipeline.addFirst(sslContext.get().newHandler(channel.alloc())));
 
         socksProxyAddress.ifPresent(socks -> pipeline.addFirst(new Socks4ProxyHandler(new InetSocketAddress(socks.getHost(), socks.getPort()))));
     }

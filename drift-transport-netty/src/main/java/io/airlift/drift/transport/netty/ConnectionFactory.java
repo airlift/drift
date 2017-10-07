@@ -30,6 +30,7 @@ import io.netty.util.concurrent.Promise;
 
 import java.net.InetSocketAddress;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 import static com.google.common.primitives.Ints.saturatedCast;
 import static io.netty.channel.ChannelOption.CONNECT_TIMEOUT_MILLIS;
@@ -41,7 +42,7 @@ class ConnectionFactory
     private final EventLoopGroup group;
     private final MessageFraming messageFraming;
     private final MessageEncoding messageEncoding;
-    private final Optional<SslContext> sslContext;
+    private final Optional<Supplier<SslContext>> sslContextSupplier;
 
     private final Duration connectTimeout;
     private final Duration requestTimeout;
@@ -51,13 +52,13 @@ class ConnectionFactory
             EventLoopGroup group,
             MessageFraming messageFraming,
             MessageEncoding messageEncoding,
-            Optional<SslContext> sslContext,
+            Optional<Supplier<SslContext>> sslContextSupplier,
             DriftNettyClientConfig clientConfig)
     {
         this.group = requireNonNull(group, "group is null");
         this.messageFraming = requireNonNull(messageFraming, "messageFraming is null");
         this.messageEncoding = requireNonNull(messageEncoding, "messageEncoding is null");
-        this.sslContext = requireNonNull(sslContext, "sslContext is null");
+        this.sslContextSupplier = requireNonNull(sslContextSupplier, "sslContextSupplier is null");
 
         requireNonNull(clientConfig, "clientConfig is null");
         this.connectTimeout = clientConfig.getConnectTimeout();
@@ -78,7 +79,7 @@ class ConnectionFactory
                             messageEncoding,
                             requestTimeout,
                             socksProxy,
-                            sslContext));
+                            sslContextSupplier));
 
             Promise<Channel> promise = group.next().newPromise();
             bootstrap.connect(new InetSocketAddress(address.getHost(), address.getPort()))

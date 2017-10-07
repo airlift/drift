@@ -26,21 +26,20 @@ import io.airlift.drift.transport.netty.DriftNettyClientConfig.Transport;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.handler.ssl.SslContext;
-import io.netty.handler.ssl.SslContextBuilder;
 import io.netty.util.concurrent.Future;
 
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
-import javax.net.ssl.SSLException;
 
 import java.io.Closeable;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
+import static io.airlift.drift.transport.netty.SslContextFactory.createSslContextFactory;
 import static java.lang.Math.toIntExact;
 import static java.util.Objects.requireNonNull;
-import static java.util.concurrent.TimeUnit.SECONDS;
 
 public class DriftNettyMethodInvokerFactory<I>
         implements MethodInvokerFactory<I>, Closeable
@@ -48,6 +47,7 @@ public class DriftNettyMethodInvokerFactory<I>
     private final Function<I, DriftNettyClientConfig> clientConfigurationProvider;
 
     private final EventLoopGroup group;
+    private final SslContextFactory sslContextFactory;
 
     public static DriftNettyMethodInvokerFactory<?> createStaticDriftNettyMethodInvokerFactory(DriftNettyClientConfig clientConfig)
     {
@@ -65,6 +65,7 @@ public class DriftNettyMethodInvokerFactory<I>
                 .build());
 
         this.clientConfigurationProvider = requireNonNull(clientConfigurationProvider, "clientConfigurationProvider is null");
+        this.sslContextFactory = createSslContextFactory(factoryConfig.getSslContextRefreshTime(), group);
     }
 
     @Override
@@ -109,25 +110,19 @@ public class DriftNettyMethodInvokerFactory<I>
                 throw new IllegalArgumentException("Unknown transport: " + clientConfig.getTransport());
         }
 
-        Optional<SslContext> sslContext;
+        Optional<Supplier<SslContext>> sslContext = Optional.empty();
         if (clientConfig.isSslEnabled()) {
-            try {
-                SslContextBuilder sslContextBuilder = SslContextBuilder.forClient()
-                        .trustManager(clientConfig.getTrustCertificate())
-                        .keyManager(clientConfig.getKey(), clientConfig.getKey(), clientConfig.getKeyPassword())
-                        .sessionCacheSize(clientConfig.getSessionCacheSize())
-                        .sessionTimeout(clientConfig.getSessionTimeout().roundTo(SECONDS));
-                if (!clientConfig.getCiphers().isEmpty()) {
-                    sslContextBuilder.ciphers(clientConfig.getCiphers());
-                }
-                sslContext = Optional.of(sslContextBuilder.build());
-            }
-            catch (SSLException e) {
-                throw new RuntimeException("Invalid SSL configuration", e);
-            }
-        }
-        else {
-            sslContext = Optional.empty();
+            sslContext = Optional.of(sslContextFactory.get(
+                    clientConfig.getTrustCertificate(),
+                    Optional.ofNullable(clientConfig.getKey()),
+                    Optional.ofNullable(clientConfig.getKey()),
+                    Optional.ofNullable(clientConfig.getKeyPassword()),
+                    clientConfig.getSessionCacheSize(),
+                    clientConfig.getSessionTimeout(),
+                    clientConfig.getCiphers()));
+
+            // validate ssl context configuration is valid
+            sslContext.get().get();
         }
 
         ConnectionManager connectionManager = new ConnectionFactory(

@@ -16,12 +16,17 @@
 package io.airlift.drift.transport.netty;
 
 import io.airlift.configuration.Config;
+import io.airlift.units.Duration;
+import io.airlift.units.MinDuration;
+
+import static java.util.concurrent.TimeUnit.MINUTES;
 
 public class DriftNettyConnectionFactoryConfig
 {
     private static final int DEFAULT_WORKER_THREAD_COUNT = Runtime.getRuntime().availableProcessors() * 2;
 
     private Integer threadCount = DEFAULT_WORKER_THREAD_COUNT;
+    private Duration sslContextRefreshTime = new Duration(1, MINUTES);
 
     public Integer getThreadCount()
     {
@@ -32,6 +37,19 @@ public class DriftNettyConnectionFactoryConfig
     public DriftNettyConnectionFactoryConfig setThreadCount(int threadCount)
     {
         this.threadCount = threadCount;
+        return this;
+    }
+
+    @MinDuration("1s")
+    public Duration getSslContextRefreshTime()
+    {
+        return sslContextRefreshTime;
+    }
+
+    @Config("thrift.client.ssl-context.refresh-time")
+    public DriftNettyConnectionFactoryConfig setSslContextRefreshTime(Duration sslContextRefreshTime)
+    {
+        this.sslContextRefreshTime = sslContextRefreshTime;
         return this;
     }
 }
