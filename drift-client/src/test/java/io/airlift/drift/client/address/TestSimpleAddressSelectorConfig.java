@@ -39,7 +39,7 @@ public class TestSimpleAddressSelectorConfig
     public void testExplicitPropertyMappings()
     {
         Map<String, String> properties = new ImmutableMap.Builder<String, String>()
-                .put("addresses", "abc:8080,xyz:8888")
+                .put("thrift.client.addresses", "abc:8080,xyz:8888")
                 .build();
 
         SimpleAddressSelectorConfig expected = new SimpleAddressSelectorConfig()

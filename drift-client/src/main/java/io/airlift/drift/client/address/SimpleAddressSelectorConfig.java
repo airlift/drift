@@ -38,7 +38,7 @@ public class SimpleAddressSelectorConfig
         return addresses;
     }
 
-    @Config("addresses")
+    @Config("thrift.client.addresses")
     public SimpleAddressSelectorConfig setAddresses(String addresses)
     {
         if (addresses == null) {
