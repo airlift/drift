@@ -15,6 +15,7 @@
  */
 package io.airlift.drift.client.address;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.net.HostAndPort;
 import io.airlift.drift.transport.Address;
@@ -45,6 +46,12 @@ public class SimpleAddressSelector
             checkArgument(address.getPortOrDefault(0) > 0, "address port must be set");
         }
         this.addresses = ImmutableSet.copyOf(addresses);
+    }
+
+    @VisibleForTesting
+    Set<HostAndPort> getAddresses()
+    {
+        return addresses;
     }
 
     @Override

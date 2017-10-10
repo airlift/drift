@@ -15,6 +15,8 @@
  */
 package io.airlift.drift.client.address;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.net.HostAndPort;
 import com.google.inject.Binder;
 import com.google.inject.Injector;
 import com.google.inject.Key;
@@ -22,23 +24,50 @@ import io.airlift.drift.client.guice.AbstractAnnotatedProvider;
 import io.airlift.drift.client.guice.AddressSelectorBinder;
 
 import java.lang.annotation.Annotation;
+import java.util.List;
+import java.util.Optional;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static io.airlift.configuration.ConfigBinder.configBinder;
+import static java.util.Objects.requireNonNull;
 
 public final class SimpleAddressSelectorBinder
         implements AddressSelectorBinder
 {
     public static AddressSelectorBinder simpleAddressSelector()
     {
-        return new SimpleAddressSelectorBinder();
+        return new SimpleAddressSelectorBinder(Optional.empty());
     }
 
-    private SimpleAddressSelectorBinder() {}
+    public static AddressSelectorBinder simpleAddressSelector(HostAndPort defaultAddress)
+    {
+        requireNonNull(defaultAddress, "defaultAddress is null");
+        return new SimpleAddressSelectorBinder(Optional.of(ImmutableList.of(defaultAddress)));
+    }
+
+    public static AddressSelectorBinder simpleAddressSelector(List<HostAndPort> defaultAddresses)
+    {
+        requireNonNull(defaultAddresses, "defaultAddresses is null");
+        checkArgument(!defaultAddresses.isEmpty(), "defaultAddresses is empty");
+        return new SimpleAddressSelectorBinder(Optional.of(ImmutableList.copyOf(defaultAddresses)));
+    }
+
+    private final Optional<List<HostAndPort>> defaultAddresses;
+
+    private SimpleAddressSelectorBinder(Optional<List<HostAndPort>> defaultAddresses)
+    {
+        this.defaultAddresses = requireNonNull(defaultAddresses, "defaultAddresses is null");
+    }
 
     @Override
     public void bind(Binder binder, Annotation annotation, String prefix)
     {
         configBinder(binder).bindConfig(SimpleAddressSelectorConfig.class, annotation, prefix);
+
+        defaultAddresses.ifPresent(addresses -> configBinder(binder).bindConfigDefaults(
+                SimpleAddressSelectorConfig.class,
+                annotation,
+                config -> config.setAddressesList(addresses)));
 
         binder.bind(AddressSelector.class)
                 .annotatedWith(annotation)
