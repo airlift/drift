@@ -15,7 +15,6 @@
  */
 package io.airlift.drift.codec.metadata;
 
-import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import io.airlift.drift.annotations.ThriftEnumValue;
@@ -28,6 +27,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import static com.google.common.base.MoreObjects.toStringHelper;
+import static com.google.common.base.Preconditions.checkArgument;
 import static java.lang.String.format;
 import static java.util.Objects.requireNonNull;
 
@@ -52,23 +52,23 @@ public class ThriftEnumMetadata<T extends Enum<T>>
         Method enumValueMethod = null;
         for (Method method : enumClass.getMethods()) {
             if (method.isAnnotationPresent(ThriftEnumValue.class)) {
-                Preconditions.checkArgument(
+                checkArgument(
                         Modifier.isPublic(method.getModifiers()),
                         "Enum class %s @ThriftEnumValue method is not public: %s",
                         enumClass.getName(),
                         method);
-                Preconditions.checkArgument(
+                checkArgument(
                         !Modifier.isStatic(method.getModifiers()),
                         "Enum class %s @ThriftEnumValue method is static: %s",
                         enumClass.getName(),
                         method);
-                Preconditions.checkArgument(
+                checkArgument(
                         method.getTypeParameters().length == 0,
                         "Enum class %s @ThriftEnumValue method has parameters: %s",
                         enumClass.getName(),
                         method);
                 Class<?> returnType = method.getReturnType();
-                Preconditions.checkArgument(
+                checkArgument(
                         returnType == int.class || returnType == Integer.class,
                         "Enum class %s @ThriftEnumValue method does not return int or Integer: %s",
                         enumClass.getName(),
@@ -89,7 +89,7 @@ public class ThriftEnumMetadata<T extends Enum<T>>
                 catch (Exception e) {
                     throw new RuntimeException(format("Enum class %s element %s get value method threw an exception", enumClass.getName(), enumConstant), e);
                 }
-                Preconditions.checkArgument(
+                checkArgument(
                         value != null,
                         "Enum class %s element %s returned null for enum value: %s",
                         enumClass.getName(),

@@ -15,12 +15,13 @@
  */
 package io.airlift.drift.codec;
 
-import com.google.common.base.Preconditions;
 import io.airlift.drift.codec.internal.ProtocolReader;
 import io.airlift.drift.codec.internal.ProtocolWriter;
 import io.airlift.drift.codec.metadata.ThriftType;
 import io.airlift.drift.protocol.TProtocolReader;
 import io.airlift.drift.protocol.TProtocolWriter;
+
+import static com.google.common.base.Preconditions.checkState;
 
 public class UnionFieldThriftCodec
         implements ThriftCodec<UnionField>
@@ -51,7 +52,7 @@ public class UnionFieldThriftCodec
 
         boolean consumed = false;
         while (reader.nextField()) {
-            Preconditions.checkState(!consumed, "already consumed");
+            checkState(!consumed, "already consumed");
 
             field.id = reader.getFieldId();
             switch (field.id) {

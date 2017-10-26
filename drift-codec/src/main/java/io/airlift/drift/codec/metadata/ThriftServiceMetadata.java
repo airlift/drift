@@ -15,7 +15,6 @@
  */
 package io.airlift.drift.codec.metadata;
 
-import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Ordering;
@@ -30,6 +29,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static io.airlift.drift.codec.metadata.ReflectionHelper.findAnnotatedMethods;
 import static io.airlift.drift.codec.metadata.ReflectionHelper.getEffectiveClassAnnotations;
 import static java.util.Objects.requireNonNull;
@@ -84,12 +84,8 @@ public class ThriftServiceMetadata
     public static ThriftService getThriftServiceAnnotation(Class<?> serviceClass)
     {
         Set<ThriftService> serviceAnnotations = getEffectiveClassAnnotations(serviceClass, ThriftService.class);
-        Preconditions.checkArgument(!serviceAnnotations.isEmpty(), "Service class %s is not annotated with @ThriftService", serviceClass.getName());
-        Preconditions.checkArgument(
-                serviceAnnotations.size() == 1,
-                "Service class %s has multiple conflicting @ThriftService annotations: %s",
-                serviceClass.getName(),
-                serviceAnnotations);
+        checkArgument(!serviceAnnotations.isEmpty(), "Service class %s is not annotated with @ThriftService", serviceClass.getName());
+        checkArgument(serviceAnnotations.size() == 1, "Service class %s has multiple conflicting @ThriftService annotations: %s", serviceClass.getName(), serviceAnnotations);
 
         return Iterables.getOnlyElement(serviceAnnotations);
     }

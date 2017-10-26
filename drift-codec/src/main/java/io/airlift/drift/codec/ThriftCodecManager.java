@@ -15,7 +15,6 @@
  */
 package io.airlift.drift.codec;
 
-import com.google.common.base.Preconditions;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
@@ -58,6 +57,7 @@ import java.util.Deque;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkState;
 import static com.google.common.base.Throwables.throwIfUnchecked;
 import static java.util.Objects.requireNonNull;
@@ -179,14 +179,14 @@ public class ThriftCodecManager
     public ThriftCodec<?> getCodec(Type javaType)
     {
         ThriftType thriftType = catalog.getThriftType(javaType);
-        Preconditions.checkArgument(thriftType != null, "Unsupported java type %s", javaType);
+        checkArgument(thriftType != null, "Unsupported java type %s", javaType);
         return getCodec(thriftType);
     }
 
     public <T> ThriftCodec<T> getCodec(Class<T> javaType)
     {
         ThriftType thriftType = catalog.getThriftType(javaType);
-        Preconditions.checkArgument(thriftType != null, "Unsupported java type %s", javaType.getName());
+        checkArgument(thriftType != null, "Unsupported java type %s", javaType.getName());
         return (ThriftCodec<T>) getCodec(thriftType);
     }
 
@@ -227,14 +227,14 @@ public class ThriftCodecManager
     public ThriftCodec<?> getCachedCodecIfPresent(Type javaType)
     {
         ThriftType thriftType = catalog.getThriftType(javaType);
-        Preconditions.checkArgument(thriftType != null, "Unsupported java type %s", javaType);
+        checkArgument(thriftType != null, "Unsupported java type %s", javaType);
         return getCachedCodecIfPresent(thriftType);
     }
 
     public <T> ThriftCodec<T> getCachedCodecIfPresent(Class<T> javaType)
     {
         ThriftType thriftType = catalog.getThriftType(javaType);
-        Preconditions.checkArgument(thriftType != null, "Unsupported java type %s", javaType.getName());
+        checkArgument(thriftType != null, "Unsupported java type %s", javaType.getName());
         return (ThriftCodec<T>) getCachedCodecIfPresent(thriftType);
     }
 

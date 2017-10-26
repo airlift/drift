@@ -16,7 +16,6 @@
 package io.airlift.drift.codec.metadata;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Sets;
 import com.google.common.reflect.TypeToken;
@@ -46,6 +45,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.stream.Stream;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkState;
 import static io.airlift.drift.codec.metadata.ReflectionHelper.getFutureReturnType;
 import static io.airlift.drift.codec.metadata.ReflectionHelper.getIterableType;
@@ -138,7 +138,7 @@ public class ThriftCatalog
                 ThriftType coercedType = thriftType.coerceTo(method.getGenericParameterTypes()[0]);
 
                 Method oldValue = toThriftCoercions.put(coercedType, method);
-                Preconditions.checkArgument(
+                checkArgument(
                         oldValue == null,
                         "Coercion class two @ToThrift methods (%s and %s) for type %s",
                         coercionsClass.getName(),
@@ -152,7 +152,7 @@ public class ThriftCatalog
                 ThriftType coercedType = thriftType.coerceTo(method.getGenericReturnType());
 
                 Method oldValue = fromThriftCoercions.put(coercedType, method);
-                Preconditions.checkArgument(
+                checkArgument(
                         oldValue == null,
                         "Coercion class two @FromThrift methods (%s and %s) for type %s",
                         coercionsClass.getName(),
@@ -164,7 +164,7 @@ public class ThriftCatalog
 
         // assure coercions are symmetric
         Set<ThriftType> difference = Sets.symmetricDifference(toThriftCoercions.keySet(), fromThriftCoercions.keySet());
-        Preconditions.checkArgument(
+        checkArgument(
                 difference.isEmpty(),
                 "Coercion class %s does not have matched @ToThrift and @FromThrift methods for types %s",
                 coercionsClass.getName(),
@@ -190,9 +190,9 @@ public class ThriftCatalog
 
     private void verifyCoercionMethod(Method method)
     {
-        Preconditions.checkArgument(isStatic(method.getModifiers()), "Method %s is not static", method.toGenericString());
-        Preconditions.checkArgument(method.getParameterTypes().length == 1, "Method %s must have exactly one parameter", method.toGenericString());
-        Preconditions.checkArgument(method.getReturnType() != void.class, "Method %s must have a return value", method.toGenericString());
+        checkArgument(isStatic(method.getModifiers()), "Method %s is not static", method.toGenericString());
+        checkArgument(method.getParameterTypes().length == 1, "Method %s must have exactly one parameter", method.toGenericString());
+        checkArgument(method.getReturnType() != void.class, "Method %s must have a return value", method.toGenericString());
     }
 
     /**

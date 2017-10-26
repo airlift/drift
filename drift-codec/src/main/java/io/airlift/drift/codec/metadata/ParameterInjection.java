@@ -15,12 +15,12 @@
  */
 package io.airlift.drift.codec.metadata;
 
-import com.google.common.base.Preconditions;
 import io.airlift.drift.annotations.ThriftField;
 
 import java.lang.reflect.Type;
 
 import static com.google.common.base.MoreObjects.toStringHelper;
+import static com.google.common.base.Preconditions.checkArgument;
 import static io.airlift.drift.codec.metadata.FieldKind.THRIFT_FIELD;
 import static io.airlift.drift.codec.metadata.ReflectionHelper.resolveFieldType;
 import static java.util.Objects.requireNonNull;
@@ -45,7 +45,7 @@ class ParameterInjection
         if (void.class.equals(parameterJavaType)) {
             throw new AssertionError();
         }
-        Preconditions.checkArgument(getName() != null || extractedName != null, "Parameter must have an explicit name or an extractedName");
+        checkArgument(getName() != null || extractedName != null, "Parameter must have an explicit name or an extractedName");
     }
 
     public int getParameterIndex()

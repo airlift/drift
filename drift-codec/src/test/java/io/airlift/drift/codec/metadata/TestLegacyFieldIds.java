@@ -15,7 +15,6 @@
  */
 package io.airlift.drift.codec.metadata;
 
-import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
 import io.airlift.drift.annotations.ThriftField;
 import io.airlift.drift.annotations.ThriftStruct;
@@ -31,6 +30,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class TestLegacyFieldIds
@@ -308,7 +308,7 @@ public class TestLegacyFieldIds
                 expected = Optional.empty();
             }
             else {
-                Preconditions.checkArgument(f.getName().startsWith("broken"));
+                checkArgument(f.getName().startsWith("broken"));
                 continue;
             }
 
