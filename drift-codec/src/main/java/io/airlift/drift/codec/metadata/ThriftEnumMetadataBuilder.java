@@ -25,13 +25,18 @@ public class ThriftEnumMetadataBuilder<T extends Enum<T>>
     private final Class<T> enumClass;
     private final String enumName;
 
-    public ThriftEnumMetadataBuilder(Class<T> enumClass)
+    public static <T extends Enum<T>> ThriftEnumMetadata<T> thriftEnumMetadata(Class<T> enumClass)
+    {
+        return new ThriftEnumMetadataBuilder<>(enumClass).build();
+    }
+
+    private ThriftEnumMetadataBuilder(Class<T> enumClass)
     {
         this.enumClass = enumClass;
         this.enumName = extractEnumName(enumClass);
     }
 
-    public ThriftEnumMetadata<T> build()
+    private ThriftEnumMetadata<T> build()
     {
         return new ThriftEnumMetadata<>(enumName, enumClass);
     }

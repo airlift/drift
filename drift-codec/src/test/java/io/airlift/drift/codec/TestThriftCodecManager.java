@@ -22,7 +22,6 @@ import io.airlift.drift.codec.internal.EnumThriftCodec;
 import io.airlift.drift.codec.internal.coercion.DefaultJavaCoercions;
 import io.airlift.drift.codec.metadata.ThriftCatalog;
 import io.airlift.drift.codec.metadata.ThriftEnumMetadata;
-import io.airlift.drift.codec.metadata.ThriftEnumMetadataBuilder;
 import io.airlift.drift.codec.metadata.ThriftType;
 import io.airlift.drift.protocol.TBinaryProtocol;
 import io.airlift.drift.protocol.TCompactProtocol;
@@ -32,6 +31,7 @@ import io.airlift.drift.protocol.TProtocolFactory;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+import static io.airlift.drift.codec.metadata.ThriftEnumMetadataBuilder.thriftEnumMetadata;
 import static io.airlift.drift.codec.metadata.ThriftType.BOOL;
 import static io.airlift.drift.codec.metadata.ThriftType.BYTE;
 import static io.airlift.drift.codec.metadata.ThriftType.DOUBLE;
@@ -99,8 +99,8 @@ public class TestThriftCodecManager
     public void testEnum()
             throws Exception
     {
-        ThriftEnumMetadata<Fruit> fruitEnumMetadata = new ThriftEnumMetadataBuilder<>(Fruit.class).build();
-        ThriftEnumMetadata<Letter> letterEnumMetadata = new ThriftEnumMetadataBuilder<>(Letter.class).build();
+        ThriftEnumMetadata<Fruit> fruitEnumMetadata = thriftEnumMetadata(Fruit.class);
+        ThriftEnumMetadata<Letter> letterEnumMetadata = thriftEnumMetadata(Letter.class);
         testRoundTripSerialize(Fruit.CHERRY);
         testRoundTripSerialize(Letter.C);
         testRoundTripSerialize(enumType(fruitEnumMetadata), Fruit.CHERRY);

@@ -51,6 +51,7 @@ import static io.airlift.drift.codec.metadata.ReflectionHelper.getFutureReturnTy
 import static io.airlift.drift.codec.metadata.ReflectionHelper.getIterableType;
 import static io.airlift.drift.codec.metadata.ReflectionHelper.getMapKeyType;
 import static io.airlift.drift.codec.metadata.ReflectionHelper.getMapValueType;
+import static io.airlift.drift.codec.metadata.ThriftEnumMetadataBuilder.thriftEnumMetadata;
 import static io.airlift.drift.codec.metadata.ThriftType.BINARY;
 import static io.airlift.drift.codec.metadata.ThriftType.BOOL;
 import static io.airlift.drift.codec.metadata.ThriftType.BYTE;
@@ -509,7 +510,7 @@ public class ThriftCatalog
     {
         ThriftEnumMetadata<?> enumMetadata = enums.get(enumClass);
         if (enumMetadata == null) {
-            enumMetadata = new ThriftEnumMetadataBuilder<>((Class<T>) enumClass).build();
+            enumMetadata = thriftEnumMetadata((Class<T>) enumClass);
 
             ThriftEnumMetadata<?> current = enums.putIfAbsent(enumClass, enumMetadata);
             if (current != null) {
