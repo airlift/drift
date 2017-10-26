@@ -153,7 +153,7 @@ public class DriftNettyClientConfig
         return poolEnabled;
     }
 
-    @Config("thrift.client.pool-enabled")
+    @Config("thrift.client.pool.enabled")
     public DriftNettyClientConfig setPoolEnabled(boolean poolEnabled)
     {
         this.poolEnabled = poolEnabled;

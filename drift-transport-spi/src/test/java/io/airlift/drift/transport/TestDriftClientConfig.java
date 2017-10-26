@@ -51,7 +51,7 @@ public class TestDriftClientConfig
                 .put("thrift.client.max-backoff-delay", "22m")
                 .put("thrift.client.backoff-scale-factor", "2.2")
                 .put("thrift.client.max-retry-time", "33m")
-                .put("thrift.client.stats-enabled", "false")
+                .put("thrift.client.stats.enabled", "false")
                 .build();
 
         DriftClientConfig expected = new DriftClientConfig()

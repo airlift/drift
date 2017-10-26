@@ -69,7 +69,7 @@ public class TestDriftNettyClientConfig
                 .put("thrift.client.request-timeout", "33m")
                 .put("thrift.client.socks-proxy", "localhost:11")
                 .put("thrift.client.max-frame-size", "55MB")
-                .put("thrift.client.pool-enabled", "true")
+                .put("thrift.client.pool.enabled", "true")
                 .put("thrift.client.ssl.enabled", "true")
                 .put("thrift.client.ssl.trust-certificate", "trust")
                 .put("thrift.client.ssl.key", "key")

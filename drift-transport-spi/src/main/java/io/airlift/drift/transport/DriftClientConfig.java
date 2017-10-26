@@ -114,7 +114,7 @@ public class DriftClientConfig
         return statsEnabled;
     }
 
-    @Config("thrift.client.stats-enabled")
+    @Config("thrift.client.stats.enabled")
     @ConfigDescription("Enable per-method JMX stats")
     public DriftClientConfig setStatsEnabled(boolean statsEnabled)
     {
