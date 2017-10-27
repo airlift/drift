@@ -15,7 +15,15 @@
  */
 package io.airlift.drift.codec;
 
+import io.airlift.drift.annotations.ThriftEnumValue;
+
 public enum Fruit
 {
-    APPLE, BANANA, CHERRY
+    APPLE, BANANA, CHERRY;
+
+    @ThriftEnumValue
+    public int value()
+    {
+        return ordinal();
+    }
 }

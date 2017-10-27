@@ -15,7 +15,15 @@
  */
 package io.airlift.drift.transport.apache.scribe.drift;
 
+import io.airlift.drift.annotations.ThriftEnumValue;
+
 public enum ResultCode
 {
-    OK, TRY_LATER
+    OK, TRY_LATER;
+
+    @ThriftEnumValue
+    public int value()
+    {
+        return ordinal();
+    }
 }

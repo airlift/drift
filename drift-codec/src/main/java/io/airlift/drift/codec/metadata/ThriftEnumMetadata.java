@@ -23,8 +23,10 @@ import javax.annotation.concurrent.Immutable;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import static com.google.common.base.MoreObjects.toStringHelper;
 import static com.google.common.base.Preconditions.checkArgument;
@@ -73,42 +75,39 @@ public class ThriftEnumMetadata<T extends Enum<T>>
                         "Enum class %s @ThriftEnumValue method does not return int or Integer: %s",
                         enumClass.getName(),
                         method);
+                checkArgument(
+                        enumValueMethod == null,
+                        "Enum class %s has multiple methods annotated with @ThriftEnumValue",
+                        enumClass.getName());
                 enumValueMethod = method;
             }
         }
+        checkArgument(
+                enumValueMethod != null,
+                "Enum class %s must have a method annotated with @ThriftEnumValue",
+                enumClass.getName());
 
+        Set<Integer> values = new HashSet<>();
         ImmutableMap.Builder<T, ImmutableList<String>> elementDocs = ImmutableMap.builder();
-        if (enumValueMethod != null) {
-            ImmutableMap.Builder<Integer, T> byEnumValue = ImmutableMap.builder();
-            ImmutableMap.Builder<T, Integer> byEnumConstant = ImmutableMap.builder();
-            for (T enumConstant : enumClass.getEnumConstants()) {
-                Integer value;
-                try {
-                    value = (Integer) enumValueMethod.invoke(enumConstant);
-                }
-                catch (Exception e) {
-                    throw new RuntimeException(format("Enum class %s element %s get value method threw an exception", enumClass.getName(), enumConstant), e);
-                }
-                checkArgument(
-                        value != null,
-                        "Enum class %s element %s returned null for enum value: %s",
-                        enumClass.getName(),
-                        enumConstant);
+        ImmutableMap.Builder<Integer, T> byEnumValue = ImmutableMap.builder();
+        ImmutableMap.Builder<T, Integer> byEnumConstant = ImmutableMap.builder();
+        for (T enumConstant : enumClass.getEnumConstants()) {
+            Integer value;
+            try {
+                value = (Integer) enumValueMethod.invoke(enumConstant);
+            }
+            catch (Exception e) {
+                throw new RuntimeException(format("Enum class %s element %s get value method threw an exception", enumClass.getName(), enumConstant), e);
+            }
+            checkArgument(value != null, "Enum class %s element %s returned null for enum value", enumClass.getName(), enumConstant);
+            checkArgument(values.add(value), "Enum class %s returned duplicate enum values: %s", enumClass.getName(), value);
 
-                byEnumValue.put(value, enumConstant);
-                byEnumConstant.put(enumConstant, value);
-                elementDocs.put(enumConstant, ThriftCatalog.getThriftDocumentation(enumConstant));
-            }
-            this.byEnumValue = byEnumValue.build();
-            this.byEnumConstant = byEnumConstant.build();
+            byEnumValue.put(value, enumConstant);
+            byEnumConstant.put(enumConstant, value);
+            elementDocs.put(enumConstant, ThriftCatalog.getThriftDocumentation(enumConstant));
         }
-        else {
-            byEnumValue = null;
-            byEnumConstant = null;
-            for (T enumConstant : enumClass.getEnumConstants()) {
-                elementDocs.put(enumConstant, ThriftCatalog.getThriftDocumentation(enumConstant));
-            }
-        }
+        this.byEnumValue = byEnumValue.build();
+        this.byEnumConstant = byEnumConstant.build();
         this.elementDocs = elementDocs.build();
         this.documentation = ThriftCatalog.getThriftDocumentation(enumClass);
     }
