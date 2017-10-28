@@ -27,6 +27,8 @@ import io.airlift.drift.codec.internal.ThriftCodecFactory;
 import io.airlift.drift.codec.internal.compiler.CompilerThriftCodecFactory;
 import io.airlift.drift.codec.metadata.ThriftCatalog;
 
+import java.util.Objects;
+
 import static com.google.inject.multibindings.Multibinder.newSetBinder;
 
 public class ThriftCodecModule
@@ -55,5 +57,24 @@ public class ThriftCodecModule
         binder.bind(ClassLoader.class)
                 .annotatedWith(ForCompiler.class)
                 .toInstance(parent);
+    }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        ThriftCodecModule that = (ThriftCodecModule) o;
+        return Objects.equals(parent, that.parent);
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return Objects.hash(parent);
     }
 }

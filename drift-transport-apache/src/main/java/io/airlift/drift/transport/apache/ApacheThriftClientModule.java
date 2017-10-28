@@ -53,4 +53,19 @@ public class ApacheThriftClientModule
     {
         return new ApacheThriftMethodInvokerFactory<>(factoryConfig, annotation -> injector.getInstance(Key.get(ApacheThriftClientConfig.class, annotation)));
     }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o) {
+            return true;
+        }
+        return o != null && getClass() == o.getClass();
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return getClass().hashCode();
+    }
 }
