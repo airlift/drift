@@ -81,7 +81,10 @@ public class DriftClientBinder
 
     public <T> DriftClientBindingBuilder bindDriftClient(Class<T> clientInterface, Class<? extends Annotation> annotationType)
     {
-        String configPrefix = getServiceName(clientInterface) + "." + annotationType.getSimpleName();
+        String configPrefix = getServiceName(clientInterface);
+        if (annotationType != DefaultClient.class) {
+            configPrefix += "." + annotationType.getSimpleName();
+        }
         return bindDriftClient(clientInterface, configPrefix, annotationType);
     }
 
