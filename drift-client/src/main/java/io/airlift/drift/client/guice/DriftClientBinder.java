@@ -25,6 +25,7 @@ import com.google.inject.Module;
 import com.google.inject.Provides;
 import com.google.inject.Scopes;
 import com.google.inject.TypeLiteral;
+import io.airlift.configuration.ConfigDefaults;
 import io.airlift.drift.client.DriftClient;
 import io.airlift.drift.client.DriftClientFactory;
 import io.airlift.drift.client.DriftClientFactoryManager;
@@ -108,6 +109,26 @@ public class DriftClientBinder
         }
 
         return new DriftClientBindingBuilder(binder, clientAnnotation, configPrefix);
+    }
+
+    public <T> void bindClientConfigDefaults(Class<T> clientInterface, ConfigDefaults<DriftClientConfig> configDefaults)
+    {
+        bindClientConfigDefaults(clientInterface, DefaultClient.class, configDefaults);
+    }
+
+    public <T> void bindClientConfigDefaults(Class<T> clientInterface, Class<? extends Annotation> annotationType, ConfigDefaults<DriftClientConfig> configDefaults)
+    {
+        bindConfigDefaults(clientInterface, annotationType, DriftClientConfig.class, configDefaults);
+    }
+
+    public <T, C> void bindConfigDefaults(Class<T> clientInterface, Class<C> configClass, ConfigDefaults<C> configDefaults)
+    {
+        bindConfigDefaults(configClass, DefaultClient.class, configClass, configDefaults);
+    }
+
+    public <T, C> void bindConfigDefaults(Class<T> clientInterface, Class<? extends Annotation> annotationType, Class<C> configClass, ConfigDefaults<C> configDefaults)
+    {
+        configBinder(binder).bindConfigDefaults(configClass, getDriftClientAnnotation(clientInterface, annotationType), configDefaults);
     }
 
     private static String getServiceName(Class<?> clientInterface)
