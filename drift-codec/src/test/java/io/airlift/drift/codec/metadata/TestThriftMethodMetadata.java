@@ -15,9 +15,11 @@
  */
 package io.airlift.drift.codec.metadata;
 
+import com.google.common.collect.ImmutableSet;
 import io.airlift.drift.TException;
 import io.airlift.drift.annotations.ThriftException;
 import io.airlift.drift.annotations.ThriftField;
+import io.airlift.drift.annotations.ThriftHeader;
 import io.airlift.drift.annotations.ThriftMethod;
 import io.airlift.drift.annotations.ThriftStruct;
 import org.testng.annotations.Test;
@@ -71,6 +73,34 @@ public class TestThriftMethodMetadata
     public void invalidLegacyFieldId()
     {
         extractThriftMethodMetadata("invalidLegacyFieldId");
+    }
+
+    @Test
+    public void testValidHeaderWithInferredFieldIds()
+    {
+        Method validHeaderWithInferredFieldIds = getMethod("validHeaderParameters", String.class, boolean.class, String.class, boolean.class, boolean.class);
+        ThriftMethodMetadata metadata = new ThriftMethodMetadata(validHeaderWithInferredFieldIds, THRIFT_CATALOG);
+        List<ThriftFieldMetadata> parameters = metadata.getParameters();
+        assertEquals(parameters.size(), 3);
+        assertEquals(parameters.get(0).getId(), 1);
+        assertEquals(parameters.get(1).getId(), 22);
+        assertEquals(parameters.get(2).getId(), 3);
+        assertEquals(metadata.getHeaderParameters(),
+                ImmutableSet.of(new ThriftHeaderParameter(0, "header1"), new ThriftHeaderParameter(2, "header2")));
+    }
+
+    @Test(expectedExceptions = IllegalArgumentException.class, expectedExceptionsMessageRegExp = "ThriftMethod .* parameter 1 can not be annotated with both @ThriftField and @ThriftHeader")
+    public void invalidHeaderAndFieldParameter()
+    {
+        Method validHeaderWithInferredFieldIds = getMethod("invalidHeaderAndFieldParameter", boolean.class, String.class);
+        new ThriftMethodMetadata(validHeaderWithInferredFieldIds, THRIFT_CATALOG);
+    }
+
+    @Test(expectedExceptions = IllegalArgumentException.class, expectedExceptionsMessageRegExp = "ThriftMethod .* parameter 1 annotated with @ThriftHeader must be a String")
+    public void invalidHeaderType()
+    {
+        Method validHeaderWithInferredFieldIds = getMethod("invalidHeaderType", boolean.class, int.class);
+        new ThriftMethodMetadata(validHeaderWithInferredFieldIds, THRIFT_CATALOG);
     }
 
     @Test
@@ -180,6 +210,20 @@ public class TestThriftMethodMetadata
 
         @ThriftMethod
         void invalidLegacyFieldId(@ThriftField(-5) boolean parameter);
+
+        @ThriftMethod
+        void validHeaderParameters(
+                @ThriftHeader("header1") String headerA,
+                boolean parameter1,
+                @ThriftHeader("header2") String headerB,
+                @ThriftField(22) boolean parameter2,
+                boolean parameter3);
+
+        @ThriftMethod
+        void invalidHeaderAndFieldParameter(boolean parameter1, @ThriftField(22) @ThriftHeader("header1") String headerA);
+
+        @ThriftMethod
+        void invalidHeaderType(boolean parameter1, @ThriftHeader("header1") int headerA);
 
         @ThriftMethod
         void noExceptions();

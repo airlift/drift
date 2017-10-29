@@ -119,7 +119,7 @@ public class DriftClientFactory
                 statHandler = new NullMethodInvocationStat();
             }
 
-            DriftMethodHandler handler = new DriftMethodHandler(metadata, invoker, method.isAsync(), addressSelector, retryPolicy, statHandler);
+            DriftMethodHandler handler = new DriftMethodHandler(metadata, method.getHeaderParameters(), invoker, method.isAsync(), addressSelector, retryPolicy, statHandler);
             builder.put(method.getMethod(), handler);
         }
         Map<Method, DriftMethodHandler> methods = builder.build();

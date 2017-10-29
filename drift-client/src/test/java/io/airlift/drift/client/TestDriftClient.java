@@ -26,6 +26,7 @@ import io.airlift.bootstrap.LifeCycleManager;
 import io.airlift.drift.TApplicationException;
 import io.airlift.drift.TException;
 import io.airlift.drift.annotations.ThriftException;
+import io.airlift.drift.annotations.ThriftHeader;
 import io.airlift.drift.annotations.ThriftMethod;
 import io.airlift.drift.annotations.ThriftService;
 import io.airlift.drift.annotations.ThriftStruct;
@@ -47,6 +48,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ThreadLocalRandom;
@@ -361,6 +363,18 @@ public class TestDriftClient
         verifyMethodInvocation(targets, "testAsync", invocationId, "normal");
         classifiers.forEach(TestingExceptionClassifier::assertNoException);
         stat.assertSuccess(0);
+
+        stat = statsFactory.getStat("clientService", qualifier, "testHeader");
+        stat.clear();
+        invocationId = ThreadLocalRandom.current().nextInt();
+        assertEquals(client.testHeader("headerValueA", invocationId, "headerValueB", "normal"), "result");
+        verifyMethodInvocation(targets, "testHeader", invocationId, "normal", ImmutableMap.<String, String>builder()
+                .putAll(HEADERS)
+                .put("headerA", "headerValueA")
+                .put("headerB", "headerValueB")
+                .build());
+        classifiers.forEach(TestingExceptionClassifier::assertNoException);
+        stat.assertSuccess(0);
     }
 
     @SafeVarargs
@@ -460,11 +474,16 @@ public class TestDriftClient
 
     private static void verifyMethodInvocation(Collection<Supplier<InvokeRequest>> targets, String methodName, int id, String name)
     {
+        verifyMethodInvocation(targets, methodName, id, name, HEADERS);
+    }
+
+    private static void verifyMethodInvocation(Collection<Supplier<InvokeRequest>> targets, String methodName, int id, String name, Map<String, String> headers)
+    {
         for (Supplier<InvokeRequest> target : targets) {
             InvokeRequest invokeRequest = target.get();
             assertEquals(invokeRequest.getMethod().getName(), methodName);
             assertEquals(invokeRequest.getParameters(), ImmutableList.of(id, name));
-            assertEquals(invokeRequest.getHeaders(), HEADERS);
+            assertEquals(invokeRequest.getHeaders(), headers);
         }
     }
 
@@ -477,6 +496,10 @@ public class TestDriftClient
 
         @ThriftMethod
         void testNoTException(int id, String name)
+                throws ClientException;
+
+        @ThriftMethod
+        String testHeader(@ThriftHeader("headerA") String firstHeader, int id, @ThriftHeader("headerB") String secondHeader, String name)
                 throws ClientException;
 
         @ThriftMethod(exception = @ThriftException(id = 0, type = ClientException.class))

@@ -17,11 +17,13 @@ package io.airlift.drift.codec.metadata;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.reflect.TypeToken;
 import com.google.common.util.concurrent.ListenableFuture;
 import io.airlift.drift.TException;
 import io.airlift.drift.annotations.ThriftException;
 import io.airlift.drift.annotations.ThriftField;
+import io.airlift.drift.annotations.ThriftHeader;
 import io.airlift.drift.annotations.ThriftIdlAnnotation;
 import io.airlift.drift.annotations.ThriftMethod;
 import io.airlift.drift.annotations.ThriftStruct;
@@ -38,6 +40,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static io.airlift.drift.annotations.ThriftField.Requiredness;
@@ -51,6 +54,7 @@ public class ThriftMethodMetadata
     private final String name;
     private final ThriftType returnType;
     private final List<ThriftFieldMetadata> parameters;
+    private final Set<ThriftHeaderParameter> headerParameters;
     private final Method method;
     private final ImmutableMap<Short, ThriftType> exceptions;
     private final boolean oneway;
@@ -76,26 +80,55 @@ public class ThriftMethodMetadata
 
         returnType = catalog.getThriftType(method.getGenericReturnType());
 
-        ImmutableList.Builder<ThriftFieldMetadata> builder = ImmutableList.builder();
+        ImmutableList.Builder<ThriftFieldMetadata> thriftParameterBuilder = ImmutableList.builder();
+        ImmutableSet.Builder<ThriftHeaderParameter> headerParameterBuilder = ImmutableSet.builder();
         Type[] parameterTypes = method.getGenericParameterTypes();
         List<String> parameterNames = extractParameterNames(method);
         Annotation[][] parameterAnnotations = method.getParameterAnnotations();
-        for (int index = 0; index < parameterTypes.length; index++) {
-            ThriftField thriftField = null;
-            for (Annotation annotation : parameterAnnotations[index]) {
-                if (annotation instanceof ThriftField) {
-                    thriftField = (ThriftField) annotation;
-                    break;
-                }
+        short nextThriftFieldId = 1;
+        for (int parameterIndex = 0; parameterIndex < parameterTypes.length; parameterIndex++) {
+            ThriftField thriftField = Stream.of(parameterAnnotations[parameterIndex])
+                    .filter(ThriftField.class::isInstance)
+                    .map(ThriftField.class::cast)
+                    .findAny()
+                    .orElse(null);
+
+            ThriftHeader thriftHeader = Stream.of(parameterAnnotations[parameterIndex])
+                    .filter(ThriftHeader.class::isInstance)
+                    .map(ThriftHeader.class::cast)
+                    .findAny()
+                    .orElse(null);
+            if (thriftHeader != null) {
+                checkArgument(
+                        thriftField == null,
+                        "ThriftMethod [%s] parameter %s must not be annotated with both @ThriftField and @ThriftHeader",
+                        methodName(method),
+                        parameterIndex);
+
+                checkArgument(
+                        parameterTypes[parameterIndex] == String.class,
+                        "ThriftMethod [%s] parameter %s annotated with @ThriftHeader must be a String",
+                        methodName(method),
+                        parameterIndex);
+
+                String headerName = thriftHeader.value();
+                checkArgument(
+                        !headerName.isEmpty(),
+                        "ThriftMethod [%s] parameter %s @ThriftHeader.name must not be empty",
+                        methodName(method),
+                        parameterIndex);
+
+                headerParameterBuilder.add(new ThriftHeaderParameter(parameterIndex, headerName));
+                continue;
             }
 
-            short parameterId = Short.MIN_VALUE;
+            short thriftFieldId = Short.MIN_VALUE;
             boolean isLegacyId = false;
             String parameterName = null;
             Map<String, String> parameterIdlAnnotations = null;
             Requiredness parameterRequiredness = Requiredness.UNSPECIFIED;
             if (thriftField != null) {
-                parameterId = thriftField.value();
+                thriftFieldId = thriftField.value();
                 isLegacyId = thriftField.isLegacyId();
                 parameterRequiredness = thriftField.requiredness();
                 ImmutableMap.Builder<String, String> idlAnnotationsBuilder = ImmutableMap.builder();
@@ -108,18 +141,21 @@ public class ThriftMethodMetadata
                     parameterName = thriftField.name();
                 }
             }
-            if (parameterId == Short.MIN_VALUE) {
-                parameterId = (short) (index + 1);
+
+            if (thriftFieldId == Short.MIN_VALUE) {
+                thriftFieldId = nextThriftFieldId;
             }
+            nextThriftFieldId++;
+
             if (parameterName == null) {
-                parameterName = parameterNames.get(index);
+                parameterName = parameterNames.get(parameterIndex);
             }
 
-            Type parameterType = parameterTypes[index];
+            Type parameterType = parameterTypes[parameterIndex];
 
             ThriftType thriftType = catalog.getThriftType(parameterType);
 
-            ThriftInjection parameterInjection = new ThriftParameterInjection(parameterId, parameterName, index, parameterType);
+            ThriftInjection parameterInjection = new ThriftParameterInjection(thriftFieldId, parameterName, parameterIndex, parameterType);
 
             if (parameterRequiredness == Requiredness.UNSPECIFIED) {
                 // There is only one field injection used to build metadata for method parameters, and if a
@@ -128,7 +164,7 @@ public class ThriftMethodMetadata
             }
 
             ThriftFieldMetadata fieldMetadata = new ThriftFieldMetadata(
-                    parameterId,
+                    thriftFieldId,
                     isLegacyId,
                     false,
                     parameterRequiredness,
@@ -141,9 +177,10 @@ public class ThriftMethodMetadata
                     Optional.empty(),
                     Optional.empty(),
                     Optional.empty());
-            builder.add(fieldMetadata);
+            thriftParameterBuilder.add(fieldMetadata);
         }
-        parameters = builder.build();
+        parameters = thriftParameterBuilder.build();
+        headerParameters = headerParameterBuilder.build();
 
         exceptions = buildExceptionMap(catalog, thriftMethod);
 
@@ -163,6 +200,11 @@ public class ThriftMethodMetadata
     public List<ThriftFieldMetadata> getParameters()
     {
         return parameters;
+    }
+
+    public Set<ThriftHeaderParameter> getHeaderParameters()
+    {
+        return headerParameters;
     }
 
     public Map<Short, ThriftType> getExceptions()
@@ -235,6 +277,7 @@ public class ThriftMethodMetadata
                 Objects.equals(name, that.name) &&
                 Objects.equals(returnType, that.returnType) &&
                 Objects.equals(parameters, that.parameters) &&
+                Objects.equals(headerParameters, that.headerParameters) &&
                 Objects.equals(method, that.method) &&
                 Objects.equals(exceptions, that.exceptions);
     }
@@ -242,7 +285,7 @@ public class ThriftMethodMetadata
     @Override
     public int hashCode()
     {
-        return Objects.hash(name, returnType, parameters, method, exceptions, oneway);
+        return Objects.hash(name, returnType, parameters, headerParameters, method, exceptions, oneway);
     }
 
     private static String methodName(Method method)

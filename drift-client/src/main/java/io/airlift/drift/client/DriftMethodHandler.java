@@ -16,23 +16,31 @@
 package io.airlift.drift.client;
 
 import com.google.common.base.Ticker;
+import com.google.common.collect.ImmutableList;
 import com.google.common.util.concurrent.ListenableFuture;
 import io.airlift.drift.client.address.AddressSelector;
 import io.airlift.drift.client.stats.MethodInvocationStat;
+import io.airlift.drift.codec.metadata.ThriftHeaderParameter;
 import io.airlift.drift.transport.Address;
 import io.airlift.drift.transport.MethodInvoker;
 import io.airlift.drift.transport.MethodMetadata;
 
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.Set;
 
+import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static io.airlift.drift.client.DriftMethodInvocation.createDriftMethodInvocation;
 import static java.util.Objects.requireNonNull;
+import static java.util.function.Function.identity;
 
 class DriftMethodHandler
 {
     private final MethodMetadata metadata;
+    private final Map<Integer, ThriftHeaderParameter> headerParameters;
     private final MethodInvoker invoker;
     private final boolean async;
     private final AddressSelector<? extends Address> addressSelector;
@@ -41,6 +49,7 @@ class DriftMethodHandler
 
     public DriftMethodHandler(
             MethodMetadata metadata,
+            Set<ThriftHeaderParameter> headersParameters,
             MethodInvoker invoker,
             boolean async,
             AddressSelector<? extends Address> addressSelector,
@@ -48,6 +57,8 @@ class DriftMethodHandler
             MethodInvocationStat stat)
     {
         this.metadata = requireNonNull(metadata, "metadata is null");
+        this.headerParameters = requireNonNull(headersParameters, "headersParameters is null").stream()
+                .collect(toImmutableMap(ThriftHeaderParameter::getIndex, identity()));
         this.invoker = requireNonNull(invoker, "invoker is null");
         this.async = async;
         this.addressSelector = requireNonNull(addressSelector, "addressSelector is null");
@@ -62,6 +73,20 @@ class DriftMethodHandler
 
     public ListenableFuture<Object> invoke(Optional<String> addressSelectionContext, Map<String, String> headers, List<Object> parameters)
     {
+        if (!headerParameters.isEmpty()) {
+            headers = new LinkedHashMap<>(headers);
+            for (Entry<Integer, ThriftHeaderParameter> entry : headerParameters.entrySet()) {
+                headers.put(entry.getValue().getName(), (String) parameters.get(entry.getKey()));
+            }
+
+            ImmutableList.Builder<Object> newParameters = ImmutableList.builder();
+            for (int index = 0; index < parameters.size(); index++) {
+                if (!headerParameters.containsKey(index)) {
+                    newParameters.add(parameters.get(index));
+                }
+            }
+            parameters = newParameters.build();
+        }
         return createDriftMethodInvocation(invoker, metadata, headers, parameters, retryPolicy, addressSelector, addressSelectionContext, stat, Ticker.systemTicker());
     }
 }
