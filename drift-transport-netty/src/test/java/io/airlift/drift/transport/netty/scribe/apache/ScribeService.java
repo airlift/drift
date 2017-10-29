@@ -15,8 +15,13 @@
  */
 package io.airlift.drift.transport.netty.scribe.apache;
 
+import org.apache.thrift.TApplicationException;
+import org.apache.thrift.TException;
+
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.apache.thrift.TApplicationException.UNSUPPORTED_CLIENT_TYPE;
 
 public class ScribeService
         implements scribe.Iface
@@ -30,7 +35,13 @@ public class ScribeService
 
     @Override
     public ResultCode Log(List<LogEntry> messages)
+            throws TException
     {
+        for (LogEntry message : messages) {
+            if (message.getCategory().equals("exception")) {
+                throw new TApplicationException(UNSUPPORTED_CLIENT_TYPE, message.getMessage());
+            }
+        }
         this.messages.addAll(messages);
         return ResultCode.OK;
     }

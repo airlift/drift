@@ -31,6 +31,8 @@ import io.airlift.drift.transport.netty.scribe.apache.ResultCode;
 import io.airlift.drift.transport.netty.scribe.apache.ScribeService;
 import io.airlift.drift.transport.netty.scribe.apache.scribe;
 import io.airlift.drift.transport.netty.scribe.apache.scribe.AsyncClient.Log_call;
+import io.airlift.drift.transport.netty.scribe.apache.scribe.Client;
+import org.apache.thrift.TApplicationException;
 import org.apache.thrift.TException;
 import org.apache.thrift.TProcessor;
 import org.apache.thrift.async.AsyncMethodCallback;
@@ -48,13 +50,16 @@ import org.apache.thrift.transport.TTransportFactory;
 import org.testng.annotations.Test;
 
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.function.ToIntFunction;
 import java.util.stream.Collectors;
 
 import static com.google.common.collect.Iterables.concat;
 import static com.google.common.collect.Lists.newArrayList;
 import static io.airlift.drift.codec.metadata.ThriftType.list;
+import static io.airlift.testing.Assertions.assertInstanceOf;
 import static java.util.Collections.nCopies;
+import static org.apache.thrift.TApplicationException.INTERNAL_ERROR;
 import static org.testng.Assert.assertEquals;
 
 public class TestDriftNettyMethodInvoker
@@ -129,7 +134,15 @@ public class TestDriftNettyMethodInvoker
             socket.open();
             try {
                 TBinaryProtocol tp = new TBinaryProtocol(new TFramedTransport(socket));
-                assertEquals(new scribe.Client(tp).Log(messages), ResultCode.OK);
+                Client client = new Client(tp);
+                assertEquals(client.Log(messages), ResultCode.OK);
+
+                try {
+                    client.Log(ImmutableList.of(new LogEntry("exception", "test")));
+                }
+                catch (TApplicationException e) {
+                    assertEquals(e.getType(), INTERNAL_ERROR);
+                }
             }
             finally {
                 socket.close();
@@ -202,6 +215,16 @@ public class TestDriftNettyMethodInvoker
             ListenableFuture<Object> future = methodInvoker.invoke(new InvokeRequest(methodMetadata, () -> address, ImmutableMap.of(), ImmutableList.of(entries)));
             assertEquals(future.get(), DRIFT_OK);
 
+            try {
+                future = methodInvoker.invoke(new InvokeRequest(methodMetadata, () -> address, ImmutableMap.of(), ImmutableList.of(ImmutableList.of(new io.airlift.drift.transport.netty.scribe.drift.LogEntry("exception", "test")))));
+                assertEquals(future.get(), DRIFT_OK);
+            }
+            catch (ExecutionException e) {
+                Throwable cause = e.getCause();
+                assertInstanceOf(cause, io.airlift.drift.TApplicationException.class);
+                io.airlift.drift.TApplicationException applicationException = (io.airlift.drift.TApplicationException) cause;
+                assertEquals(applicationException.getType(), io.airlift.drift.TApplicationException.Type.INTERNAL_ERROR);
+            }
             return 1;
         }
         catch (Exception e) {

@@ -17,6 +17,7 @@ package io.airlift.drift;
 
 import io.airlift.drift.annotations.ThriftConstructor;
 import io.airlift.drift.annotations.ThriftEnum;
+import io.airlift.drift.annotations.ThriftEnumValue;
 import io.airlift.drift.annotations.ThriftField;
 import io.airlift.drift.annotations.ThriftStruct;
 
@@ -46,6 +47,7 @@ public class TApplicationException
             this.type = type;
         }
 
+        @ThriftEnumValue
         public int getType()
         {
             return type;
