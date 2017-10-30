@@ -15,8 +15,10 @@
  */
 package io.airlift.drift.integration.scribe.drift;
 
+import io.airlift.drift.annotations.ThriftEnum;
 import io.airlift.drift.annotations.ThriftEnumValue;
 
+@ThriftEnum
 public enum DriftResultCode
 {
     OK, TRY_LATER;

@@ -16,6 +16,7 @@
 package io.airlift.drift.codec.metadata;
 
 import com.google.common.collect.ImmutableMap;
+import io.airlift.drift.annotations.ThriftEnum;
 import io.airlift.drift.annotations.ThriftEnumValue;
 import io.airlift.drift.codec.Letter;
 import org.testng.annotations.Test;
@@ -45,6 +46,12 @@ public class TestThriftEnumMetadata
                 .build());
     }
 
+    @Test(expectedExceptions = IllegalArgumentException.class, expectedExceptionsMessageRegExp = "Enum class .*MissingEnumAnnotation is not annotated with @ThriftEnum")
+    public void testMissingEnumAnnotation()
+    {
+        thriftEnumMetadata(MissingEnumAnnotation.class);
+    }
+
     @Test(expectedExceptions = IllegalArgumentException.class, expectedExceptionsMessageRegExp = "Enum class .*MissingValueMethod must have a method annotated with @ThriftEnumValue")
     public void testMissingValueMethod()
     {
@@ -63,11 +70,24 @@ public class TestThriftEnumMetadata
         thriftEnumMetadata(DuplicateValues.class);
     }
 
+    public enum MissingEnumAnnotation
+    {
+        FOO;
+
+        @ThriftEnumValue
+        public int value()
+        {
+            return 42;
+        }
+    }
+
+    @ThriftEnum
     public enum MissingValueMethod
     {
         FOO
     }
 
+    @ThriftEnum
     public enum MultipleValueMethods
     {
         FOO;
@@ -85,6 +105,7 @@ public class TestThriftEnumMetadata
         }
     }
 
+    @ThriftEnum
     public enum DuplicateValues
     {
         FOO, BAR;

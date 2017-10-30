@@ -19,6 +19,8 @@ import io.airlift.drift.annotations.ThriftEnum;
 
 import javax.annotation.concurrent.NotThreadSafe;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
 @NotThreadSafe
 public class ThriftEnumMetadataBuilder<T extends Enum<T>>
 {
@@ -44,14 +46,10 @@ public class ThriftEnumMetadataBuilder<T extends Enum<T>>
     private String extractEnumName(Class<T> enumClass)
     {
         ThriftEnum annotation = enumClass.getAnnotation(ThriftEnum.class);
-        if (annotation == null) {
-            return enumClass.getSimpleName();
-        }
-        else if (!annotation.value().isEmpty()) {
+        checkArgument(annotation != null, "Enum class %s is not annotated with @ThriftEnum", enumClass.getName());
+        if (!annotation.value().isEmpty()) {
             return annotation.value();
         }
-        else {
-            return enumClass.getSimpleName();
-        }
+        return enumClass.getSimpleName();
     }
 }

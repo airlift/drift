@@ -15,8 +15,10 @@
  */
 package io.airlift.drift.codec;
 
+import io.airlift.drift.annotations.ThriftEnum;
 import io.airlift.drift.annotations.ThriftEnumValue;
 
+@ThriftEnum
 public enum Fruit
 {
     APPLE, BANANA, CHERRY;

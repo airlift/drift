@@ -15,8 +15,10 @@
  */
 package io.airlift.drift.transport.netty.scribe.drift;
 
+import io.airlift.drift.annotations.ThriftEnum;
 import io.airlift.drift.annotations.ThriftEnumValue;
 
+@ThriftEnum
 public enum ResultCode
 {
     OK, TRY_LATER;
