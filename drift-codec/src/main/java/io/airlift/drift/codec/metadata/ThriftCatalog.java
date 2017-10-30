@@ -508,6 +508,7 @@ public class ThriftCatalog
      */
     public <T extends Enum<T>> ThriftEnumMetadata<?> getThriftEnumMetadata(Class<?> enumClass)
     {
+        checkArgument(enumClass.isEnum(), "Class %s is not an enum", enumClass.getName());
         ThriftEnumMetadata<?> enumMetadata = enums.get(enumClass);
         if (enumMetadata == null) {
             enumMetadata = thriftEnumMetadata((Class<T>) enumClass);
