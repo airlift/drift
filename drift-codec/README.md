@@ -172,22 +172,12 @@ method itself.
 # Enumerations
 
 Drift automatically maps Java enumerations to a Thrift int.
+The enumeration must be annotated with `@ThriftEnum` and have a method
+annotated with `@ThriftEnumValue` that supplies an int value.
+Drift does *not* support the potentially error-prone method of using
+the Java ordinal for automatic mapping.
 
-## Implicit Value
-
-Drift supports standard Java enumerations directly as a Thrift enumeration
-using the Java ordinal value as the Thrift enum value.
-
-    public enum Fruit
-    {
-        APPLE, BANANA, CHERRY
-    }
-
-## Explicit Value
-
-For custom enumerations, you can annotate a method on the enumeration to
-supply an int value.
-
+    @ThriftEnum
     public enum Letter
     {
         A(65), B(66), C(67), D(68);
