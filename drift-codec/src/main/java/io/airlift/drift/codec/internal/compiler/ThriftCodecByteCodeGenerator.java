@@ -60,6 +60,10 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.OptionalDouble;
+import java.util.OptionalInt;
+import java.util.OptionalLong;
 import java.util.Set;
 import java.util.TreeMap;
 
@@ -102,6 +106,9 @@ public class ThriftCodecByteCodeGenerator<T>
 
     private static final Map<Type, Method> ARRAY_READ_METHODS;
     private static final Map<Type, Method> ARRAY_WRITE_METHODS;
+
+    private static final Method OPTIONAL_READ_METHOD;
+    private static final Method OPTIONAL_WRITE_METHOD;
 
     private final ThriftCodecManager codecManager;
     private final ThriftStructMetadata metadata;
@@ -430,6 +437,21 @@ public class ThriftCodecByteCodeGenerator<T>
         // push parameters on stack
         for (ThriftParameterInjection parameter : constructor.getParameters()) {
             read.loadVariable(structData.get(parameter.getId()));
+
+            // if there is a codec, replace null with the default null value from the codec
+            FieldDefinition codecField = codecFields.get(parameter.getId());
+            if (codecField != null) {
+                read.dup();
+                read.ifNotNullGoto(parameter.getName() + "-constructor-default");
+
+                read.pop();
+                read.loadThis().getField(codecType, codecField);
+                read.invokeInterface(ThriftCodec.class, "getType", ThriftType.class);
+                read.invokeVirtual(ThriftType.class, "getNullValue", Object.class);
+                read.checkCast(structData.get(parameter.getId()).getType());
+
+                read.visitLabel(parameter.getName() + "-constructor-default");
+            }
         }
         // invoke constructor
         read.invokeConstructor(constructor.getConstructor())
@@ -698,7 +720,7 @@ public class ThriftCodecByteCodeGenerator<T>
                 ThriftFieldInjection fieldInjection = (ThriftFieldInjection) injection;
 
                 // if field is an Object && field != null
-                if (!isProtocolTypeJavaPrimitive(field)) {
+                if (!fieldInjection.getField().getType().isPrimitive()) {
                     read.loadVariable(sourceVariable)
                             .ifNullGoto("field_is_null_" + field.getName());
                 }
@@ -709,7 +731,7 @@ public class ThriftCodecByteCodeGenerator<T>
                         .putField(fieldInjection.getField());
 
                 // else do nothing
-                if (!isProtocolTypeJavaPrimitive(field)) {
+                if (!fieldInjection.getField().getType().isPrimitive()) {
                     read.visitLabel("field_is_null_" + field.getName());
                 }
             }
@@ -1061,8 +1083,13 @@ public class ThriftCodecByteCodeGenerator<T>
 
     private boolean needsCodec(ThriftFieldMetadata fieldMetadata)
     {
-        if (ReflectionHelper.isArray(fieldMetadata.getThriftType().getJavaType())) {
+        Type javaType = fieldMetadata.getThriftType().getJavaType();
+        if (ReflectionHelper.isArray(javaType)) {
             return false;
+        }
+
+        if (isOptionalWrapper(javaType)) {
+            return true;
         }
 
         ThriftProtocolType protocolType = fieldMetadata.getThriftType().getProtocolType();
@@ -1076,6 +1103,14 @@ public class ThriftCodecByteCodeGenerator<T>
     private ParameterizedType toCodecType(ThriftStructMetadata metadata)
     {
         return type(PACKAGE + "/" + type(metadata.getStructClass()).getClassName() + "Codec");
+    }
+
+    private static boolean isOptionalWrapper(Type javaType)
+    {
+        return ReflectionHelper.isOptional(javaType) ||
+                javaType == OptionalDouble.class ||
+                javaType == OptionalInt.class ||
+                javaType == OptionalLong.class;
     }
 
     private static class ConstructorParameters
@@ -1125,6 +1160,10 @@ public class ThriftCodecByteCodeGenerator<T>
             return type((Class<?>) typeRef.getJavaType());
         }
 
+        if (ReflectionHelper.isOptional(typeRef.getJavaType())) {
+            return type(Optional.class, toParameterizedType(typeRef.get().getValueTypeReference()));
+        }
+
         switch (typeRef.getProtocolType()) {
             case BOOL:
             case BYTE:
@@ -1153,6 +1192,9 @@ public class ThriftCodecByteCodeGenerator<T>
         if (ReflectionHelper.isArray(thriftType.getJavaType())) {
             return ARRAY_WRITE_METHODS.get(thriftType.getJavaType());
         }
+        if (isOptionalWrapper(thriftType.getJavaType())) {
+            return OPTIONAL_WRITE_METHOD;
+        }
         return WRITE_METHODS.get(thriftType.getProtocolType());
     }
 
@@ -1160,6 +1202,9 @@ public class ThriftCodecByteCodeGenerator<T>
     {
         if (ReflectionHelper.isArray(thriftType.getJavaType())) {
             return ARRAY_READ_METHODS.get(thriftType.getJavaType());
+        }
+        if (isOptionalWrapper(thriftType.getJavaType())) {
+            return OPTIONAL_READ_METHOD;
         }
         return READ_METHODS.get(thriftType.getProtocolType());
     }
@@ -1229,5 +1274,13 @@ public class ThriftCodecByteCodeGenerator<T>
         }
         ARRAY_WRITE_METHODS = arrayWriteBuilder.build();
         ARRAY_READ_METHODS = arrayReadBuilder.build();
+
+        try {
+            OPTIONAL_READ_METHOD = ProtocolReader.class.getMethod("readField", ThriftCodec.class);
+            OPTIONAL_WRITE_METHOD = ProtocolWriter.class.getMethod("writeField", String.class, short.class, ThriftCodec.class, Object.class);
+        }
+        catch (NoSuchMethodException e) {
+            throw new AssertionError(e);
+        }
     }
 }

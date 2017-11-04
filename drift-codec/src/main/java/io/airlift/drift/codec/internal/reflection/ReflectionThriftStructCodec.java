@@ -134,6 +134,9 @@ public class ReflectionThriftStructCodec<T>
             Object[] parametersValues = new Object[constructor.getParameters().size()];
             for (ThriftParameterInjection parameter : constructor.getParameters()) {
                 Object value = data.get(parameter.getId());
+                if (value == null) {
+                    value = metadata.getField(parameter.getId()).getThriftType().getNullValue();
+                }
                 parametersValues[parameter.getParameterIndex()] = value;
             }
 

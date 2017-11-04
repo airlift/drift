@@ -23,6 +23,7 @@ import com.google.common.util.concurrent.SettableFuture;
 import io.airlift.drift.codec.ThriftCodec;
 import io.airlift.drift.codec.ThriftCodecManager;
 import io.airlift.drift.codec.internal.builtin.VoidThriftCodec;
+import io.airlift.drift.codec.metadata.ThriftType;
 import io.airlift.drift.transport.InvokeRequest;
 import io.airlift.drift.transport.MethodInvoker;
 import io.airlift.drift.transport.MethodMetadata;
@@ -55,6 +56,7 @@ import org.apache.thrift.transport.TTransportFactory;
 import org.testng.annotations.Test;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.function.ToIntFunction;
@@ -64,6 +66,7 @@ import static com.google.common.collect.Iterables.concat;
 import static com.google.common.collect.Lists.newArrayList;
 import static io.airlift.concurrent.Threads.daemonThreadsNamed;
 import static io.airlift.drift.codec.metadata.ThriftType.list;
+import static io.airlift.drift.codec.metadata.ThriftType.optional;
 import static io.airlift.testing.Assertions.assertInstanceOf;
 import static java.util.Collections.nCopies;
 import static java.util.concurrent.Executors.newSingleThreadScheduledExecutor;
@@ -101,7 +104,8 @@ public class TestDriftNettyMethodInvoker
         int invocationCount = testProcessor(processor, ImmutableList.of(
                 address -> logThrift(address, MESSAGES),
                 address -> logThriftAsync(address, MESSAGES),
-                address -> logNiftyInvocationHandler1(address, DRIFT_MESSAGES)));
+                address -> logNiftyInvocationHandler1(address, DRIFT_MESSAGES),
+                address -> logNiftyInvocationHandlerOptional(address, DRIFT_MESSAGES)));
 
         return newArrayList(concat(nCopies(invocationCount, MESSAGES)));
     }
@@ -274,6 +278,53 @@ public class TestDriftNettyMethodInvoker
         }
         finally {
             executor.shutdown();
+        }
+    }
+
+    private static int logNiftyInvocationHandlerOptional(HostAndPort address, List<io.airlift.drift.transport.netty.scribe.drift.LogEntry> entries)
+    {
+        DriftNettyClientConfig config = new DriftNettyClientConfig()
+                .setPoolEnabled(true);
+        try (DriftNettyMethodInvokerFactory<Void> methodInvokerFactory = new DriftNettyMethodInvokerFactory<>(new DriftNettyConnectionFactoryConfig(), clientIdentity -> config)) {
+            MethodInvoker methodInvoker = methodInvokerFactory.createMethodInvoker(null);
+
+            ThriftType optionalType = optional(list(codecManager.getCatalog().getThriftType(io.airlift.drift.transport.netty.scribe.drift.LogEntry.class)));
+            ParameterMetadata parameter = new ParameterMetadata(
+                    (short) 1,
+                    "messages",
+                    (ThriftCodec<Object>) codecManager.getCodec(optionalType));
+
+            MethodMetadata methodMetadata = new MethodMetadata(
+                    "Log",
+                    ImmutableList.of(parameter),
+                    (ThriftCodec<Object>) (Object) codecManager.getCodec(io.airlift.drift.transport.netty.scribe.drift.ResultCode.class),
+                    ImmutableMap.of(),
+                    false);
+
+            ListenableFuture<Object> future = methodInvoker.invoke(new InvokeRequest(methodMetadata, () -> address, ImmutableMap.of(), ImmutableList.of(Optional.of(entries))));
+            assertEquals(future.get(), DRIFT_OK);
+
+            future = methodInvoker.invoke(new InvokeRequest(methodMetadata, () -> address, ImmutableMap.of(), ImmutableList.of(Optional.empty())));
+            assertEquals(future.get(), DRIFT_OK);
+
+            try {
+                future = methodInvoker.invoke(new InvokeRequest(
+                        methodMetadata,
+                        () -> address,
+                        ImmutableMap.of(),
+                        ImmutableList.of(Optional.of(ImmutableList.of(new io.airlift.drift.transport.netty.scribe.drift.LogEntry("exception", "test"))))));
+                assertEquals(future.get(), DRIFT_OK);
+            }
+            catch (ExecutionException e) {
+                Throwable cause = e.getCause();
+                assertInstanceOf(cause, io.airlift.drift.TApplicationException.class);
+                io.airlift.drift.TApplicationException applicationException = (io.airlift.drift.TApplicationException) cause;
+                assertEquals(applicationException.getTypeValue(), io.airlift.drift.TApplicationException.Type.INTERNAL_ERROR.getType());
+            }
+            return 1;
+        }
+        catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 

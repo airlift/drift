@@ -57,6 +57,7 @@ public final class ReflectionHelper
     private static final Type MAP_VALUE_TYPE;
     private static final Type ITERATOR_TYPE;
     private static final Type ITERATOR_ELEMENT_TYPE;
+    private static final Type OPTIONAL_TYPE;
     private static final Type FUTURE_RETURN_TYPE;
 
     static {
@@ -67,6 +68,8 @@ public final class ReflectionHelper
 
             ITERATOR_TYPE = Iterable.class.getMethod("iterator").getGenericReturnType();
             ITERATOR_ELEMENT_TYPE = Iterator.class.getMethod("next").getGenericReturnType();
+
+            OPTIONAL_TYPE = Optional.class.getMethod("get").getGenericReturnType();
 
             Method futureGetMethod = Future.class.getMethod("get");
             FUTURE_RETURN_TYPE = futureGetMethod.getGenericReturnType();
@@ -79,6 +82,11 @@ public final class ReflectionHelper
     public static boolean isArray(Type type)
     {
         return TypeToken.of(type).getComponentType() != null;
+    }
+
+    public static boolean isOptional(Type type)
+    {
+        return TypeToken.of(type).getRawType() == Optional.class;
     }
 
     public static Class<?> getArrayOfType(Type componentType)
@@ -101,6 +109,11 @@ public final class ReflectionHelper
     public static Type getIterableType(Type type)
     {
         return TypeToken.of(type).resolveType(ITERATOR_TYPE).resolveType(ITERATOR_ELEMENT_TYPE).getType();
+    }
+
+    public static Type getOptionalType(Type type)
+    {
+        return TypeToken.of(type).resolveType(OPTIONAL_TYPE).getType();
     }
 
     public static Type getFutureReturnType(Type type)

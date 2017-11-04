@@ -54,4 +54,15 @@ public interface ThriftCodec<T>
      */
     void write(T value, TProtocolWriter protocol)
             throws Exception;
+
+    /**
+     * If the value is effectively null and should not be written.
+     *
+     * @param value the value to test
+     * @return true if the value should not be written
+     */
+    default boolean isNull(T value)
+    {
+        return value == null;
+    }
 }

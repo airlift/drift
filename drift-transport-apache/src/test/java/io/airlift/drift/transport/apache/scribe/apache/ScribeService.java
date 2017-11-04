@@ -31,7 +31,9 @@ public class ScribeService
     @Override
     public ResultCode Log(List<LogEntry> messages)
     {
-        this.messages.addAll(messages);
+        if (messages != null) {
+            this.messages.addAll(messages);
+        }
         return ResultCode.OK;
     }
 }

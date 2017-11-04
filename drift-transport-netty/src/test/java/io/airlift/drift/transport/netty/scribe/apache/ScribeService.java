@@ -37,12 +37,14 @@ public class ScribeService
     public ResultCode Log(List<LogEntry> messages)
             throws TException
     {
-        for (LogEntry message : messages) {
-            if (message.getCategory().equals("exception")) {
-                throw new TApplicationException(UNSUPPORTED_CLIENT_TYPE, message.getMessage());
+        if (messages != null) {
+            for (LogEntry message : messages) {
+                if (message.getCategory().equals("exception")) {
+                    throw new TApplicationException(UNSUPPORTED_CLIENT_TYPE, message.getMessage());
+                }
             }
+            this.messages.addAll(messages);
         }
-        this.messages.addAll(messages);
         return ResultCode.OK;
     }
 }

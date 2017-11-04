@@ -40,6 +40,7 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -51,6 +52,7 @@ import static io.airlift.drift.codec.metadata.ReflectionHelper.getFutureReturnTy
 import static io.airlift.drift.codec.metadata.ReflectionHelper.getIterableType;
 import static io.airlift.drift.codec.metadata.ReflectionHelper.getMapKeyType;
 import static io.airlift.drift.codec.metadata.ReflectionHelper.getMapValueType;
+import static io.airlift.drift.codec.metadata.ReflectionHelper.getOptionalType;
 import static io.airlift.drift.codec.metadata.ThriftEnumMetadataBuilder.thriftEnumMetadata;
 import static io.airlift.drift.codec.metadata.ThriftType.BINARY;
 import static io.airlift.drift.codec.metadata.ThriftType.BOOL;
@@ -65,6 +67,7 @@ import static io.airlift.drift.codec.metadata.ThriftType.array;
 import static io.airlift.drift.codec.metadata.ThriftType.enumType;
 import static io.airlift.drift.codec.metadata.ThriftType.list;
 import static io.airlift.drift.codec.metadata.ThriftType.map;
+import static io.airlift.drift.codec.metadata.ThriftType.optional;
 import static io.airlift.drift.codec.metadata.ThriftType.set;
 import static io.airlift.drift.codec.metadata.ThriftType.struct;
 import static java.lang.reflect.Modifier.isStatic;
@@ -308,6 +311,10 @@ public class ThriftCatalog
             Type elementType = getIterableType(javaType);
             return list(getCollectionElementThriftTypeReference(elementType));
         }
+        if (Optional.class.isAssignableFrom(rawType)) {
+            Type elementType = getOptionalType(javaType);
+            return optional(getOptionalThriftTypeReference(elementType));
+        }
         // The void type is used by service methods and is encoded as an empty struct
         if (void.class.isAssignableFrom(rawType) || Void.class.isAssignableFrom(rawType)) {
             return VOID;
@@ -389,6 +396,20 @@ public class ThriftCatalog
         }
     }
 
+    public ThriftTypeReference getOptionalThriftTypeReference(Type javaType)
+    {
+        // Optional types are always allowed to be recursive links
+        if (isStructType(javaType)) {
+            // TODO: This gets things working, but is only necessary when this collection is
+            // involved in a recursive chain. Otherwise, it's just introducing unnecessary
+            // references. We should see if we can clean this up.
+            return getThriftTypeReference(javaType, Recursiveness.FORCED);
+        }
+        else {
+            return getThriftTypeReference(javaType, Recursiveness.NOT_ALLOWED);
+        }
+    }
+
     private ThriftTypeReference getThriftTypeReference(Type javaType, Recursiveness recursiveness)
     {
         ThriftType thriftType = getThriftTypeFromCache(javaType);
@@ -414,6 +435,11 @@ public class ThriftCatalog
 
     public ThriftProtocolType getThriftProtocolType(Type javaType)
     {
+        ThriftType manualType = manualTypes.get(javaType);
+        if (manualType != null) {
+            return manualType.getProtocolType();
+        }
+
         Class<?> rawType = TypeToken.of(javaType).getRawType();
 
         if (boolean.class == rawType) {
@@ -468,6 +494,10 @@ public class ThriftCatalog
             if (isSupportedStructFieldType(elementType)) {
                 return ThriftProtocolType.LIST;
             }
+        }
+        if (Optional.class.isAssignableFrom(rawType)) {
+            Type elementType = getOptionalType(javaType);
+            return getThriftProtocolType(elementType);
         }
         if (isStructType(rawType)) {
             return ThriftProtocolType.STRUCT;

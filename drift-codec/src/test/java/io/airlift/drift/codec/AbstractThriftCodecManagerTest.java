@@ -56,6 +56,10 @@ import org.testng.annotations.Test;
 import java.lang.reflect.Type;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.Optional;
+import java.util.OptionalDouble;
+import java.util.OptionalInt;
+import java.util.OptionalLong;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.testng.Assert.assertEquals;
@@ -285,6 +289,92 @@ public abstract class AbstractThriftCodecManagerTest
     }
 
     @Test
+    public void testAllOptionalField()
+            throws Exception
+    {
+        OptionalField optionalField = new OptionalField();
+        optionalField.aBooleanOptional = Optional.of(true);
+        optionalField.aByteOptional = Optional.of(Byte.MIN_VALUE);
+        optionalField.aShortOptional = Optional.of(Short.MIN_VALUE);
+        optionalField.aIntegerOptional = Optional.of(Integer.MIN_VALUE);
+        optionalField.aLongOptional = Optional.of(Long.MIN_VALUE);
+        optionalField.aDoubleOptional = Optional.of(-42.1d);
+        optionalField.aStringOptional = Optional.of("a");
+        optionalField.aStructOptional = Optional.of(new BonkField("message", 42));
+        optionalField.aEnumOptional = Optional.of(Fruit.BANANA);
+
+        optionalField.aOptionalDouble = OptionalDouble.of(87.6d);
+        optionalField.aOptionalInt = OptionalInt.of(Integer.MAX_VALUE - 10);
+        optionalField.aOptionalLong = OptionalLong.of(Long.MAX_VALUE - 20);
+
+        optionalField.aCustomEnumOptional = Optional.of(Letter.C);
+        optionalField.aListBooleanOptional = Optional.of(ImmutableList.of(true));
+        optionalField.aListByteOptional = Optional.of(ImmutableList.of(Byte.MAX_VALUE));
+        optionalField.aListShortOptional = Optional.of(ImmutableList.of(Short.MAX_VALUE));
+        optionalField.aListIntegerOptional = Optional.of(ImmutableList.of(Integer.MAX_VALUE));
+        optionalField.aListLongOptional = Optional.of(ImmutableList.of(Long.MAX_VALUE));
+        optionalField.aListDoubleOptional = Optional.of(ImmutableList.of(-42.1d));
+        optionalField.aListStringOptional = Optional.of(ImmutableList.of("a"));
+        optionalField.aListStructOptional = Optional.of(ImmutableList.of(new BonkField("message", 42)));
+        optionalField.aListEnumOptional = Optional.of(ImmutableList.of(Fruit.BANANA));
+        optionalField.aListCustomEnumOptional = Optional.of(ImmutableList.of(Letter.C));
+
+        testRoundTripSerialize(optionalField, new TBinaryProtocol.Factory());
+        testRoundTripSerialize(optionalField, new TCompactProtocol.Factory());
+    }
+
+    @Test
+    public void testAllOptionalFieldEmpty()
+            throws Exception
+    {
+        testRoundTripSerialize(new OptionalField(), new TBinaryProtocol.Factory());
+        testRoundTripSerialize(new OptionalField(), new TCompactProtocol.Factory());
+    }
+
+    @Test
+    public void testAllOptionalStruct()
+            throws Exception
+    {
+        OptionalStruct optionalStruct = new OptionalStruct(
+                Optional.of(true),
+                Optional.of(Byte.MIN_VALUE),
+                Optional.of(Short.MIN_VALUE),
+                Optional.of(Integer.MIN_VALUE),
+                Optional.of(Long.MIN_VALUE),
+                Optional.of(-42.1d),
+                Optional.of("a"),
+                Optional.of(new BonkField("message", 42)),
+                Optional.of(Fruit.BANANA),
+                Optional.of(Letter.C),
+
+                OptionalDouble.of(87.6d),
+                OptionalInt.of(Integer.MAX_VALUE - 10),
+                OptionalLong.of(Long.MAX_VALUE - 20),
+
+                Optional.of(ImmutableList.of(true)),
+                Optional.of(ImmutableList.of(Byte.MAX_VALUE)),
+                Optional.of(ImmutableList.of(Short.MAX_VALUE)),
+                Optional.of(ImmutableList.of(Integer.MAX_VALUE)),
+                Optional.of(ImmutableList.of(Long.MAX_VALUE)),
+                Optional.of(ImmutableList.of(-42.1d)),
+                Optional.of(ImmutableList.of("a")),
+                Optional.of(ImmutableList.of(new BonkField("message", 42))),
+                Optional.of(ImmutableList.of(Fruit.BANANA)),
+                Optional.of(ImmutableList.of(Letter.C)));
+
+        testRoundTripSerialize(optionalStruct, new TBinaryProtocol.Factory());
+        testRoundTripSerialize(optionalStruct, new TCompactProtocol.Factory());
+    }
+
+    @Test
+    public void testAllOptionalStructEmpty()
+            throws Exception
+    {
+        testRoundTripSerialize(new OptionalStruct(), new TBinaryProtocol.Factory());
+        testRoundTripSerialize(new OptionalStruct(), new TCompactProtocol.Factory());
+    }
+
+    @Test
     public void testOneOfEverythingField()
             throws Exception
     {
@@ -334,8 +424,8 @@ public abstract class AbstractThriftCodecManagerTest
             throws Exception
     {
         OneOfEverything one = new OneOfEverything();
-        testRoundTripSerialize(one, new TCompactProtocol.Factory());
         testRoundTripSerialize(one, new TBinaryProtocol.Factory());
+        testRoundTripSerialize(one, new TCompactProtocol.Factory());
     }
 
     @Test
@@ -744,6 +834,17 @@ public abstract class AbstractThriftCodecManagerTest
         one.aStructKeyMap = ImmutableMap.copyOf(HashBiMap.create(one.aStructValueMap).inverse());
         one.aEnumKeyMap = ImmutableMap.of(Fruit.APPLE, "apple", Fruit.BANANA, "banana");
         one.aCustomEnumKeyMap = ImmutableMap.of(Letter.A, "a", Letter.B, "b");
+
+        one.aBooleanOptional = Optional.of(true);
+        one.aByteOptional = Optional.of((byte) -1);
+        one.aShortOptional = Optional.of((short) -1);
+        one.aIntegerOptional = Optional.of(-1);
+        one.aLongOptional = Optional.of(-1L);
+        one.aDoubleOptional = Optional.of(-42.1d);
+        one.aStringOptional = Optional.of("a");
+        one.aStructOptional = Optional.of(new BonkField("message", 42));
+        one.aEnumOptional = Optional.of(Fruit.BANANA);
+        one.aCustomEnumOptional = Optional.of(Letter.C);
 
         one.aSetOfListsOfMaps = ImmutableSet.of(
                 ImmutableList.of(

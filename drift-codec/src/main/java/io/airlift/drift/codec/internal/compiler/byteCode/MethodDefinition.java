@@ -72,6 +72,7 @@ import static org.objectweb.asm.Opcodes.IFEQ;
 import static org.objectweb.asm.Opcodes.IFNONNULL;
 import static org.objectweb.asm.Opcodes.IFNULL;
 import static org.objectweb.asm.Opcodes.ILOAD;
+import static org.objectweb.asm.Opcodes.INVOKEINTERFACE;
 import static org.objectweb.asm.Opcodes.INVOKESPECIAL;
 import static org.objectweb.asm.Opcodes.INVOKESTATIC;
 import static org.objectweb.asm.Opcodes.INVOKEVIRTUAL;
@@ -415,6 +416,22 @@ public class MethodDefinition
                         name,
                         methodDescription(returnType, parameterTypes),
                         false));
+        return this;
+    }
+
+    public MethodDefinition invokeInterface(
+            Class<?> type,
+            String name,
+            Class<?> returnType,
+            Class<?>... parameterTypes)
+    {
+        instructionList.add(
+                new MethodInsnNode(
+                        INVOKEINTERFACE,
+                        type(type).getClassName(),
+                        name,
+                        methodDescription(returnType, parameterTypes),
+                        true));
         return this;
     }
 

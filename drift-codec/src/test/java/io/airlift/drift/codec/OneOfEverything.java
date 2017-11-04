@@ -21,6 +21,7 @@ import io.airlift.drift.annotations.ThriftStruct;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 
 import static com.google.common.base.MoreObjects.toStringHelper;
@@ -133,15 +134,36 @@ public final class OneOfEverything
     @ThriftField(50)
     public Map<Letter, String> aCustomEnumKeyMap;
 
+    @ThriftField(51)
+    public Optional<Boolean> aBooleanOptional = Optional.empty();
+    @ThriftField(52)
+    public Optional<Byte> aByteOptional = Optional.empty();
+    @ThriftField(53)
+    public Optional<Short> aShortOptional = Optional.empty();
+    @ThriftField(54)
+    public Optional<Integer> aIntegerOptional = Optional.empty();
+    @ThriftField(55)
+    public Optional<Long> aLongOptional = Optional.empty();
+    @ThriftField(56)
+    public Optional<Double> aDoubleOptional = Optional.empty();
+    @ThriftField(57)
+    public Optional<String> aStringOptional = Optional.empty();
+    @ThriftField(58)
+    public Optional<BonkField> aStructOptional = Optional.empty();
+    @ThriftField(59)
+    public Optional<Fruit> aEnumOptional = Optional.empty();
     @ThriftField(60)
+    public Optional<Letter> aCustomEnumOptional = Optional.empty();
+
+    @ThriftField(70)
     public UnionField aUnion;
-    @ThriftField(61)
+    @ThriftField(71)
     public Set<UnionField> aUnionSet;
-    @ThriftField(62)
+    @ThriftField(72)
     public List<UnionField> aUnionList;
-    @ThriftField(63)
+    @ThriftField(73)
     public Map<UnionField, String> aUnionKeyMap;
-    @ThriftField(64)
+    @ThriftField(74)
     public Map<String, UnionField> aUnionValueMap;
 
     @ThriftField(100)
@@ -209,6 +231,16 @@ public final class OneOfEverything
                 Objects.equals(aStructKeyMap, that.aStructKeyMap) &&
                 Objects.equals(aEnumKeyMap, that.aEnumKeyMap) &&
                 Objects.equals(aCustomEnumKeyMap, that.aCustomEnumKeyMap) &&
+                Objects.equals(aBooleanOptional, that.aBooleanOptional) &&
+                Objects.equals(aByteOptional, that.aByteOptional) &&
+                Objects.equals(aShortOptional, that.aShortOptional) &&
+                Objects.equals(aIntegerOptional, that.aIntegerOptional) &&
+                Objects.equals(aLongOptional, that.aLongOptional) &&
+                Objects.equals(aDoubleOptional, that.aDoubleOptional) &&
+                Objects.equals(aStringOptional, that.aStringOptional) &&
+                Objects.equals(aStructOptional, that.aStructOptional) &&
+                Objects.equals(aEnumOptional, that.aEnumOptional) &&
+                Objects.equals(aCustomEnumOptional, that.aCustomEnumOptional) &&
                 Objects.equals(aUnion, that.aUnion) &&
                 Objects.equals(aUnionSet, that.aUnionSet) &&
                 Objects.equals(aUnionList, that.aUnionList) &&
@@ -272,6 +304,16 @@ public final class OneOfEverything
                 aStructKeyMap,
                 aEnumKeyMap,
                 aCustomEnumKeyMap,
+                aBooleanOptional,
+                aByteOptional,
+                aShortOptional,
+                aIntegerOptional,
+                aLongOptional,
+                aDoubleOptional,
+                aStringOptional,
+                aStructOptional,
+                aEnumOptional,
+                aCustomEnumOptional,
                 aUnion,
                 aUnionSet,
                 aUnionList,
@@ -335,6 +377,16 @@ public final class OneOfEverything
                 .add("aStructKeyMap", aStructKeyMap)
                 .add("aEnumKeyMap", aEnumKeyMap)
                 .add("aCustomEnumKeyMap", aCustomEnumKeyMap)
+                .add("aBooleanOptional", aBooleanOptional)
+                .add("aByteOptional", aByteOptional)
+                .add("aShortOptional", aShortOptional)
+                .add("aIntegerOptional", aIntegerOptional)
+                .add("aLongOptional", aLongOptional)
+                .add("aDoubleOptional", aDoubleOptional)
+                .add("aStringOptional", aStringOptional)
+                .add("aStructOptional", aStructOptional)
+                .add("aEnumOptional", aEnumOptional)
+                .add("aCustomEnumOptional", aCustomEnumOptional)
                 .add("aUnion", aUnion)
                 .add("aUnionSet", aUnionSet)
                 .add("aUnionList", aUnionList)

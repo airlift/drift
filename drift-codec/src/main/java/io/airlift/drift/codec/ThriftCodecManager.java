@@ -35,6 +35,10 @@ import io.airlift.drift.codec.internal.builtin.ListThriftCodec;
 import io.airlift.drift.codec.internal.builtin.LongArrayThriftCodec;
 import io.airlift.drift.codec.internal.builtin.LongThriftCodec;
 import io.airlift.drift.codec.internal.builtin.MapThriftCodec;
+import io.airlift.drift.codec.internal.builtin.OptionalDoubleThriftCodec;
+import io.airlift.drift.codec.internal.builtin.OptionalIntThriftCodec;
+import io.airlift.drift.codec.internal.builtin.OptionalLongThriftCodec;
+import io.airlift.drift.codec.internal.builtin.OptionalThriftCodec;
 import io.airlift.drift.codec.internal.builtin.SetThriftCodec;
 import io.airlift.drift.codec.internal.builtin.ShortArrayThriftCodec;
 import io.airlift.drift.codec.internal.builtin.ShortThriftCodec;
@@ -42,6 +46,7 @@ import io.airlift.drift.codec.internal.builtin.StringThriftCodec;
 import io.airlift.drift.codec.internal.builtin.VoidThriftCodec;
 import io.airlift.drift.codec.internal.coercion.CoercionThriftCodec;
 import io.airlift.drift.codec.internal.compiler.CompilerThriftCodecFactory;
+import io.airlift.drift.codec.metadata.ReflectionHelper;
 import io.airlift.drift.codec.metadata.ThriftCatalog;
 import io.airlift.drift.codec.metadata.ThriftType;
 import io.airlift.drift.codec.metadata.ThriftTypeReference;
@@ -68,7 +73,7 @@ import static java.util.Objects.requireNonNull;
  * class should be created.
  */
 @ThreadSafe
-public class ThriftCodecManager
+public final class ThriftCodecManager
 {
     private final ThriftCatalog catalog;
     private final LoadingCache<ThriftType, ThriftCodec<?>> typeCodecs;
@@ -129,6 +134,10 @@ public class ThriftCodecManager
                     // so that we can detect recursive loads.
                     stack.get().push(type);
 
+                    if (ReflectionHelper.isOptional(type.getJavaType())) {
+                        return new OptionalThriftCodec<>(type, getElementCodec(type.getValueTypeReference()));
+                    }
+
                     switch (type.getProtocolType()) {
                         case STRUCT:
                             return factory.generateThriftTypeCodec(ThriftCodecManager.this, type.getStructMetadata());
@@ -156,6 +165,7 @@ public class ThriftCodecManager
             }
         });
 
+        // these codecs use built-in types that must NOT be registered with the type catalog
         addBuiltinCodec(new BooleanThriftCodec());
         addBuiltinCodec(new ByteThriftCodec());
         addBuiltinCodec(new ShortThriftCodec());
@@ -170,6 +180,11 @@ public class ThriftCodecManager
         addBuiltinCodec(new IntArrayThriftCodec());
         addBuiltinCodec(new LongArrayThriftCodec());
         addBuiltinCodec(new DoubleArrayThriftCodec());
+
+        // these codecs use non-built-in types that must be registered with the type catalog
+        addCodec(new OptionalDoubleThriftCodec());
+        addCodec(new OptionalIntThriftCodec());
+        addCodec(new OptionalLongThriftCodec());
 
         for (ThriftCodec<?> codec : codecs) {
             addCodec(codec);

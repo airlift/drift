@@ -23,6 +23,7 @@ import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.SettableFuture;
 import io.airlift.drift.codec.ThriftCodec;
 import io.airlift.drift.codec.ThriftCodecManager;
+import io.airlift.drift.codec.metadata.ThriftType;
 import io.airlift.drift.transport.InvokeRequest;
 import io.airlift.drift.transport.MethodInvoker;
 import io.airlift.drift.transport.MethodMetadata;
@@ -50,11 +51,13 @@ import org.apache.thrift.transport.TTransportFactory;
 import org.testng.annotations.Test;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.function.ToIntFunction;
 import java.util.stream.Collectors;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static io.airlift.drift.codec.metadata.ThriftType.list;
+import static io.airlift.drift.codec.metadata.ThriftType.optional;
 import static java.util.Collections.nCopies;
 import static org.testng.Assert.assertEquals;
 
@@ -87,7 +90,8 @@ public class TestApacheThriftMethodInvoker
         int invocationCount = testProcessor(processor, ImmutableList.of(
                 address -> logThrift(address, MESSAGES),
                 address -> logThriftAsync(address, MESSAGES),
-                address -> logApacheThriftInvocationHandler(address, DRIFT_MESSAGES)));
+                address -> logApacheThriftInvocationHandler(address, DRIFT_MESSAGES),
+                address -> logApacheThriftInvocationHandlerOptional(address, DRIFT_MESSAGES)));
 
         return newArrayList(Iterables.concat(nCopies(invocationCount, MESSAGES)));
     }
@@ -204,6 +208,39 @@ public class TestApacheThriftMethodInvoker
                     false);
 
             ListenableFuture<Object> future = methodInvoker.invoke(new InvokeRequest(methodMetadata, () -> address, ImmutableMap.of(), ImmutableList.of(entries)));
+            assertEquals(future.get(), DRIFT_OK);
+
+            return 1;
+        }
+        catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static int logApacheThriftInvocationHandlerOptional(HostAndPort address, List<io.airlift.drift.transport.apache.scribe.drift.LogEntry> entries)
+    {
+        ApacheThriftClientConfig config = new ApacheThriftClientConfig();
+        ApacheThriftConnectionFactoryConfig factoryConfig = new ApacheThriftConnectionFactoryConfig();
+        try (ApacheThriftMethodInvokerFactory<Void> methodInvokerFactory = new ApacheThriftMethodInvokerFactory<>(factoryConfig, clientIdentity -> config)) {
+            MethodInvoker methodInvoker = methodInvokerFactory.createMethodInvoker(null);
+
+            ThriftType optionalType = optional(list(codecManager.getCatalog().getThriftType(io.airlift.drift.transport.apache.scribe.drift.LogEntry.class)));
+            ParameterMetadata parameter = new ParameterMetadata(
+                    (short) 1,
+                    "messages",
+                    (ThriftCodec<Object>) codecManager.getCodec(optionalType));
+
+            MethodMetadata methodMetadata = new MethodMetadata(
+                    "Log",
+                    ImmutableList.of(parameter),
+                    (ThriftCodec<Object>) (Object) codecManager.getCodec(io.airlift.drift.transport.apache.scribe.drift.ResultCode.class),
+                    ImmutableMap.of(),
+                    false);
+
+            ListenableFuture<Object> future = methodInvoker.invoke(new InvokeRequest(methodMetadata, () -> address, ImmutableMap.of(), ImmutableList.of(Optional.of(entries))));
+            assertEquals(future.get(), DRIFT_OK);
+
+            future = methodInvoker.invoke(new InvokeRequest(methodMetadata, () -> address, ImmutableMap.of(), ImmutableList.of(Optional.empty())));
             assertEquals(future.get(), DRIFT_OK);
 
             return 1;

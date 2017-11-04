@@ -58,7 +58,7 @@ public class ProtocolWriter
     public <T> void writeField(String name, short id, ThriftCodec<T> codec, T value)
             throws Exception
     {
-        if (value == null) {
+        if (codec.isNull(value)) {
             return;
         }
 
