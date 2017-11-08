@@ -56,15 +56,8 @@ import java.util.Optional;
 import static com.google.common.base.Throwables.throwIfUnchecked;
 import static com.google.common.util.concurrent.Futures.immediateFailedFuture;
 import static io.airlift.drift.TApplicationException.Type.BAD_SEQUENCE_ID;
-import static io.airlift.drift.TApplicationException.Type.INTERNAL_ERROR;
 import static io.airlift.drift.TApplicationException.Type.INVALID_MESSAGE_TYPE;
-import static io.airlift.drift.TApplicationException.Type.INVALID_PROTOCOL;
-import static io.airlift.drift.TApplicationException.Type.INVALID_TRANSFORM;
 import static io.airlift.drift.TApplicationException.Type.MISSING_RESULT;
-import static io.airlift.drift.TApplicationException.Type.PROTOCOL_ERROR;
-import static io.airlift.drift.TApplicationException.Type.UNKNOWN;
-import static io.airlift.drift.TApplicationException.Type.UNKNOWN_METHOD;
-import static io.airlift.drift.TApplicationException.Type.UNSUPPORTED_CLIENT_TYPE;
 import static io.airlift.drift.TApplicationException.Type.WRONG_METHOD_NAME;
 import static java.lang.String.format;
 import static java.net.Proxy.Type.SOCKS;
@@ -297,7 +290,7 @@ public class ApacheThriftMethodInvoker
     {
         if (e instanceof org.apache.thrift.TApplicationException) {
             org.apache.thrift.TApplicationException tae = (org.apache.thrift.TApplicationException) e;
-            return new TApplicationException(toDriftApplicationExceptionType(tae.getType()), tae.getMessage());
+            return new TApplicationException(tae.getType(), tae.getMessage());
         }
         if (e instanceof org.apache.thrift.transport.TTransportException) {
             return new TTransportException(e);
@@ -309,32 +302,5 @@ public class ApacheThriftMethodInvoker
             return new TException(e);
         }
         return e;
-    }
-
-    private static TApplicationException.Type toDriftApplicationExceptionType(int type)
-    {
-        switch (type) {
-            case org.apache.thrift.TApplicationException.UNKNOWN_METHOD:
-                return UNKNOWN_METHOD;
-            case org.apache.thrift.TApplicationException.INVALID_MESSAGE_TYPE:
-                return INVALID_MESSAGE_TYPE;
-            case org.apache.thrift.TApplicationException.WRONG_METHOD_NAME:
-                return WRONG_METHOD_NAME;
-            case org.apache.thrift.TApplicationException.BAD_SEQUENCE_ID:
-                return BAD_SEQUENCE_ID;
-            case org.apache.thrift.TApplicationException.MISSING_RESULT:
-                return MISSING_RESULT;
-            case org.apache.thrift.TApplicationException.INTERNAL_ERROR:
-                return INTERNAL_ERROR;
-            case org.apache.thrift.TApplicationException.PROTOCOL_ERROR:
-                return PROTOCOL_ERROR;
-            case org.apache.thrift.TApplicationException.INVALID_TRANSFORM:
-                return INVALID_TRANSFORM;
-            case org.apache.thrift.TApplicationException.INVALID_PROTOCOL:
-                return INVALID_PROTOCOL;
-            case org.apache.thrift.TApplicationException.UNSUPPORTED_CLIENT_TYPE:
-                return UNSUPPORTED_CLIENT_TYPE;
-        }
-        return UNKNOWN;
     }
 }

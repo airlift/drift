@@ -223,7 +223,7 @@ public class TestDriftNettyMethodInvoker
                 Throwable cause = e.getCause();
                 assertInstanceOf(cause, io.airlift.drift.TApplicationException.class);
                 io.airlift.drift.TApplicationException applicationException = (io.airlift.drift.TApplicationException) cause;
-                assertEquals(applicationException.getType(), io.airlift.drift.TApplicationException.Type.INTERNAL_ERROR);
+                assertEquals(applicationException.getTypeValue(), io.airlift.drift.TApplicationException.Type.INTERNAL_ERROR.getType());
             }
             return 1;
         }
