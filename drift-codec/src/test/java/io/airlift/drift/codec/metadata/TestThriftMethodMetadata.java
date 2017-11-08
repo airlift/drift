@@ -89,7 +89,7 @@ public class TestThriftMethodMetadata
                 ImmutableSet.of(new ThriftHeaderParameter(0, "header1"), new ThriftHeaderParameter(2, "header2")));
     }
 
-    @Test(expectedExceptions = IllegalArgumentException.class, expectedExceptionsMessageRegExp = "ThriftMethod .* parameter 1 can not be annotated with both @ThriftField and @ThriftHeader")
+    @Test(expectedExceptions = IllegalArgumentException.class, expectedExceptionsMessageRegExp = "ThriftMethod .* parameter 1 must not be annotated with both @ThriftField and @ThriftHeader")
     public void invalidHeaderAndFieldParameter()
     {
         Method validHeaderWithInferredFieldIds = getMethod("invalidHeaderAndFieldParameter", boolean.class, String.class);
