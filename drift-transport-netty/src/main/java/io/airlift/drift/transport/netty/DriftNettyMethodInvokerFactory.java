@@ -15,6 +15,7 @@
  */
 package io.airlift.drift.transport.netty;
 
+import com.google.common.net.HostAndPort;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import io.airlift.drift.protocol.TBinaryProtocol;
 import io.airlift.drift.protocol.TCompactProtocol;
@@ -48,6 +49,7 @@ public class DriftNettyMethodInvokerFactory<I>
 
     private final EventLoopGroup group;
     private final SslContextFactory sslContextFactory;
+    private final HostAndPort defaultSocksProxy;
 
     public static DriftNettyMethodInvokerFactory<?> createStaticDriftNettyMethodInvokerFactory(DriftNettyClientConfig clientConfig)
     {
@@ -66,12 +68,16 @@ public class DriftNettyMethodInvokerFactory<I>
 
         this.clientConfigurationProvider = requireNonNull(clientConfigurationProvider, "clientConfigurationProvider is null");
         this.sslContextFactory = createSslContextFactory(factoryConfig.getSslContextRefreshTime(), group);
+        this.defaultSocksProxy = factoryConfig.getSocksProxy();
     }
 
     @Override
     public MethodInvoker createMethodInvoker(I clientIdentity)
     {
         DriftNettyClientConfig clientConfig = clientConfigurationProvider.apply(clientIdentity);
+        if (clientConfig.getSocksProxy() == null) {
+            clientConfig.setSocksProxy(defaultSocksProxy);
+        }
 
         TProtocolFactory protocolFactory;
         switch (clientConfig.getProtocol()) {

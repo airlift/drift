@@ -15,11 +15,13 @@
  */
 package io.airlift.drift.transport.apache;
 
+import com.google.common.net.HostAndPort;
 import io.airlift.configuration.Config;
 
 public class ApacheThriftConnectionFactoryConfig
 {
     private Integer threadCount;
+    private HostAndPort socksProxy;
 
     public Integer getThreadCount()
     {
@@ -27,9 +29,21 @@ public class ApacheThriftConnectionFactoryConfig
     }
 
     @Config("thrift.client.thread-count")
-    public ApacheThriftConnectionFactoryConfig setThreadCount(int threadCount)
+    public ApacheThriftConnectionFactoryConfig setThreadCount(Integer threadCount)
     {
         this.threadCount = threadCount;
+        return this;
+    }
+
+    public HostAndPort getSocksProxy()
+    {
+        return socksProxy;
+    }
+
+    @Config("thrift.client.socks-proxy")
+    public ApacheThriftConnectionFactoryConfig setSocksProxy(HostAndPort socksProxy)
+    {
+        this.socksProxy = socksProxy;
         return this;
     }
 }

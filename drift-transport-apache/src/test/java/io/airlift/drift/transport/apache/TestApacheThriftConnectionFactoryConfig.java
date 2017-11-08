@@ -13,11 +13,10 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
-package io.airlift.drift.transport.netty;
+package io.airlift.drift.transport.apache;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.net.HostAndPort;
-import io.airlift.units.Duration;
 import org.testng.annotations.Test;
 
 import java.util.Map;
@@ -25,16 +24,14 @@ import java.util.Map;
 import static io.airlift.configuration.testing.ConfigAssertions.assertFullMapping;
 import static io.airlift.configuration.testing.ConfigAssertions.assertRecordedDefaults;
 import static io.airlift.configuration.testing.ConfigAssertions.recordDefaults;
-import static java.util.concurrent.TimeUnit.MINUTES;
 
-public class TestDriftNettyConnectionFactoryConfig
+public class TestApacheThriftConnectionFactoryConfig
 {
     @Test
     public void testDefaults()
     {
-        assertRecordedDefaults(recordDefaults(DriftNettyConnectionFactoryConfig.class)
-                .setThreadCount(Runtime.getRuntime().availableProcessors() * 2)
-                .setSslContextRefreshTime(new Duration(1, MINUTES))
+        assertRecordedDefaults(recordDefaults(ApacheThriftConnectionFactoryConfig.class)
+                .setThreadCount(null)
                 .setSocksProxy(null));
     }
 
@@ -43,13 +40,11 @@ public class TestDriftNettyConnectionFactoryConfig
     {
         Map<String, String> properties = new ImmutableMap.Builder<String, String>()
                 .put("thrift.client.thread-count", "99")
-                .put("thrift.client.ssl-context.refresh-time", "33m")
                 .put("thrift.client.socks-proxy", "example.com:9876")
                 .build();
 
-        DriftNettyConnectionFactoryConfig expected = new DriftNettyConnectionFactoryConfig()
+        ApacheThriftConnectionFactoryConfig expected = new ApacheThriftConnectionFactoryConfig()
                 .setThreadCount(99)
-                .setSslContextRefreshTime(new Duration(33, MINUTES))
                 .setSocksProxy(HostAndPort.fromParts("example.com", 9876));
 
         assertFullMapping(properties, expected);

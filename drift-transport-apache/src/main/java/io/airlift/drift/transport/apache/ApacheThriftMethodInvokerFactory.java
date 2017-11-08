@@ -15,6 +15,7 @@
  */
 package io.airlift.drift.transport.apache;
 
+import com.google.common.net.HostAndPort;
 import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.ListeningScheduledExecutorService;
 import io.airlift.drift.transport.MethodInvoker;
@@ -58,6 +59,7 @@ public class ApacheThriftMethodInvokerFactory<I>
 
     private final ListeningExecutorService executorService;
     private final ListeningScheduledExecutorService delayService;
+    private final HostAndPort defaultSocksProxy;
 
     public static ApacheThriftMethodInvokerFactory<?> createStaticApacheThriftMethodInvokerFactory(ApacheThriftClientConfig clientConfig)
     {
@@ -87,12 +89,16 @@ public class ApacheThriftMethodInvokerFactory<I>
             executorService = delayService;
         }
         this.clientConfigurationProvider = requireNonNull(clientConfigurationProvider, "clientConfigurationProvider is null");
+        this.defaultSocksProxy = factoryConfig.getSocksProxy();
     }
 
     @Override
     public MethodInvoker createMethodInvoker(I clientIdentity)
     {
         ApacheThriftClientConfig config = clientConfigurationProvider.apply(clientIdentity);
+        if (config.getSocksProxy() == null) {
+            config.setSocksProxy(defaultSocksProxy);
+        }
 
         TTransportFactory transportFactory;
         switch (config.getTransport()) {

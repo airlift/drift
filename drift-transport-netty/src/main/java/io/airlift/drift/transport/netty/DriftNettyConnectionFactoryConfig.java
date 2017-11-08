@@ -15,6 +15,7 @@
  */
 package io.airlift.drift.transport.netty;
 
+import com.google.common.net.HostAndPort;
 import io.airlift.configuration.Config;
 import io.airlift.units.Duration;
 import io.airlift.units.MinDuration;
@@ -27,6 +28,7 @@ public class DriftNettyConnectionFactoryConfig
 
     private Integer threadCount = DEFAULT_WORKER_THREAD_COUNT;
     private Duration sslContextRefreshTime = new Duration(1, MINUTES);
+    private HostAndPort socksProxy;
 
     public Integer getThreadCount()
     {
@@ -50,6 +52,18 @@ public class DriftNettyConnectionFactoryConfig
     public DriftNettyConnectionFactoryConfig setSslContextRefreshTime(Duration sslContextRefreshTime)
     {
         this.sslContextRefreshTime = sslContextRefreshTime;
+        return this;
+    }
+
+    public HostAndPort getSocksProxy()
+    {
+        return socksProxy;
+    }
+
+    @Config("thrift.client.socks-proxy")
+    public DriftNettyConnectionFactoryConfig setSocksProxy(HostAndPort socksProxy)
+    {
+        this.socksProxy = socksProxy;
         return this;
     }
 }
