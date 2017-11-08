@@ -42,7 +42,7 @@
 
         <dependency>
             <groupId>org.ow2.asm</groupId>
-            <artifactId>asm-all</artifactId>
+            <artifactId>asm-debug-all</artifactId>
         </dependency>
 
         <dependency>
@@ -103,10 +103,11 @@
                         <configuration>
                             <createSourcesJar>true</createSourcesJar>
                             <shadeSourcesContent>true</shadeSourcesContent>
+                            <minimizeJar>true</minimizeJar>
                             <dependencyReducedPomLocation>${project.build.directory}/pom.xml</dependencyReducedPomLocation>
                             <artifactSet>
                                 <includes>
-                                    <include>org.ow2.asm:asm-all</include>
+                                    <include>org.ow2.asm:asm-debug-all</include>
                                 </includes>
                             </artifactSet>
                             <relocations>
@@ -117,7 +118,7 @@
                             </relocations>
                             <filters>
                                 <filter>
-                                    <artifact>org.ow2.asm:asm-all</artifact>
+                                    <artifact>org.ow2.asm:asm-debug-all</artifact>
                                     <excludes>
                                         <exclude>META-INF/maven/**</exclude>
                                         <excludes>org/objectweb/asm/xml/**</excludes>
