@@ -1,15 +1,25 @@
 # Drift
 
 Drift is an easy-to-use, annotation-based Java library for creating Thrift
-serializable types and services.
+clients and serializable types.  The client library is similar to JAX-RS 
+(HTTP Rest) and the serialization library is similar to JaxB (XML) and Jackson
+(JSON), but for Thrift.
 
-# Drift Codec
+## Example 
 
-[Drift Codec](drift-codec) is a simple library specifying how Java
-objects are converted to and from Thrift.  This library is similar to JaxB
-(XML) and Jackson (JSON), but for Thrift.  Drift codec supports field, method,
-constructor, and builder injection.  For example:
+The following interface defines a client for a Scribe server:
 
+```java
+@ThriftService
+public interface Scribe
+{
+    @ThriftMethod
+    ResultCode log(List<LogEntry> messages);
+}
+```
+
+The `log` method above uses the `LogEntry` Thrift struct which is defined as follows:   
+ 
 ```java
 @ThriftStruct
 public class LogEntry
@@ -38,16 +48,22 @@ public class LogEntry
 }
 ```
 
-# Drift Client
-
-[Drift Client](drift-client) is a simple library for creating Thrift clients
-that call remote Thrift servers.  For example:
-
+An instance of the Scribe client can be created using a `DriftClientFactory`:
 ```java
-@ThriftService
-public interface Scribe
-{
-    @ThriftMethod
-    ResultCode log(List<LogEntry> messages);
-}
+// expensive services that should only be created once
+ThriftCodecManager codecManager = new ThriftCodecManager();
+AddressSelector addressSelector = new SimpleAddressSelector(scribeHostAddreses);
+DriftNettyClientConfig config = new DriftNettyClientConfig();
+// methodInvokerFactory must be closed 
+DriftNettyMethodInvokerFactory<?> methodInvokerFactory = DriftNettyMethodInvokerFactory.createStaticDriftNettyMethodInvokerFactory(config);
+DriftClientFactory clientFactory = new DriftClientFactory(codecManager, methodInvokerFactory, addressSelector);
+
+// create a client (cached also)
+Scribe scribe = clientFactory.createDriftClient(Scribe.class);
+
+// use client
+scribe.log(Arrays.asList(new LogEntry("category", "message")));
 ```
+
+See [Drift Codec](drift-codec) for more information on annotating Thrift types, and [Drift Client]
+(drift-client) for more information on Thrift client usage. 
