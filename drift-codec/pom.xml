@@ -40,7 +40,24 @@
 
         <dependency>
             <groupId>org.ow2.asm</groupId>
-            <artifactId>asm-debug-all</artifactId>
+            <artifactId>asm</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.ow2.asm</groupId>
+            <artifactId>asm-tree</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.ow2.asm</groupId>
+            <artifactId>asm-util</artifactId>
+        </dependency>
+
+        <!-- this undeclared dependency is used by asm-util -->
+        <dependency>
+            <groupId>org.ow2.asm</groupId>
+            <artifactId>asm-analysis</artifactId>
+            <scope>runtime</scope>
         </dependency>
 
         <dependency>
@@ -105,7 +122,7 @@
                             <dependencyReducedPomLocation>${project.build.directory}/pom.xml</dependencyReducedPomLocation>
                             <artifactSet>
                                 <includes>
-                                    <include>org.ow2.asm:asm-debug-all</include>
+                                    <include>org.ow2.asm:*</include>
                                 </includes>
                             </artifactSet>
                             <relocations>
@@ -116,10 +133,9 @@
                             </relocations>
                             <filters>
                                 <filter>
-                                    <artifact>org.ow2.asm:asm-debug-all</artifact>
+                                    <artifact>org.ow2.asm:*</artifact>
                                     <excludes>
                                         <exclude>META-INF/maven/**</exclude>
-                                        <excludes>org/objectweb/asm/xml/**</excludes>
                                     </excludes>
                                 </filter>
                             </filters>
