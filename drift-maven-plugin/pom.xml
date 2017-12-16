@@ -14,8 +14,6 @@
 
     <properties>
         <air.main.basedir>${project.parent.basedir}</air.main.basedir>
-        <mavenVersion>3.2.3</mavenVersion>
-        <mavenPluginPluginVersion>3.2</mavenPluginPluginVersion>
     </properties>
 
     <dependencies>
@@ -78,6 +76,16 @@
     </dependencies>
 
     <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-plugin-plugin</artifactId>
+                    <version>3.5</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+
         <plugins>
             <plugin>
                 <groupId>io.takari.maven.plugins</groupId>
