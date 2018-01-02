@@ -154,6 +154,7 @@ public class TestDriftNettyMethodInvoker
 
                 try {
                     client.Log(ImmutableList.of(new LogEntry("exception", "test")));
+                    fail("Expected exception");
                 }
                 catch (org.apache.thrift.TApplicationException e) {
                     assertEquals(e.getType(), org.apache.thrift.TApplicationException.INTERNAL_ERROR);
@@ -232,7 +233,8 @@ public class TestDriftNettyMethodInvoker
 
             try {
                 future = methodInvoker.invoke(new InvokeRequest(methodMetadata, () -> address, ImmutableMap.of(), ImmutableList.of(ImmutableList.of(new DriftLogEntry("exception", "test")))));
-                assertEquals(future.get(), DRIFT_OK);
+                future.get();
+                fail("Expected exception");
             }
             catch (ExecutionException e) {
                 Throwable cause = e.getCause();
