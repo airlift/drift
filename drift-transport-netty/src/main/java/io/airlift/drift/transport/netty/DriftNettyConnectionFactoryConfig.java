@@ -24,13 +24,13 @@ import static java.util.concurrent.TimeUnit.MINUTES;
 
 public class DriftNettyConnectionFactoryConfig
 {
-    private static final int DEFAULT_WORKER_THREAD_COUNT = Runtime.getRuntime().availableProcessors() * 2;
+    private static final int DEFAULT_THREAD_COUNT = Runtime.getRuntime().availableProcessors() * 2;
 
-    private Integer threadCount = DEFAULT_WORKER_THREAD_COUNT;
+    private int threadCount = DEFAULT_THREAD_COUNT;
     private Duration sslContextRefreshTime = new Duration(1, MINUTES);
     private HostAndPort socksProxy;
 
-    public Integer getThreadCount()
+    public int getThreadCount()
     {
         return threadCount;
     }
