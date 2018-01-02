@@ -13,13 +13,13 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
-package io.airlift.drift.transport.apache.scribe.drift;
+package io.airlift.drift.transport.netty.scribe.drift;
 
 import io.airlift.drift.annotations.ThriftEnum;
 import io.airlift.drift.annotations.ThriftEnumValue;
 
 @ThriftEnum
-public enum ResultCode
+public enum DriftResultCode
 {
     OK, TRY_LATER;
 

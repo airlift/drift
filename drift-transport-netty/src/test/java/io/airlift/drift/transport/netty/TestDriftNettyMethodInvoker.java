@@ -20,6 +20,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.net.HostAndPort;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.SettableFuture;
+import io.airlift.drift.TApplicationException;
 import io.airlift.drift.codec.ThriftCodec;
 import io.airlift.drift.codec.ThriftCodecManager;
 import io.airlift.drift.codec.internal.builtin.VoidThriftCodec;
@@ -34,11 +35,12 @@ import io.airlift.drift.transport.netty.scribe.apache.ScribeService;
 import io.airlift.drift.transport.netty.scribe.apache.scribe;
 import io.airlift.drift.transport.netty.scribe.apache.scribe.AsyncClient.Log_call;
 import io.airlift.drift.transport.netty.scribe.apache.scribe.Client;
+import io.airlift.drift.transport.netty.scribe.drift.DriftLogEntry;
+import io.airlift.drift.transport.netty.scribe.drift.DriftResultCode;
 import io.airlift.units.Duration;
 import io.netty.channel.Channel;
 import io.netty.util.concurrent.DefaultEventExecutor;
 import io.netty.util.concurrent.Future;
-import org.apache.thrift.TApplicationException;
 import org.apache.thrift.TException;
 import org.apache.thrift.TProcessor;
 import org.apache.thrift.async.AsyncMethodCallback;
@@ -71,7 +73,6 @@ import static io.airlift.testing.Assertions.assertInstanceOf;
 import static java.util.Collections.nCopies;
 import static java.util.concurrent.Executors.newSingleThreadScheduledExecutor;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
-import static org.apache.thrift.TApplicationException.INTERNAL_ERROR;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.fail;
 
@@ -81,11 +82,11 @@ public class TestDriftNettyMethodInvoker
     private static final List<LogEntry> MESSAGES = ImmutableList.of(
             new LogEntry("hello", "world"),
             new LogEntry("bye", "world"));
-    private static final List<io.airlift.drift.transport.netty.scribe.drift.LogEntry> DRIFT_MESSAGES = ImmutableList.copyOf(
+    private static final List<DriftLogEntry> DRIFT_MESSAGES = ImmutableList.copyOf(
             MESSAGES.stream()
-                    .map(input -> new io.airlift.drift.transport.netty.scribe.drift.LogEntry(input.category, input.message))
+                    .map(input -> new DriftLogEntry(input.category, input.message))
                     .collect(Collectors.toList()));
-    private static final io.airlift.drift.transport.netty.scribe.drift.ResultCode DRIFT_OK = io.airlift.drift.transport.netty.scribe.drift.ResultCode.OK;
+    private static final DriftResultCode DRIFT_OK = DriftResultCode.OK;
 
     @Test
     public void testThriftService()
@@ -154,8 +155,8 @@ public class TestDriftNettyMethodInvoker
                 try {
                     client.Log(ImmutableList.of(new LogEntry("exception", "test")));
                 }
-                catch (TApplicationException e) {
-                    assertEquals(e.getType(), INTERNAL_ERROR);
+                catch (org.apache.thrift.TApplicationException e) {
+                    assertEquals(e.getType(), org.apache.thrift.TApplicationException.INTERNAL_ERROR);
                 }
             }
             finally {
@@ -207,7 +208,7 @@ public class TestDriftNettyMethodInvoker
         return 1;
     }
 
-    private static int logNiftyInvocationHandler1(HostAndPort address, List<io.airlift.drift.transport.netty.scribe.drift.LogEntry> entries)
+    private static int logNiftyInvocationHandler1(HostAndPort address, List<DriftLogEntry> entries)
     {
         DriftNettyClientConfig config = new DriftNettyClientConfig()
                 .setPoolEnabled(true);
@@ -217,12 +218,12 @@ public class TestDriftNettyMethodInvoker
             ParameterMetadata parameter = new ParameterMetadata(
                     (short) 1,
                     "messages",
-                    (ThriftCodec<Object>) codecManager.getCodec(list(codecManager.getCodec(io.airlift.drift.transport.netty.scribe.drift.LogEntry.class).getType())));
+                    (ThriftCodec<Object>) codecManager.getCodec(list(codecManager.getCodec(DriftLogEntry.class).getType())));
 
             MethodMetadata methodMetadata = new MethodMetadata(
                     "Log",
                     ImmutableList.of(parameter),
-                    (ThriftCodec<Object>) (Object) codecManager.getCodec(io.airlift.drift.transport.netty.scribe.drift.ResultCode.class),
+                    (ThriftCodec<Object>) (Object) codecManager.getCodec(DriftResultCode.class),
                     ImmutableMap.of(),
                     false);
 
@@ -230,14 +231,14 @@ public class TestDriftNettyMethodInvoker
             assertEquals(future.get(), DRIFT_OK);
 
             try {
-                future = methodInvoker.invoke(new InvokeRequest(methodMetadata, () -> address, ImmutableMap.of(), ImmutableList.of(ImmutableList.of(new io.airlift.drift.transport.netty.scribe.drift.LogEntry("exception", "test")))));
+                future = methodInvoker.invoke(new InvokeRequest(methodMetadata, () -> address, ImmutableMap.of(), ImmutableList.of(ImmutableList.of(new DriftLogEntry("exception", "test")))));
                 assertEquals(future.get(), DRIFT_OK);
             }
             catch (ExecutionException e) {
                 Throwable cause = e.getCause();
-                assertInstanceOf(cause, io.airlift.drift.TApplicationException.class);
-                io.airlift.drift.TApplicationException applicationException = (io.airlift.drift.TApplicationException) cause;
-                assertEquals(applicationException.getTypeValue(), io.airlift.drift.TApplicationException.Type.INTERNAL_ERROR.getType());
+                assertInstanceOf(cause, TApplicationException.class);
+                TApplicationException applicationException = (TApplicationException) cause;
+                assertEquals(applicationException.getTypeValue(), TApplicationException.Type.INTERNAL_ERROR.getType());
             }
             return 1;
         }
@@ -281,14 +282,14 @@ public class TestDriftNettyMethodInvoker
         }
     }
 
-    private static int logNiftyInvocationHandlerOptional(HostAndPort address, List<io.airlift.drift.transport.netty.scribe.drift.LogEntry> entries)
+    private static int logNiftyInvocationHandlerOptional(HostAndPort address, List<DriftLogEntry> entries)
     {
         DriftNettyClientConfig config = new DriftNettyClientConfig()
                 .setPoolEnabled(true);
         try (DriftNettyMethodInvokerFactory<Void> methodInvokerFactory = new DriftNettyMethodInvokerFactory<>(new DriftNettyConnectionFactoryConfig(), clientIdentity -> config)) {
             MethodInvoker methodInvoker = methodInvokerFactory.createMethodInvoker(null);
 
-            ThriftType optionalType = optional(list(codecManager.getCatalog().getThriftType(io.airlift.drift.transport.netty.scribe.drift.LogEntry.class)));
+            ThriftType optionalType = optional(list(codecManager.getCatalog().getThriftType(DriftLogEntry.class)));
             ParameterMetadata parameter = new ParameterMetadata(
                     (short) 1,
                     "messages",
@@ -297,7 +298,7 @@ public class TestDriftNettyMethodInvoker
             MethodMetadata methodMetadata = new MethodMetadata(
                     "Log",
                     ImmutableList.of(parameter),
-                    (ThriftCodec<Object>) (Object) codecManager.getCodec(io.airlift.drift.transport.netty.scribe.drift.ResultCode.class),
+                    (ThriftCodec<Object>) (Object) codecManager.getCodec(DriftResultCode.class),
                     ImmutableMap.of(),
                     false);
 
@@ -312,7 +313,7 @@ public class TestDriftNettyMethodInvoker
                         methodMetadata,
                         () -> address,
                         ImmutableMap.of(),
-                        ImmutableList.of(Optional.of(ImmutableList.of(new io.airlift.drift.transport.netty.scribe.drift.LogEntry("exception", "test"))))));
+                        ImmutableList.of(Optional.of(ImmutableList.of(new DriftLogEntry("exception", "test"))))));
                 assertEquals(future.get(), DRIFT_OK);
             }
             catch (ExecutionException e) {

@@ -13,20 +13,24 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
-package io.airlift.drift.transport.apache.scribe.drift;
+package io.airlift.drift.transport.netty.scribe.drift;
 
 import io.airlift.drift.annotations.ThriftConstructor;
 import io.airlift.drift.annotations.ThriftField;
 import io.airlift.drift.annotations.ThriftStruct;
 
+import java.util.Objects;
+
+import static com.google.common.base.MoreObjects.toStringHelper;
+
 @ThriftStruct
-public final class LogEntry
+public final class DriftLogEntry
 {
     private final String category;
     private final String message;
 
     @ThriftConstructor
-    public LogEntry(
+    public DriftLogEntry(
             @ThriftField(name = "category") String category,
             @ThriftField(name = "message") String message)
     {
@@ -55,35 +59,23 @@ public final class LogEntry
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-
-        LogEntry logEntry = (LogEntry) o;
-
-        if (category != null ? !category.equals(logEntry.category) : logEntry.category != null) {
-            return false;
-        }
-        if (message != null ? !message.equals(logEntry.message) : logEntry.message != null) {
-            return false;
-        }
-
-        return true;
+        DriftLogEntry that = (DriftLogEntry) o;
+        return Objects.equals(category, that.category) &&
+                Objects.equals(message, that.message);
     }
 
     @Override
     public int hashCode()
     {
-        int result = category != null ? category.hashCode() : 0;
-        result = 31 * result + (message != null ? message.hashCode() : 0);
-        return result;
+        return Objects.hash(category, message);
     }
 
     @Override
     public String toString()
     {
-        StringBuilder sb = new StringBuilder();
-        sb.append("LogEntryStruct");
-        sb.append("{category='").append(category).append('\'');
-        sb.append(", message='").append(message).append('\'');
-        sb.append('}');
-        return sb.toString();
+        return toStringHelper(this)
+                .add("category", category)
+                .add("message", message)
+                .toString();
     }
 }

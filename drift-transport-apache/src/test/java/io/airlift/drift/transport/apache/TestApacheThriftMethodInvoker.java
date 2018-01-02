@@ -33,6 +33,8 @@ import io.airlift.drift.transport.apache.scribe.apache.ResultCode;
 import io.airlift.drift.transport.apache.scribe.apache.ScribeService;
 import io.airlift.drift.transport.apache.scribe.apache.scribe;
 import io.airlift.drift.transport.apache.scribe.apache.scribe.AsyncClient.Log_call;
+import io.airlift.drift.transport.apache.scribe.drift.DriftLogEntry;
+import io.airlift.drift.transport.apache.scribe.drift.DriftResultCode;
 import org.apache.thrift.TException;
 import org.apache.thrift.TProcessor;
 import org.apache.thrift.async.AsyncMethodCallback;
@@ -67,11 +69,11 @@ public class TestApacheThriftMethodInvoker
     private static final List<LogEntry> MESSAGES = ImmutableList.of(
             new LogEntry("hello", "world"),
             new LogEntry("bye", "world"));
-    private static final List<io.airlift.drift.transport.apache.scribe.drift.LogEntry> DRIFT_MESSAGES = ImmutableList.copyOf(
+    private static final List<DriftLogEntry> DRIFT_MESSAGES = ImmutableList.copyOf(
             MESSAGES.stream()
-                    .map(input -> new io.airlift.drift.transport.apache.scribe.drift.LogEntry(input.category, input.message))
+                    .map(input -> new DriftLogEntry(input.category, input.message))
                     .collect(Collectors.toList()));
-    private static final io.airlift.drift.transport.apache.scribe.drift.ResultCode DRIFT_OK = io.airlift.drift.transport.apache.scribe.drift.ResultCode.OK;
+    private static final DriftResultCode DRIFT_OK = DriftResultCode.OK;
 
     @Test
     public void testThriftService()
@@ -188,7 +190,7 @@ public class TestApacheThriftMethodInvoker
         return 1;
     }
 
-    private static int logApacheThriftInvocationHandler(HostAndPort address, List<io.airlift.drift.transport.apache.scribe.drift.LogEntry> entries)
+    private static int logApacheThriftInvocationHandler(HostAndPort address, List<DriftLogEntry> entries)
     {
         ApacheThriftClientConfig config = new ApacheThriftClientConfig();
         ApacheThriftConnectionFactoryConfig factoryConfig = new ApacheThriftConnectionFactoryConfig();
@@ -198,12 +200,12 @@ public class TestApacheThriftMethodInvoker
             ParameterMetadata parameter = new ParameterMetadata(
                     (short) 1,
                     "messages",
-                    (ThriftCodec<Object>) codecManager.getCodec(list(codecManager.getCodec(io.airlift.drift.transport.apache.scribe.drift.LogEntry.class).getType())));
+                    (ThriftCodec<Object>) codecManager.getCodec(list(codecManager.getCodec(DriftLogEntry.class).getType())));
 
             MethodMetadata methodMetadata = new MethodMetadata(
                     "Log",
                     ImmutableList.of(parameter),
-                    (ThriftCodec<Object>) (Object) codecManager.getCodec(io.airlift.drift.transport.apache.scribe.drift.ResultCode.class),
+                    (ThriftCodec<Object>) (Object) codecManager.getCodec(DriftResultCode.class),
                     ImmutableMap.of(),
                     false);
 
@@ -217,14 +219,14 @@ public class TestApacheThriftMethodInvoker
         }
     }
 
-    private static int logApacheThriftInvocationHandlerOptional(HostAndPort address, List<io.airlift.drift.transport.apache.scribe.drift.LogEntry> entries)
+    private static int logApacheThriftInvocationHandlerOptional(HostAndPort address, List<DriftLogEntry> entries)
     {
         ApacheThriftClientConfig config = new ApacheThriftClientConfig();
         ApacheThriftConnectionFactoryConfig factoryConfig = new ApacheThriftConnectionFactoryConfig();
         try (ApacheThriftMethodInvokerFactory<Void> methodInvokerFactory = new ApacheThriftMethodInvokerFactory<>(factoryConfig, clientIdentity -> config)) {
             MethodInvoker methodInvoker = methodInvokerFactory.createMethodInvoker(null);
 
-            ThriftType optionalType = optional(list(codecManager.getCatalog().getThriftType(io.airlift.drift.transport.apache.scribe.drift.LogEntry.class)));
+            ThriftType optionalType = optional(list(codecManager.getCatalog().getThriftType(DriftLogEntry.class)));
             ParameterMetadata parameter = new ParameterMetadata(
                     (short) 1,
                     "messages",
@@ -233,7 +235,7 @@ public class TestApacheThriftMethodInvoker
             MethodMetadata methodMetadata = new MethodMetadata(
                     "Log",
                     ImmutableList.of(parameter),
-                    (ThriftCodec<Object>) (Object) codecManager.getCodec(io.airlift.drift.transport.apache.scribe.drift.ResultCode.class),
+                    (ThriftCodec<Object>) (Object) codecManager.getCodec(DriftResultCode.class),
                     ImmutableMap.of(),
                     false);
 
