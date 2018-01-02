@@ -22,17 +22,14 @@ import io.airlift.drift.client.stats.MethodInvocationStat;
 import io.airlift.drift.client.stats.MethodInvocationStatsFactory;
 import io.airlift.drift.client.stats.NullMethodInvocationStat;
 import io.airlift.drift.client.stats.NullMethodInvocationStatsFactory;
-import io.airlift.drift.codec.ThriftCodec;
 import io.airlift.drift.codec.ThriftCodecManager;
 import io.airlift.drift.codec.metadata.ThriftMethodMetadata;
 import io.airlift.drift.codec.metadata.ThriftServiceMetadata;
-import io.airlift.drift.codec.metadata.ThriftType;
 import io.airlift.drift.transport.Address;
 import io.airlift.drift.transport.DriftClientConfig;
 import io.airlift.drift.transport.MethodInvoker;
 import io.airlift.drift.transport.MethodInvokerFactory;
 import io.airlift.drift.transport.MethodMetadata;
-import io.airlift.drift.transport.ParameterMetadata;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
@@ -43,11 +40,10 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.Supplier;
 
-import static com.google.common.collect.Maps.transformEntries;
 import static com.google.common.reflect.Reflection.newProxy;
 import static io.airlift.drift.client.FilteredMethodInvoker.createFilteredMethodInvoker;
+import static io.airlift.drift.transport.MethodMetadata.toMethodMetadata;
 import static java.util.Objects.requireNonNull;
-import static java.util.stream.Collectors.toList;
 
 public class DriftClientFactory
 {
@@ -107,7 +103,7 @@ public class DriftClientFactory
 
         ImmutableMap.Builder<Method, DriftMethodHandler> builder = ImmutableMap.builder();
         for (ThriftMethodMetadata method : serviceMetadata.getMethods().values()) {
-            MethodMetadata metadata = getMethodMetadata(method);
+            MethodMetadata metadata = toMethodMetadata(codecManager, method);
 
             RetryPolicy retryPolicy = new RetryPolicy(config, exceptionClassifier);
 
@@ -125,33 +121,5 @@ public class DriftClientFactory
         Map<Method, DriftMethodHandler> methods = builder.build();
 
         return (context, headers) -> newProxy(clientInterface, new DriftInvocationHandler(serviceMetadata.getName(), methods, context, headers));
-    }
-
-    private MethodMetadata getMethodMetadata(ThriftMethodMetadata metadata)
-    {
-        List<ParameterMetadata> parameters = metadata.getParameters().stream()
-                .map(parameter -> new ParameterMetadata(
-                        parameter.getId(),
-                        parameter.getName(),
-                        getCodec(parameter.getThriftType())))
-                .collect(toList());
-
-        ThriftCodec<Object> resultCodec = getCodec(metadata.getReturnType());
-
-        Map<Short, ThriftCodec<Object>> exceptionCodecs = ImmutableMap.copyOf(
-                transformEntries(metadata.getExceptions(), (key, value) -> getCodec(value)));
-
-        return new MethodMetadata(
-                metadata.getName(),
-                parameters,
-                resultCodec,
-                exceptionCodecs,
-                metadata.getOneway());
-    }
-
-    @SuppressWarnings("unchecked")
-    private ThriftCodec<Object> getCodec(ThriftType thriftType)
-    {
-        return (ThriftCodec<Object>) codecManager.getCodec(thriftType);
     }
 }

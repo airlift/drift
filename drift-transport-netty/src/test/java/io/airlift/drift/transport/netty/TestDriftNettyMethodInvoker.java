@@ -217,6 +217,7 @@ public class TestDriftNettyMethodInvoker
             MethodInvoker methodInvoker = methodInvokerFactory.createMethodInvoker(null);
 
             ParameterMetadata parameter = new ParameterMetadata(
+                    0,
                     (short) 1,
                     "messages",
                     (ThriftCodec<Object>) codecManager.getCodec(list(codecManager.getCodec(DriftLogEntry.class).getType())));
@@ -293,6 +294,7 @@ public class TestDriftNettyMethodInvoker
 
             ThriftType optionalType = optional(list(codecManager.getCatalog().getThriftType(DriftLogEntry.class)));
             ParameterMetadata parameter = new ParameterMetadata(
+                    0,
                     (short) 1,
                     "messages",
                     (ThriftCodec<Object>) codecManager.getCodec(optionalType));

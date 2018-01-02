@@ -212,7 +212,7 @@ public class ApacheThriftMethodInvoker
         for (int i = 0; i < parameters.size(); i++) {
             Object value = parameters.get(i);
             ParameterMetadata parameter = method.getParameters().get(i);
-            writer.writeField(parameter.getName(), parameter.getId(), parameter.getCodec(), value);
+            writer.writeField(parameter.getName(), parameter.getFieldId(), parameter.getCodec(), value);
         }
         writer.writeStructEnd();
 
