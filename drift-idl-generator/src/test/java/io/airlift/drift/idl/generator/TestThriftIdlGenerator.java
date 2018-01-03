@@ -34,10 +34,10 @@ public class TestThriftIdlGenerator
     public void testGenerator()
             throws Exception
     {
-        assertGenerated(DriftScribe.class, "scribe", ignored -> { });
-        assertGenerated(RenamedService.class, "renamed", ignored -> { });
-        assertGenerated(Fruit.class, "fruit", ignored -> { });
-        assertGenerated(TreeNode.class, "tree", ignored -> { });
+        assertGenerated(DriftScribe.class, "scribe", ignored -> {});
+        assertGenerated(RenamedService.class, "renamed", ignored -> {});
+        assertGenerated(Fruit.class, "fruit", ignored -> {});
+        assertGenerated(TreeNode.class, "tree", ignored -> {});
 
         assertGenerated(Point.class, "point", config -> config
                 .namespaces(ImmutableMap.<String, String>builder()
