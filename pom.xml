@@ -55,7 +55,7 @@
         <dep.airlift.version>0.159</dep.airlift.version>
         <dep.asm.version>6.0</dep.asm.version>
         <dep.takari-plugin.version>2.9.1</dep.takari-plugin.version>
-        <dep.maven.version>3.5.0</dep.maven.version>
+        <dep.maven.version>3.5.3</dep.maven.version>
     </properties>
 
     <dependencyManagement>
