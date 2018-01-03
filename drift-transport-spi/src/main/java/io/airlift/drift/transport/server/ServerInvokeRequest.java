@@ -15,10 +15,9 @@
  */
 package io.airlift.drift.transport.server;
 
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import io.airlift.drift.transport.MethodMetadata;
 
-import java.util.List;
 import java.util.Map;
 
 import static com.google.common.base.MoreObjects.toStringHelper;
@@ -28,13 +27,13 @@ public final class ServerInvokeRequest
 {
     private final MethodMetadata method;
     private final Map<String, String> headers;
-    private final List<Object> parameters;
+    private final Map<Short, Object> parameters;
 
-    public ServerInvokeRequest(MethodMetadata method, Map<String, String> headers, List<Object> parameters)
+    public ServerInvokeRequest(MethodMetadata method, Map<String, String> headers, Map<Short, Object> parameters)
     {
         this.method = requireNonNull(method, "method is null");
-        this.headers = requireNonNull(headers, "headers is null");
-        this.parameters = ImmutableList.copyOf(requireNonNull(parameters, "parameters is null"));
+        this.headers = ImmutableMap.copyOf(requireNonNull(headers, "headers is null"));
+        this.parameters = ImmutableMap.copyOf(requireNonNull(parameters, "parameters is null"));
     }
 
     public MethodMetadata getMethod()
@@ -47,7 +46,7 @@ public final class ServerInvokeRequest
         return headers;
     }
 
-    public List<Object> getParameters()
+    public Map<Short, Object> getParameters()
     {
         return parameters;
     }

@@ -43,7 +43,7 @@ public class ShortCircuitFilter
     public void assertInvocation(String expectedMethodName, int expectedId, String expectedName)
     {
         assertEquals(request.getMethod().getName(), expectedMethodName);
-        assertEquals(request.getParameters().get(0), expectedId);
-        assertEquals(request.getParameters().get(1), expectedName);
+        assertEquals(request.getParameters().get((short) 1), expectedId);
+        assertEquals(request.getParameters().get((short) 2), expectedName);
     }
 }

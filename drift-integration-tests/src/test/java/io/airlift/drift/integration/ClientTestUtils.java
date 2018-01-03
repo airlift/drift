@@ -71,6 +71,7 @@ final class ClientTestUtils
     public static final List<LogEntry> MESSAGES = ImmutableList.of(
             new LogEntry("hello", "world"),
             new LogEntry("bye", "world"));
+    public static final String HEADER_VALUE = "header-value";
     public static final List<DriftLogEntry> DRIFT_MESSAGES = ImmutableList.copyOf(
             MESSAGES.stream()
                     .map(input -> new DriftLogEntry(input.category, input.message))
@@ -81,6 +82,7 @@ final class ClientTestUtils
 
     public static int logDriftClientBinder(
             HostAndPort address,
+            String headerValue,
             List<DriftLogEntry> entries,
             Module transportModule,
             List<MethodInvocationFilter> filters,
@@ -138,12 +140,12 @@ final class ClientTestUtils
 
             ScribeUser user = injector.getInstance(ScribeUser.class);
 
-            assertEquals(scribe.log(entries), DRIFT_OK);
+            assertEquals(scribe.log(headerValue, entries), DRIFT_OK);
 
-            assertEquals(user.getClient().log(entries), DRIFT_OK);
-            assertEquals(user.getClientCustom().log(entries), DRIFT_OK);
-            assertEquals(user.getFactory().get().log(entries), DRIFT_OK);
-            assertEquals(user.getFactoryCustom().get().log(entries), DRIFT_OK);
+            assertEquals(user.getClient().log(headerValue, entries), DRIFT_OK);
+            assertEquals(user.getClientCustom().log(headerValue, entries), DRIFT_OK);
+            assertEquals(user.getFactory().get().log(headerValue, entries), DRIFT_OK);
+            assertEquals(user.getFactoryCustom().get().log(headerValue, entries), DRIFT_OK);
 
             assertSame(scribe, user.getClient());
             assertNotSame(user.getClient(), user.getClientCustom());

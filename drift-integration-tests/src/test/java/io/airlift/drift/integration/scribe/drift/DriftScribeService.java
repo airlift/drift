@@ -21,6 +21,7 @@ import java.util.List;
 public class DriftScribeService
         implements DriftScribe
 {
+    private final List<String> headers = new ArrayList<>();
     private final List<DriftLogEntry> messages = new ArrayList<>();
 
     public List<DriftLogEntry> getMessages()
@@ -28,9 +29,17 @@ public class DriftScribeService
         return messages;
     }
 
-    @Override
-    public DriftResultCode log(List<DriftLogEntry> messages)
+    public List<String> getHeaders()
     {
+        return headers;
+    }
+
+    @Override
+    public DriftResultCode log(String header, List<DriftLogEntry> messages)
+    {
+        if (header != null) {
+            this.headers.add(header);
+        }
         this.messages.addAll(messages);
         return DriftResultCode.OK;
     }

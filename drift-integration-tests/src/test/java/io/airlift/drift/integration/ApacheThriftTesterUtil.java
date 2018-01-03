@@ -40,6 +40,7 @@ import static io.airlift.drift.client.ExceptionClassifier.NORMAL_RESULT;
 import static io.airlift.drift.integration.ClientTestUtils.CODEC_MANAGER;
 import static io.airlift.drift.integration.ClientTestUtils.DRIFT_MESSAGES;
 import static io.airlift.drift.integration.ClientTestUtils.DRIFT_OK;
+import static io.airlift.drift.integration.ClientTestUtils.HEADER_VALUE;
 import static io.airlift.drift.integration.ClientTestUtils.logDriftClientBinder;
 import static io.airlift.drift.transport.apache.ApacheThriftMethodInvokerFactory.createStaticApacheThriftMethodInvokerFactory;
 import static io.airlift.drift.transport.netty.DriftNettyClientConfig.Transport.HEADER;
@@ -52,14 +53,15 @@ final class ApacheThriftTesterUtil
     public static List<ToIntFunction<HostAndPort>> apacheThriftTestClients(List<MethodInvocationFilter> filters, Transport transport, Protocol protocol, boolean secure)
     {
         return ImmutableList.of(
-                address -> logApacheThriftDriftClient(address, DRIFT_MESSAGES, filters, transport, protocol, secure),
-                address -> logApacheThriftStaticDriftClient(address, DRIFT_MESSAGES, filters, transport, protocol, secure),
-                address -> logApacheThriftDriftClientAsync(address, DRIFT_MESSAGES, filters, transport, protocol, secure),
-                address -> logApacheThriftClientBinder(address, DRIFT_MESSAGES, filters, transport, protocol, secure));
+                address -> logApacheThriftDriftClient(address, HEADER_VALUE, DRIFT_MESSAGES, filters, transport, protocol, secure),
+                address -> logApacheThriftStaticDriftClient(address, HEADER_VALUE, DRIFT_MESSAGES, filters, transport, protocol, secure),
+                address -> logApacheThriftDriftClientAsync(address, HEADER_VALUE, DRIFT_MESSAGES, filters, transport, protocol, secure),
+                address -> logApacheThriftClientBinder(address, HEADER_VALUE, DRIFT_MESSAGES, filters, transport, protocol, secure));
     }
 
     private static int logApacheThriftDriftClient(
             HostAndPort address,
+            String headerValue,
             List<DriftLogEntry> entries,
             List<MethodInvocationFilter> filters,
             Transport transport,
@@ -83,7 +85,7 @@ final class ApacheThriftTesterUtil
 
             DriftScribe scribe = proxyFactory.createDriftClient(DriftScribe.class, Optional.empty(), filters, new DriftClientConfig()).get();
 
-            assertEquals(scribe.log(entries), DRIFT_OK);
+            assertEquals(scribe.log(headerValue, entries), DRIFT_OK);
         }
         catch (Exception e) {
             throw new RuntimeException(e);
@@ -93,6 +95,7 @@ final class ApacheThriftTesterUtil
 
     private static int logApacheThriftStaticDriftClient(
             HostAndPort address,
+            String headerValue,
             List<DriftLogEntry> entries,
             List<MethodInvocationFilter> filters,
             Transport transport,
@@ -115,7 +118,7 @@ final class ApacheThriftTesterUtil
 
             DriftScribe scribe = proxyFactory.createDriftClient(DriftScribe.class, Optional.empty(), filters, new DriftClientConfig()).get();
 
-            assertEquals(scribe.log(entries), DRIFT_OK);
+            assertEquals(scribe.log(headerValue, entries), DRIFT_OK);
         }
         catch (Exception e) {
             throw new RuntimeException(e);
@@ -125,6 +128,7 @@ final class ApacheThriftTesterUtil
 
     private static int logApacheThriftDriftClientAsync(
             HostAndPort address,
+            String headerValue,
             List<DriftLogEntry> entries,
             List<MethodInvocationFilter> filters,
             Transport transport,
@@ -148,7 +152,7 @@ final class ApacheThriftTesterUtil
 
             DriftAsyncScribe scribe = proxyFactory.createDriftClient(DriftAsyncScribe.class, Optional.empty(), filters, new DriftClientConfig()).get();
 
-            assertEquals(scribe.log(entries).get(), DRIFT_OK);
+            assertEquals(scribe.log(headerValue, entries).get(), DRIFT_OK);
         }
         catch (Exception e) {
             throw new RuntimeException(e);
@@ -158,6 +162,7 @@ final class ApacheThriftTesterUtil
 
     private static int logApacheThriftClientBinder(
             HostAndPort address,
+            String headerValue,
             List<DriftLogEntry> entries,
             List<MethodInvocationFilter> filters,
             Transport transport,
@@ -168,7 +173,7 @@ final class ApacheThriftTesterUtil
             return 0;
         }
 
-        return logDriftClientBinder(address, entries, new ApacheThriftClientModule(), filters, transport, protocol, secure);
+        return logDriftClientBinder(address, headerValue, entries, new ApacheThriftClientModule(), filters, transport, protocol, secure);
     }
 
     private static boolean isValidConfiguration(Transport transport)

@@ -17,7 +17,11 @@ package io.airlift.drift.server;
 
 import com.google.common.util.concurrent.ListenableFuture;
 import io.airlift.drift.codec.ThriftCodecManager;
+import io.airlift.drift.codec.metadata.ThriftFieldMetadata;
+import io.airlift.drift.codec.metadata.ThriftHeaderParameter;
+import io.airlift.drift.codec.metadata.ThriftInjection;
 import io.airlift.drift.codec.metadata.ThriftMethodMetadata;
+import io.airlift.drift.codec.metadata.ThriftParameterInjection;
 import io.airlift.drift.transport.MethodMetadata;
 import io.airlift.drift.transport.server.ServerInvokeRequest;
 
@@ -46,7 +50,7 @@ class ServiceMethod
 
         this.service = service;
         this.methodMetadata = toMethodMetadata(codecManager, methodMetadata);
-        invoker = createFilteredMethodInvoker(filters, new ServiceMethodInvoker(service, methodMetadata.getMethod()));
+        invoker = createFilteredMethodInvoker(filters, new ServiceMethodInvoker(service, methodMetadata));
     }
 
     public MethodMetadata getMethodMetadata()
@@ -73,19 +77,46 @@ class ServiceMethod
     {
         private final Object service;
         private final Method method;
+        private final ThriftHeaderParameter[] headerParameters;
+        private final ThriftFieldMetadata[] normalParameters;
 
-        public ServiceMethodInvoker(Object service, Method method)
+        public ServiceMethodInvoker(Object service, ThriftMethodMetadata methodMetadata)
         {
             this.service = requireNonNull(service, "service is null");
-            this.method = requireNonNull(method, "method is null");
+            this.method = requireNonNull(methodMetadata.getMethod(), "method is null");
+
+            this.headerParameters = new ThriftHeaderParameter[method.getParameterCount()];
+            for (ThriftHeaderParameter headerParameter : methodMetadata.getHeaderParameters()) {
+                this.headerParameters[headerParameter.getIndex()] = headerParameter;
+            }
+
+            this.normalParameters = new ThriftFieldMetadata[method.getParameterCount()];
+            for (ThriftFieldMetadata normalParameter : methodMetadata.getParameters()) {
+                for (ThriftInjection thriftInjection : normalParameter.getInjections()) {
+                    ThriftParameterInjection parameterInjection = (ThriftParameterInjection) thriftInjection;
+                    this.normalParameters[parameterInjection.getParameterIndex()] = normalParameter;
+                }
+            }
         }
 
         @Override
         public ListenableFuture<Object> invoke(ServerInvokeRequest request)
         {
+            Object[] parameters = new Object[method.getParameterCount()];
+
+            for (int i = 0; i < headerParameters.length; i++) {
+                ThriftHeaderParameter headerParameter = headerParameters[i];
+                if (headerParameter != null) {
+                    parameters[i] = request.getHeaders().get(headerParameter.getName());
+                }
+                ThriftFieldMetadata normalParameter = normalParameters[i];
+                if (normalParameter != null) {
+                    parameters[i] = request.getParameters().get(normalParameter.getId());
+                }
+            }
+
             try {
-                List<Object> parameters = request.getParameters();
-                Object response = method.invoke(service, parameters.toArray(new Object[parameters.size()]));
+                Object response = method.invoke(service, parameters);
                 if (response instanceof ListenableFuture) {
                     return (ListenableFuture<Object>) response;
                 }

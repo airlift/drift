@@ -39,11 +39,13 @@ import io.airlift.drift.transport.server.ServerTransport;
 import org.testng.annotations.Test;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.ToIntFunction;
 
 import static com.google.common.collect.Iterables.concat;
+import static com.google.common.collect.Iterables.getOnlyElement;
 import static com.google.common.collect.Lists.newArrayList;
 import static io.airlift.drift.codec.metadata.ThriftType.list;
 import static io.airlift.drift.integration.ApacheThriftTesterUtil.apacheThriftTestClients;
@@ -162,11 +164,11 @@ public class TestClientsWithDriftNettyServerTransport
                 return Futures.immediateFailedFuture(new IllegalArgumentException("unknown method " + method));
             }
 
-            List<Object> parameters = request.getParameters();
-            if (parameters.size() != 1 || !(parameters.get(0) instanceof List)) {
+            Map<Short, Object> parameters = request.getParameters();
+            if (parameters.size() != 1 || !parameters.containsKey((short) 1) || !(getOnlyElement(parameters.values()) instanceof List)) {
                 return Futures.immediateFailedFuture(new IllegalArgumentException("invalid parameters"));
             }
-            for (DriftLogEntry driftLogEntry : (List<DriftLogEntry>) parameters.get(0)) {
+            for (DriftLogEntry driftLogEntry : (List<DriftLogEntry>) getOnlyElement(parameters.values())) {
                 messages.add(new LogEntry(driftLogEntry.getCategory(), driftLogEntry.getMessage()));
             }
 

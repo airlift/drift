@@ -69,6 +69,7 @@ import org.apache.thrift.transport.TTransportFactory;
 import org.testng.annotations.Test;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutionException;
@@ -77,6 +78,7 @@ import java.util.function.ToIntFunction;
 import java.util.stream.Collectors;
 
 import static com.google.common.collect.Iterables.concat;
+import static com.google.common.collect.Iterables.getOnlyElement;
 import static com.google.common.collect.Lists.newArrayList;
 import static io.airlift.concurrent.Threads.daemonThreadsNamed;
 import static io.airlift.drift.TApplicationException.Type.UNSUPPORTED_CLIENT_TYPE;
@@ -438,11 +440,11 @@ public class TestDriftNettyMethodInvoker
                 return Futures.immediateFailedFuture(new IllegalArgumentException("unknown method " + method));
             }
 
-            List<Object> parameters = request.getParameters();
-            if (parameters.size() != 1 || !(parameters.get(0) instanceof List)) {
+            Map<Short, Object> parameters = request.getParameters();
+            if (parameters.size() != 1 || !parameters.containsKey((short) 1) || !(getOnlyElement(parameters.values()) instanceof List)) {
                 return Futures.immediateFailedFuture(new IllegalArgumentException("invalid parameters"));
             }
-            List<DriftLogEntry> messages = (List<DriftLogEntry>) parameters.get(0);
+            List<DriftLogEntry> messages = (List<DriftLogEntry>) getOnlyElement(parameters.values());
 
             for (DriftLogEntry message : messages) {
                 if (message.getCategory().equals("exception")) {

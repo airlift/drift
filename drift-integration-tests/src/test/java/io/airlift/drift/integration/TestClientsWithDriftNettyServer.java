@@ -17,6 +17,7 @@ package io.airlift.drift.integration;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Streams;
 import com.google.common.net.HostAndPort;
 import io.airlift.drift.client.MethodInvocationFilter;
 import io.airlift.drift.codec.ThriftCodecManager;
@@ -32,14 +33,17 @@ import io.airlift.drift.transport.netty.server.DriftNettyServerTransportFactory;
 import org.testng.annotations.Test;
 
 import java.util.List;
-import java.util.function.ToIntFunction;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Consumer;
 
 import static com.google.common.collect.Iterables.concat;
 import static com.google.common.collect.Lists.newArrayList;
 import static io.airlift.drift.integration.ApacheThriftTesterUtil.apacheThriftTestClients;
 import static io.airlift.drift.integration.ClientTestUtils.DRIFT_MESSAGES;
+import static io.airlift.drift.integration.ClientTestUtils.HEADER_VALUE;
 import static io.airlift.drift.integration.DriftNettyTesterUtil.driftNettyTestClients;
 import static io.airlift.drift.integration.LegacyApacheThriftTesterUtil.legacyApacheThriftTestClients;
+import static io.airlift.drift.transport.netty.DriftNettyClientConfig.Transport.HEADER;
 import static java.util.Collections.nCopies;
 import static org.testng.Assert.assertEquals;
 
@@ -71,26 +75,35 @@ public class TestClientsWithDriftNettyServer
     private static int testDriftServer(List<MethodInvocationFilter> filters)
             throws Exception
     {
-        ImmutableList.Builder<ToIntFunction<HostAndPort>> clients = ImmutableList.builder();
-        for (boolean secure : ImmutableList.of(true, false)) {
-            for (Transport transport : Transport.values()) {
-                for (Protocol protocol : Protocol.values()) {
-                    clients.addAll(legacyApacheThriftTestClients(filters, transport, protocol, secure))
-                            .addAll(driftNettyTestClients(filters, transport, protocol, secure))
-                            .addAll(apacheThriftTestClients(filters, transport, protocol, secure));
+        DriftScribeService scribeService = new DriftScribeService();
+        AtomicInteger invocationCount = new AtomicInteger();
+        AtomicInteger headerInvocationCount = new AtomicInteger();
+        testDriftServer(new DriftService(scribeService), address -> {
+            for (boolean secure : ImmutableList.of(true, false)) {
+                for (Transport transport : ImmutableList.of(HEADER)) {
+                    for (Protocol protocol : Protocol.values()) {
+                        int count = Streams.concat(
+                                legacyApacheThriftTestClients(filters, transport, protocol, secure).stream(),
+                                driftNettyTestClients(filters, transport, protocol, secure).stream(),
+                                apacheThriftTestClients(filters, transport, protocol, secure).stream())
+                                .mapToInt(client -> client.applyAsInt(address))
+                                .sum();
+                        invocationCount.addAndGet(count);
+                        if (transport == HEADER) {
+                            headerInvocationCount.addAndGet(count);
+                        }
+                    }
                 }
             }
-        }
+        });
 
-        DriftScribeService scribeService = new DriftScribeService();
-        int invocationCount = testDriftServer(new DriftService(scribeService), clients.build());
+        assertEquals(scribeService.getMessages(), newArrayList(concat(nCopies(invocationCount.get(), DRIFT_MESSAGES))));
+        assertEquals(scribeService.getHeaders(), newArrayList(nCopies(headerInvocationCount.get(), HEADER_VALUE)));
 
-        assertEquals(scribeService.getMessages(), newArrayList(concat(nCopies(invocationCount, DRIFT_MESSAGES))));
-
-        return invocationCount;
+        return invocationCount.get();
     }
 
-    private static int testDriftServer(DriftService service, List<ToIntFunction<HostAndPort>> clients)
+    private static void testDriftServer(DriftService service, Consumer<HostAndPort> task)
             throws Exception
     {
         DriftNettyServerConfig config = new DriftNettyServerConfig()
@@ -108,11 +121,7 @@ public class TestClientsWithDriftNettyServer
 
             HostAndPort address = HostAndPort.fromParts("localhost", ((DriftNettyServerTransport) driftServer.getServerTransport()).getPort());
 
-            int sum = 0;
-            for (ToIntFunction<HostAndPort> client : clients) {
-                sum += client.applyAsInt(address);
-            }
-            return sum;
+            task.accept(address);
         }
         finally {
             driftServer.shutdownGracefully();

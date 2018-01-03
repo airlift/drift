@@ -21,7 +21,6 @@ import io.airlift.drift.transport.MethodMetadata;
 import io.airlift.drift.transport.server.ServerInvokeRequest;
 import io.airlift.drift.transport.server.ServerTransport;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -56,7 +55,7 @@ public class TestingServerTransport
         state = State.RUNNING;
     }
 
-    public synchronized ListenableFuture<Object> invoke(String methodName, Map<String, String> headers, List<Object> parameters)
+    public synchronized ListenableFuture<Object> invoke(String methodName, Map<String, String> headers, Map<Short, Object> parameters)
     {
         long startTime = System.nanoTime();
         Optional<MethodMetadata> methodMetadata = serverMethodInvoker.getMethodMetadata(methodName);

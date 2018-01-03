@@ -16,6 +16,7 @@
 package io.airlift.drift.integration.scribe.drift;
 
 import io.airlift.drift.TException;
+import io.airlift.drift.annotations.ThriftHeader;
 import io.airlift.drift.annotations.ThriftMethod;
 import io.airlift.drift.annotations.ThriftService;
 
@@ -25,6 +26,6 @@ import java.util.List;
 public interface DriftScribe
 {
     @ThriftMethod("Log")
-    DriftResultCode log(List<DriftLogEntry> messages)
+    DriftResultCode log(@ThriftHeader("header") String headerValue, List<DriftLogEntry> messages)
             throws TException;
 }

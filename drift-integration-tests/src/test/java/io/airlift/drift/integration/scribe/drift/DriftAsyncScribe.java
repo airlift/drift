@@ -17,6 +17,7 @@ package io.airlift.drift.integration.scribe.drift;
 
 import com.google.common.util.concurrent.ListenableFuture;
 import io.airlift.drift.TException;
+import io.airlift.drift.annotations.ThriftHeader;
 import io.airlift.drift.annotations.ThriftMethod;
 import io.airlift.drift.annotations.ThriftService;
 
@@ -27,6 +28,6 @@ public interface DriftAsyncScribe
         extends AutoCloseable
 {
     @ThriftMethod("Log")
-    ListenableFuture<DriftResultCode> log(List<DriftLogEntry> logEntries)
+    ListenableFuture<DriftResultCode> log(@ThriftHeader("header") String headerValue, List<DriftLogEntry> logEntries)
             throws TException;
 }

@@ -76,7 +76,10 @@ class DriftMethodHandler
         if (!headerParameters.isEmpty()) {
             headers = new LinkedHashMap<>(headers);
             for (Entry<Integer, ThriftHeaderParameter> entry : headerParameters.entrySet()) {
-                headers.put(entry.getValue().getName(), (String) parameters.get(entry.getKey()));
+                String headerValue = (String) parameters.get(entry.getKey());
+                if (headerValue != null) {
+                    headers.put(entry.getValue().getName(), headerValue);
+                }
             }
 
             ImmutableList.Builder<Object> newParameters = ImmutableList.builder();

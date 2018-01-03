@@ -40,6 +40,7 @@ import static io.airlift.drift.client.ExceptionClassifier.NORMAL_RESULT;
 import static io.airlift.drift.integration.ClientTestUtils.CODEC_MANAGER;
 import static io.airlift.drift.integration.ClientTestUtils.DRIFT_MESSAGES;
 import static io.airlift.drift.integration.ClientTestUtils.DRIFT_OK;
+import static io.airlift.drift.integration.ClientTestUtils.HEADER_VALUE;
 import static io.airlift.drift.integration.ClientTestUtils.logDriftClientBinder;
 import static io.airlift.drift.transport.netty.DriftNettyMethodInvokerFactory.createStaticDriftNettyMethodInvokerFactory;
 import static org.testng.Assert.assertEquals;
@@ -51,13 +52,15 @@ final class DriftNettyTesterUtil
     public static List<ToIntFunction<HostAndPort>> driftNettyTestClients(List<MethodInvocationFilter> filters, Transport transport, Protocol protocol, boolean secure)
     {
         return ImmutableList.of(
-                address -> logNettyDriftClient(address, DRIFT_MESSAGES, filters, transport, protocol, secure),
-                address -> logNettyStaticDriftClient(address, DRIFT_MESSAGES, filters, transport, protocol, secure),
-                address -> logNettyDriftClientAsync(address, DRIFT_MESSAGES, filters, transport, protocol, secure),
-                address -> logNettyClientBinder(address, DRIFT_MESSAGES, filters, transport, protocol, secure));
+                address -> logNettyDriftClient(address, HEADER_VALUE, DRIFT_MESSAGES, filters, transport, protocol, secure),
+                address -> logNettyStaticDriftClient(address, HEADER_VALUE, DRIFT_MESSAGES, filters, transport, protocol, secure),
+                address -> logNettyDriftClientAsync(address, HEADER_VALUE, DRIFT_MESSAGES, filters, transport, protocol, secure),
+                address -> logNettyClientBinder(address, HEADER_VALUE, DRIFT_MESSAGES, filters, transport, protocol, secure));
     }
 
-    private static int logNettyDriftClient(HostAndPort address,
+    private static int logNettyDriftClient(
+            HostAndPort address,
+            String headerValue,
             List<DriftLogEntry> entries,
             List<MethodInvocationFilter> filters,
             Transport transport,
@@ -80,7 +83,7 @@ final class DriftNettyTesterUtil
 
             DriftScribe scribe = proxyFactory.createDriftClient(DriftScribe.class, Optional.empty(), filters, new DriftClientConfig()).get();
 
-            assertEquals(scribe.log(entries), DRIFT_OK);
+            assertEquals(scribe.log(headerValue, entries), DRIFT_OK);
         }
         catch (Exception e) {
             throw new RuntimeException(e);
@@ -88,7 +91,9 @@ final class DriftNettyTesterUtil
         return 1;
     }
 
-    private static int logNettyStaticDriftClient(HostAndPort address,
+    private static int logNettyStaticDriftClient(
+            HostAndPort address,
+            String headerValue,
             List<DriftLogEntry> entries,
             List<MethodInvocationFilter> filters,
             Transport transport,
@@ -108,7 +113,7 @@ final class DriftNettyTesterUtil
 
             DriftScribe scribe = proxyFactory.createDriftClient(DriftScribe.class, Optional.empty(), filters, new DriftClientConfig()).get();
 
-            assertEquals(scribe.log(entries), DRIFT_OK);
+            assertEquals(scribe.log(headerValue, entries), DRIFT_OK);
         }
         catch (Exception e) {
             throw new RuntimeException(e);
@@ -116,7 +121,9 @@ final class DriftNettyTesterUtil
         return 1;
     }
 
-    private static int logNettyDriftClientAsync(HostAndPort address,
+    private static int logNettyDriftClientAsync(
+            HostAndPort address,
+            String headerValue,
             List<DriftLogEntry> entries,
             List<MethodInvocationFilter> filters,
             Transport transport,
@@ -139,7 +146,7 @@ final class DriftNettyTesterUtil
 
             DriftAsyncScribe scribe = proxyFactory.createDriftClient(DriftAsyncScribe.class, Optional.empty(), filters, new DriftClientConfig()).get();
 
-            assertEquals(scribe.log(entries).get(), DRIFT_OK);
+            assertEquals(scribe.log(headerValue, entries).get(), DRIFT_OK);
         }
         catch (Exception e) {
             throw new RuntimeException(e);
@@ -147,13 +154,15 @@ final class DriftNettyTesterUtil
         return 1;
     }
 
-    private static int logNettyClientBinder(HostAndPort address,
+    private static int logNettyClientBinder(
+            HostAndPort address,
+            String headerValue,
             List<DriftLogEntry> entries,
             List<MethodInvocationFilter> filters,
             Transport transport,
             Protocol protocol,
             boolean secure)
     {
-        return logDriftClientBinder(address, entries, new DriftNettyClientModule(), filters, transport, protocol, secure);
+        return logDriftClientBinder(address, headerValue, entries, new DriftNettyClientModule(), filters, transport, protocol, secure);
     }
 }

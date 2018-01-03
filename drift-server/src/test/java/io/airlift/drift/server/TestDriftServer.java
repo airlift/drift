@@ -16,7 +16,6 @@
 package io.airlift.drift.server;
 
 import com.google.common.base.Throwables;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.util.concurrent.Futures;
@@ -247,7 +246,7 @@ public class TestDriftServer
         int invocationId = ThreadLocalRandom.current().nextInt();
         String expectedResult = "result " + invocationId;
         resultsSupplier.setSuccessResult(expectedResult);
-        ListenableFuture<Object> result = serverTransport.invoke("test", ImmutableMap.of(), ImmutableList.of(invocationId, "normal"));
+        ListenableFuture<Object> result = serverTransport.invoke("test", ImmutableMap.of(), ImmutableMap.of((short) 1, invocationId, (short) 2, "normal"));
         assertTrue(result.isDone());
         assertEquals(getDone(result), expectedResult);
         invocationTarget.assertInvocation("test", invocationId, "normal");
@@ -258,7 +257,7 @@ public class TestDriftServer
         invocationId = ThreadLocalRandom.current().nextInt();
         expectedResult = "async " + expectedResult;
         resultsSupplier.setSuccessResult(expectedResult);
-        ListenableFuture<Object> asyncResult = serverTransport.invoke("testAsync", ImmutableMap.of(), ImmutableList.of(invocationId, "async"));
+        ListenableFuture<Object> asyncResult = serverTransport.invoke("testAsync", ImmutableMap.of(), ImmutableMap.of((short) 1, invocationId, (short) 2, "async"));
         assertTrue(asyncResult.isDone());
         assertEquals(getDone(asyncResult), expectedResult);
         invocationTarget.assertInvocation("testAsync", invocationId, "async");
@@ -280,7 +279,7 @@ public class TestDriftServer
         testStat.clear();
         int invocationId = ThreadLocalRandom.current().nextInt();
         resultsSupplier.setFailedResult(testException);
-        ListenableFuture<Object> result = serverTransport.invoke("test", ImmutableMap.of(), ImmutableList.of(invocationId, name));
+        ListenableFuture<Object> result = serverTransport.invoke("test", ImmutableMap.of(), ImmutableMap.of((short) 1, invocationId, (short) 2, name));
         assertTrue(result.isDone());
         try {
             getDone(result);
@@ -297,7 +296,7 @@ public class TestDriftServer
         testAsyncStat.clear();
         invocationId = ThreadLocalRandom.current().nextInt();
         resultsSupplier.setFailedResult(testException);
-        ListenableFuture<Object> asyncResult = serverTransport.invoke("testAsync", ImmutableMap.of(), ImmutableList.of(invocationId, name));
+        ListenableFuture<Object> asyncResult = serverTransport.invoke("testAsync", ImmutableMap.of(), ImmutableMap.of((short) 1, invocationId, (short) 2, name));
         assertTrue(asyncResult.isDone());
         try {
             getDone(result);

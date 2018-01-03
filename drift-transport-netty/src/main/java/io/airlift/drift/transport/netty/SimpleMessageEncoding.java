@@ -28,7 +28,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.OptionalInt;
 
-import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.Objects.requireNonNull;
 
 @ThreadSafe
@@ -46,7 +45,7 @@ class SimpleMessageEncoding
     public ByteBuf writeRequest(ByteBufAllocator allocator, int sequenceId, MethodMetadata method, List<Object> parameters, Map<String, String> headers)
             throws Exception
     {
-        checkArgument(headers.isEmpty(), "Headers are only supported with header transport");
+        // Note: simple transports do not support headers.  This is acceptable since headers should only inconsequential to the request
         return MessageEncoding.encodeRequest(protocolFactory, allocator, sequenceId, method, parameters);
     }
 

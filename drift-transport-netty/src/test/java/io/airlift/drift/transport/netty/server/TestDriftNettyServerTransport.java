@@ -48,6 +48,7 @@ import org.apache.thrift.transport.TTransportFactory;
 import org.testng.annotations.Test;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
@@ -56,6 +57,7 @@ import java.util.function.ToIntFunction;
 import java.util.stream.Collectors;
 
 import static com.google.common.collect.Iterables.concat;
+import static com.google.common.collect.Iterables.getOnlyElement;
 import static com.google.common.collect.Lists.newArrayList;
 import static io.airlift.drift.codec.metadata.ThriftType.list;
 import static java.lang.String.format;
@@ -272,11 +274,11 @@ public class TestDriftNettyServerTransport
                 return Futures.immediateFailedFuture(new IllegalArgumentException("unknown method " + method));
             }
 
-            List<Object> parameters = request.getParameters();
-            if (parameters.size() != 1 || !(parameters.get(0) instanceof List)) {
+            Map<Short, Object> parameters = request.getParameters();
+            if (parameters.size() != 1 || !parameters.containsKey((short) 1) || !(getOnlyElement(parameters.values()) instanceof List)) {
                 return Futures.immediateFailedFuture(new IllegalArgumentException("invalid parameters"));
             }
-            messages.addAll((List<LogEntry>) parameters.get(0));
+            messages.addAll((List<LogEntry>) getOnlyElement(parameters.values()));
 
             SettableFuture<Object> result = SettableFuture.create();
             futureResults.add(result);

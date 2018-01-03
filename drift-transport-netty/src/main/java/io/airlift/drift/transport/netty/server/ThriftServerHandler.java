@@ -41,7 +41,7 @@ import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
 
 import java.lang.reflect.Type;
-import java.util.List;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.OptionalInt;
@@ -55,7 +55,6 @@ import static io.airlift.drift.TApplicationException.Type.INVALID_MESSAGE_TYPE;
 import static io.airlift.drift.TApplicationException.Type.UNKNOWN_METHOD;
 import static io.airlift.drift.protocol.TMessageType.EXCEPTION;
 import static io.airlift.drift.protocol.TMessageType.REPLY;
-import static java.util.Arrays.asList;
 import static java.util.Objects.requireNonNull;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
@@ -159,7 +158,7 @@ public class ThriftServerHandler
                     null));
         }
 
-        List<Object> parameters = readArguments(method, protocol);
+        Map<Short, Object> parameters = readArguments(method, protocol);
 
         ListenableFuture<Object> result = methodInvoker.invoke(new ServerInvokeRequest(method, headers, parameters));
         methodInvoker.recordResult(message.getName(), start, result);
@@ -183,10 +182,10 @@ public class ThriftServerHandler
         return encodedResult;
     }
 
-    private static List<Object> readArguments(MethodMetadata method, TProtocol protocol)
+    private static Map<Short, Object> readArguments(MethodMetadata method, TProtocol protocol)
             throws Exception
     {
-        Object[] arguments = new Object[method.getParameters().size()];
+        Map<Short, Object> arguments = new HashMap<>(method.getParameters().size());
         ProtocolReader reader = new ProtocolReader(protocol);
 
         reader.readStructBegin();
@@ -198,25 +197,25 @@ public class ThriftServerHandler
                 reader.skipFieldData();
             }
             else {
-                arguments[parameter.getIndex()] = reader.readField(parameter.getCodec());
+                arguments.put(fieldId, reader.readField(parameter.getCodec()));
             }
         }
         reader.readStructEnd();
 
         // set defaults for missing arguments
         for (ParameterMetadata parameter : method.getParameters()) {
-            if (arguments[parameter.getIndex()] == null) {
+            if (arguments.containsKey(parameter.getFieldId())) {
                 Type argumentType = parameter.getCodec().getType().getJavaType();
 
                 if (argumentType instanceof Class) {
                     Class<?> argumentClass = (Class<?>) argumentType;
                     argumentClass = Primitives.unwrap(argumentClass);
-                    arguments[parameter.getIndex()] = defaultValue(argumentClass);
+                    arguments.put(parameter.getFieldId(), defaultValue(argumentClass));
                 }
             }
         }
 
-        return asList(arguments);
+        return arguments;
     }
 
     private static ThriftFrame writeSuccessResponse(
