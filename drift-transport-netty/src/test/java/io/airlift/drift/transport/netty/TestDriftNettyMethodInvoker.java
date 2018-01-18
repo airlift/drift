@@ -22,6 +22,7 @@ import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.SettableFuture;
 import io.airlift.drift.codec.ThriftCodec;
 import io.airlift.drift.codec.ThriftCodecManager;
+import io.airlift.drift.codec.internal.builtin.VoidThriftCodec;
 import io.airlift.drift.transport.InvokeRequest;
 import io.airlift.drift.transport.MethodInvoker;
 import io.airlift.drift.transport.MethodMetadata;
@@ -32,6 +33,10 @@ import io.airlift.drift.transport.netty.scribe.apache.ScribeService;
 import io.airlift.drift.transport.netty.scribe.apache.scribe;
 import io.airlift.drift.transport.netty.scribe.apache.scribe.AsyncClient.Log_call;
 import io.airlift.drift.transport.netty.scribe.apache.scribe.Client;
+import io.airlift.units.Duration;
+import io.netty.channel.Channel;
+import io.netty.util.concurrent.DefaultEventExecutor;
+import io.netty.util.concurrent.Future;
 import org.apache.thrift.TApplicationException;
 import org.apache.thrift.TException;
 import org.apache.thrift.TProcessor;
@@ -51,16 +56,21 @@ import org.testng.annotations.Test;
 
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.function.ToIntFunction;
 import java.util.stream.Collectors;
 
 import static com.google.common.collect.Iterables.concat;
 import static com.google.common.collect.Lists.newArrayList;
+import static io.airlift.concurrent.Threads.daemonThreadsNamed;
 import static io.airlift.drift.codec.metadata.ThriftType.list;
 import static io.airlift.testing.Assertions.assertInstanceOf;
 import static java.util.Collections.nCopies;
+import static java.util.concurrent.Executors.newSingleThreadScheduledExecutor;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.apache.thrift.TApplicationException.INTERNAL_ERROR;
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.fail;
 
 public class TestDriftNettyMethodInvoker
 {
@@ -229,6 +239,57 @@ public class TestDriftNettyMethodInvoker
         }
         catch (Exception e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    @Test
+    public void testTimeout()
+            throws Exception
+    {
+        ScheduledExecutorService executor = newSingleThreadScheduledExecutor(daemonThreadsNamed("test-timeout"));
+
+        DriftNettyMethodInvoker invoker = new DriftNettyMethodInvoker(
+                new HangingConnectionManager(),
+                executor,
+                new Duration(20, MILLISECONDS));
+
+        ListenableFuture<Object> response = invoker.invoke(new InvokeRequest(
+                new MethodMetadata(
+                        "test",
+                        ImmutableList.of(),
+                        (ThriftCodec<Object>) (Object) new VoidThriftCodec(),
+                        ImmutableMap.of(),
+                        false),
+                () -> HostAndPort.fromParts("localhost", 1234),
+                ImmutableMap.of(),
+                ImmutableList.of()));
+
+        try {
+            response.get();
+            fail("expected exception");
+        }
+        catch (ExecutionException e) {
+            assertInstanceOf(e.getCause(), io.airlift.drift.TException.class);
+            assertEquals(e.getCause().getMessage(), "Invocation response future did not complete after 20.00ms");
+        }
+        finally {
+            executor.shutdown();
+        }
+    }
+
+    private static class HangingConnectionManager
+            implements ConnectionManager
+    {
+        @Override
+        public Future<Channel> getConnection(HostAndPort address)
+        {
+            return new DefaultEventExecutor().newPromise();
+        }
+
+        @Override
+        public void returnConnection(Channel connection)
+        {
+            throw new UnsupportedOperationException();
         }
     }
 }

@@ -24,6 +24,7 @@ import io.airlift.drift.protocol.TProtocolFactory;
 import io.airlift.drift.transport.MethodInvoker;
 import io.airlift.drift.transport.MethodInvokerFactory;
 import io.airlift.drift.transport.netty.DriftNettyClientConfig.Transport;
+import io.airlift.units.Duration;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.handler.ssl.SslContext;
@@ -41,6 +42,8 @@ import java.util.function.Supplier;
 import static io.airlift.drift.transport.netty.SslContextFactory.createSslContextFactory;
 import static java.lang.Math.toIntExact;
 import static java.util.Objects.requireNonNull;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 public class DriftNettyMethodInvokerFactory<I>
         implements MethodInvokerFactory<I>, Closeable
@@ -140,7 +143,15 @@ public class DriftNettyMethodInvokerFactory<I>
         if (clientConfig.isPoolEnabled()) {
             connectionManager = new ConnectionPool(connectionManager, group, clientConfig);
         }
-        return new DriftNettyMethodInvoker(connectionManager, group);
+
+        // an invocation should complete long before this
+        Duration invokeTimeout = new Duration(
+                SECONDS.toMillis(10) +
+                        clientConfig.getConnectTimeout().toMillis() +
+                        clientConfig.getRequestTimeout().toMillis(),
+                MILLISECONDS);
+
+        return new DriftNettyMethodInvoker(connectionManager, group, invokeTimeout);
     }
 
     @PreDestroy
