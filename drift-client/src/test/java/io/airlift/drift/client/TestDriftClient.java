@@ -320,21 +320,21 @@ public class TestDriftClient
 
         // test method does not throw TException
         assertNoTExceptionInvocation(resultsSupplier, targets, statsFactory, classifiers, client, empty, new ClientException());
-        assertNoTExceptionInvocation(resultsSupplier, targets, statsFactory, classifiers, client, empty, new TException(), RuntimeTException.class);
-        assertNoTExceptionInvocation(resultsSupplier, targets, statsFactory, classifiers, client, empty, new TApplicationException(), RuntimeTApplicationException.class);
-        assertNoTExceptionInvocation(resultsSupplier, targets, statsFactory, classifiers, client, empty, new TTransportException(), RuntimeTTransportException.class);
-        assertNoTExceptionInvocation(resultsSupplier, targets, statsFactory, classifiers, client, empty, new TProtocolException(), RuntimeTProtocolException.class);
+        assertNoTExceptionInvocation(resultsSupplier, targets, statsFactory, classifiers, client, empty, new TException(), UncheckedTException.class);
+        assertNoTExceptionInvocation(resultsSupplier, targets, statsFactory, classifiers, client, empty, new TApplicationException(), UncheckedTApplicationException.class);
+        assertNoTExceptionInvocation(resultsSupplier, targets, statsFactory, classifiers, client, empty, new TTransportException(), UncheckedTTransportException.class);
+        assertNoTExceptionInvocation(resultsSupplier, targets, statsFactory, classifiers, client, empty, new TProtocolException(), UncheckedTProtocolException.class);
         assertNoTExceptionInvocation(resultsSupplier, targets, statsFactory, classifiers, client, empty, new Error());
-        assertNoTExceptionInvocation(resultsSupplier, targets, statsFactory, classifiers, client, empty, new UnknownException(), RuntimeTException.class, TException.class);
-        assertNoTExceptionInvocation(resultsSupplier, targets, statsFactory, classifiers, client, empty, new RuntimeException(), RuntimeTException.class, TException.class);
-        assertNoTExceptionInvocation(resultsSupplier, targets, statsFactory, classifiers, client, empty, new InterruptedException(), RuntimeTException.class, TException.class);
+        assertNoTExceptionInvocation(resultsSupplier, targets, statsFactory, classifiers, client, empty, new UnknownException(), UncheckedTException.class, TException.class);
+        assertNoTExceptionInvocation(resultsSupplier, targets, statsFactory, classifiers, client, empty, new RuntimeException(), UncheckedTException.class, TException.class);
+        assertNoTExceptionInvocation(resultsSupplier, targets, statsFactory, classifiers, client, empty, new InterruptedException(), UncheckedTException.class, TException.class);
 
         // custom exception subclasses
         assertNoTExceptionInvocation(resultsSupplier, targets, statsFactory, classifiers, client, empty, new ClientException() {});
-        assertNoTExceptionInvocation(resultsSupplier, targets, statsFactory, classifiers, client, empty, new TException() {}, RuntimeTException.class);
-        assertNoTExceptionInvocation(resultsSupplier, targets, statsFactory, classifiers, client, empty, new TApplicationException() {}, RuntimeTApplicationException.class);
-        assertNoTExceptionInvocation(resultsSupplier, targets, statsFactory, classifiers, client, empty, new TTransportException() {}, RuntimeTTransportException.class);
-        assertNoTExceptionInvocation(resultsSupplier, targets, statsFactory, classifiers, client, empty, new TProtocolException() {}, RuntimeTProtocolException.class);
+        assertNoTExceptionInvocation(resultsSupplier, targets, statsFactory, classifiers, client, empty, new TException() {}, UncheckedTException.class);
+        assertNoTExceptionInvocation(resultsSupplier, targets, statsFactory, classifiers, client, empty, new TApplicationException() {}, UncheckedTApplicationException.class);
+        assertNoTExceptionInvocation(resultsSupplier, targets, statsFactory, classifiers, client, empty, new TTransportException() {}, UncheckedTTransportException.class);
+        assertNoTExceptionInvocation(resultsSupplier, targets, statsFactory, classifiers, client, empty, new TProtocolException() {}, UncheckedTProtocolException.class);
     }
 
     private static void assertNormalInvocation(

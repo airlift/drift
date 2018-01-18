@@ -114,19 +114,19 @@ class DriftInvocationHandler
             }
 
             if (e instanceof TApplicationException) {
-                throw new RuntimeTApplicationException((TApplicationException) e);
+                throw new UncheckedTApplicationException((TApplicationException) e);
             }
 
             if (e instanceof TProtocolException) {
-                throw new RuntimeTProtocolException((TProtocolException) e);
+                throw new UncheckedTProtocolException((TProtocolException) e);
             }
 
             if (e instanceof TTransportException) {
-                throw new RuntimeTTransportException((TTransportException) e);
+                throw new UncheckedTTransportException((TTransportException) e);
             }
 
             if (e instanceof TException) {
-                throw new RuntimeTException((TException) e);
+                throw new UncheckedTException((TException) e);
             }
 
             TException wrappedException;
@@ -141,7 +141,7 @@ class DriftInvocationHandler
             if (canThrowTException) {
                 throw wrappedException;
             }
-            throw new RuntimeTException(wrappedException);
+            throw new UncheckedTException(wrappedException);
         }
     }
 

@@ -15,18 +15,18 @@
  */
 package io.airlift.drift.client;
 
-import io.airlift.drift.TApplicationException;
+import io.airlift.drift.protocol.TTransportException;
 
 /**
- * Runtime equivalent of TApplicationException.  If a Drift client receives a
- * TApplicationException for a method that doesn't declare
- * TApplicationException to be thrown, the underlying exception is wrapped in
- * this class and rethrown.
+ * Wraps a {@link TTransportException} with an unchecked exception.
+ * If a Drift client receives a TTransportException for a method
+ * that doesn't declare TTransportException to be thrown,
+ * the underlying exception is wrapped in this class and rethrown.
  */
-public class RuntimeTApplicationException
-        extends RuntimeTException
+public class UncheckedTTransportException
+        extends UncheckedTException
 {
-    public RuntimeTApplicationException(TApplicationException cause)
+    public UncheckedTTransportException(TTransportException cause)
     {
         super(cause);
     }

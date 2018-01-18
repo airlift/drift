@@ -15,20 +15,19 @@
  */
 package io.airlift.drift.client;
 
-import io.airlift.drift.TException;
-
-import static java.util.Objects.requireNonNull;
+import io.airlift.drift.protocol.TProtocolException;
 
 /**
- * Runtime equivalent of TException.  If a Drift client receives a TException
- * for a method that doesn't declare TException to be thrown, the underlying
- * exception is wrapped in this class and rethrown.
+ * Wraps a {@link TProtocolException} with an unchecked exception.
+ * If a Drift client receives a TProtocolException for a method
+ * that doesn't declare TProtocolException to be thrown,
+ * the underlying exception is wrapped in this class and rethrown.
  */
-public class RuntimeTException
-        extends RuntimeException
+public class UncheckedTProtocolException
+        extends UncheckedTException
 {
-    public RuntimeTException(TException cause)
+    public UncheckedTProtocolException(TProtocolException cause)
     {
-        super(requireNonNull(cause, "cause is null").getMessage(), cause);
+        super(cause);
     }
 }

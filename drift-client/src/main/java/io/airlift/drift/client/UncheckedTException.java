@@ -15,19 +15,20 @@
  */
 package io.airlift.drift.client;
 
-import io.airlift.drift.protocol.TTransportException;
+import io.airlift.drift.TException;
+
+import static java.util.Objects.requireNonNull;
 
 /**
- * Runtime equivalent of TTransportException.  If a Drift client receives a
- * TTransportException for a method that doesn't declare TTransportException
- * to be thrown, the underlying exception is wrapped in this class and
- * rethrown.
+ * Wraps a {@link TException} with an unchecked exception. If a Drift client
+ * receives a TException for a method that doesn't declare TException to be
+ * thrown, the underlying exception is wrapped in this class and rethrown.
  */
-public class RuntimeTTransportException
-        extends RuntimeTException
+public class UncheckedTException
+        extends RuntimeException
 {
-    public RuntimeTTransportException(TTransportException cause)
+    public UncheckedTException(TException cause)
     {
-        super(cause);
+        super(requireNonNull(cause, "cause is null").getMessage(), cause);
     }
 }
