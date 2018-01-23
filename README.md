@@ -65,5 +65,5 @@ Scribe scribe = clientFactory.createDriftClient(Scribe.class);
 scribe.log(Arrays.asList(new LogEntry("category", "message")));
 ```
 
-See [Drift Codec](drift-codec) for more information on annotating Thrift types, and [Drift Client]
-(drift-client) for more information on Thrift client usage. 
+See [Drift Codec](drift-codec) for more information on annotating Thrift types,
+and [Drift Client](drift-client) for more information on Thrift client usage. 
