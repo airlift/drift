@@ -10,7 +10,7 @@
 
     <groupId>io.airlift.drift</groupId>
     <artifactId>drift-root</artifactId>
-    <version>1.3</version>
+    <version>1.4-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>drift-root</name>
@@ -20,7 +20,7 @@
     <scm>
         <connection>scm:git:git://github.com/airlift/drift.git</connection>
         <url>https://github.com/airlift/drift</url>
-        <tag>1.3</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <modules>
