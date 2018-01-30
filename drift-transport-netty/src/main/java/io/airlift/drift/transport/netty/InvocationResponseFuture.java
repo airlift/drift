@@ -96,7 +96,7 @@ class InvocationResponseFuture
         }
 
         try {
-            invocationFuture = new ThriftRequest(request.getMethod(), request.getParameters());
+            invocationFuture = new ThriftRequest(request.getMethod(), request.getParameters(), request.getHeaders());
             channel.writeAndFlush(invocationFuture);
             Futures.addCallback(invocationFuture, new FutureCallback<Object>()
             {

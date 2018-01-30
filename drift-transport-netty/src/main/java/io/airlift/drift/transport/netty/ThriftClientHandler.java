@@ -15,7 +15,6 @@
  */
 package io.airlift.drift.transport.netty;
 
-import com.google.common.collect.ImmutableMap;
 import com.google.common.util.concurrent.AbstractFuture;
 import io.airlift.drift.TException;
 import io.airlift.drift.protocol.TTransportException;
@@ -34,6 +33,7 @@ import javax.annotation.concurrent.ThreadSafe;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.OptionalInt;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -201,11 +201,13 @@ class ThriftClientHandler
     {
         private final MethodMetadata method;
         private final List<Object> parameters;
+        private final Map<String, String> headers;
 
-        public ThriftRequest(MethodMetadata method, List<Object> parameters)
+        public ThriftRequest(MethodMetadata method, List<Object> parameters, Map<String, String> headers)
         {
             this.method = method;
             this.parameters = parameters;
+            this.headers = headers;
         }
 
         MethodMetadata getMethod()
@@ -216,6 +218,11 @@ class ThriftClientHandler
         List<Object> getParameters()
         {
             return parameters;
+        }
+
+        public Map<String, String> getHeaders()
+        {
+            return headers;
         }
 
         boolean isOneway()
@@ -266,7 +273,12 @@ class ThriftClientHandler
                 throws Exception
         {
             try {
-                return messageEncoding.writeRequest(allocator, sequenceId, thriftRequest.getMethod(), thriftRequest.getParameters(), ImmutableMap.of());
+                return messageEncoding.writeRequest(
+                        allocator,
+                        sequenceId,
+                        thriftRequest.getMethod(),
+                        thriftRequest.getParameters(),
+                        thriftRequest.getHeaders());
             }
             catch (Throwable throwable) {
                 onChannelError(throwable);
