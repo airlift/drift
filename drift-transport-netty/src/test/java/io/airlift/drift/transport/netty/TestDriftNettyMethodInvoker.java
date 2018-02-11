@@ -98,7 +98,6 @@ public class TestDriftNettyMethodInvoker
     private static final MethodMetadata LOG_METHOD_METADATA = new MethodMetadata(
             "Log",
             ImmutableList.of(new ParameterMetadata(
-                    0,
                     (short) 1,
                     "messages",
                     (ThriftCodec<Object>) CODEC_MANAGER.getCodec(list(CODEC_MANAGER.getCodec(DriftLogEntry.class).getType())))),
@@ -358,7 +357,6 @@ public class TestDriftNettyMethodInvoker
 
             ThriftType optionalType = optional(list(CODEC_MANAGER.getCatalog().getThriftType(DriftLogEntry.class)));
             ParameterMetadata parameter = new ParameterMetadata(
-                    0,
                     (short) 1,
                     "messages",
                     (ThriftCodec<Object>) CODEC_MANAGER.getCodec(optionalType));

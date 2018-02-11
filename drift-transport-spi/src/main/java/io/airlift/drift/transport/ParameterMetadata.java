@@ -23,24 +23,16 @@ import static java.util.Objects.requireNonNull;
 
 public final class ParameterMetadata
 {
-    private final int index;
     private final short fieldId;
     private final String name;
     private final ThriftCodec<Object> codec;
 
-    public ParameterMetadata(int index, short fieldId, String name, ThriftCodec<Object> codec)
+    public ParameterMetadata(short fieldId, String name, ThriftCodec<Object> codec)
     {
-        checkArgument(index >= 0, "index is negative");
-        this.index = index;
         checkArgument(fieldId >= 0, "fieldId is negative");
         this.fieldId = fieldId;
         this.name = requireNonNull(name, "name is null");
         this.codec = requireNonNull(codec, "codec is null");
-    }
-
-    public int getIndex()
-    {
-        return index;
     }
 
     public short getFieldId()
@@ -62,7 +54,6 @@ public final class ParameterMetadata
     public String toString()
     {
         return toStringHelper(this)
-                .add("index", index)
                 .add("fieldId", fieldId)
                 .add("name", name)
                 .toString();

@@ -20,7 +20,6 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.reflect.TypeToken;
 import io.airlift.drift.codec.ThriftCodec;
 import io.airlift.drift.codec.ThriftCodecManager;
-import io.airlift.drift.codec.metadata.ThriftFieldMetadata;
 import io.airlift.drift.codec.metadata.ThriftMethodMetadata;
 import io.airlift.drift.codec.metadata.ThriftType;
 
@@ -28,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static com.google.common.base.MoreObjects.toStringHelper;
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
@@ -47,16 +47,12 @@ public final class MethodMetadata
 
     public static MethodMetadata toMethodMetadata(ThriftCodecManager codecManager, ThriftMethodMetadata metadata)
     {
-        int parameterIndex = 0;
-        ImmutableList.Builder<ParameterMetadata> parameters = ImmutableList.builder();
-        for (ThriftFieldMetadata parameter : metadata.getParameters()) {
-            parameters.add(new ParameterMetadata(
-                    parameterIndex,
-                    parameter.getId(),
-                    parameter.getName(),
-                    getCodec(codecManager, parameter.getThriftType())));
-            parameterIndex++;
-        }
+        List<ParameterMetadata> parameters = metadata.getParameters().stream()
+                .map(parameter -> new ParameterMetadata(
+                        parameter.getId(),
+                        parameter.getName(),
+                        getCodec(codecManager, parameter.getThriftType())))
+                .collect(Collectors.toList());
 
         ThriftCodec<Object> resultCodec = getCodec(codecManager, metadata.getReturnType());
 
@@ -65,7 +61,7 @@ public final class MethodMetadata
 
         return new MethodMetadata(
                 metadata.getName(),
-                parameters.build(),
+                parameters,
                 resultCodec,
                 exceptionCodecs,
                 metadata.getOneway());
