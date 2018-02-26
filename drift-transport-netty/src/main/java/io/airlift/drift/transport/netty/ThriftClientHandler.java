@@ -126,8 +126,13 @@ public class ThriftClientHandler
         if (message instanceof ByteBuf && ((ByteBuf) message).isReadable()) {
             ByteBuf response = (ByteBuf) message;
             if (response.isReadable()) {
-                messageReceived(context, response);
-                return;
+                try {
+                    messageReceived(context, response);
+                    return;
+                }
+                finally {
+                    response.release();
+                }
             }
         }
         context.fireChannelRead(message);
