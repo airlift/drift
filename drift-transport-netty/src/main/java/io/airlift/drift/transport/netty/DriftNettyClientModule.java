@@ -19,13 +19,18 @@ import com.google.inject.Binder;
 import com.google.inject.Injector;
 import com.google.inject.Key;
 import com.google.inject.Module;
-import com.google.inject.Provides;
-import com.google.inject.Singleton;
+import com.google.inject.Scopes;
+import com.google.inject.TypeLiteral;
 import io.airlift.drift.transport.DriftClientConfig;
 import io.airlift.drift.transport.MethodInvokerFactory;
 
+import javax.annotation.PreDestroy;
+import javax.inject.Inject;
+import javax.inject.Provider;
+
 import java.lang.annotation.Annotation;
 
+import static com.google.common.base.Preconditions.checkState;
 import static io.airlift.configuration.ConfigBinder.configBinder;
 
 public class DriftNettyClientModule
@@ -40,13 +45,10 @@ public class DriftNettyClientModule
                 configBinder.bindConfig(DriftNettyClientConfig.class, binding.getKey().getAnnotation(), binding.getPrefix().orElse(null));
             }
         });
-    }
 
-    @Provides
-    @Singleton
-    private static MethodInvokerFactory<Annotation> getMethodInvokerFactory(DriftNettyConnectionFactoryConfig factoryConfig, Injector injector)
-    {
-        return new DriftNettyMethodInvokerFactory<>(factoryConfig, annotation -> injector.getInstance(Key.get(DriftNettyClientConfig.class, annotation)));
+        binder.bind(new TypeLiteral<MethodInvokerFactory<Annotation>>() {})
+                .toProvider(MethodInvokerFactoryProvider.class)
+                .in(Scopes.SINGLETON);
     }
 
     @Override
@@ -62,5 +64,36 @@ public class DriftNettyClientModule
     public int hashCode()
     {
         return getClass().hashCode();
+    }
+
+    private static class MethodInvokerFactoryProvider
+            implements Provider<MethodInvokerFactory<Annotation>>
+    {
+        private Injector injector;
+        private DriftNettyMethodInvokerFactory<Annotation> factory;
+
+        @Inject
+        public void setInjector(Injector injector)
+        {
+            this.injector = injector;
+        }
+
+        @Override
+        public MethodInvokerFactory<Annotation> get()
+        {
+            checkState(factory == null, "factory already created");
+
+            factory = new DriftNettyMethodInvokerFactory<>(
+                    injector.getInstance(DriftNettyConnectionFactoryConfig.class),
+                    annotation -> injector.getInstance(Key.get(DriftNettyClientConfig.class, annotation)));
+
+            return factory;
+        }
+
+        @PreDestroy
+        public void destroy()
+        {
+            factory.close();
+        }
     }
 }
