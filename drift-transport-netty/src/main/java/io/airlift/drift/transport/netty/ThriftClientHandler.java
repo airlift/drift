@@ -126,13 +126,8 @@ public class ThriftClientHandler
         if (message instanceof ByteBuf && ((ByteBuf) message).isReadable()) {
             ByteBuf response = (ByteBuf) message;
             if (response.isReadable()) {
-                try {
-                    messageReceived(context, response);
-                    return;
-                }
-                finally {
-                    response.release();
-                }
+                messageReceived(context, response);
+                return;
             }
         }
         context.fireChannelRead(message);
@@ -141,7 +136,7 @@ public class ThriftClientHandler
     private void messageReceived(ChannelHandlerContext context, ByteBuf response)
     {
         try {
-            OptionalInt sequenceId = messageEncoding.extractResponseSequenceId(response);
+            OptionalInt sequenceId = messageEncoding.extractResponseSequenceId(response.retainedDuplicate());
             if (!sequenceId.isPresent()) {
                 throw new TTransportException("Could not find sequenceId in Thrift message");
             }
@@ -151,10 +146,13 @@ public class ThriftClientHandler
                 throw new TTransportException("Unknown sequence id in response: " + sequenceId.getAsInt());
             }
 
-            requestHandler.onResponseReceived(response);
+            requestHandler.onResponseReceived(response.retainedDuplicate());
         }
         catch (Throwable t) {
             onError(context, t);
+        }
+        finally {
+            response.release();
         }
     }
 

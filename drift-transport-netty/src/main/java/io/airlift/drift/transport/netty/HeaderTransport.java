@@ -22,6 +22,9 @@ import io.airlift.drift.protocol.TFacebookCompactProtocol;
 import io.airlift.drift.protocol.TProtocolFactory;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
+import io.netty.util.ReferenceCounted;
+
+import javax.annotation.CheckReturnValue;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -33,6 +36,7 @@ import static com.google.common.base.Verify.verify;
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Objects.requireNonNull;
+import static javax.annotation.meta.When.UNKNOWN;
 
 public final class HeaderTransport
 {
@@ -55,41 +59,57 @@ public final class HeaderTransport
 
     public static OptionalInt extractResponseSequenceId(ByteBuf buffer)
     {
-        if (buffer.readableBytes() < HEADER_SEQUENCE_ID_OFFSET + Integer.BYTES) {
-            return OptionalInt.empty();
+        try {
+            if (buffer.readableBytes() < HEADER_SEQUENCE_ID_OFFSET + Integer.BYTES) {
+                return OptionalInt.empty();
+            }
+            return OptionalInt.of(buffer.getInt(buffer.readerIndex() + HEADER_SEQUENCE_ID_OFFSET));
         }
-        return OptionalInt.of(buffer.getInt(buffer.readerIndex() + HEADER_SEQUENCE_ID_OFFSET));
+        finally {
+            buffer.release();
+        }
     }
 
+    /**
+     * Encodes the HeaderFrame into a ByteBuf transferring the reference ownership.
+     * @param frame frame to be encoded; reference count ownership is transferred to this method
+     * @return the encoded frame data; caller is responsible for releasing this buffer
+     */
     public static ByteBuf encodeFrame(HeaderFrame frame)
     {
-        // describe the encoding (Thrift protocol, compression info)
-        ByteBuf encodingInfo = Unpooled.buffer(3);
-        encodingInfo.writeByte(frame.getProtocol().getId());
-        // number of "transforms" -- no transforms are supported
-        encodingInfo.writeByte(0);
+        try {
+            // describe the encoding (Thrift protocol, compression info)
+            ByteBuf encodingInfo = Unpooled.buffer(3);
+            encodingInfo.writeByte(frame.getProtocol().getId());
+            // number of "transforms" -- no transforms are supported
+            encodingInfo.writeByte(0);
 
-        // headers
-        ByteBuf encodedHeaders = encodeHeaders(frame.getHeaders());
+            // headers
+            ByteBuf encodedHeaders = encodeHeaders(frame.getHeaders());
 
-        // Padding - header size must be a multiple of 4
-        int headerSize = encodingInfo.readableBytes() + encodedHeaders.readableBytes();
-        ByteBuf padding = getPadding(headerSize);
-        headerSize += padding.readableBytes();
+            // Padding - header size must be a multiple of 4
+            int headerSize = encodingInfo.readableBytes() + encodedHeaders.readableBytes();
+            ByteBuf padding = getPadding(headerSize);
+            headerSize += padding.readableBytes();
 
-        // frame header (magic, flags, sequenceId, headerSize
-        ByteBuf frameHeader = Unpooled.buffer(FRAME_HEADER_SIZE);
-        frameHeader.writeShort(HEADER_MAGIC);
-        frameHeader.writeShort(frame.isSupportOutOfOrderResponse() ? FLAG_SUPPORT_OUT_OF_ORDER : FLAGS_NONE);
-        frameHeader.writeInt(frame.getFrameSequenceId());
-        frameHeader.writeShort(headerSize >> 2);
+            // frame header (magic, flags, sequenceId, headerSize
+            ByteBuf frameHeader = Unpooled.buffer(FRAME_HEADER_SIZE);
+            frameHeader.writeShort(HEADER_MAGIC);
+            frameHeader.writeShort(frame.isSupportOutOfOrderResponse() ? FLAG_SUPPORT_OUT_OF_ORDER : FLAGS_NONE);
+            frameHeader.writeInt(frame.getFrameSequenceId());
+            frameHeader.writeShort(headerSize >> 2);
 
-        return Unpooled.wrappedBuffer(
-                frameHeader,
-                encodingInfo,
-                encodedHeaders,
-                padding,
-                frame.getMessage());
+            // header frame is a simple wrapper around the frame method, so the frame does not need to be released
+            return Unpooled.wrappedBuffer(
+                    frameHeader,
+                    encodingInfo,
+                    encodedHeaders,
+                    padding,
+                    frame.getMessage());
+        }
+        finally {
+            frame.release();
+        }
     }
 
     private static ByteBuf getPadding(int headerSize)
@@ -144,46 +164,64 @@ public final class HeaderTransport
         }
     }
 
+    /**
+     * Decodes the ByteBuf into a HeaderFrame transferring the reference ownership.
+     * @param buffer buffer to be decoded; reference count ownership is transferred to this method
+     * @return the decoded frame; caller is responsible for releasing this object
+     */
     public static HeaderFrame decodeFrame(ByteBuf buffer)
     {
-        // frame header
-        short magic = buffer.readShort();
-        verify(magic == HEADER_MAGIC, "Invalid header magic");
-        short flags = buffer.readShort();
-        boolean outOfOrderResponse;
-        switch (flags) {
-            case FLAGS_NONE:
-                outOfOrderResponse = false;
-                break;
-            case FLAG_SUPPORT_OUT_OF_ORDER:
-                outOfOrderResponse = true;
-                break;
-            default:
-                throw new IllegalArgumentException("Unsupported header flags: " + flags);
+        ByteBuf messageHeader = null;
+        try {
+            // frame header
+            short magic = buffer.readShort();
+            verify(magic == HEADER_MAGIC, "Invalid header magic");
+            short flags = buffer.readShort();
+            boolean outOfOrderResponse;
+            switch (flags) {
+                case FLAGS_NONE:
+                    outOfOrderResponse = false;
+                    break;
+                case FLAG_SUPPORT_OUT_OF_ORDER:
+                    outOfOrderResponse = true;
+                    break;
+                default:
+                    throw new IllegalArgumentException("Unsupported header flags: " + flags);
+            }
+            int frameSequenceId = buffer.readInt();
+            int headerSize = buffer.readShort() << 2;
+            messageHeader = buffer.readBytes(headerSize);
+
+            // encoding info
+            byte protocolId = messageHeader.readByte();
+            HeaderTransportProtocol protocol = HeaderTransportProtocol.decodeProtocol(protocolId);
+            byte numberOfTransforms = messageHeader.readByte();
+            if (numberOfTransforms > 0) {
+                // currently there are only two transforms, a cryptographic extension which is deprecated, and gzip which is too expensive
+                throw new IllegalArgumentException("Unsupported transform");
+            }
+
+            // headers
+            // todo what about duplicate headers?
+            ImmutableMap.Builder<String, String> allHeaders = ImmutableMap.builder();
+            allHeaders.putAll(decodeHeaders(NORMAL_HEADERS, messageHeader));
+            allHeaders.putAll(decodeHeaders(PERSISTENT_HEADERS, messageHeader));
+
+            // message
+            ByteBuf message = buffer.readBytes(buffer.readableBytes());
+
+            // header frame wraps message byte buffer, so message should not be release yet
+            return new HeaderFrame(frameSequenceId, message, allHeaders.build(), protocol, outOfOrderResponse);
         }
-        int frameSequenceId = buffer.readInt();
-        int headerSize = buffer.readShort() << 2;
-        ByteBuf messageHeader = buffer.readBytes(headerSize);
+        finally {
+            // message header in an independent buffer and must be released
+            if (messageHeader != null) {
+                messageHeader.release();
+            }
 
-        // encoding info
-        byte protocolId = messageHeader.readByte();
-        HeaderTransportProtocol protocol = HeaderTransportProtocol.decodeProtocol(protocolId);
-        byte numberOfTransforms = messageHeader.readByte();
-        if (numberOfTransforms > 0) {
-            // currently there are only two transforms, a cryptographic extension which is deprecated, and gzip which is too expensive
-            throw new IllegalArgumentException("Unsupported transform");
+            // input buffer has been consumed and transformed into a HeaderFrame, so release it
+            buffer.release();
         }
-
-        // headers
-        // todo what about duplicate headers?
-        ImmutableMap.Builder<String, String> allHeaders = ImmutableMap.builder();
-        allHeaders.putAll(decodeHeaders(NORMAL_HEADERS, messageHeader));
-        allHeaders.putAll(decodeHeaders(PERSISTENT_HEADERS, messageHeader));
-
-        // message
-        ByteBuf message = buffer.readBytes(buffer.readableBytes());
-
-        return new HeaderFrame(frameSequenceId, message, allHeaders.build(), protocol, outOfOrderResponse);
     }
 
     private static Map<String, String> decodeHeaders(int expectedHeadersType, ByteBuf messageHeader)
@@ -231,6 +269,7 @@ public final class HeaderTransport
     }
 
     public static class HeaderFrame
+            implements ReferenceCounted
     {
         private final int frameSequenceId;
         private final ByteBuf message;
@@ -252,9 +291,12 @@ public final class HeaderTransport
             return frameSequenceId;
         }
 
+        /**
+         * @return a retained message; caller must release this buffer
+         */
         public ByteBuf getMessage()
         {
-            return message;
+            return message.retainedDuplicate();
         }
 
         public Map<String, String> getHeaders()
@@ -270,6 +312,53 @@ public final class HeaderTransport
         public boolean isSupportOutOfOrderResponse()
         {
             return supportOutOfOrderResponse;
+        }
+
+        @Override
+        public int refCnt()
+        {
+            return message.refCnt();
+        }
+
+        @Override
+        public ReferenceCounted retain()
+        {
+            message.retain();
+            return this;
+        }
+
+        @Override
+        public ReferenceCounted retain(int increment)
+        {
+            message.retain(increment);
+            return this;
+        }
+
+        @Override
+        public ReferenceCounted touch()
+        {
+            message.touch();
+            return this;
+        }
+
+        @Override
+        public ReferenceCounted touch(Object hint)
+        {
+            message.touch(hint);
+            return this;
+        }
+
+        @CheckReturnValue(when = UNKNOWN)
+        @Override
+        public boolean release()
+        {
+            return message.release();
+        }
+
+        @Override
+        public boolean release(int decrement)
+        {
+            return message.release(decrement);
         }
     }
 

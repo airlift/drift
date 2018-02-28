@@ -18,7 +18,6 @@ package io.airlift.drift.transport.netty;
 import io.airlift.drift.protocol.TProtocolFactory;
 import io.airlift.drift.protocol.TProtocolReader;
 import io.airlift.drift.protocol.TProtocolUtil;
-import io.airlift.drift.protocol.TTransport;
 import io.airlift.drift.protocol.TType;
 import io.airlift.units.DataSize;
 import io.netty.buffer.ByteBuf;
@@ -43,20 +42,13 @@ class ThriftUnframedDecoder
         this.maxFrameSize = toIntExact(requireNonNull(maxFrameSize, "maxFrameSize is null").toBytes());
     }
 
+    // This method is an exception to the normal reference counted rules and buffer should not be released
     @Override
-    protected final void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out)
-    {
-        Object decoded = decode(ctx, in);
-        if (decoded != null) {
-            out.add(decoded);
-        }
-    }
-
-    private Object decode(ChannelHandlerContext ctx, ByteBuf buffer)
+    protected final void decode(ChannelHandlerContext ctx, ByteBuf buffer, List<Object> out)
     {
         int frameOffset = buffer.readerIndex();
+        TChannelBufferInputTransport transport = new TChannelBufferInputTransport(buffer.retain());
         try {
-            TTransport transport = new TChannelBufferInputTransport(buffer);
             TProtocolReader protocol = protocolFactory.getProtocol(transport);
 
             protocol.readMessageBegin();
@@ -68,11 +60,13 @@ class ThriftUnframedDecoder
                 ctx.fireExceptionCaught(new TooLongFrameException("Response message exceeds max size " + maxFrameSize + ": " + frameLength + " - discarded"));
             }
 
-            return buffer.slice(frameOffset, frameLength).retain();
+            out.add(buffer.slice(frameOffset, frameLength).retain());
         }
         catch (Throwable th) {
             buffer.readerIndex(frameOffset);
-            return null;
+        }
+        finally {
+            transport.release();
         }
     }
 }

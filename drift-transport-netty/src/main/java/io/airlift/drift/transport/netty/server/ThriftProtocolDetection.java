@@ -63,6 +63,7 @@ public class ThriftProtocolDetection
         this.assumeClientsSupportOutOfOrderResponses = assumeClientsSupportOutOfOrderResponses;
     }
 
+    // This method is an exception to the normal reference counted rules and buffer should not be released
     @Override
     protected void decode(ChannelHandlerContext context, ByteBuf in, List<Object> out)
             throws Exception

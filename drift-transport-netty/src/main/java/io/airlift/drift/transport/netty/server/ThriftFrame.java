@@ -17,13 +17,18 @@ package io.airlift.drift.transport.netty.server;
 
 import io.airlift.drift.protocol.TProtocolFactory;
 import io.netty.buffer.ByteBuf;
+import io.netty.util.ReferenceCounted;
+
+import javax.annotation.CheckReturnValue;
 
 import java.util.Map;
 import java.util.OptionalInt;
 
 import static java.util.Objects.requireNonNull;
+import static javax.annotation.meta.When.UNKNOWN;
 
 public class ThriftFrame
+        implements ReferenceCounted
 {
     private final OptionalInt sequenceId;
     private final ByteBuf message;
@@ -45,9 +50,12 @@ public class ThriftFrame
         return sequenceId;
     }
 
+    /**
+     * @return a retained message; caller must release this buffer
+     */
     public ByteBuf getMessage()
     {
-        return message;
+        return message.retainedDuplicate();
     }
 
     public Map<String, String> getHeaders()
@@ -63,5 +71,52 @@ public class ThriftFrame
     public boolean isSupportOutOfOrderResponse()
     {
         return supportOutOfOrderResponse;
+    }
+
+    @Override
+    public int refCnt()
+    {
+        return message.refCnt();
+    }
+
+    @Override
+    public ReferenceCounted retain()
+    {
+        message.retain();
+        return this;
+    }
+
+    @Override
+    public ReferenceCounted retain(int increment)
+    {
+        message.retain(increment);
+        return this;
+    }
+
+    @Override
+    public ReferenceCounted touch()
+    {
+        message.touch();
+        return this;
+    }
+
+    @Override
+    public ReferenceCounted touch(Object hint)
+    {
+        message.touch(hint);
+        return this;
+    }
+
+    @CheckReturnValue(when = UNKNOWN)
+    @Override
+    public boolean release()
+    {
+        return message.release();
+    }
+
+    @Override
+    public boolean release(int decrement)
+    {
+        return message.release(decrement);
     }
 }

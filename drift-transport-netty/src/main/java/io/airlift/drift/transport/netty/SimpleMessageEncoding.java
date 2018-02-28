@@ -17,7 +17,6 @@ package io.airlift.drift.transport.netty;
 
 import io.airlift.drift.protocol.TMessage;
 import io.airlift.drift.protocol.TProtocolFactory;
-import io.airlift.drift.protocol.TTransport;
 import io.airlift.drift.transport.MethodMetadata;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
@@ -52,12 +51,15 @@ class SimpleMessageEncoding
     @Override
     public OptionalInt extractResponseSequenceId(ByteBuf buffer)
     {
+        TChannelBufferInputTransport inputTransport = new TChannelBufferInputTransport(buffer.duplicate());
         try {
-            TTransport inputTransport = new TChannelBufferInputTransport(buffer.duplicate());
             TMessage message = protocolFactory.getProtocol(inputTransport).readMessageBegin();
             return OptionalInt.of(message.getSequenceId());
         }
         catch (Throwable ignored) {
+        }
+        finally {
+            inputTransport.release();
         }
         return OptionalInt.empty();
     }

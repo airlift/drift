@@ -17,14 +17,17 @@ package io.airlift.drift.transport.netty;
 
 import io.airlift.drift.protocol.TTransport;
 import io.netty.buffer.ByteBuf;
+import io.netty.util.ReferenceCounted;
 
+import javax.annotation.CheckReturnValue;
 import javax.annotation.concurrent.NotThreadSafe;
 
 import static java.util.Objects.requireNonNull;
+import static javax.annotation.meta.When.UNKNOWN;
 
 @NotThreadSafe
 public class TChannelBufferInputTransport
-        implements TTransport
+        implements TTransport, ReferenceCounted
 {
     private final ByteBuf buffer;
 
@@ -43,5 +46,52 @@ public class TChannelBufferInputTransport
     public void write(byte[] buf, int off, int len)
     {
         throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public int refCnt()
+    {
+        return buffer.refCnt();
+    }
+
+    @Override
+    public ReferenceCounted retain()
+    {
+        buffer.retain();
+        return this;
+    }
+
+    @Override
+    public ReferenceCounted retain(int increment)
+    {
+        buffer.retain(increment);
+        return this;
+    }
+
+    @Override
+    public ReferenceCounted touch()
+    {
+        buffer.touch();
+        return this;
+    }
+
+    @Override
+    public ReferenceCounted touch(Object hint)
+    {
+        buffer.touch(hint);
+        return this;
+    }
+
+    @CheckReturnValue(when = UNKNOWN)
+    @Override
+    public boolean release()
+    {
+        return buffer.release();
+    }
+
+    @Override
+    public boolean release(int decrement)
+    {
+        return buffer.release(decrement);
     }
 }

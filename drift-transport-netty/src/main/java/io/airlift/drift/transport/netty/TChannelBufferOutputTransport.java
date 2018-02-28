@@ -17,34 +17,91 @@ package io.airlift.drift.transport.netty;
 
 import io.airlift.drift.protocol.TTransport;
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufAllocator;
+import io.netty.util.ReferenceCounted;
 
+import javax.annotation.CheckReturnValue;
 import javax.annotation.concurrent.NotThreadSafe;
+
+import static javax.annotation.meta.When.UNKNOWN;
 
 @NotThreadSafe
 public class TChannelBufferOutputTransport
-        implements TTransport
+        implements TTransport, ReferenceCounted
 {
-    private final ByteBuf outputBuffer;
+    private final ByteBuf buffer;
 
-    public TChannelBufferOutputTransport(ByteBuf outputBuffer)
+    public TChannelBufferOutputTransport(ByteBufAllocator byteBufAllocator)
     {
-        this.outputBuffer = outputBuffer;
+        this(byteBufAllocator.buffer(1024));
     }
 
-    public ByteBuf getOutputBuffer()
+    public TChannelBufferOutputTransport(ByteBuf buffer)
     {
-        return outputBuffer;
+        this.buffer = buffer;
+    }
+
+    public ByteBuf getBuffer()
+    {
+        return buffer.retainedDuplicate();
     }
 
     @Override
     public void write(byte[] buf, int off, int len)
     {
-        outputBuffer.writeBytes(buf, off, len);
+        buffer.writeBytes(buf, off, len);
     }
 
     @Override
     public void read(byte[] buf, int off, int len)
     {
         throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public int refCnt()
+    {
+        return buffer.refCnt();
+    }
+
+    @Override
+    public ReferenceCounted retain()
+    {
+        buffer.retain();
+        return this;
+    }
+
+    @Override
+    public ReferenceCounted retain(int increment)
+    {
+        buffer.retain(increment);
+        return this;
+    }
+
+    @Override
+    public ReferenceCounted touch()
+    {
+        buffer.touch();
+        return this;
+    }
+
+    @Override
+    public ReferenceCounted touch(Object hint)
+    {
+        buffer.touch(hint);
+        return this;
+    }
+
+    @CheckReturnValue(when = UNKNOWN)
+    @Override
+    public boolean release()
+    {
+        return buffer.release();
+    }
+
+    @Override
+    public boolean release(int decrement)
+    {
+        return buffer.release(decrement);
     }
 }

@@ -64,15 +64,19 @@ public class SimpleFrameCodec
             throws Exception
     {
         if (message instanceof ThriftFrame) {
+            // strip the underlying message from the frame
             ThriftFrame thriftFrame = (ThriftFrame) message;
-            verify(thriftFrame.getSequenceId().isPresent(), "Sequence id not set in response frame");
-            if (!thriftFrame.getHeaders().isEmpty()) {
-                throw new EncoderException("Headers are only supported in header transport");
+            try {
+                verify(thriftFrame.getSequenceId().isPresent(), "Sequence id not set in response frame");
+                if (!thriftFrame.getHeaders().isEmpty()) {
+                    throw new EncoderException("Headers are only supported in header transport");
+                }
+                message = thriftFrame.getMessage();
             }
-            context.write(thriftFrame.getMessage(), promise);
+            finally {
+                thriftFrame.release();
+            }
         }
-        else {
-            context.write(message, promise);
-        }
+        context.write(message, promise);
     }
 }

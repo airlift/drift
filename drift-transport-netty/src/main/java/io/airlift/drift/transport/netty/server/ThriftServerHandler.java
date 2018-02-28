@@ -28,6 +28,7 @@ import io.airlift.drift.protocol.TMessage;
 import io.airlift.drift.protocol.TMessageType;
 import io.airlift.drift.protocol.TProtocol;
 import io.airlift.drift.protocol.TProtocolFactory;
+import io.airlift.drift.protocol.TTransport;
 import io.airlift.drift.transport.MethodMetadata;
 import io.airlift.drift.transport.ParameterMetadata;
 import io.airlift.drift.transport.netty.TChannelBufferInputTransport;
@@ -36,7 +37,6 @@ import io.airlift.drift.transport.server.ServerInvokeRequest;
 import io.airlift.drift.transport.server.ServerMethodInvoker;
 import io.airlift.log.Logger;
 import io.airlift.units.Duration;
-import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
 
@@ -87,11 +87,12 @@ public class ThriftServerHandler
 
     private void messageReceived(ChannelHandlerContext context, ThriftFrame frame)
     {
+        TChannelBufferInputTransport inputTransport = new TChannelBufferInputTransport(frame.getMessage());
         try {
             ListenableFuture<ThriftFrame> response = decodeMessage(
                     context,
                     frame.getProtocolFactory(),
-                    frame.getMessage(),
+                    inputTransport,
                     frame.getHeaders(),
                     frame.isSupportOutOfOrderResponse());
             Futures.addCallback(response, new FutureCallback<ThriftFrame>()
@@ -118,18 +119,22 @@ public class ThriftServerHandler
             context.disconnect();
             throw e;
         }
+        finally {
+            inputTransport.release();
+            frame.release();
+        }
     }
 
     private ListenableFuture<ThriftFrame> decodeMessage(
             ChannelHandlerContext context,
             TProtocolFactory protocolFactory,
-            ByteBuf frame,
+            TTransport messageData,
             Map<String, String> headers,
             boolean supportOutOfOrderResponse)
             throws Exception
     {
         long start = System.nanoTime();
-        TProtocol protocol = protocolFactory.getProtocol(new TChannelBufferInputTransport(frame));
+        TProtocol protocol = protocolFactory.getProtocol(messageData);
 
         TMessage message = protocol.readMessageBegin();
         Optional<MethodMetadata> methodMetadata = methodInvoker.getMethodMetadata(message.getName());
@@ -227,18 +232,22 @@ public class ThriftServerHandler
             Object result)
             throws Exception
     {
-        ByteBuf buffer = context.alloc().buffer(1024);
-        TChannelBufferOutputTransport transport = new TChannelBufferOutputTransport(buffer);
-        TProtocol protocol = protocolFactory.getProtocol(transport);
+        TChannelBufferOutputTransport transport = new TChannelBufferOutputTransport(context.alloc());
+        try {
+            TProtocol protocol = protocolFactory.getProtocol(transport);
 
-        writeResponse(methodMetadata.getName(), protocol, sequenceId, "success", (short) 0, methodMetadata.getResultCodec(), result);
+            writeResponse(methodMetadata.getName(), protocol, sequenceId, "success", (short) 0, methodMetadata.getResultCodec(), result);
 
-        return new ThriftFrame(
-                OptionalInt.of(sequenceId),
-                buffer,
-                ImmutableMap.of(),
-                protocolFactory,
-                supportOutOfOrderResponse);
+            return new ThriftFrame(
+                    OptionalInt.of(sequenceId),
+                    transport.getBuffer(),
+                    ImmutableMap.of(),
+                    protocolFactory,
+                    supportOutOfOrderResponse);
+        }
+        finally {
+            transport.release();
+        }
     }
 
     private static ThriftFrame writeExceptionResponse(ChannelHandlerContext context,
@@ -251,25 +260,29 @@ public class ThriftServerHandler
     {
         Optional<Short> exceptionId = methodMetadata.getExceptionId(exception.getClass());
         if (exceptionId.isPresent()) {
-            ByteBuf buffer = context.alloc().buffer(1024);
-            TChannelBufferOutputTransport transport = new TChannelBufferOutputTransport(buffer);
-            TProtocol protocol = protocolFactory.getProtocol(transport);
+            TChannelBufferOutputTransport transport = new TChannelBufferOutputTransport(context.alloc());
+            try {
+                TProtocol protocol = protocolFactory.getProtocol(transport);
 
-            writeResponse(
-                    methodMetadata.getName(),
-                    protocol,
-                    sequenceId,
-                    "exception",
-                    exceptionId.get(),
-                    methodMetadata.getExceptionCodecs().get(exceptionId.get()),
-                    exception);
+                writeResponse(
+                        methodMetadata.getName(),
+                        protocol,
+                        sequenceId,
+                        "exception",
+                        exceptionId.get(),
+                        methodMetadata.getExceptionCodecs().get(exceptionId.get()),
+                        exception);
 
-            return new ThriftFrame(
-                    OptionalInt.of(sequenceId),
-                    buffer,
-                    ImmutableMap.of(),
-                    protocolFactory,
-                    supportOutOfOrderResponse);
+                return new ThriftFrame(
+                        OptionalInt.of(sequenceId),
+                        transport.getBuffer(),
+                        ImmutableMap.of(),
+                        protocolFactory,
+                        supportOutOfOrderResponse);
+            }
+            finally {
+                transport.release();
+            }
         }
 
         return writeApplicationException(
@@ -299,20 +312,25 @@ public class ThriftServerHandler
             applicationException.initCause(cause);
         }
 
-        TChannelBufferOutputTransport transport = new TChannelBufferOutputTransport(context.alloc().buffer(1024));
-        TProtocol protocol = protocolFactory.getProtocol(transport);
+        TChannelBufferOutputTransport transport = new TChannelBufferOutputTransport(context.alloc());
+        try {
+            TProtocol protocol = protocolFactory.getProtocol(transport);
 
-        protocol.writeMessageBegin(new TMessage(methodName, EXCEPTION, sequenceId));
+            protocol.writeMessageBegin(new TMessage(methodName, EXCEPTION, sequenceId));
 
-        ExceptionWriter.writeTApplicationException(applicationException, protocol);
+            ExceptionWriter.writeTApplicationException(applicationException, protocol);
 
-        protocol.writeMessageEnd();
-        return new ThriftFrame(
-                OptionalInt.of(sequenceId),
-                transport.getOutputBuffer(),
-                ImmutableMap.of(),
-                protocolFactory,
-                supportOutOfOrderResponse);
+            protocol.writeMessageEnd();
+            return new ThriftFrame(
+                    OptionalInt.of(sequenceId),
+                    transport.getBuffer(),
+                    ImmutableMap.of(),
+                    protocolFactory,
+                    supportOutOfOrderResponse);
+        }
+        finally {
+            transport.release();
+        }
     }
 
     private static void writeResponse(

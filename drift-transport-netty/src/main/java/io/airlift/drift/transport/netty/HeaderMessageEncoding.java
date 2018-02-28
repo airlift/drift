@@ -64,18 +64,22 @@ class HeaderMessageEncoding
             throws Exception
     {
         HeaderFrame headerFrame = HeaderTransport.decodeFrame(buffer);
+        try {
+            // verify the frame sequence id matches the expected id
+            if (headerFrame.getFrameSequenceId() != sequenceId) {
+                throw new TApplicationException(BAD_SEQUENCE_ID, method.getName() + " failed: unexpected response sequence id");
+            }
 
-        // verify the frame sequence id matches the expected id
-        if (headerFrame.getFrameSequenceId() != sequenceId) {
-            throw new TApplicationException(BAD_SEQUENCE_ID, method.getName() + " failed: unexpected response sequence id");
+            // the response frame includes the out of order flag, but it doesn't matter if it matches
+
+            // verify the server wrote the response using the same protocol
+            // this could be allowed, but due to the poor performance of compact protocol, a change could be a big burden on clients
+            verify(headerFrame.getProtocol() == this.protocol, "response protocol is different than request protocol");
+
+            return MessageEncoding.decodeResponse(protocolFactory, headerFrame.getMessage(), sequenceId, method);
         }
-
-        // the response frame includes the out of order flag, but it doesn't matter if it matches
-
-        // verify the server wrote the response using the same protocol
-        // this could be allowed, but due to the poor performance of compact protocol, a change could be a big burden on clients
-        verify(headerFrame.getProtocol() == this.protocol, "response protocol is different than request protocol");
-
-        return MessageEncoding.decodeResponse(protocolFactory, headerFrame.getMessage(), sequenceId, method);
+        finally {
+            headerFrame.release();
+        }
     }
 }
