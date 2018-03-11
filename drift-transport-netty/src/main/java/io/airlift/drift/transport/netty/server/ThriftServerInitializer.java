@@ -73,10 +73,10 @@ public class ThriftServerInitializer
 
         if (sslContextSupplier.isPresent()) {
             if (allowPlainText) {
-                pipeline.addFirst(new OptionalSslHandler(sslContextSupplier.get().get()));
+                pipeline.addLast(new OptionalSslHandler(sslContextSupplier.get().get()));
             }
             else {
-                pipeline.addFirst(sslContextSupplier.get().get().newHandler(channel.alloc()));
+                pipeline.addLast(sslContextSupplier.get().get().newHandler(channel.alloc()));
             }
         }
 
