@@ -29,8 +29,8 @@ import io.airlift.drift.transport.apache.ApacheThriftClientConfig;
 import io.airlift.drift.transport.apache.ApacheThriftClientModule;
 import io.airlift.drift.transport.apache.ApacheThriftConnectionFactoryConfig;
 import io.airlift.drift.transport.apache.ApacheThriftMethodInvokerFactory;
-import io.airlift.drift.transport.netty.DriftNettyClientConfig.Protocol;
 import io.airlift.drift.transport.netty.DriftNettyClientConfig.Transport;
+import io.airlift.drift.transport.netty.Protocol;
 
 import java.util.List;
 import java.util.Optional;

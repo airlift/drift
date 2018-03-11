@@ -30,7 +30,6 @@ import io.airlift.drift.transport.InvokeRequest;
 import io.airlift.drift.transport.MethodInvoker;
 import io.airlift.drift.transport.MethodMetadata;
 import io.airlift.drift.transport.ParameterMetadata;
-import io.airlift.drift.transport.netty.DriftNettyClientConfig.Protocol;
 import io.airlift.drift.transport.netty.DriftNettyClientConfig.Transport;
 import io.airlift.drift.transport.netty.scribe.apache.LogEntry;
 import io.airlift.drift.transport.netty.scribe.apache.ResultCode;

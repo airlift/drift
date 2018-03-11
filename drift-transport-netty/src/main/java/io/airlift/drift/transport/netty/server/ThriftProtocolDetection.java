@@ -16,12 +16,10 @@
 package io.airlift.drift.transport.netty.server;
 
 import com.google.common.primitives.Ints;
-import io.airlift.drift.protocol.TBinaryProtocol;
-import io.airlift.drift.protocol.TCompactProtocol;
-import io.airlift.drift.protocol.TFacebookCompactProtocol;
 import io.airlift.drift.protocol.TProtocolFactory;
 import io.airlift.drift.transport.netty.LengthPrefixedMessageFraming;
 import io.airlift.drift.transport.netty.NoMessageFraming;
+import io.airlift.drift.transport.netty.Protocol;
 import io.airlift.units.DataSize;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
@@ -31,6 +29,10 @@ import io.netty.handler.codec.ByteToMessageDecoder;
 import java.util.List;
 import java.util.Optional;
 
+import static io.airlift.drift.transport.netty.DriftNettyClientConfig.Transport.FRAMED;
+import static io.airlift.drift.transport.netty.DriftNettyClientConfig.Transport.UNFRAMED;
+import static io.airlift.drift.transport.netty.Protocol.BINARY;
+import static io.airlift.drift.transport.netty.Protocol.COMPACT;
 import static java.util.Objects.requireNonNull;
 
 public class ThriftProtocolDetection
@@ -85,14 +87,14 @@ public class ThriftProtocolDetection
         // Unframed transport magic starts with the high byte set, whereas framed and header
         // both start with the frame size which must be a positive int
         if ((magic & UNFRAMED_MESSAGE_MASK) == UNFRAMED_MESSAGE_FLAG) {
-            Optional<TProtocolFactory> protocolFactory = detectProtocolFactory(magic);
-            if (!protocolFactory.isPresent()) {
+            Optional<Protocol> protocol = detectProtocol(magic);
+            if (!protocol.isPresent()) {
                 in.clear();
                 context.close();
                 return;
             }
 
-            switchToUnframedTransport(context, protocolFactory.get());
+            switchToUnframedTransport(context, protocol.get());
             return;
         }
 
@@ -107,33 +109,34 @@ public class ThriftProtocolDetection
             return;
         }
 
-        Optional<TProtocolFactory> protocolFactory = detectProtocolFactory(magic2);
-        if (!protocolFactory.isPresent()) {
+        Optional<Protocol> protocol = detectProtocol(magic2);
+        if (!protocol.isPresent()) {
             in.clear();
             context.close();
             return;
         }
 
-        switchToFramedTransport(context, protocolFactory.get());
+        switchToFramedTransport(context, protocol.get());
     }
 
-    private static Optional<TProtocolFactory> detectProtocolFactory(int magic)
+    private static Optional<Protocol> detectProtocol(int magic)
     {
         if ((magic & BINARY_PROTOCOL_VERSION_MASK) == BINARY_PROTOCOL_VERSION_1) {
-            return Optional.of(new TBinaryProtocol.Factory());
+            return Optional.of(BINARY);
         }
         if ((magic & COMPACT_PROTOCOL_VERSION_MASK) == COMPACT_PROTOCOL_VERSION_1) {
-            return Optional.of(new TCompactProtocol.Factory());
+            return Optional.of(COMPACT);
         }
         if ((magic & COMPACT_PROTOCOL_VERSION_MASK) == COMPACT_PROTOCOL_VERSION_2) {
-            return Optional.of(new TFacebookCompactProtocol.Factory());
+            return Optional.of(COMPACT);
         }
         return Optional.empty();
     }
 
-    private void switchToUnframedTransport(ChannelHandlerContext context, TProtocolFactory protocolFactory)
+    private void switchToUnframedTransport(ChannelHandlerContext context, Protocol protocol)
     {
         ChannelPipeline pipeline = context.pipeline();
+        TProtocolFactory protocolFactory = protocol.createProtocolFactory(UNFRAMED);
         new NoMessageFraming(protocolFactory, maxFrameSize).addFrameHandlers(pipeline);
         pipeline.addLast(new SimpleFrameCodec(protocolFactory, assumeClientsSupportOutOfOrderResponses));
         pipeline.addLast(new ResponseOrderingHandler());
@@ -143,11 +146,11 @@ public class ThriftProtocolDetection
         pipeline.remove(this);
     }
 
-    private void switchToFramedTransport(ChannelHandlerContext context, TProtocolFactory protocolFactory)
+    private void switchToFramedTransport(ChannelHandlerContext context, Protocol protocol)
     {
         ChannelPipeline pipeline = context.pipeline();
         new LengthPrefixedMessageFraming(maxFrameSize).addFrameHandlers(pipeline);
-        pipeline.addLast(new SimpleFrameCodec(protocolFactory, assumeClientsSupportOutOfOrderResponses));
+        pipeline.addLast(new SimpleFrameCodec(protocol.createProtocolFactory(FRAMED), assumeClientsSupportOutOfOrderResponses));
         pipeline.addLast(new ResponseOrderingHandler());
         pipeline.addLast(thriftServerHandler);
 

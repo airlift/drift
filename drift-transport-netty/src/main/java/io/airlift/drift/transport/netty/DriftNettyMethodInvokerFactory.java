@@ -17,13 +17,9 @@ package io.airlift.drift.transport.netty;
 
 import com.google.common.net.HostAndPort;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import io.airlift.drift.protocol.TBinaryProtocol;
-import io.airlift.drift.protocol.TCompactProtocol;
-import io.airlift.drift.protocol.TFacebookCompactProtocol;
 import io.airlift.drift.protocol.TProtocolFactory;
 import io.airlift.drift.transport.MethodInvoker;
 import io.airlift.drift.transport.MethodInvokerFactory;
-import io.airlift.drift.transport.netty.DriftNettyClientConfig.Transport;
 import io.airlift.units.Duration;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -81,23 +77,7 @@ public class DriftNettyMethodInvokerFactory<I>
             clientConfig.setSocksProxy(defaultSocksProxy);
         }
 
-        TProtocolFactory protocolFactory;
-        switch (clientConfig.getProtocol()) {
-            case BINARY:
-                protocolFactory = new TBinaryProtocol.Factory();
-                break;
-            case COMPACT:
-                // Header transport uses the FB fork of the compact protocol
-                if (clientConfig.getTransport() == Transport.HEADER) {
-                    protocolFactory = new TFacebookCompactProtocol.Factory();
-                }
-                else {
-                    protocolFactory = new TCompactProtocol.Factory();
-                }
-                break;
-            default:
-                throw new IllegalArgumentException("Unknown protocol: " + clientConfig.getProtocol());
-        }
+        TProtocolFactory protocolFactory = clientConfig.getProtocol().createProtocolFactory(clientConfig.getTransport());
 
         MessageFraming messageFraming;
         MessageEncoding messageEncoding;
