@@ -47,6 +47,7 @@ import static com.google.common.util.concurrent.MoreExecutors.shutdownAndAwaitTe
 import static io.airlift.concurrent.Threads.daemonThreadsNamed;
 import static io.airlift.drift.transport.apache.PemReader.loadKeyStore;
 import static io.airlift.drift.transport.apache.PemReader.loadTrustStore;
+import static java.lang.Math.toIntExact;
 import static java.util.Objects.requireNonNull;
 import static java.util.concurrent.Executors.newCachedThreadPool;
 import static java.util.concurrent.Executors.newScheduledThreadPool;
@@ -106,7 +107,7 @@ public class ApacheThriftMethodInvokerFactory<I>
                 transportFactory = new TTransportFactory();
                 break;
             case FRAMED:
-                transportFactory = new TFramedTransport.Factory();
+                transportFactory = new TFramedTransport.Factory(toIntExact(config.getMaxFrameSize().toBytes()));
                 break;
             default:
                 throw new IllegalArgumentException("Unknown transport: " + config.getTransport());

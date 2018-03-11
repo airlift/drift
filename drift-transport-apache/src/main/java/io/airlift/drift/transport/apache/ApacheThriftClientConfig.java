@@ -48,7 +48,6 @@ public class ApacheThriftClientConfig
     private Transport transport = FRAMED;
     private Protocol protocol = BINARY;
     private DataSize maxFrameSize = new DataSize(16, MEGABYTE);
-    private DataSize maxStringSize = new DataSize(16, MEGABYTE);
 
     private Duration connectTimeout = new Duration(500, MILLISECONDS);
     private Duration requestTimeout = new Duration(1, MINUTES);
@@ -136,19 +135,6 @@ public class ApacheThriftClientConfig
     public ApacheThriftClientConfig setMaxFrameSize(DataSize maxFrameSize)
     {
         this.maxFrameSize = maxFrameSize;
-        return this;
-    }
-
-    @MaxDataSize("1023MB")
-    public DataSize getMaxStringSize()
-    {
-        return maxStringSize;
-    }
-
-    @Config("thrift.client.max-string-size")
-    public ApacheThriftClientConfig setMaxStringSize(DataSize maxFrameSize)
-    {
-        this.maxStringSize = maxFrameSize;
         return this;
     }
 
