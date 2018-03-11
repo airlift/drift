@@ -17,7 +17,6 @@ package io.airlift.drift.transport.netty;
 
 import com.google.common.net.HostAndPort;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import io.airlift.drift.protocol.TProtocolFactory;
 import io.airlift.drift.transport.MethodInvoker;
 import io.airlift.drift.transport.MethodInvokerFactory;
 import io.airlift.units.Duration;
@@ -77,26 +76,7 @@ public class DriftNettyMethodInvokerFactory<I>
             clientConfig.setSocksProxy(defaultSocksProxy);
         }
 
-        TProtocolFactory protocolFactory = clientConfig.getProtocol().createProtocolFactory(clientConfig.getTransport());
-
-        MessageFraming messageFraming;
-        MessageEncoding messageEncoding;
-        switch (clientConfig.getTransport()) {
-            case UNFRAMED:
-                messageFraming = new NoMessageFraming(protocolFactory, clientConfig.getMaxFrameSize());
-                messageEncoding = new SimpleMessageEncoding(protocolFactory);
-                break;
-            case FRAMED:
-                messageFraming = new LengthPrefixedMessageFraming(clientConfig.getMaxFrameSize());
-                messageEncoding = new SimpleMessageEncoding(protocolFactory);
-                break;
-            case HEADER:
-                messageFraming = new LengthPrefixedMessageFraming(clientConfig.getMaxFrameSize());
-                messageEncoding = new HeaderMessageEncoding(protocolFactory);
-                break;
-            default:
-                throw new IllegalArgumentException("Unknown transport: " + clientConfig.getTransport());
-        }
+        MessageEncoding messageEncoding = clientConfig.getTransport().createMessageEncoding(clientConfig.getProtocol());
 
         Optional<Supplier<SslContext>> sslContext = Optional.empty();
         if (clientConfig.isSslEnabled()) {
@@ -115,7 +95,9 @@ public class DriftNettyMethodInvokerFactory<I>
 
         ConnectionManager connectionManager = new ConnectionFactory(
                 group,
-                messageFraming,
+                clientConfig.getTransport(),
+                clientConfig.getProtocol(),
+                clientConfig.getMaxFrameSize(),
                 messageEncoding,
                 sslContext,
                 clientConfig);

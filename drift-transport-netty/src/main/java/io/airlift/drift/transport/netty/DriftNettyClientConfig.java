@@ -29,8 +29,8 @@ import javax.validation.constraints.NotNull;
 import java.io.File;
 import java.util.List;
 
-import static io.airlift.drift.transport.netty.DriftNettyClientConfig.Transport.FRAMED;
 import static io.airlift.drift.transport.netty.Protocol.BINARY;
+import static io.airlift.drift.transport.netty.Transport.FRAMED;
 import static io.airlift.units.DataSize.Unit.MEGABYTE;
 import static java.util.Objects.requireNonNull;
 import static java.util.concurrent.TimeUnit.DAYS;
@@ -39,11 +39,6 @@ import static java.util.concurrent.TimeUnit.MINUTES;
 
 public class DriftNettyClientConfig
 {
-    public enum Transport
-    {
-        UNFRAMED, FRAMED, HEADER
-    }
-
     private Transport transport = FRAMED;
     private Protocol protocol = BINARY;
     private DataSize maxFrameSize = new DataSize(16, MEGABYTE);

@@ -29,8 +29,8 @@ import io.airlift.drift.transport.apache.ApacheThriftClientConfig;
 import io.airlift.drift.transport.apache.ApacheThriftClientModule;
 import io.airlift.drift.transport.apache.ApacheThriftConnectionFactoryConfig;
 import io.airlift.drift.transport.apache.ApacheThriftMethodInvokerFactory;
-import io.airlift.drift.transport.netty.DriftNettyClientConfig.Transport;
 import io.airlift.drift.transport.netty.Protocol;
+import io.airlift.drift.transport.netty.Transport;
 
 import java.util.List;
 import java.util.Optional;
@@ -43,7 +43,7 @@ import static io.airlift.drift.integration.ClientTestUtils.DRIFT_OK;
 import static io.airlift.drift.integration.ClientTestUtils.HEADER_VALUE;
 import static io.airlift.drift.integration.ClientTestUtils.logDriftClientBinder;
 import static io.airlift.drift.transport.apache.ApacheThriftMethodInvokerFactory.createStaticApacheThriftMethodInvokerFactory;
-import static io.airlift.drift.transport.netty.DriftNettyClientConfig.Transport.HEADER;
+import static io.airlift.drift.transport.netty.Transport.HEADER;
 import static org.testng.Assert.assertEquals;
 
 final class ApacheThriftTesterUtil

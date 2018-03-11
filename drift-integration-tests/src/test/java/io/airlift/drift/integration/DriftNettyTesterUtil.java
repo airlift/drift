@@ -26,11 +26,11 @@ import io.airlift.drift.integration.scribe.drift.DriftLogEntry;
 import io.airlift.drift.integration.scribe.drift.DriftScribe;
 import io.airlift.drift.transport.DriftClientConfig;
 import io.airlift.drift.transport.netty.DriftNettyClientConfig;
-import io.airlift.drift.transport.netty.DriftNettyClientConfig.Transport;
 import io.airlift.drift.transport.netty.DriftNettyClientModule;
 import io.airlift.drift.transport.netty.DriftNettyConnectionFactoryConfig;
 import io.airlift.drift.transport.netty.DriftNettyMethodInvokerFactory;
 import io.airlift.drift.transport.netty.Protocol;
+import io.airlift.drift.transport.netty.Transport;
 
 import java.util.List;
 import java.util.Optional;

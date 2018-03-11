@@ -20,8 +20,8 @@ import com.google.common.net.HostAndPort;
 import io.airlift.drift.client.MethodInvocationFilter;
 import io.airlift.drift.integration.scribe.apache.ScribeService;
 import io.airlift.drift.integration.scribe.apache.scribe;
-import io.airlift.drift.transport.netty.DriftNettyClientConfig.Transport;
 import io.airlift.drift.transport.netty.Protocol;
+import io.airlift.drift.transport.netty.Transport;
 import org.apache.thrift.TProcessor;
 import org.apache.thrift.protocol.TBinaryProtocol;
 import org.apache.thrift.protocol.TCompactProtocol;
@@ -47,7 +47,7 @@ import static io.airlift.drift.integration.ApacheThriftTesterUtil.apacheThriftTe
 import static io.airlift.drift.integration.ClientTestUtils.MESSAGES;
 import static io.airlift.drift.integration.DriftNettyTesterUtil.driftNettyTestClients;
 import static io.airlift.drift.integration.LegacyApacheThriftTesterUtil.legacyApacheThriftTestClients;
-import static io.airlift.drift.transport.netty.DriftNettyClientConfig.Transport.HEADER;
+import static io.airlift.drift.transport.netty.Transport.HEADER;
 import static java.util.Collections.nCopies;
 import static org.testng.Assert.assertEquals;
 

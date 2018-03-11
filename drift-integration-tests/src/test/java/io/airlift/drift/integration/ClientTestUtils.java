@@ -33,8 +33,8 @@ import io.airlift.drift.integration.scribe.drift.DriftLogEntry;
 import io.airlift.drift.integration.scribe.drift.DriftResultCode;
 import io.airlift.drift.integration.scribe.drift.DriftScribe;
 import io.airlift.drift.transport.apache.PemReader;
-import io.airlift.drift.transport.netty.DriftNettyClientConfig.Transport;
 import io.airlift.drift.transport.netty.Protocol;
+import io.airlift.drift.transport.netty.Transport;
 import io.airlift.jmx.testing.TestingJmxModule;
 import org.weakref.jmx.guice.MBeanModule;
 

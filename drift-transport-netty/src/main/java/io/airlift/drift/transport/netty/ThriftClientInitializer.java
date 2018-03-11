@@ -16,6 +16,7 @@
 package io.airlift.drift.transport.netty;
 
 import com.google.common.net.HostAndPort;
+import io.airlift.units.DataSize;
 import io.airlift.units.Duration;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
@@ -30,20 +31,26 @@ import java.util.function.Supplier;
 class ThriftClientInitializer
         extends ChannelInitializer<SocketChannel>
 {
-    private final MessageFraming messageFraming;
+    private final Transport transport;
+    private final Protocol protocol;
+    private final DataSize maxFrameSize;
     private final Duration requestTimeout;
     private final MessageEncoding messageEncoding;
     private final Optional<HostAndPort> socksProxyAddress;
     private final Optional<Supplier<SslContext>> sslContextSupplier;
 
     public ThriftClientInitializer(
-            MessageFraming messageFraming,
+            Transport transport,
+            Protocol protocol,
+            DataSize maxFrameSize,
             MessageEncoding messageEncoding,
             Duration requestTimeout,
             Optional<HostAndPort> socksProxyAddress,
             Optional<Supplier<SslContext>> sslContextSupplier)
     {
-        this.messageFraming = messageFraming;
+        this.transport = transport;
+        this.protocol = protocol;
+        this.maxFrameSize = maxFrameSize;
         this.requestTimeout = requestTimeout;
         this.messageEncoding = messageEncoding;
         this.socksProxyAddress = socksProxyAddress;
@@ -59,7 +66,7 @@ class ThriftClientInitializer
 
         sslContextSupplier.ifPresent(sslContext -> pipeline.addLast(sslContext.get().newHandler(channel.alloc())));
 
-        messageFraming.addFrameHandlers(pipeline);
+        transport.addFrameHandlers(pipeline, Optional.of(protocol), maxFrameSize);
 
         pipeline.addLast(new ThriftClientHandler(requestTimeout, messageEncoding));
     }

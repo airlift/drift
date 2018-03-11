@@ -17,6 +17,7 @@ package io.airlift.drift.transport.netty;
 
 import com.google.common.net.HostAndPort;
 import io.airlift.drift.protocol.TTransportException;
+import io.airlift.units.DataSize;
 import io.airlift.units.Duration;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
@@ -40,7 +41,9 @@ class ConnectionFactory
         implements ConnectionManager
 {
     private final EventLoopGroup group;
-    private final MessageFraming messageFraming;
+    private final Transport transport;
+    private final Protocol protocol;
+    private final DataSize maxFrameSize;
     private final MessageEncoding messageEncoding;
     private final Optional<Supplier<SslContext>> sslContextSupplier;
 
@@ -50,13 +53,17 @@ class ConnectionFactory
 
     ConnectionFactory(
             EventLoopGroup group,
-            MessageFraming messageFraming,
+            Transport transport,
+            Protocol protocol,
+            DataSize maxFrameSize,
             MessageEncoding messageEncoding,
             Optional<Supplier<SslContext>> sslContextSupplier,
             DriftNettyClientConfig clientConfig)
     {
         this.group = requireNonNull(group, "group is null");
-        this.messageFraming = requireNonNull(messageFraming, "messageFraming is null");
+        this.transport = requireNonNull(transport, "transport is null");
+        this.protocol = requireNonNull(protocol, "protocol is null");
+        this.maxFrameSize = requireNonNull(maxFrameSize, "maxFrameSize is null");
         this.messageEncoding = requireNonNull(messageEncoding, "messageEncoding is null");
         this.sslContextSupplier = requireNonNull(sslContextSupplier, "sslContextSupplier is null");
 
@@ -75,7 +82,9 @@ class ConnectionFactory
                     .channel(NioSocketChannel.class)
                     .option(CONNECT_TIMEOUT_MILLIS, saturatedCast(connectTimeout.toMillis()))
                     .handler(new ThriftClientInitializer(
-                            messageFraming,
+                            transport,
+                            protocol,
+                            maxFrameSize,
                             messageEncoding,
                             requestTimeout,
                             socksProxy,

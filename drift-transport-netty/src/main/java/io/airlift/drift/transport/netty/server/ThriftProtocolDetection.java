@@ -16,9 +16,6 @@
 package io.airlift.drift.transport.netty.server;
 
 import com.google.common.primitives.Ints;
-import io.airlift.drift.protocol.TProtocolFactory;
-import io.airlift.drift.transport.netty.LengthPrefixedMessageFraming;
-import io.airlift.drift.transport.netty.NoMessageFraming;
 import io.airlift.drift.transport.netty.Protocol;
 import io.airlift.units.DataSize;
 import io.netty.buffer.ByteBuf;
@@ -29,10 +26,11 @@ import io.netty.handler.codec.ByteToMessageDecoder;
 import java.util.List;
 import java.util.Optional;
 
-import static io.airlift.drift.transport.netty.DriftNettyClientConfig.Transport.FRAMED;
-import static io.airlift.drift.transport.netty.DriftNettyClientConfig.Transport.UNFRAMED;
 import static io.airlift.drift.transport.netty.Protocol.BINARY;
 import static io.airlift.drift.transport.netty.Protocol.COMPACT;
+import static io.airlift.drift.transport.netty.Transport.FRAMED;
+import static io.airlift.drift.transport.netty.Transport.HEADER;
+import static io.airlift.drift.transport.netty.Transport.UNFRAMED;
 import static java.util.Objects.requireNonNull;
 
 public class ThriftProtocolDetection
@@ -136,9 +134,8 @@ public class ThriftProtocolDetection
     private void switchToUnframedTransport(ChannelHandlerContext context, Protocol protocol)
     {
         ChannelPipeline pipeline = context.pipeline();
-        TProtocolFactory protocolFactory = protocol.createProtocolFactory(UNFRAMED);
-        new NoMessageFraming(protocolFactory, maxFrameSize).addFrameHandlers(pipeline);
-        pipeline.addLast(new SimpleFrameCodec(protocolFactory, assumeClientsSupportOutOfOrderResponses));
+        UNFRAMED.addFrameHandlers(pipeline, Optional.of(protocol), maxFrameSize);
+        pipeline.addLast(new SimpleFrameCodec(protocol.createProtocolFactory(UNFRAMED), assumeClientsSupportOutOfOrderResponses));
         pipeline.addLast(new ResponseOrderingHandler());
         pipeline.addLast(thriftServerHandler);
 
@@ -149,7 +146,7 @@ public class ThriftProtocolDetection
     private void switchToFramedTransport(ChannelHandlerContext context, Protocol protocol)
     {
         ChannelPipeline pipeline = context.pipeline();
-        new LengthPrefixedMessageFraming(maxFrameSize).addFrameHandlers(pipeline);
+        FRAMED.addFrameHandlers(pipeline, Optional.of(protocol), maxFrameSize);
         pipeline.addLast(new SimpleFrameCodec(protocol.createProtocolFactory(FRAMED), assumeClientsSupportOutOfOrderResponses));
         pipeline.addLast(new ResponseOrderingHandler());
         pipeline.addLast(thriftServerHandler);
@@ -161,7 +158,7 @@ public class ThriftProtocolDetection
     private void switchToHeaderTransport(ChannelHandlerContext context)
     {
         ChannelPipeline pipeline = context.pipeline();
-        new LengthPrefixedMessageFraming(maxFrameSize).addFrameHandlers(pipeline);
+        HEADER.addFrameHandlers(pipeline, Optional.empty(), maxFrameSize);
         pipeline.addLast(new HeaderCodec());
         pipeline.addLast(new ResponseOrderingHandler());
         pipeline.addLast(thriftServerHandler);

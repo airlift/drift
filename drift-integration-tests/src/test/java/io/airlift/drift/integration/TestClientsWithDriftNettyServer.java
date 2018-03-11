@@ -25,8 +25,8 @@ import io.airlift.drift.integration.scribe.drift.DriftScribeService;
 import io.airlift.drift.server.DriftServer;
 import io.airlift.drift.server.DriftService;
 import io.airlift.drift.server.stats.NullMethodInvocationStatsFactory;
-import io.airlift.drift.transport.netty.DriftNettyClientConfig.Transport;
 import io.airlift.drift.transport.netty.Protocol;
+import io.airlift.drift.transport.netty.Transport;
 import io.airlift.drift.transport.netty.server.DriftNettyServerConfig;
 import io.airlift.drift.transport.netty.server.DriftNettyServerTransport;
 import io.airlift.drift.transport.netty.server.DriftNettyServerTransportFactory;
@@ -43,7 +43,7 @@ import static io.airlift.drift.integration.ClientTestUtils.DRIFT_MESSAGES;
 import static io.airlift.drift.integration.ClientTestUtils.HEADER_VALUE;
 import static io.airlift.drift.integration.DriftNettyTesterUtil.driftNettyTestClients;
 import static io.airlift.drift.integration.LegacyApacheThriftTesterUtil.legacyApacheThriftTestClients;
-import static io.airlift.drift.transport.netty.DriftNettyClientConfig.Transport.HEADER;
+import static io.airlift.drift.transport.netty.Transport.HEADER;
 import static java.util.Collections.nCopies;
 import static org.testng.Assert.assertEquals;
 
