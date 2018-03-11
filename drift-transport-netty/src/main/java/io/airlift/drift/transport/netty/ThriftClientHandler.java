@@ -31,9 +31,9 @@ import io.netty.util.concurrent.ScheduledFuture;
 
 import javax.annotation.concurrent.ThreadSafe;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -95,12 +95,21 @@ public class ThriftClientHandler
             }
         }
 
+        // if this connection is failed, immediately fail the request
+        TException channelError = this.channelError.get();
+        if (channelError != null) {
+            thriftRequest.failed(channelError);
+            requestBuffer.release();
+            return;
+        }
+
         try {
             ChannelFuture sendFuture = context.write(requestBuffer, promise);
             sendFuture.addListener(future -> messageSent(context, sendFuture, requestHandler));
         }
         catch (Throwable t) {
-            onError(context, t);
+            onError(context, t, Optional.of(requestHandler));
+            requestBuffer.release();
         }
     }
 
@@ -108,14 +117,14 @@ public class ThriftClientHandler
     {
         try {
             if (!future.isSuccess()) {
-                onError(context, new TTransportException("Sending request failed", future.cause()));
+                onError(context, new TTransportException("Sending request failed", future.cause()), Optional.of(requestHandler));
                 return;
             }
 
             requestHandler.onRequestSent();
         }
         catch (Throwable t) {
-            onError(context, t);
+            onError(context, t, Optional.of(requestHandler));
         }
     }
 
@@ -135,13 +144,14 @@ public class ThriftClientHandler
 
     private void messageReceived(ChannelHandlerContext context, ByteBuf response)
     {
+        RequestHandler requestHandler = null;
         try {
             OptionalInt sequenceId = messageEncoding.extractResponseSequenceId(response.retainedDuplicate());
             if (!sequenceId.isPresent()) {
                 throw new TTransportException("Could not find sequenceId in Thrift message");
             }
 
-            RequestHandler requestHandler = pendingRequests.remove(sequenceId.getAsInt());
+            requestHandler = pendingRequests.remove(sequenceId.getAsInt());
             if (requestHandler == null) {
                 throw new TTransportException("Unknown sequence id in response: " + sequenceId.getAsInt());
             }
@@ -149,7 +159,7 @@ public class ThriftClientHandler
             requestHandler.onResponseReceived(response.retainedDuplicate());
         }
         catch (Throwable t) {
-            onError(context, t);
+            onError(context, t, Optional.ofNullable(requestHandler));
         }
         finally {
             response.release();
@@ -159,19 +169,17 @@ public class ThriftClientHandler
     @Override
     public void exceptionCaught(ChannelHandlerContext context, Throwable cause)
     {
-        onError(context, cause);
+        onError(context, cause, Optional.empty());
     }
 
     @Override
     public void channelInactive(ChannelHandlerContext context)
             throws Exception
     {
-        if (!pendingRequests.isEmpty()) {
-            onError(context, new TTransportException("Client was disconnected by server"));
-        }
+        onError(context, new TTransportException("Client was disconnected by server"), Optional.empty());
     }
 
-    private void onError(ChannelHandlerContext context, Throwable throwable)
+    private void onError(ChannelHandlerContext context, Throwable throwable, Optional<RequestHandler> currentRequest)
     {
         TException thriftException;
         if (throwable instanceof TException) {
@@ -187,13 +195,20 @@ public class ThriftClientHandler
             return;
         }
 
+        // current request may have already been removed from pendingRequests, so notify it directly
+        currentRequest.ifPresent(request -> {
+            pendingRequests.remove(request.getSequenceId());
+            request.onChannelError(thriftException);
+        });
+
         // notify all pending requests of the error
+        // Note while loop should not be necessary since this class should be single
+        // threaded, but it is better to be safe in cleanup code
         while (!pendingRequests.isEmpty()) {
-            for (Iterator<RequestHandler> iterator = pendingRequests.values().iterator(); iterator.hasNext(); ) {
-                RequestHandler requestHandler = iterator.next();
-                iterator.remove();
-                requestHandler.onChannelError(thriftException);
-            }
+            pendingRequests.values().removeIf(request -> {
+                request.onChannelError(thriftException);
+                return true;
+            });
         }
 
         context.close();
@@ -256,6 +271,11 @@ public class ThriftClientHandler
         {
             this.thriftRequest = thriftRequest;
             this.sequenceId = sequenceId;
+        }
+
+        public int getSequenceId()
+        {
+            return sequenceId;
         }
 
         void registerRequestTimeout(EventExecutor executor)
