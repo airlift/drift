@@ -80,28 +80,28 @@ public class ThriftFrame
     }
 
     @Override
-    public ReferenceCounted retain()
+    public ThriftFrame retain()
     {
         message.retain();
         return this;
     }
 
     @Override
-    public ReferenceCounted retain(int increment)
+    public ThriftFrame retain(int increment)
     {
         message.retain(increment);
         return this;
     }
 
     @Override
-    public ReferenceCounted touch()
+    public ThriftFrame touch()
     {
         message.touch();
         return this;
     }
 
     @Override
-    public ReferenceCounted touch(Object hint)
+    public ThriftFrame touch(Object hint)
     {
         message.touch(hint);
         return this;

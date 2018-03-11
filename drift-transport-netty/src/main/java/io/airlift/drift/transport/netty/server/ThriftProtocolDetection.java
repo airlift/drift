@@ -17,6 +17,7 @@ package io.airlift.drift.transport.netty.server;
 
 import com.google.common.primitives.Ints;
 import io.airlift.drift.transport.netty.Protocol;
+import io.airlift.drift.transport.netty.Transport;
 import io.airlift.units.DataSize;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
@@ -92,7 +93,7 @@ public class ThriftProtocolDetection
                 return;
             }
 
-            switchToUnframedTransport(context, protocol.get());
+            switchToTransport(context, UNFRAMED, Optional.of(protocol.get()));
             return;
         }
 
@@ -103,7 +104,7 @@ public class ThriftProtocolDetection
 
         int magic2 = in.getInt(in.readerIndex() + 4);
         if ((magic2 & HEADER_MAGIC_MASK) == HEADER_MAGIC) {
-            switchToHeaderTransport(context);
+            switchToTransport(context, HEADER, Optional.empty());
             return;
         }
 
@@ -114,7 +115,7 @@ public class ThriftProtocolDetection
             return;
         }
 
-        switchToFramedTransport(context, protocol.get());
+        switchToTransport(context, FRAMED, Optional.of(protocol.get()));
     }
 
     private static Optional<Protocol> detectProtocol(int magic)
@@ -131,35 +132,10 @@ public class ThriftProtocolDetection
         return Optional.empty();
     }
 
-    private void switchToUnframedTransport(ChannelHandlerContext context, Protocol protocol)
+    private void switchToTransport(ChannelHandlerContext context, Transport transport, Optional<Protocol> protocol)
     {
         ChannelPipeline pipeline = context.pipeline();
-        UNFRAMED.addFrameHandlers(pipeline, Optional.of(protocol), maxFrameSize);
-        pipeline.addLast(new SimpleFrameCodec(protocol.createProtocolFactory(UNFRAMED), assumeClientsSupportOutOfOrderResponses));
-        pipeline.addLast(new ResponseOrderingHandler());
-        pipeline.addLast(thriftServerHandler);
-
-        // remove(this) must be last because it triggers downstream processing of the current message
-        pipeline.remove(this);
-    }
-
-    private void switchToFramedTransport(ChannelHandlerContext context, Protocol protocol)
-    {
-        ChannelPipeline pipeline = context.pipeline();
-        FRAMED.addFrameHandlers(pipeline, Optional.of(protocol), maxFrameSize);
-        pipeline.addLast(new SimpleFrameCodec(protocol.createProtocolFactory(FRAMED), assumeClientsSupportOutOfOrderResponses));
-        pipeline.addLast(new ResponseOrderingHandler());
-        pipeline.addLast(thriftServerHandler);
-
-        // remove(this) must be last because it triggers downstream processing of the current message
-        pipeline.remove(this);
-    }
-
-    private void switchToHeaderTransport(ChannelHandlerContext context)
-    {
-        ChannelPipeline pipeline = context.pipeline();
-        HEADER.addFrameHandlers(pipeline, Optional.empty(), maxFrameSize);
-        pipeline.addLast(new HeaderCodec());
+        transport.addFrameHandlers(pipeline, protocol, maxFrameSize, assumeClientsSupportOutOfOrderResponses);
         pipeline.addLast(new ResponseOrderingHandler());
         pipeline.addLast(thriftServerHandler);
 

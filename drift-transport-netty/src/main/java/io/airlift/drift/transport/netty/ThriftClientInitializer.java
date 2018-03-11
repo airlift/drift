@@ -35,7 +35,6 @@ class ThriftClientInitializer
     private final Protocol protocol;
     private final DataSize maxFrameSize;
     private final Duration requestTimeout;
-    private final MessageEncoding messageEncoding;
     private final Optional<HostAndPort> socksProxyAddress;
     private final Optional<Supplier<SslContext>> sslContextSupplier;
 
@@ -43,7 +42,6 @@ class ThriftClientInitializer
             Transport transport,
             Protocol protocol,
             DataSize maxFrameSize,
-            MessageEncoding messageEncoding,
             Duration requestTimeout,
             Optional<HostAndPort> socksProxyAddress,
             Optional<Supplier<SslContext>> sslContextSupplier)
@@ -52,7 +50,6 @@ class ThriftClientInitializer
         this.protocol = protocol;
         this.maxFrameSize = maxFrameSize;
         this.requestTimeout = requestTimeout;
-        this.messageEncoding = messageEncoding;
         this.socksProxyAddress = socksProxyAddress;
         this.sslContextSupplier = sslContextSupplier;
     }
@@ -66,8 +63,8 @@ class ThriftClientInitializer
 
         sslContextSupplier.ifPresent(sslContext -> pipeline.addLast(sslContext.get().newHandler(channel.alloc())));
 
-        transport.addFrameHandlers(pipeline, Optional.of(protocol), maxFrameSize);
+        transport.addFrameHandlers(pipeline, Optional.of(protocol), maxFrameSize, true);
 
-        pipeline.addLast(new ThriftClientHandler(requestTimeout, messageEncoding));
+        pipeline.addLast(new ThriftClientHandler(requestTimeout, protocol.createProtocolFactory(transport)));
     }
 }

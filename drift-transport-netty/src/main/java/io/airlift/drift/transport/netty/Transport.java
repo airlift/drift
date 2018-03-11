@@ -16,6 +16,8 @@
 package io.airlift.drift.transport.netty;
 
 import io.airlift.drift.protocol.TProtocolFactory;
+import io.airlift.drift.transport.netty.server.HeaderCodec;
+import io.airlift.drift.transport.netty.server.SimpleFrameCodec;
 import io.airlift.units.DataSize;
 import io.netty.channel.ChannelPipeline;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
@@ -29,48 +31,32 @@ public enum Transport
 {
     UNFRAMED {
         @Override
-        public void addFrameHandlers(ChannelPipeline pipeline, Optional<Protocol> protocol, DataSize maxFrameSize)
+        public void addFrameHandlers(ChannelPipeline pipeline, Optional<Protocol> protocol, DataSize maxFrameSize, boolean assumeClientsSupportOutOfOrderResponses)
         {
             TProtocolFactory protocolFactory = protocol.get().createProtocolFactory(this);
             pipeline.addLast("thriftUnframedDecoder", new ThriftUnframedDecoder(protocolFactory, maxFrameSize));
-        }
-
-        @Override
-        public MessageEncoding createMessageEncoding(Protocol protocol)
-        {
-            return new SimpleMessageEncoding(protocol.createProtocolFactory(this));
+            pipeline.addLast(new SimpleFrameCodec(protocolFactory, assumeClientsSupportOutOfOrderResponses));
         }
     },
     FRAMED {
         @Override
-        public void addFrameHandlers(ChannelPipeline pipeline, Optional<Protocol> protocol, DataSize maxFrameSize)
+        public void addFrameHandlers(ChannelPipeline pipeline, Optional<Protocol> protocol, DataSize maxFrameSize, boolean assumeClientsSupportOutOfOrderResponses)
         {
             pipeline.addLast("frameEncoder", new LengthFieldPrepender(Integer.BYTES));
             pipeline.addLast("frameDecoder", new LengthFieldBasedFrameDecoder(toIntExact(maxFrameSize.toBytes()), 0, Integer.BYTES, 0, Integer.BYTES));
-        }
-
-        @Override
-        public MessageEncoding createMessageEncoding(Protocol protocol)
-        {
-            return new SimpleMessageEncoding(protocol.createProtocolFactory(this));
+            TProtocolFactory protocolFactory = protocol.get().createProtocolFactory(this);
+            pipeline.addLast(new SimpleFrameCodec(protocolFactory, assumeClientsSupportOutOfOrderResponses));
         }
     },
     HEADER {
         @Override
-        public void addFrameHandlers(ChannelPipeline pipeline, Optional<Protocol> protocol, DataSize maxFrameSize)
+        public void addFrameHandlers(ChannelPipeline pipeline, Optional<Protocol> protocol, DataSize maxFrameSize, boolean assumeClientsSupportOutOfOrderResponses)
         {
             pipeline.addLast("frameEncoder", new LengthFieldPrepender(Integer.BYTES));
             pipeline.addLast("frameDecoder", new LengthFieldBasedFrameDecoder(toIntExact(maxFrameSize.toBytes()), 0, Integer.BYTES, 0, Integer.BYTES));
-        }
-
-        @Override
-        public MessageEncoding createMessageEncoding(Protocol protocol)
-        {
-            return new HeaderMessageEncoding(protocol.createProtocolFactory(this));
+            pipeline.addLast(new HeaderCodec());
         }
     };
 
-    public abstract void addFrameHandlers(ChannelPipeline pipeline, Optional<Protocol> protocol, DataSize maxFrameSize);
-
-    public abstract MessageEncoding createMessageEncoding(Protocol protocol);
+    public abstract void addFrameHandlers(ChannelPipeline pipeline, Optional<Protocol> protocol, DataSize maxFrameSize, boolean assumeClientsSupportOutOfOrderResponses);
 }

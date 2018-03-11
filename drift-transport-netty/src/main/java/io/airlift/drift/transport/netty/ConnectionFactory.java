@@ -44,7 +44,6 @@ class ConnectionFactory
     private final Transport transport;
     private final Protocol protocol;
     private final DataSize maxFrameSize;
-    private final MessageEncoding messageEncoding;
     private final Optional<Supplier<SslContext>> sslContextSupplier;
 
     private final Duration connectTimeout;
@@ -56,7 +55,6 @@ class ConnectionFactory
             Transport transport,
             Protocol protocol,
             DataSize maxFrameSize,
-            MessageEncoding messageEncoding,
             Optional<Supplier<SslContext>> sslContextSupplier,
             DriftNettyClientConfig clientConfig)
     {
@@ -64,7 +62,6 @@ class ConnectionFactory
         this.transport = requireNonNull(transport, "transport is null");
         this.protocol = requireNonNull(protocol, "protocol is null");
         this.maxFrameSize = requireNonNull(maxFrameSize, "maxFrameSize is null");
-        this.messageEncoding = requireNonNull(messageEncoding, "messageEncoding is null");
         this.sslContextSupplier = requireNonNull(sslContextSupplier, "sslContextSupplier is null");
 
         requireNonNull(clientConfig, "clientConfig is null");
@@ -85,7 +82,6 @@ class ConnectionFactory
                             transport,
                             protocol,
                             maxFrameSize,
-                            messageEncoding,
                             requestTimeout,
                             socksProxy,
                             sslContextSupplier));

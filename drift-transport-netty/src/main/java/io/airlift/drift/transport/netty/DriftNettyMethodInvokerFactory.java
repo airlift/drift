@@ -76,8 +76,6 @@ public class DriftNettyMethodInvokerFactory<I>
             clientConfig.setSocksProxy(defaultSocksProxy);
         }
 
-        MessageEncoding messageEncoding = clientConfig.getTransport().createMessageEncoding(clientConfig.getProtocol());
-
         Optional<Supplier<SslContext>> sslContext = Optional.empty();
         if (clientConfig.isSslEnabled()) {
             sslContext = Optional.of(sslContextFactory.get(
@@ -98,7 +96,6 @@ public class DriftNettyMethodInvokerFactory<I>
                 clientConfig.getTransport(),
                 clientConfig.getProtocol(),
                 clientConfig.getMaxFrameSize(),
-                messageEncoding,
                 sslContext,
                 clientConfig);
         if (clientConfig.isPoolEnabled()) {

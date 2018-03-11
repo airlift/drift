@@ -16,12 +16,13 @@
 package io.airlift.drift.transport.netty.server;
 
 import com.google.common.collect.ImmutableMap;
+import io.airlift.drift.protocol.TMessage;
 import io.airlift.drift.protocol.TProtocolFactory;
+import io.airlift.drift.transport.netty.TChannelBufferInputTransport;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPromise;
-import io.netty.handler.codec.EncoderException;
 
 import java.util.OptionalInt;
 
@@ -45,11 +46,11 @@ public class SimpleFrameCodec
             throws Exception
     {
         if (message instanceof ByteBuf) {
-            ByteBuf request = (ByteBuf) message;
-            if (request.isReadable()) {
+            ByteBuf buffer = (ByteBuf) message;
+            if (buffer.isReadable()) {
                 context.fireChannelRead(new ThriftFrame(
-                        OptionalInt.empty(),
-                        request,
+                        extractResponseSequenceId(buffer.retain()),
+                        buffer,
                         ImmutableMap.of(),
                         protocolFactory,
                         assumeClientsSupportOutOfOrderResponses));
@@ -57,6 +58,21 @@ public class SimpleFrameCodec
             }
         }
         context.fireChannelRead(message);
+    }
+
+    private OptionalInt extractResponseSequenceId(ByteBuf buffer)
+    {
+        TChannelBufferInputTransport inputTransport = new TChannelBufferInputTransport(buffer.duplicate());
+        try {
+            TMessage message = protocolFactory.getProtocol(inputTransport).readMessageBegin();
+            return OptionalInt.of(message.getSequenceId());
+        }
+        catch (Throwable ignored) {
+        }
+        finally {
+            inputTransport.release();
+        }
+        return OptionalInt.empty();
     }
 
     @Override
@@ -68,9 +84,7 @@ public class SimpleFrameCodec
             ThriftFrame thriftFrame = (ThriftFrame) message;
             try {
                 verify(thriftFrame.getSequenceId().isPresent(), "Sequence id not set in response frame");
-                if (!thriftFrame.getHeaders().isEmpty()) {
-                    throw new EncoderException("Headers are only supported in header transport");
-                }
+                // Note: simple transports do not support headers. This is acceptable since headers should be inconsequential to the request
                 message = thriftFrame.getMessage();
             }
             finally {
