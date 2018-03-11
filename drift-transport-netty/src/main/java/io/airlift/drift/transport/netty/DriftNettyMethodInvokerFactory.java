@@ -40,7 +40,6 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 import static io.airlift.drift.transport.netty.SslContextFactory.createSslContextFactory;
-import static java.lang.Math.toIntExact;
 import static java.util.Objects.requireNonNull;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
@@ -85,15 +84,15 @@ public class DriftNettyMethodInvokerFactory<I>
         TProtocolFactory protocolFactory;
         switch (clientConfig.getProtocol()) {
             case BINARY:
-                protocolFactory = new TBinaryProtocol.Factory(false, true, -1, clientConfig.getMaxFrameSize().toBytes());
+                protocolFactory = new TBinaryProtocol.Factory();
                 break;
             case COMPACT:
                 // Header transport uses the FB fork of the compact protocol
                 if (clientConfig.getTransport() == Transport.HEADER) {
-                    protocolFactory = new TFacebookCompactProtocol.Factory(toIntExact(clientConfig.getMaxFrameSize().toBytes()));
+                    protocolFactory = new TFacebookCompactProtocol.Factory();
                 }
                 else {
-                    protocolFactory = new TCompactProtocol.Factory(-1, clientConfig.getMaxFrameSize().toBytes());
+                    protocolFactory = new TCompactProtocol.Factory();
                 }
                 break;
             default:
