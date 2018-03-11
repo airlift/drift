@@ -16,8 +16,8 @@
 package io.airlift.drift.transport.netty.server;
 
 import com.google.common.primitives.Ints;
-import io.airlift.drift.transport.netty.Protocol;
-import io.airlift.drift.transport.netty.Transport;
+import io.airlift.drift.transport.netty.codec.Protocol;
+import io.airlift.drift.transport.netty.codec.Transport;
 import io.airlift.units.DataSize;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
@@ -27,11 +27,11 @@ import io.netty.handler.codec.ByteToMessageDecoder;
 import java.util.List;
 import java.util.Optional;
 
-import static io.airlift.drift.transport.netty.Protocol.BINARY;
-import static io.airlift.drift.transport.netty.Protocol.COMPACT;
-import static io.airlift.drift.transport.netty.Transport.FRAMED;
-import static io.airlift.drift.transport.netty.Transport.HEADER;
-import static io.airlift.drift.transport.netty.Transport.UNFRAMED;
+import static io.airlift.drift.transport.netty.codec.Protocol.BINARY;
+import static io.airlift.drift.transport.netty.codec.Protocol.COMPACT;
+import static io.airlift.drift.transport.netty.codec.Transport.FRAMED;
+import static io.airlift.drift.transport.netty.codec.Transport.HEADER;
+import static io.airlift.drift.transport.netty.codec.Transport.UNFRAMED;
 import static java.util.Objects.requireNonNull;
 
 public class ThriftProtocolDetection

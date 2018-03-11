@@ -24,11 +24,11 @@ import io.airlift.drift.TException;
 import io.airlift.drift.client.address.AddressSelector;
 import io.airlift.drift.client.stats.MethodInvocationStat;
 import io.airlift.drift.protocol.TTransportException;
-import io.airlift.drift.transport.Address;
-import io.airlift.drift.transport.DriftApplicationException;
-import io.airlift.drift.transport.InvokeRequest;
-import io.airlift.drift.transport.MethodInvoker;
 import io.airlift.drift.transport.MethodMetadata;
+import io.airlift.drift.transport.client.Address;
+import io.airlift.drift.transport.client.DriftApplicationException;
+import io.airlift.drift.transport.client.InvokeRequest;
+import io.airlift.drift.transport.client.MethodInvoker;
 import io.airlift.log.Logger;
 import io.airlift.units.Duration;
 

@@ -24,13 +24,13 @@ import io.airlift.drift.client.address.AddressSelector;
 import io.airlift.drift.integration.scribe.drift.DriftAsyncScribe;
 import io.airlift.drift.integration.scribe.drift.DriftLogEntry;
 import io.airlift.drift.integration.scribe.drift.DriftScribe;
-import io.airlift.drift.transport.DriftClientConfig;
-import io.airlift.drift.transport.netty.DriftNettyClientConfig;
-import io.airlift.drift.transport.netty.DriftNettyClientModule;
-import io.airlift.drift.transport.netty.DriftNettyConnectionFactoryConfig;
-import io.airlift.drift.transport.netty.DriftNettyMethodInvokerFactory;
-import io.airlift.drift.transport.netty.Protocol;
-import io.airlift.drift.transport.netty.Transport;
+import io.airlift.drift.transport.client.DriftClientConfig;
+import io.airlift.drift.transport.netty.client.DriftNettyClientConfig;
+import io.airlift.drift.transport.netty.client.DriftNettyClientModule;
+import io.airlift.drift.transport.netty.client.DriftNettyConnectionFactoryConfig;
+import io.airlift.drift.transport.netty.client.DriftNettyMethodInvokerFactory;
+import io.airlift.drift.transport.netty.codec.Protocol;
+import io.airlift.drift.transport.netty.codec.Transport;
 
 import java.util.List;
 import java.util.Optional;
@@ -42,7 +42,7 @@ import static io.airlift.drift.integration.ClientTestUtils.DRIFT_MESSAGES;
 import static io.airlift.drift.integration.ClientTestUtils.DRIFT_OK;
 import static io.airlift.drift.integration.ClientTestUtils.HEADER_VALUE;
 import static io.airlift.drift.integration.ClientTestUtils.logDriftClientBinder;
-import static io.airlift.drift.transport.netty.DriftNettyMethodInvokerFactory.createStaticDriftNettyMethodInvokerFactory;
+import static io.airlift.drift.transport.netty.client.DriftNettyMethodInvokerFactory.createStaticDriftNettyMethodInvokerFactory;
 import static org.testng.Assert.assertEquals;
 
 final class DriftNettyTesterUtil

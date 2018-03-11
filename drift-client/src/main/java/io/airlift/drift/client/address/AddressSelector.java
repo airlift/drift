@@ -15,7 +15,7 @@
  */
 package io.airlift.drift.client.address;
 
-import io.airlift.drift.transport.Address;
+import io.airlift.drift.transport.client.Address;
 
 import java.util.Optional;
 

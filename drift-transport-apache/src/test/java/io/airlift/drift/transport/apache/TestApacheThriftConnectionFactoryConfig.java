@@ -17,6 +17,7 @@ package io.airlift.drift.transport.apache;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.net.HostAndPort;
+import io.airlift.drift.transport.apache.client.ApacheThriftConnectionFactoryConfig;
 import org.testng.annotations.Test;
 
 import java.util.Map;

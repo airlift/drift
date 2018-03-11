@@ -15,8 +15,8 @@
  */
 package io.airlift.drift.client;
 
-import io.airlift.drift.transport.ConnectionFailedException;
-import io.airlift.drift.transport.DriftClientConfig;
+import io.airlift.drift.transport.client.ConnectionFailedException;
+import io.airlift.drift.transport.client.DriftClientConfig;
 import io.airlift.units.Duration;
 
 import java.io.InterruptedIOException;

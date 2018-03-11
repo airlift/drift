@@ -19,7 +19,7 @@ import io.airlift.drift.client.address.AddressSelector;
 import io.airlift.drift.client.stats.MethodInvocationStatsFactory;
 import io.airlift.drift.client.stats.NullMethodInvocationStatsFactory;
 import io.airlift.drift.codec.ThriftCodecManager;
-import io.airlift.drift.transport.MethodInvokerFactory;
+import io.airlift.drift.transport.client.MethodInvokerFactory;
 
 import static java.util.Objects.requireNonNull;
 

@@ -17,7 +17,7 @@ package io.airlift.drift.transport.netty.server;
 
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.SettableFuture;
-import io.airlift.drift.transport.netty.SslContextFactory;
+import io.airlift.drift.transport.netty.ssl.SslContextFactory;
 import io.airlift.drift.transport.server.ServerMethodInvoker;
 import io.airlift.drift.transport.server.ServerTransport;
 import io.netty.bootstrap.ServerBootstrap;
@@ -36,7 +36,7 @@ import java.util.function.Supplier;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static io.airlift.concurrent.Threads.daemonThreadsNamed;
-import static io.airlift.drift.transport.netty.SslContextFactory.createSslContextFactory;
+import static io.airlift.drift.transport.netty.ssl.SslContextFactory.createSslContextFactory;
 import static io.netty.channel.ChannelOption.SO_BACKLOG;
 import static io.netty.channel.ChannelOption.SO_KEEPALIVE;
 import static java.util.Objects.requireNonNull;

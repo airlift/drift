@@ -21,9 +21,9 @@ import com.google.common.util.concurrent.ListenableFuture;
 import io.airlift.drift.client.address.AddressSelector;
 import io.airlift.drift.client.stats.MethodInvocationStat;
 import io.airlift.drift.codec.metadata.ThriftHeaderParameter;
-import io.airlift.drift.transport.Address;
-import io.airlift.drift.transport.MethodInvoker;
 import io.airlift.drift.transport.MethodMetadata;
+import io.airlift.drift.transport.client.Address;
+import io.airlift.drift.transport.client.MethodInvoker;
 
 import java.util.LinkedHashMap;
 import java.util.List;

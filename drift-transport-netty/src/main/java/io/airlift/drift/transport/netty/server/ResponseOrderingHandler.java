@@ -15,6 +15,7 @@
  */
 package io.airlift.drift.transport.netty.server;
 
+import io.airlift.drift.transport.netty.codec.ThriftFrame;
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPromise;

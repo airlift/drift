@@ -36,8 +36,8 @@ import io.airlift.drift.client.stats.JmxMethodInvocationStatsFactory;
 import io.airlift.drift.client.stats.MethodInvocationStatsFactory;
 import io.airlift.drift.client.stats.NullMethodInvocationStatsFactory;
 import io.airlift.drift.codec.ThriftCodecManager;
-import io.airlift.drift.transport.DriftClientConfig;
-import io.airlift.drift.transport.MethodInvokerFactory;
+import io.airlift.drift.transport.client.DriftClientConfig;
+import io.airlift.drift.transport.client.MethodInvokerFactory;
 import org.weakref.jmx.MBeanExporter;
 
 import javax.inject.Inject;

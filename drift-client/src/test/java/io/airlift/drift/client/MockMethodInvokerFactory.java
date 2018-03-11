@@ -16,7 +16,7 @@
 package io.airlift.drift.client;
 
 import com.google.common.util.concurrent.ListenableFuture;
-import io.airlift.drift.transport.MethodInvokerFactory;
+import io.airlift.drift.transport.client.MethodInvokerFactory;
 
 import java.util.function.Supplier;
 

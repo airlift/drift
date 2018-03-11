@@ -15,6 +15,7 @@
  */
 package io.airlift.drift.transport.apache;
 
+import io.airlift.drift.transport.apache.client.PemReader;
 import org.testng.annotations.Test;
 
 import java.io.File;

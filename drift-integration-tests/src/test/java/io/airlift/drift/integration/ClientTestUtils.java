@@ -32,9 +32,9 @@ import io.airlift.drift.integration.scribe.apache.LogEntry;
 import io.airlift.drift.integration.scribe.drift.DriftLogEntry;
 import io.airlift.drift.integration.scribe.drift.DriftResultCode;
 import io.airlift.drift.integration.scribe.drift.DriftScribe;
-import io.airlift.drift.transport.apache.PemReader;
-import io.airlift.drift.transport.netty.Protocol;
-import io.airlift.drift.transport.netty.Transport;
+import io.airlift.drift.transport.apache.client.PemReader;
+import io.airlift.drift.transport.netty.codec.Protocol;
+import io.airlift.drift.transport.netty.codec.Transport;
 import io.airlift.jmx.testing.TestingJmxModule;
 import org.weakref.jmx.guice.MBeanModule;
 
@@ -56,7 +56,7 @@ import java.util.stream.Collectors;
 
 import static io.airlift.drift.client.guice.DriftClientBinder.driftClientBinder;
 import static io.airlift.drift.client.guice.MethodInvocationFilterBinder.staticFilterBinder;
-import static io.airlift.drift.transport.apache.PemReader.loadTrustStore;
+import static io.airlift.drift.transport.apache.client.PemReader.loadTrustStore;
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.ElementType.PARAMETER;

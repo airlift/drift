@@ -17,8 +17,8 @@ package io.airlift.drift.integration;
 
 import com.google.common.util.concurrent.ListenableFuture;
 import io.airlift.drift.client.MethodInvocationFilter;
-import io.airlift.drift.transport.InvokeRequest;
-import io.airlift.drift.transport.MethodInvoker;
+import io.airlift.drift.transport.client.InvokeRequest;
+import io.airlift.drift.transport.client.MethodInvoker;
 
 import java.util.concurrent.atomic.AtomicInteger;
 

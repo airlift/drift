@@ -18,8 +18,8 @@ package io.airlift.drift.client;
 import com.google.common.collect.ImmutableList;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
-import io.airlift.drift.transport.InvokeRequest;
-import io.airlift.drift.transport.MethodInvoker;
+import io.airlift.drift.transport.client.InvokeRequest;
+import io.airlift.drift.transport.client.MethodInvoker;
 import io.airlift.testing.TestingTicker;
 import io.airlift.units.Duration;
 

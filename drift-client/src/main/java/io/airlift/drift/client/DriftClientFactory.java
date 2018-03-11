@@ -25,11 +25,11 @@ import io.airlift.drift.client.stats.NullMethodInvocationStatsFactory;
 import io.airlift.drift.codec.ThriftCodecManager;
 import io.airlift.drift.codec.metadata.ThriftMethodMetadata;
 import io.airlift.drift.codec.metadata.ThriftServiceMetadata;
-import io.airlift.drift.transport.Address;
-import io.airlift.drift.transport.DriftClientConfig;
-import io.airlift.drift.transport.MethodInvoker;
-import io.airlift.drift.transport.MethodInvokerFactory;
 import io.airlift.drift.transport.MethodMetadata;
+import io.airlift.drift.transport.client.Address;
+import io.airlift.drift.transport.client.DriftClientConfig;
+import io.airlift.drift.transport.client.MethodInvoker;
+import io.airlift.drift.transport.client.MethodInvokerFactory;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;

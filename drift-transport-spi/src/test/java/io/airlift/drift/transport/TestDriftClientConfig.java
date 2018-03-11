@@ -16,6 +16,7 @@
 package io.airlift.drift.transport;
 
 import com.google.common.collect.ImmutableMap;
+import io.airlift.drift.transport.client.DriftClientConfig;
 import io.airlift.units.Duration;
 import org.testng.annotations.Test;
 

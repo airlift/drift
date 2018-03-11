@@ -24,7 +24,7 @@ import io.airlift.drift.TApplicationException;
 import io.airlift.drift.TException;
 import io.airlift.drift.protocol.TProtocolException;
 import io.airlift.drift.protocol.TTransportException;
-import io.airlift.drift.transport.DriftApplicationException;
+import io.airlift.drift.transport.client.DriftApplicationException;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;

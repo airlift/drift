@@ -17,7 +17,7 @@ package io.airlift.drift.client.address;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.net.HostAndPort;
-import io.airlift.drift.transport.Address;
+import io.airlift.drift.transport.client.Address;
 
 import java.util.List;
 import java.util.Optional;
