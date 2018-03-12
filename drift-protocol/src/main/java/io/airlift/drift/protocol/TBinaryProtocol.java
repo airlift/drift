@@ -34,7 +34,6 @@ public class TBinaryProtocol
         implements TProtocol
 {
     private static final TStruct ANONYMOUS_STRUCT = new TStruct("");
-    private static final long NO_LENGTH_LIMIT = -1;
 
     protected static final int VERSION_MASK = 0xffff0000;
     protected static final int VERSION_1 = 0x80010000;
@@ -42,54 +41,15 @@ public class TBinaryProtocol
     private final TTransport transport;
 
     /**
-     * The maximum number of bytes to read from the transport for
-     * variable-length fields (such as strings or binary) or {@link #NO_LENGTH_LIMIT} for
-     * unlimited.
-     */
-    private final long stringLengthLimit;
-
-    /**
-     * The maximum number of elements to read from the network for
-     * containers (maps, sets, lists), or {@link #NO_LENGTH_LIMIT} for unlimited.
-     */
-    private final long containerLengthLimit;
-
-    protected boolean strictRead;
-    protected boolean strictWrite;
-
-    /**
      * Factory
      */
     public static class Factory
             implements TProtocolFactory
     {
-        protected long stringLengthLimit;
-        protected long containerLengthLimit;
-        protected boolean strictRead;
-        protected boolean strictWrite;
-
-        public Factory()
-        {
-            this(false, true);
-        }
-
-        public Factory(boolean strictRead, boolean strictWrite)
-        {
-            this(strictRead, strictWrite, NO_LENGTH_LIMIT, NO_LENGTH_LIMIT);
-        }
-
-        public Factory(boolean strictRead, boolean strictWrite, long stringLengthLimit, long containerLengthLimit)
-        {
-            this.stringLengthLimit = stringLengthLimit;
-            this.containerLengthLimit = containerLengthLimit;
-            this.strictRead = strictRead;
-            this.strictWrite = strictWrite;
-        }
-
         @Override
         public TProtocol getProtocol(TTransport transport)
         {
-            return new TBinaryProtocol(transport, stringLengthLimit, containerLengthLimit, strictRead, strictWrite);
+            return new TBinaryProtocol(transport);
         }
     }
 
@@ -98,38 +58,16 @@ public class TBinaryProtocol
      */
     public TBinaryProtocol(TTransport transport)
     {
-        this(transport, false, true);
-    }
-
-    public TBinaryProtocol(TTransport transport, boolean strictRead, boolean strictWrite)
-    {
-        this(transport, NO_LENGTH_LIMIT, NO_LENGTH_LIMIT, strictRead, strictWrite);
-    }
-
-    public TBinaryProtocol(TTransport transport, long stringLengthLimit, long containerLengthLimit, boolean strictRead, boolean strictWrite)
-    {
         this.transport = requireNonNull(transport, "transport is null");
-        this.stringLengthLimit = stringLengthLimit;
-        this.containerLengthLimit = containerLengthLimit;
-        this.strictRead = strictRead;
-        this.strictWrite = strictWrite;
     }
 
     @Override
     public void writeMessageBegin(TMessage message)
             throws TException
     {
-        if (strictWrite) {
-            int version = VERSION_1 | (message.getType() & 0xFF);
-            writeI32(version);
-            writeString(message.getName());
-            writeI32(message.getSequenceId());
-        }
-        else {
-            writeString(message.getName());
-            writeByte(message.getType());
-            writeI32(message.getSequenceId());
-        }
+        writeI32(VERSION_1 | (message.getType() & 0xFF));
+        writeString(message.getName());
+        writeI32(message.getSequenceId());
     }
 
     @Override
@@ -293,9 +231,7 @@ public class TBinaryProtocol
             return new TMessage(readString(), (byte) (size & 0x000000ff), readI32());
         }
 
-        if (strictRead) {
-            throw new TProtocolException("Missing version in readMessageBegin (old client?)");
-        }
+        // throw new TProtocolException("Missing version in readMessageBegin (old client?)");
         return new TMessage(readStringBody(size), readByte(), readI32());
     }
 
@@ -328,7 +264,7 @@ public class TBinaryProtocol
             throws TException
     {
         TMap map = new TMap(readByte(), readByte(), readI32());
-        checkContainerReadLength(map.getSize());
+        checkSize(map.getSize());
         return map;
     }
 
@@ -340,7 +276,7 @@ public class TBinaryProtocol
             throws TException
     {
         TList list = new TList(readByte(), readI32());
-        checkContainerReadLength(list.getSize());
+        checkSize(list.getSize());
         return list;
     }
 
@@ -352,7 +288,7 @@ public class TBinaryProtocol
             throws TException
     {
         TSet set = new TSet(readByte(), readI32());
-        checkContainerReadLength(set.getSize());
+        checkSize(set.getSize());
         return set;
     }
 
@@ -433,13 +369,7 @@ public class TBinaryProtocol
     public String readString()
             throws TException
     {
-        int size = readI32();
-
-        checkStringReadLength(size);
-        if (stringLengthLimit > 0 && size > stringLengthLimit) {
-            throw new TProtocolException("String field exceeded string size limit: " + size);
-        }
-
+        int size = checkSize(readI32());
         return readStringBody(size);
     }
 
@@ -455,37 +385,19 @@ public class TBinaryProtocol
     public ByteBuffer readBinary()
             throws TException
     {
-        int size = readI32();
-
-        if (stringLengthLimit > 0 && size > stringLengthLimit) {
-            throw new TProtocolException("Binary field exceeded string size limit: " + size);
-        }
-
+        int size = checkSize(readI32());
         byte[] buf = new byte[size];
         transport.read(buf, 0, size);
         return ByteBuffer.wrap(buf);
     }
 
-    private void checkStringReadLength(int length)
+    private static int checkSize(int length)
             throws TProtocolException
     {
         if (length < 0) {
             throw new TProtocolException("Negative length: " + length);
         }
-        if (stringLengthLimit != NO_LENGTH_LIMIT && length > stringLengthLimit) {
-            throw new TProtocolException("Length exceeded max allowed: " + length);
-        }
-    }
-
-    private void checkContainerReadLength(int length)
-            throws TProtocolException
-    {
-        if (length < 0) {
-            throw new TProtocolException("Negative length: " + length);
-        }
-        if (containerLengthLimit != NO_LENGTH_LIMIT && length > containerLengthLimit) {
-            throw new TProtocolException("Length exceeded max allowed: " + length);
-        }
+        return length;
     }
 
     private void readAll(byte[] buf, int len)
