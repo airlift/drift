@@ -22,10 +22,6 @@ import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPromise;
 
-import java.util.OptionalInt;
-
-import static com.google.common.base.Verify.verify;
-
 public class HeaderCodec
         extends ChannelDuplexHandler
 {
@@ -64,7 +60,7 @@ public class HeaderCodec
     {
         try {
             return new ThriftFrame(
-                    OptionalInt.of(headerFrame.getFrameSequenceId()),
+                    headerFrame.getFrameSequenceId(),
                     headerFrame.getMessage(),
                     headerFrame.getHeaders(),
                     headerFrame.getProtocol().createProtocolFactory(),
@@ -83,9 +79,8 @@ public class HeaderCodec
     private static HeaderFrame toHeaderFrame(ThriftFrame thriftFrame)
     {
         try {
-            verify(thriftFrame.getSequenceId().isPresent(), "Sequence id not set in response frame");
             return new HeaderFrame(
-                    thriftFrame.getSequenceId().getAsInt(),
+                    thriftFrame.getSequenceId(),
                     thriftFrame.getMessage(),
                     thriftFrame.getHeaders(),
                     HeaderTransportProtocol.create(thriftFrame.getProtocolFactory()),

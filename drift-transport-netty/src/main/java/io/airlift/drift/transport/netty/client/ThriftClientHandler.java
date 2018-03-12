@@ -48,7 +48,6 @@ import javax.annotation.concurrent.ThreadSafe;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.OptionalInt;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -128,7 +127,7 @@ public class ThriftClientHandler
 
         try {
             ThriftFrame thriftFrame = new ThriftFrame(
-                    OptionalInt.of(sequenceId),
+                    sequenceId,
                     requestBuffer,
                     thriftRequest.getHeaders(),
                     protocolFactory,
@@ -172,14 +171,9 @@ public class ThriftClientHandler
     {
         RequestHandler requestHandler = null;
         try {
-            OptionalInt sequenceId = thriftFrame.getSequenceId();
-            if (!sequenceId.isPresent()) {
-                throw new TTransportException("Could not find sequenceId in Thrift message");
-            }
-
-            requestHandler = pendingRequests.remove(sequenceId.getAsInt());
+            requestHandler = pendingRequests.remove(thriftFrame.getSequenceId());
             if (requestHandler == null) {
-                throw new TTransportException("Unknown sequence id in response: " + sequenceId.getAsInt());
+                throw new TTransportException("Unknown sequence id in response: " + thriftFrame.getSequenceId());
             }
 
             requestHandler.onResponseReceived(thriftFrame.retain());

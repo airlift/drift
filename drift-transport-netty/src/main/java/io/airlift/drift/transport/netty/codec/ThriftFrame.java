@@ -22,7 +22,6 @@ import io.netty.util.ReferenceCounted;
 import javax.annotation.CheckReturnValue;
 
 import java.util.Map;
-import java.util.OptionalInt;
 
 import static java.util.Objects.requireNonNull;
 import static javax.annotation.meta.When.UNKNOWN;
@@ -30,13 +29,13 @@ import static javax.annotation.meta.When.UNKNOWN;
 public class ThriftFrame
         implements ReferenceCounted
 {
-    private final OptionalInt sequenceId;
+    private final int sequenceId;
     private final ByteBuf message;
     private final Map<String, String> headers;
     private final TProtocolFactory protocolFactory;
     private final boolean supportOutOfOrderResponse;
 
-    public ThriftFrame(OptionalInt sequenceId, ByteBuf message, Map<String, String> headers, TProtocolFactory protocolFactory, boolean supportOutOfOrderResponse)
+    public ThriftFrame(int sequenceId, ByteBuf message, Map<String, String> headers, TProtocolFactory protocolFactory, boolean supportOutOfOrderResponse)
     {
         this.sequenceId = requireNonNull(sequenceId, "sequenceId is null");
         this.message = requireNonNull(message, "message is null");
@@ -45,7 +44,7 @@ public class ThriftFrame
         this.supportOutOfOrderResponse = supportOutOfOrderResponse;
     }
 
-    public OptionalInt getSequenceId()
+    public int getSequenceId()
     {
         return sequenceId;
     }

@@ -18,15 +18,13 @@ package io.airlift.drift.transport.netty.codec;
 import com.google.common.collect.ImmutableMap;
 import io.airlift.drift.protocol.TMessage;
 import io.airlift.drift.protocol.TProtocolFactory;
+import io.airlift.drift.protocol.TTransportException;
 import io.airlift.drift.transport.netty.ssl.TChannelBufferInputTransport;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPromise;
 
-import java.util.OptionalInt;
-
-import static com.google.common.base.Verify.verify;
 import static java.util.Objects.requireNonNull;
 
 public class SimpleFrameCodec
@@ -60,19 +58,20 @@ public class SimpleFrameCodec
         context.fireChannelRead(message);
     }
 
-    private OptionalInt extractResponseSequenceId(ByteBuf buffer)
+    private int extractResponseSequenceId(ByteBuf buffer)
+            throws TTransportException
     {
         TChannelBufferInputTransport inputTransport = new TChannelBufferInputTransport(buffer.duplicate());
         try {
             TMessage message = protocolFactory.getProtocol(inputTransport).readMessageBegin();
-            return OptionalInt.of(message.getSequenceId());
+            return message.getSequenceId();
         }
-        catch (Throwable ignored) {
+        catch (Throwable e) {
+            throw new TTransportException("Could not find sequenceId in Thrift message", e);
         }
         finally {
             inputTransport.release();
         }
-        return OptionalInt.empty();
     }
 
     @Override
@@ -83,7 +82,6 @@ public class SimpleFrameCodec
             // strip the underlying message from the frame
             ThriftFrame thriftFrame = (ThriftFrame) message;
             try {
-                verify(thriftFrame.getSequenceId().isPresent(), "Sequence id not set in response frame");
                 // Note: simple transports do not support headers. This is acceptable since headers should be inconsequential to the request
                 message = thriftFrame.getMessage();
             }

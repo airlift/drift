@@ -45,7 +45,6 @@ import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import java.util.OptionalInt;
 import java.util.concurrent.ScheduledExecutorService;
 
 import static com.google.common.base.Defaults.defaultValue;
@@ -240,7 +239,7 @@ public class ThriftServerHandler
             writeResponse(methodMetadata.getName(), protocol, sequenceId, "success", (short) 0, methodMetadata.getResultCodec(), result);
 
             return new ThriftFrame(
-                    OptionalInt.of(sequenceId),
+                    sequenceId,
                     transport.getBuffer(),
                     ImmutableMap.of(),
                     protocolFactory,
@@ -275,7 +274,7 @@ public class ThriftServerHandler
                         exception);
 
                 return new ThriftFrame(
-                        OptionalInt.of(sequenceId),
+                        sequenceId,
                         transport.getBuffer(),
                         ImmutableMap.of(),
                         protocolFactory,
@@ -323,7 +322,7 @@ public class ThriftServerHandler
 
             protocol.writeMessageEnd();
             return new ThriftFrame(
-                    OptionalInt.of(sequenceId),
+                    sequenceId,
                     transport.getBuffer(),
                     ImmutableMap.of(),
                     protocolFactory,
