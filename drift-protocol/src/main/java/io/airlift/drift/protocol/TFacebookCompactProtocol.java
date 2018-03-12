@@ -41,8 +41,6 @@ import static java.util.Objects.requireNonNull;
 public class TFacebookCompactProtocol
         implements TProtocol
 {
-    private static final long NO_LENGTH_LIMIT = -1;
-
     private static final byte[] EMPTY_BYTE_ARRAY = new byte[0];
 
     private static final TStruct ANONYMOUS_STRUCT = new TStruct("");
@@ -71,22 +69,10 @@ public class TFacebookCompactProtocol
     public static class Factory
             implements TProtocolFactory
     {
-        private final long maxNetworkBytes;
-
-        public Factory()
-        {
-            this(NO_LENGTH_LIMIT);
-        }
-
-        public Factory(long maxNetworkBytes)
-        {
-            this.maxNetworkBytes = maxNetworkBytes;
-        }
-
         @Override
         public TProtocol getProtocol(TTransport trans)
         {
-            return new TFacebookCompactProtocol(trans, maxNetworkBytes);
+            return new TFacebookCompactProtocol(trans);
         }
     }
 
@@ -142,23 +128,13 @@ public class TFacebookCompactProtocol
     private final TTransport transport;
 
     /**
-     * The maximum number of bytes to read from the network for
-     * variable-length fields (such as strings or binary) or -1 for
-     * unlimited.
-     */
-    private final long maxNetworkBytes;
-
-    /**
      * Create a TCompactProtocol.
      *
      * @param transport the TTransport object to read from or write to.
-     * @param maxNetworkBytes the maximum number of bytes to read for
-     * variable-length fields.
      */
-    public TFacebookCompactProtocol(TTransport transport, long maxNetworkBytes)
+    public TFacebookCompactProtocol(TTransport transport)
     {
         this.transport = requireNonNull(transport, "transport is null");
-        this.maxNetworkBytes = maxNetworkBytes;
     }
 
     //
@@ -636,7 +612,7 @@ public class TFacebookCompactProtocol
     public TMap readMapBegin()
             throws TException
     {
-        int size = readVarint32();
+        int size = checkSize(readVarint32());
         byte keyAndValueType = size == 0 ? 0 : readByte();
         return new TMap(getTType((byte) (keyAndValueType >> 4)), getTType((byte) (keyAndValueType & 0xf)), size);
     }
@@ -656,6 +632,7 @@ public class TFacebookCompactProtocol
         if (size == 15) {
             size = readVarint32();
         }
+        checkSize(size);
         byte type = getTType(sizeAndType);
         return new TList(type, size);
     }
@@ -753,13 +730,10 @@ public class TFacebookCompactProtocol
     public String readString()
             throws TException
     {
-        int length = readVarint32();
-        checkStringReadLength(length);
-
+        int length = checkSize(readVarint32());
         if (length == 0) {
             return "";
         }
-
         return new String(readBinary(length), UTF_8);
     }
 
@@ -770,8 +744,7 @@ public class TFacebookCompactProtocol
     public ByteBuffer readBinary()
             throws TException
     {
-        int length = readVarint32();
-        checkStringReadLength(length);
+        int length = checkSize(readVarint32());
         if (length == 0) {
             return ByteBuffer.wrap(EMPTY_BYTE_ARRAY);
         }
@@ -796,15 +769,13 @@ public class TFacebookCompactProtocol
         return buf;
     }
 
-    private void checkStringReadLength(int length)
+    private static int checkSize(int length)
             throws TProtocolException
     {
         if (length < 0) {
             throw new TProtocolException("Negative length: " + length);
         }
-        if (maxNetworkBytes != NO_LENGTH_LIMIT && length > maxNetworkBytes) {
-            throw new TProtocolException("Length exceeded max allowed: " + length);
-        }
+        return length;
     }
 
     //
