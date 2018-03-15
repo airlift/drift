@@ -77,7 +77,7 @@ public class TestDriftServer
 
         testServer(resultsSupplier, testService, statsFactory, serverTransport);
 
-        driftServer.shutdownGracefully();
+        driftServer.shutdown();
         assertEquals(serverTransport.getState(), State.SHUTDOWN);
     }
 
@@ -109,7 +109,7 @@ public class TestDriftServer
 
         testServer(resultsSupplier, combineTestingInvocationTarget(passThroughFilter, shortCircuitFilter), statsFactory, serverTransport);
 
-        driftServer.shutdownGracefully();
+        driftServer.shutdown();
         assertEquals(serverTransport.getState(), State.SHUTDOWN);
     }
 

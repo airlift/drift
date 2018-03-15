@@ -15,7 +15,6 @@
  */
 package io.airlift.drift.server;
 
-import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import io.airlift.drift.transport.MethodMetadata;
 import io.airlift.drift.transport.server.ServerInvokeRequest;
@@ -68,10 +67,9 @@ public class TestingServerTransport
     }
 
     @Override
-    public synchronized ListenableFuture<?> shutdown()
+    public synchronized void shutdown()
     {
         checkState(state == State.RUNNING);
         state = State.SHUTDOWN;
-        return Futures.immediateFuture(true);
     }
 }

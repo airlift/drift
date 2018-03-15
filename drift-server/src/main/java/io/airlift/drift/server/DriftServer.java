@@ -16,7 +16,6 @@
 package io.airlift.drift.server;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.util.concurrent.ListenableFuture;
 import io.airlift.drift.codec.ThriftCodecManager;
 import io.airlift.drift.server.stats.MethodInvocationStatsFactory;
 import io.airlift.drift.transport.server.ServerTransport;
@@ -61,14 +60,9 @@ public class DriftServer
         serverTransport.start();
     }
 
-    public ListenableFuture<?> shutdown()
-    {
-        return serverTransport.shutdown();
-    }
-
     @PreDestroy
-    public void shutdownGracefully()
+    public void shutdown()
     {
-        serverTransport.shutdownGracefully();
+        serverTransport.shutdown();
     }
 }

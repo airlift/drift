@@ -121,7 +121,7 @@ public class TestClientsWithDriftNettyServerTransport
             return sum;
         }
         finally {
-            serverTransport.shutdownGracefully();
+            serverTransport.shutdown();
         }
     }
 

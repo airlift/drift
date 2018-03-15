@@ -212,7 +212,7 @@ public class TestDriftNettyMethodInvoker
             return sum;
         }
         finally {
-            serverTransport.shutdownGracefully();
+            serverTransport.shutdown();
         }
     }
 

@@ -24,14 +24,12 @@ import io.airlift.units.Duration;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.handler.ssl.SslContext;
-import io.netty.util.concurrent.Future;
 
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 
 import java.io.Closeable;
 import java.util.Optional;
-import java.util.concurrent.ExecutionException;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -114,29 +112,14 @@ public class DriftNettyMethodInvokerFactory<I>
     }
 
     @PreDestroy
-    public void shutdownGracefully()
-    {
-        shutdownGracefully(true);
-    }
-
     @Override
     public void close()
     {
-        shutdownGracefully(false);
-    }
-
-    private void shutdownGracefully(boolean awaitTermination)
-    {
-        Future<?> future = group.shutdownGracefully();
-        if (awaitTermination) {
-            try {
-                future.get();
-            }
-            catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-            }
-            catch (ExecutionException ignored) {
-            }
+        try {
+            group.shutdownGracefully(0, 0, MILLISECONDS).await();
+        }
+        catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
         }
     }
 }

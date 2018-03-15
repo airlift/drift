@@ -15,25 +15,9 @@
  */
 package io.airlift.drift.transport.server;
 
-import com.google.common.util.concurrent.ListenableFuture;
-
-import java.util.concurrent.ExecutionException;
-
 public interface ServerTransport
 {
     void start();
 
-    ListenableFuture<?> shutdown();
-
-    default void shutdownGracefully()
-    {
-        try {
-            shutdown().get();
-        }
-        catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
-        catch (ExecutionException ignored) {
-        }
-    }
+    void shutdown();
 }

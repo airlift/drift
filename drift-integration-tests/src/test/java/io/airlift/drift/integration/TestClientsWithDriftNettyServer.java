@@ -124,7 +124,7 @@ public class TestClientsWithDriftNettyServer
             task.accept(address);
         }
         finally {
-            driftServer.shutdownGracefully();
+            driftServer.shutdown();
         }
     }
 }

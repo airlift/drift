@@ -15,8 +15,6 @@
  */
 package io.airlift.drift.transport.netty.server;
 
-import com.google.common.util.concurrent.ListenableFuture;
-import com.google.common.util.concurrent.SettableFuture;
 import io.airlift.drift.transport.netty.ssl.SslContextFactory;
 import io.airlift.drift.transport.server.ServerMethodInvoker;
 import io.airlift.drift.transport.server.ServerTransport;
@@ -31,15 +29,14 @@ import io.netty.util.concurrent.Future;
 import java.net.InetSocketAddress;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Supplier;
 
-import static com.google.common.base.Preconditions.checkArgument;
 import static io.airlift.concurrent.Threads.daemonThreadsNamed;
 import static io.airlift.drift.transport.netty.ssl.SslContextFactory.createSslContextFactory;
 import static io.netty.channel.ChannelOption.SO_BACKLOG;
 import static io.netty.channel.ChannelOption.SO_KEEPALIVE;
 import static java.util.Objects.requireNonNull;
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 public class DriftNettyServerTransport
         implements ServerTransport
@@ -98,6 +95,7 @@ public class DriftNettyServerTransport
                 .validate();
     }
 
+    @Override
     public void start()
     {
         if (!running.compareAndSet(false, true)) {
@@ -119,32 +117,32 @@ public class DriftNettyServerTransport
     }
 
     @Override
-    public ListenableFuture<?> shutdown()
+    public void shutdown()
     {
-        SettableFuture<?> shutdownFuture = SettableFuture.create();
-
-        if (channel != null) {
-            channel.close().addListener(ignored -> completeWhenAllFinished(shutdownFuture, ioGroup.shutdownGracefully(), workerGroup.shutdownGracefully()));
+        try {
+            if (channel != null) {
+                await(channel.close());
+            }
         }
-        else {
-            completeWhenAllFinished(shutdownFuture, ioGroup.shutdownGracefully(), workerGroup.shutdownGracefully());
+        finally {
+            Future<?> ioShutdown;
+            try {
+                ioShutdown = ioGroup.shutdownGracefully(0, 0, SECONDS);
+            }
+            finally {
+                await(workerGroup.shutdownGracefully(0, 0, SECONDS));
+            }
+            await(ioShutdown);
         }
-
-        return shutdownFuture;
     }
 
-    private static void completeWhenAllFinished(SettableFuture<?> shutdownFuture, Future<?>... futures)
+    private static void await(Future<?> future)
     {
-        requireNonNull(shutdownFuture, "shutdownFuture is null");
-        checkArgument(futures.length > 0, "no futures");
-
-        AtomicLong remainingFutures = new AtomicLong(futures.length);
-        for (Future<?> future : futures) {
-            future.addListener(ignored -> {
-                if (remainingFutures.decrementAndGet() == 0) {
-                    shutdownFuture.set(null);
-                }
-            });
+        try {
+            future.await();
+        }
+        catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
         }
     }
 }
