@@ -67,6 +67,6 @@ class ThriftClientInitializer
 
         transport.addFrameHandlers(pipeline, Optional.of(protocol), maxFrameSize, true);
 
-        pipeline.addLast(new ThriftClientHandler(requestTimeout, protocol.createProtocolFactory()));
+        pipeline.addLast(new ThriftClientHandler(requestTimeout, transport, protocol));
     }
 }

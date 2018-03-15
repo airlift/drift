@@ -26,12 +26,14 @@ import io.airlift.drift.codec.internal.ProtocolReader;
 import io.airlift.drift.codec.internal.ProtocolWriter;
 import io.airlift.drift.protocol.TMessage;
 import io.airlift.drift.protocol.TMessageType;
-import io.airlift.drift.protocol.TProtocol;
-import io.airlift.drift.protocol.TProtocolFactory;
+import io.airlift.drift.protocol.TProtocolReader;
+import io.airlift.drift.protocol.TProtocolWriter;
 import io.airlift.drift.protocol.TTransport;
 import io.airlift.drift.transport.MethodMetadata;
 import io.airlift.drift.transport.ParameterMetadata;
+import io.airlift.drift.transport.netty.codec.Protocol;
 import io.airlift.drift.transport.netty.codec.ThriftFrame;
+import io.airlift.drift.transport.netty.codec.Transport;
 import io.airlift.drift.transport.netty.ssl.TChannelBufferInputTransport;
 import io.airlift.drift.transport.netty.ssl.TChannelBufferOutputTransport;
 import io.airlift.drift.transport.server.ServerInvokeRequest;
@@ -91,8 +93,9 @@ public class ThriftServerHandler
         try {
             ListenableFuture<ThriftFrame> response = decodeMessage(
                     context,
-                    frame.getProtocolFactory(),
                     inputTransport,
+                    frame.getTransport(),
+                    frame.getProtocol(),
                     frame.getHeaders(),
                     frame.isSupportOutOfOrderResponse());
             Futures.addCallback(response, new FutureCallback<ThriftFrame>()
@@ -127,22 +130,24 @@ public class ThriftServerHandler
 
     private ListenableFuture<ThriftFrame> decodeMessage(
             ChannelHandlerContext context,
-            TProtocolFactory protocolFactory,
             TTransport messageData,
+            Transport transport,
+            Protocol protocol,
             Map<String, String> headers,
             boolean supportOutOfOrderResponse)
             throws Exception
     {
         long start = System.nanoTime();
-        TProtocol protocol = protocolFactory.getProtocol(messageData);
+        TProtocolReader protocolReader = protocol.createProtocol(messageData);
 
-        TMessage message = protocol.readMessageBegin();
+        TMessage message = protocolReader.readMessageBegin();
         Optional<MethodMetadata> methodMetadata = methodInvoker.getMethodMetadata(message.getName());
         if (!methodMetadata.isPresent()) {
             return immediateFuture(writeApplicationException(
                     context,
                     message.getName(),
-                    protocolFactory,
+                    transport,
+                    protocol,
                     message.getSequenceId(),
                     supportOutOfOrderResponse,
                     UNKNOWN_METHOD,
@@ -155,7 +160,8 @@ public class ThriftServerHandler
             return immediateFuture(writeApplicationException(
                     context,
                     message.getName(),
-                    protocolFactory,
+                    transport,
+                    protocol,
                     message.getSequenceId(),
                     supportOutOfOrderResponse,
                     INVALID_MESSAGE_TYPE,
@@ -163,13 +169,13 @@ public class ThriftServerHandler
                     null));
         }
 
-        Map<Short, Object> parameters = readArguments(method, protocol);
+        Map<Short, Object> parameters = readArguments(method, protocolReader);
 
         ListenableFuture<Object> result = methodInvoker.invoke(new ServerInvokeRequest(method, headers, parameters));
         methodInvoker.recordResult(message.getName(), start, result);
         ListenableFuture<ThriftFrame> encodedResult = Futures.transformAsync(result, value -> {
             try {
-                return immediateFuture(writeSuccessResponse(context, method, protocolFactory, message.getSequenceId(), supportOutOfOrderResponse, value));
+                return immediateFuture(writeSuccessResponse(context, method, transport, protocol, message.getSequenceId(), supportOutOfOrderResponse, value));
             }
             catch (Exception e) {
                 return immediateFailedFuture(e);
@@ -178,7 +184,7 @@ public class ThriftServerHandler
         encodedResult = Futures.withTimeout(encodedResult, requestTimeout.toMillis(), MILLISECONDS, timeoutExecutor);
         encodedResult = Futures.catchingAsync(encodedResult, Exception.class, exception -> {
             try {
-                return immediateFuture(writeExceptionResponse(context, method, protocolFactory, message.getSequenceId(), supportOutOfOrderResponse, exception));
+                return immediateFuture(writeExceptionResponse(context, method, transport, protocol, message.getSequenceId(), supportOutOfOrderResponse, exception));
             }
             catch (Exception e) {
                 return immediateFailedFuture(e);
@@ -187,7 +193,7 @@ public class ThriftServerHandler
         return encodedResult;
     }
 
-    private static Map<Short, Object> readArguments(MethodMetadata method, TProtocol protocol)
+    private static Map<Short, Object> readArguments(MethodMetadata method, TProtocolReader protocol)
             throws Exception
     {
         Map<Short, Object> arguments = new HashMap<>(method.getParameters().size());
@@ -226,33 +232,41 @@ public class ThriftServerHandler
     private static ThriftFrame writeSuccessResponse(
             ChannelHandlerContext context,
             MethodMetadata methodMetadata,
-            TProtocolFactory protocolFactory,
+            Transport transport,
+            Protocol protocol,
             int sequenceId,
             boolean supportOutOfOrderResponse,
             Object result)
             throws Exception
     {
-        TChannelBufferOutputTransport transport = new TChannelBufferOutputTransport(context.alloc());
+        TChannelBufferOutputTransport outputTransport = new TChannelBufferOutputTransport(context.alloc());
         try {
-            TProtocol protocol = protocolFactory.getProtocol(transport);
-
-            writeResponse(methodMetadata.getName(), protocol, sequenceId, "success", (short) 0, methodMetadata.getResultCodec(), result);
+            writeResponse(
+                    methodMetadata.getName(),
+                    protocol.createProtocol(outputTransport),
+                    sequenceId,
+                    "success",
+                    (short) 0,
+                    methodMetadata.getResultCodec(),
+                    result);
 
             return new ThriftFrame(
                     sequenceId,
-                    transport.getBuffer(),
+                    outputTransport.getBuffer(),
                     ImmutableMap.of(),
-                    protocolFactory,
+                    transport,
+                    protocol,
                     supportOutOfOrderResponse);
         }
         finally {
-            transport.release();
+            outputTransport.release();
         }
     }
 
     private static ThriftFrame writeExceptionResponse(ChannelHandlerContext context,
             MethodMetadata methodMetadata,
-            TProtocolFactory protocolFactory,
+            Transport transport,
+            Protocol protocol,
             int sequenceId,
             boolean supportOutOfOrderResponse,
             Throwable exception)
@@ -260,13 +274,13 @@ public class ThriftServerHandler
     {
         Optional<Short> exceptionId = methodMetadata.getExceptionId(exception.getClass());
         if (exceptionId.isPresent()) {
-            TChannelBufferOutputTransport transport = new TChannelBufferOutputTransport(context.alloc());
+            TChannelBufferOutputTransport outputTransport = new TChannelBufferOutputTransport(context.alloc());
             try {
-                TProtocol protocol = protocolFactory.getProtocol(transport);
+                TProtocolWriter protocolWriter = protocol.createProtocol(outputTransport);
 
                 writeResponse(
                         methodMetadata.getName(),
-                        protocol,
+                        protocolWriter,
                         sequenceId,
                         "exception",
                         exceptionId.get(),
@@ -275,20 +289,22 @@ public class ThriftServerHandler
 
                 return new ThriftFrame(
                         sequenceId,
-                        transport.getBuffer(),
+                        outputTransport.getBuffer(),
                         ImmutableMap.of(),
-                        protocolFactory,
+                        transport,
+                        protocol,
                         supportOutOfOrderResponse);
             }
             finally {
-                transport.release();
+                outputTransport.release();
             }
         }
 
         return writeApplicationException(
                 context,
                 methodMetadata.getName(),
-                protocolFactory,
+                transport,
+                protocol,
                 sequenceId,
                 supportOutOfOrderResponse,
                 INTERNAL_ERROR,
@@ -299,7 +315,8 @@ public class ThriftServerHandler
     private static ThriftFrame writeApplicationException(
             ChannelHandlerContext context,
             String methodName,
-            TProtocolFactory protocolFactory,
+            Transport transport,
+            Protocol protocol,
             int sequenceId,
             boolean supportOutOfOrderResponse,
             TApplicationException.Type errorCode,
@@ -312,30 +329,31 @@ public class ThriftServerHandler
             applicationException.initCause(cause);
         }
 
-        TChannelBufferOutputTransport transport = new TChannelBufferOutputTransport(context.alloc());
+        TChannelBufferOutputTransport outputTransport = new TChannelBufferOutputTransport(context.alloc());
         try {
-            TProtocol protocol = protocolFactory.getProtocol(transport);
+            TProtocolWriter protocolWriter = protocol.createProtocol(outputTransport);
 
-            protocol.writeMessageBegin(new TMessage(methodName, EXCEPTION, sequenceId));
+            protocolWriter.writeMessageBegin(new TMessage(methodName, EXCEPTION, sequenceId));
 
-            ExceptionWriter.writeTApplicationException(applicationException, protocol);
+            ExceptionWriter.writeTApplicationException(applicationException, protocolWriter);
 
-            protocol.writeMessageEnd();
+            protocolWriter.writeMessageEnd();
             return new ThriftFrame(
                     sequenceId,
-                    transport.getBuffer(),
+                    outputTransport.getBuffer(),
                     ImmutableMap.of(),
-                    protocolFactory,
+                    transport,
+                    protocol,
                     supportOutOfOrderResponse);
         }
         finally {
-            transport.release();
+            outputTransport.release();
         }
     }
 
     private static void writeResponse(
             String methodName,
-            TProtocol protocol,
+            TProtocolWriter protocolWriter,
             int sequenceId,
             String responseFieldName,
             short responseFieldId,
@@ -343,13 +361,13 @@ public class ThriftServerHandler
             Object result)
             throws Exception
     {
-        protocol.writeMessageBegin(new TMessage(methodName, REPLY, sequenceId));
+        protocolWriter.writeMessageBegin(new TMessage(methodName, REPLY, sequenceId));
 
-        ProtocolWriter writer = new ProtocolWriter(protocol);
+        ProtocolWriter writer = new ProtocolWriter(protocolWriter);
         writer.writeStructBegin(methodName + "_result");
         writer.writeField(responseFieldName, responseFieldId, responseCodec, result);
         writer.writeStructEnd();
 
-        protocol.writeMessageEnd();
+        protocolWriter.writeMessageEnd();
     }
 }

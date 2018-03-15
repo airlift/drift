@@ -15,8 +15,6 @@
  */
 package io.airlift.drift.transport.netty.codec;
 
-import io.airlift.drift.transport.netty.codec.HeaderTransport.HeaderFrame;
-import io.airlift.drift.transport.netty.codec.HeaderTransport.HeaderTransportProtocol;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
@@ -32,7 +30,7 @@ public class HeaderCodec
         if (message instanceof ByteBuf) {
             ByteBuf request = (ByteBuf) message;
             if (request.isReadable()) {
-                context.fireChannelRead(toThriftFrame(HeaderTransport.decodeFrame(request)));
+                context.fireChannelRead(HeaderTransport.decodeFrame(request));
                 return;
             }
         }
@@ -44,50 +42,10 @@ public class HeaderCodec
             throws Exception
     {
         if (message instanceof ThriftFrame) {
-            context.write(HeaderTransport.encodeFrame(toHeaderFrame((ThriftFrame) message)), promise);
+            context.write(HeaderTransport.encodeFrame((ThriftFrame) message), promise);
         }
         else {
             context.write(message, promise);
-        }
-    }
-
-    /**
-     * Create a new ThriftFrame from a HeaderFrame transferring the reference ownership.
-     * @param headerFrame frame to transform; reference count ownership is transferred to this method
-     * @return the translated frame; caller is responsible for releasing this object
-     */
-    private static ThriftFrame toThriftFrame(HeaderFrame headerFrame)
-    {
-        try {
-            return new ThriftFrame(
-                    headerFrame.getFrameSequenceId(),
-                    headerFrame.getMessage(),
-                    headerFrame.getHeaders(),
-                    headerFrame.getProtocol().createProtocolFactory(),
-                    headerFrame.isSupportOutOfOrderResponse());
-        }
-        finally {
-            headerFrame.release();
-        }
-    }
-
-    /**
-     * Create a new HeaderFrame from a ThriftFrame transferring the reference ownership.
-     * @param thriftFrame frame to transform; reference count ownership is transferred to this method
-     * @return the translated frame; caller is responsible for releasing this object
-     */
-    private static HeaderFrame toHeaderFrame(ThriftFrame thriftFrame)
-    {
-        try {
-            return new HeaderFrame(
-                    thriftFrame.getSequenceId(),
-                    thriftFrame.getMessage(),
-                    thriftFrame.getHeaders(),
-                    HeaderTransportProtocol.create(thriftFrame.getProtocolFactory()),
-                    thriftFrame.isSupportOutOfOrderResponse());
-        }
-        finally {
-            thriftFrame.release();
         }
     }
 }

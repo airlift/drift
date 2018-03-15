@@ -16,27 +16,15 @@
 package io.airlift.drift.transport.netty.codec;
 
 import com.google.common.collect.ImmutableMap;
-import io.airlift.drift.protocol.TBinaryProtocol;
-import io.airlift.drift.protocol.TCompactProtocol;
-import io.airlift.drift.protocol.TFacebookCompactProtocol;
-import io.airlift.drift.protocol.TProtocolFactory;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import io.netty.util.ReferenceCounted;
 
-import javax.annotation.CheckReturnValue;
-
-import java.util.Arrays;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.OptionalInt;
-import java.util.function.Function;
 
 import static com.google.common.base.Verify.verify;
-import static com.google.common.collect.ImmutableMap.toImmutableMap;
+import static io.airlift.drift.transport.netty.codec.Transport.HEADER;
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static java.util.Objects.requireNonNull;
-import static javax.annotation.meta.When.UNKNOWN;
 
 public final class HeaderTransport
 {
@@ -53,34 +41,19 @@ public final class HeaderTransport
     private static final int NORMAL_HEADERS = 1;
     private static final int PERSISTENT_HEADERS = 1;
 
-    private static final int HEADER_SEQUENCE_ID_OFFSET = 4;
-
     private HeaderTransport() {}
-
-    public static OptionalInt extractResponseSequenceId(ByteBuf buffer)
-    {
-        try {
-            if (buffer.readableBytes() < HEADER_SEQUENCE_ID_OFFSET + Integer.BYTES) {
-                return OptionalInt.empty();
-            }
-            return OptionalInt.of(buffer.getInt(buffer.readerIndex() + HEADER_SEQUENCE_ID_OFFSET));
-        }
-        finally {
-            buffer.release();
-        }
-    }
 
     /**
      * Encodes the HeaderFrame into a ByteBuf transferring the reference ownership.
      * @param frame frame to be encoded; reference count ownership is transferred to this method
      * @return the encoded frame data; caller is responsible for releasing this buffer
      */
-    public static ByteBuf encodeFrame(HeaderFrame frame)
+    public static ByteBuf encodeFrame(ThriftFrame frame)
     {
         try {
             // describe the encoding (Thrift protocol, compression info)
             ByteBuf encodingInfo = Unpooled.buffer(3);
-            encodingInfo.writeByte(frame.getProtocol().getId());
+            encodingInfo.writeByte(frame.getProtocol().getHeaderTransportId());
             // number of "transforms" -- no transforms are supported
             encodingInfo.writeByte(0);
 
@@ -96,7 +69,7 @@ public final class HeaderTransport
             ByteBuf frameHeader = Unpooled.buffer(FRAME_HEADER_SIZE);
             frameHeader.writeShort(HEADER_MAGIC);
             frameHeader.writeShort(frame.isSupportOutOfOrderResponse() ? FLAG_SUPPORT_OUT_OF_ORDER : FLAGS_NONE);
-            frameHeader.writeInt(frame.getFrameSequenceId());
+            frameHeader.writeInt(frame.getSequenceId());
             frameHeader.writeShort(headerSize >> 2);
 
             // header frame is a simple wrapper around the frame method, so the frame does not need to be released
@@ -169,7 +142,7 @@ public final class HeaderTransport
      * @param buffer buffer to be decoded; reference count ownership is transferred to this method
      * @return the decoded frame; caller is responsible for releasing this object
      */
-    public static HeaderFrame decodeFrame(ByteBuf buffer)
+    public static ThriftFrame decodeFrame(ByteBuf buffer)
     {
         ByteBuf messageHeader = null;
         try {
@@ -194,7 +167,7 @@ public final class HeaderTransport
 
             // encoding info
             byte protocolId = messageHeader.readByte();
-            HeaderTransportProtocol protocol = HeaderTransportProtocol.decodeProtocol(protocolId);
+            Protocol protocol = Protocol.getProtocolByHeaderTransportId(protocolId);
             byte numberOfTransforms = messageHeader.readByte();
             if (numberOfTransforms > 0) {
                 // currently there are only two transforms, a cryptographic extension which is deprecated, and gzip which is too expensive
@@ -211,7 +184,7 @@ public final class HeaderTransport
             ByteBuf message = buffer.readBytes(buffer.readableBytes());
 
             // header frame wraps message byte buffer, so message should not be release yet
-            return new HeaderFrame(frameSequenceId, message, allHeaders.build(), protocol, outOfOrderResponse);
+            return new ThriftFrame(frameSequenceId, message, allHeaders.build(), HEADER, protocol, outOfOrderResponse);
         }
         finally {
             // message header in an independent buffer and must be released
@@ -266,156 +239,5 @@ public final class HeaderTransport
         }
 
         return result;
-    }
-
-    public static class HeaderFrame
-            implements ReferenceCounted
-    {
-        private final int frameSequenceId;
-        private final ByteBuf message;
-        private final Map<String, String> headers;
-        private final HeaderTransportProtocol protocol;
-        private final boolean supportOutOfOrderResponse;
-
-        public HeaderFrame(int frameSequenceId, ByteBuf message, Map<String, String> headers, HeaderTransportProtocol protocol, boolean supportOutOfOrderResponse)
-        {
-            this.frameSequenceId = frameSequenceId;
-            this.message = requireNonNull(message, "message is null");
-            this.headers = requireNonNull(headers, "headers is null");
-            this.protocol = requireNonNull(protocol, "protocol is null");
-            this.supportOutOfOrderResponse = supportOutOfOrderResponse;
-        }
-
-        public int getFrameSequenceId()
-        {
-            return frameSequenceId;
-        }
-
-        /**
-         * @return a retained message; caller must release this buffer
-         */
-        public ByteBuf getMessage()
-        {
-            return message.retainedDuplicate();
-        }
-
-        public Map<String, String> getHeaders()
-        {
-            return headers;
-        }
-
-        public HeaderTransportProtocol getProtocol()
-        {
-            return protocol;
-        }
-
-        public boolean isSupportOutOfOrderResponse()
-        {
-            return supportOutOfOrderResponse;
-        }
-
-        @Override
-        public int refCnt()
-        {
-            return message.refCnt();
-        }
-
-        @Override
-        public ReferenceCounted retain()
-        {
-            message.retain();
-            return this;
-        }
-
-        @Override
-        public ReferenceCounted retain(int increment)
-        {
-            message.retain(increment);
-            return this;
-        }
-
-        @Override
-        public ReferenceCounted touch()
-        {
-            message.touch();
-            return this;
-        }
-
-        @Override
-        public ReferenceCounted touch(Object hint)
-        {
-            message.touch(hint);
-            return this;
-        }
-
-        @CheckReturnValue(when = UNKNOWN)
-        @Override
-        public boolean release()
-        {
-            return message.release();
-        }
-
-        @Override
-        public boolean release(int decrement)
-        {
-            return message.release(decrement);
-        }
-    }
-
-    public enum HeaderTransportProtocol
-    {
-        BINARY(0) {
-            @Override
-            public TProtocolFactory createProtocolFactory()
-            {
-                return new TBinaryProtocol.Factory();
-            }
-        },
-        COMPACT(2) {
-            @Override
-            public TProtocolFactory createProtocolFactory()
-            {
-                return new TFacebookCompactProtocol.Factory();
-            }
-        };
-
-        private final int id;
-
-        HeaderTransportProtocol(int id)
-        {
-            this.id = id;
-        }
-
-        public int getId()
-        {
-            return id;
-        }
-
-        public abstract TProtocolFactory createProtocolFactory();
-
-        private static final Map<Integer, HeaderTransportProtocol> PROTOCOL_BY_ID = Arrays.stream(HeaderTransportProtocol.values())
-                .collect(toImmutableMap(HeaderTransportProtocol::getId, Function.identity()));
-
-        public static HeaderTransportProtocol decodeProtocol(int protocolId)
-        {
-            HeaderTransportProtocol headerTransportProtocol = PROTOCOL_BY_ID.get(protocolId);
-            if (headerTransportProtocol == null) {
-                throw new IllegalArgumentException("Unknown protocol: " + protocolId);
-            }
-            return headerTransportProtocol;
-        }
-
-        public static HeaderTransportProtocol create(TProtocolFactory protocolFactory)
-        {
-            if (protocolFactory instanceof TBinaryProtocol.Factory) {
-                return BINARY;
-            }
-
-            if (protocolFactory instanceof TCompactProtocol.Factory || protocolFactory instanceof TFacebookCompactProtocol.Factory) {
-                return COMPACT;
-            }
-
-            throw new IllegalArgumentException("Unknown protocol: " + protocolFactory.getClass().getName());
-        }
     }
 }

@@ -23,14 +23,15 @@ import io.airlift.drift.codec.internal.ProtocolReader;
 import io.airlift.drift.codec.internal.ProtocolWriter;
 import io.airlift.drift.codec.metadata.ThriftType;
 import io.airlift.drift.protocol.TMessage;
-import io.airlift.drift.protocol.TProtocolFactory;
 import io.airlift.drift.protocol.TProtocolReader;
 import io.airlift.drift.protocol.TProtocolWriter;
 import io.airlift.drift.protocol.TTransportException;
 import io.airlift.drift.transport.MethodMetadata;
 import io.airlift.drift.transport.ParameterMetadata;
 import io.airlift.drift.transport.client.DriftApplicationException;
+import io.airlift.drift.transport.netty.codec.Protocol;
 import io.airlift.drift.transport.netty.codec.ThriftFrame;
+import io.airlift.drift.transport.netty.codec.Transport;
 import io.airlift.drift.transport.netty.ssl.TChannelBufferInputTransport;
 import io.airlift.drift.transport.netty.ssl.TChannelBufferOutputTransport;
 import io.airlift.units.Duration;
@@ -72,16 +73,18 @@ public class ThriftClientHandler
     private static final int ONEWAY_SEQUENCE_ID = 0xFFFF_FFFF;
 
     private final Duration requestTimeout;
-    private final TProtocolFactory protocolFactory;
+    private final Transport transport;
+    private final Protocol protocol;
 
     private final ConcurrentHashMap<Integer, RequestHandler> pendingRequests = new ConcurrentHashMap<>();
     private final AtomicReference<TException> channelError = new AtomicReference<>();
     private final AtomicInteger sequenceId = new AtomicInteger(42);
 
-    ThriftClientHandler(Duration requestTimeout, TProtocolFactory protocolFactory)
+    ThriftClientHandler(Duration requestTimeout, Transport transport, Protocol protocol)
     {
         this.requestTimeout = requireNonNull(requestTimeout, "requestTimeout is null");
-        this.protocolFactory = requireNonNull(protocolFactory, "protocolFactory is null");
+        this.transport = requireNonNull(transport, "transport is null");
+        this.protocol = requireNonNull(protocol, "protocol is null");
     }
 
     @Override
@@ -130,7 +133,8 @@ public class ThriftClientHandler
                     sequenceId,
                     requestBuffer,
                     thriftRequest.getHeaders(),
-                    protocolFactory,
+                    transport,
+                    protocol,
                     true);
 
             ChannelFuture sendFuture = context.write(thriftFrame, promise);
@@ -317,17 +321,17 @@ public class ThriftClientHandler
         {
             TChannelBufferOutputTransport transport = new TChannelBufferOutputTransport(allocator);
             try {
-                TProtocolWriter protocol = protocolFactory.getProtocol(transport);
+                TProtocolWriter protocolWriter = protocol.createProtocol(transport);
 
                 // Note that though setting message type to ONEWAY can be helpful when looking at packet
                 // captures, some clients always send CALL and so servers are forced to rely on the "oneway"
                 // attribute on thrift method in the interface definition, rather than checking the message
                 // type.
                 MethodMetadata method = thriftRequest.getMethod();
-                protocol.writeMessageBegin(new TMessage(method.getName(), method.isOneway() ? ONEWAY : CALL, sequenceId));
+                protocolWriter.writeMessageBegin(new TMessage(method.getName(), method.isOneway() ? ONEWAY : CALL, sequenceId));
 
                 // write the parameters
-                ProtocolWriter writer = new ProtocolWriter(protocol);
+                ProtocolWriter writer = new ProtocolWriter(protocolWriter);
                 writer.writeStructBegin(method.getName() + "_args");
                 List<Object> parameters = thriftRequest.getParameters();
                 for (int i = 0; i < parameters.size(); i++) {
@@ -337,7 +341,7 @@ public class ThriftClientHandler
                 }
                 writer.writeStructEnd();
 
-                protocol.writeMessageEnd();
+                protocolWriter.writeMessageEnd();
                 return transport.getBuffer();
             }
             catch (Throwable throwable) {
@@ -392,14 +396,14 @@ public class ThriftClientHandler
         {
             TChannelBufferInputTransport transport = new TChannelBufferInputTransport(responseMessage);
             try {
-                TProtocolReader protocol = protocolFactory.getProtocol(transport);
+                TProtocolReader protocolReader = protocol.createProtocol(transport);
                 MethodMetadata method = thriftRequest.getMethod();
 
                 // validate response header
-                TMessage message = protocol.readMessageBegin();
+                TMessage message = protocolReader.readMessageBegin();
                 if (message.getType() == EXCEPTION) {
-                    TApplicationException exception = ExceptionReader.readTApplicationException(protocol);
-                    protocol.readMessageEnd();
+                    TApplicationException exception = ExceptionReader.readTApplicationException(protocolReader);
+                    protocolReader.readMessageEnd();
                     throw exception;
                 }
                 if (message.getType() != REPLY) {
@@ -413,7 +417,7 @@ public class ThriftClientHandler
                 }
 
                 // read response struct
-                ProtocolReader reader = new ProtocolReader(protocol);
+                ProtocolReader reader = new ProtocolReader(protocolReader);
                 reader.readStructBegin();
 
                 Object results = null;
@@ -433,7 +437,7 @@ public class ThriftClientHandler
                     }
                 }
                 reader.readStructEnd();
-                protocol.readMessageEnd();
+                protocolReader.readMessageEnd();
 
                 if (exception != null) {
                     throw new DriftApplicationException(exception);

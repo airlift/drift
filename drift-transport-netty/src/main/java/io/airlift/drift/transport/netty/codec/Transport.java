@@ -15,7 +15,6 @@
  */
 package io.airlift.drift.transport.netty.codec;
 
-import io.airlift.drift.protocol.TProtocolFactory;
 import io.airlift.units.DataSize;
 import io.netty.channel.ChannelPipeline;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
@@ -31,19 +30,19 @@ public enum Transport
         @Override
         public void addFrameHandlers(ChannelPipeline pipeline, Optional<Protocol> protocol, DataSize maxFrameSize, boolean assumeClientsSupportOutOfOrderResponses)
         {
-            TProtocolFactory protocolFactory = protocol.get().createProtocolFactory();
-            pipeline.addLast("thriftUnframedDecoder", new ThriftUnframedDecoder(protocolFactory, maxFrameSize));
-            pipeline.addLast(new SimpleFrameCodec(protocolFactory, assumeClientsSupportOutOfOrderResponses));
+            Protocol protocolType = protocol.orElseThrow(() -> new IllegalArgumentException("UNFRAMED transport requires a protocol"));
+            pipeline.addLast("thriftUnframedDecoder", new ThriftUnframedDecoder(protocolType, maxFrameSize));
+            pipeline.addLast(new SimpleFrameCodec(this, protocolType, assumeClientsSupportOutOfOrderResponses));
         }
     },
     FRAMED {
         @Override
         public void addFrameHandlers(ChannelPipeline pipeline, Optional<Protocol> protocol, DataSize maxFrameSize, boolean assumeClientsSupportOutOfOrderResponses)
         {
+            Protocol protocolType = protocol.orElseThrow(() -> new IllegalArgumentException("FRAMED transport requires a protocol"));
             pipeline.addLast("frameEncoder", new LengthFieldPrepender(Integer.BYTES));
             pipeline.addLast("frameDecoder", new LengthFieldBasedFrameDecoder(toIntExact(maxFrameSize.toBytes()), 0, Integer.BYTES, 0, Integer.BYTES));
-            TProtocolFactory protocolFactory = protocol.get().createProtocolFactory();
-            pipeline.addLast(new SimpleFrameCodec(protocolFactory, assumeClientsSupportOutOfOrderResponses));
+            pipeline.addLast(new SimpleFrameCodec(this, protocolType, assumeClientsSupportOutOfOrderResponses));
         }
     },
     HEADER {

@@ -15,7 +15,6 @@
  */
 package io.airlift.drift.transport.netty.codec;
 
-import io.airlift.drift.protocol.TProtocolFactory;
 import io.airlift.drift.protocol.TProtocolReader;
 import io.airlift.drift.protocol.TProtocolUtil;
 import io.airlift.drift.protocol.TType;
@@ -34,12 +33,12 @@ import static java.util.Objects.requireNonNull;
 class ThriftUnframedDecoder
         extends ByteToMessageDecoder
 {
-    private final TProtocolFactory protocolFactory;
+    private final Protocol protocol;
     private final int maxFrameSize;
 
-    public ThriftUnframedDecoder(TProtocolFactory protocolFactory, DataSize maxFrameSize)
+    public ThriftUnframedDecoder(Protocol protocol, DataSize maxFrameSize)
     {
-        this.protocolFactory = requireNonNull(protocolFactory, "protocolFactory is null");
+        this.protocol = requireNonNull(protocol, "protocol is null");
         this.maxFrameSize = toIntExact(requireNonNull(maxFrameSize, "maxFrameSize is null").toBytes());
     }
 
@@ -50,11 +49,11 @@ class ThriftUnframedDecoder
         int frameOffset = buffer.readerIndex();
         TChannelBufferInputTransport transport = new TChannelBufferInputTransport(buffer.retain());
         try {
-            TProtocolReader protocol = protocolFactory.getProtocol(transport);
+            TProtocolReader protocolReader = protocol.createProtocol(transport);
 
-            protocol.readMessageBegin();
-            TProtocolUtil.skip(protocol, TType.STRUCT);
-            protocol.readMessageEnd();
+            protocolReader.readMessageBegin();
+            TProtocolUtil.skip(protocolReader, TType.STRUCT);
+            protocolReader.readMessageEnd();
 
             int frameLength = buffer.readerIndex() - frameOffset;
             if (frameLength > maxFrameSize) {

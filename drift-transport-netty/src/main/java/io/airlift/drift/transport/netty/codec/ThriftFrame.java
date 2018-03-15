@@ -15,7 +15,6 @@
  */
 package io.airlift.drift.transport.netty.codec;
 
-import io.airlift.drift.protocol.TProtocolFactory;
 import io.netty.buffer.ByteBuf;
 import io.netty.util.ReferenceCounted;
 
@@ -32,15 +31,17 @@ public class ThriftFrame
     private final int sequenceId;
     private final ByteBuf message;
     private final Map<String, String> headers;
-    private final TProtocolFactory protocolFactory;
+    private final Transport transport;
+    private final Protocol protocol;
     private final boolean supportOutOfOrderResponse;
 
-    public ThriftFrame(int sequenceId, ByteBuf message, Map<String, String> headers, TProtocolFactory protocolFactory, boolean supportOutOfOrderResponse)
+    public ThriftFrame(int sequenceId, ByteBuf message, Map<String, String> headers, Transport transport, Protocol protocol, boolean supportOutOfOrderResponse)
     {
         this.sequenceId = requireNonNull(sequenceId, "sequenceId is null");
         this.message = requireNonNull(message, "message is null");
         this.headers = requireNonNull(headers, "headers is null");
-        this.protocolFactory = requireNonNull(protocolFactory, "protocolFactory is null");
+        this.transport = requireNonNull(transport, "transport is null");
+        this.protocol = requireNonNull(protocol, "protocol is null");
         this.supportOutOfOrderResponse = supportOutOfOrderResponse;
     }
 
@@ -62,9 +63,14 @@ public class ThriftFrame
         return headers;
     }
 
-    public TProtocolFactory getProtocolFactory()
+    public Transport getTransport()
     {
-        return protocolFactory;
+        return transport;
+    }
+
+    public Protocol getProtocol()
+    {
+        return protocol;
     }
 
     public boolean isSupportOutOfOrderResponse()

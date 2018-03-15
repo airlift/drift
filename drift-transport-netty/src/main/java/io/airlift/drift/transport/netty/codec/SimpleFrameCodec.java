@@ -17,7 +17,6 @@ package io.airlift.drift.transport.netty.codec;
 
 import com.google.common.collect.ImmutableMap;
 import io.airlift.drift.protocol.TMessage;
-import io.airlift.drift.protocol.TProtocolFactory;
 import io.airlift.drift.protocol.TTransportException;
 import io.airlift.drift.transport.netty.ssl.TChannelBufferInputTransport;
 import io.netty.buffer.ByteBuf;
@@ -30,12 +29,14 @@ import static java.util.Objects.requireNonNull;
 public class SimpleFrameCodec
         extends ChannelDuplexHandler
 {
-    private final TProtocolFactory protocolFactory;
+    private final Transport transport;
+    private final Protocol protocol;
     private final boolean assumeClientsSupportOutOfOrderResponses;
 
-    public SimpleFrameCodec(TProtocolFactory protocolFactory, boolean assumeClientsSupportOutOfOrderResponses)
+    public SimpleFrameCodec(Transport transport, Protocol protocol, boolean assumeClientsSupportOutOfOrderResponses)
     {
-        this.protocolFactory = requireNonNull(protocolFactory, "protocolFactory is null");
+        this.transport = requireNonNull(transport, "transport is null");
+        this.protocol = requireNonNull(protocol, "protocol is null");
         this.assumeClientsSupportOutOfOrderResponses = assumeClientsSupportOutOfOrderResponses;
     }
 
@@ -50,7 +51,8 @@ public class SimpleFrameCodec
                         extractResponseSequenceId(buffer.retain()),
                         buffer,
                         ImmutableMap.of(),
-                        protocolFactory,
+                        transport,
+                        protocol,
                         assumeClientsSupportOutOfOrderResponses));
                 return;
             }
@@ -63,7 +65,7 @@ public class SimpleFrameCodec
     {
         TChannelBufferInputTransport inputTransport = new TChannelBufferInputTransport(buffer.duplicate());
         try {
-            TMessage message = protocolFactory.getProtocol(inputTransport).readMessageBegin();
+            TMessage message = protocol.createProtocol(inputTransport).readMessageBegin();
             return message.getSequenceId();
         }
         catch (Throwable e) {

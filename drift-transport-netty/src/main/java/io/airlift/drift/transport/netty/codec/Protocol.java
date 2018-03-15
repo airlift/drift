@@ -18,31 +18,63 @@ package io.airlift.drift.transport.netty.codec;
 import io.airlift.drift.protocol.TBinaryProtocol;
 import io.airlift.drift.protocol.TCompactProtocol;
 import io.airlift.drift.protocol.TFacebookCompactProtocol;
-import io.airlift.drift.protocol.TProtocolFactory;
+import io.airlift.drift.protocol.TProtocol;
+import io.airlift.drift.protocol.TTransport;
 
 public enum Protocol
 {
     BINARY {
         @Override
-        public TProtocolFactory createProtocolFactory()
+        public TProtocol createProtocol(TTransport transport)
         {
-            return new TBinaryProtocol.Factory();
+            return new TBinaryProtocol(transport);
+        }
+
+        @Override
+        public int getHeaderTransportId()
+        {
+            return 0;
         }
     },
     COMPACT {
         @Override
-        public TProtocolFactory createProtocolFactory()
+        public TProtocol createProtocol(TTransport transport)
         {
-            return new TCompactProtocol.Factory();
+            return new TCompactProtocol(transport);
+        }
+
+        @Override
+        public int getHeaderTransportId()
+        {
+            throw new IllegalStateException("COMPACT can not be used with HEADER transport; use FB_COMPACT instead");
         }
     },
     FB_COMPACT {
         @Override
-        public TProtocolFactory createProtocolFactory()
+        public TProtocol createProtocol(TTransport transport)
         {
-            return new TFacebookCompactProtocol.Factory();
+            return new TFacebookCompactProtocol(transport);
+        }
+
+        @Override
+        public int getHeaderTransportId()
+        {
+            return 2;
         }
     };
 
-    public abstract TProtocolFactory createProtocolFactory();
+    public abstract TProtocol createProtocol(TTransport transport);
+
+    public abstract int getHeaderTransportId();
+
+    public static Protocol getProtocolByHeaderTransportId(int headerTransportId)
+    {
+        if (headerTransportId == BINARY.getHeaderTransportId()) {
+            return BINARY;
+        }
+        if (headerTransportId == FB_COMPACT.getHeaderTransportId()) {
+            return FB_COMPACT;
+        }
+        throw new IllegalArgumentException("Unsupported header transport protocol ID: " + headerTransportId);
+    }
 }
