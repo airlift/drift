@@ -29,6 +29,7 @@ import java.util.Optional;
 
 import static io.airlift.drift.transport.netty.codec.Protocol.BINARY;
 import static io.airlift.drift.transport.netty.codec.Protocol.COMPACT;
+import static io.airlift.drift.transport.netty.codec.Protocol.FB_COMPACT;
 import static io.airlift.drift.transport.netty.codec.Transport.FRAMED;
 import static io.airlift.drift.transport.netty.codec.Transport.HEADER;
 import static io.airlift.drift.transport.netty.codec.Transport.UNFRAMED;
@@ -127,7 +128,7 @@ public class ThriftProtocolDetection
             return Optional.of(COMPACT);
         }
         if ((magic & COMPACT_PROTOCOL_VERSION_MASK) == COMPACT_PROTOCOL_VERSION_2) {
-            return Optional.of(COMPACT);
+            return Optional.of(FB_COMPACT);
         }
         return Optional.empty();
     }

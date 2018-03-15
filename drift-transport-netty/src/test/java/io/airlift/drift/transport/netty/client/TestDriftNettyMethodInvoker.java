@@ -188,10 +188,12 @@ public class TestDriftNettyMethodInvoker
                 address -> logThriftAsync(address, MESSAGES),
                 address -> logNiftyInvocationHandler(address, DRIFT_MESSAGES, Transport.UNFRAMED, Protocol.BINARY),
                 address -> logNiftyInvocationHandler(address, DRIFT_MESSAGES, Transport.UNFRAMED, Protocol.COMPACT),
+                address -> logNiftyInvocationHandler(address, DRIFT_MESSAGES, Transport.UNFRAMED, Protocol.FB_COMPACT),
                 address -> logNiftyInvocationHandler(address, DRIFT_MESSAGES, Transport.FRAMED, Protocol.BINARY),
                 address -> logNiftyInvocationHandler(address, DRIFT_MESSAGES, Transport.FRAMED, Protocol.COMPACT),
+                address -> logNiftyInvocationHandler(address, DRIFT_MESSAGES, Transport.FRAMED, Protocol.FB_COMPACT),
                 address -> logNiftyInvocationHandler(address, DRIFT_MESSAGES, Transport.HEADER, Protocol.BINARY),
-                address -> logNiftyInvocationHandler(address, DRIFT_MESSAGES, Transport.HEADER, Protocol.COMPACT)));
+                address -> logNiftyInvocationHandler(address, DRIFT_MESSAGES, Transport.HEADER, Protocol.FB_COMPACT)));
 
         return newArrayList(concat(nCopies(invocationCount, DRIFT_MESSAGES)));
     }

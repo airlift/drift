@@ -24,22 +24,25 @@ public enum Protocol
 {
     BINARY {
         @Override
-        public TProtocolFactory createProtocolFactory(Transport transport)
+        public TProtocolFactory createProtocolFactory()
         {
             return new TBinaryProtocol.Factory();
         }
     },
     COMPACT {
         @Override
-        public TProtocolFactory createProtocolFactory(Transport transport)
+        public TProtocolFactory createProtocolFactory()
         {
-            // Header transport uses the FB fork of the compact protocol
-            if (transport == Transport.HEADER) {
-                return new TFacebookCompactProtocol.Factory();
-            }
             return new TCompactProtocol.Factory();
+        }
+    },
+    FB_COMPACT {
+        @Override
+        public TProtocolFactory createProtocolFactory()
+        {
+            return new TFacebookCompactProtocol.Factory();
         }
     };
 
-    public abstract TProtocolFactory createProtocolFactory(Transport transport);
+    public abstract TProtocolFactory createProtocolFactory();
 }

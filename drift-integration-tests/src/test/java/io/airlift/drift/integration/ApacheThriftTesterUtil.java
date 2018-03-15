@@ -43,6 +43,7 @@ import static io.airlift.drift.integration.ClientTestUtils.DRIFT_OK;
 import static io.airlift.drift.integration.ClientTestUtils.HEADER_VALUE;
 import static io.airlift.drift.integration.ClientTestUtils.logDriftClientBinder;
 import static io.airlift.drift.transport.apache.client.ApacheThriftMethodInvokerFactory.createStaticApacheThriftMethodInvokerFactory;
+import static io.airlift.drift.transport.netty.codec.Protocol.FB_COMPACT;
 import static io.airlift.drift.transport.netty.codec.Transport.HEADER;
 import static org.testng.Assert.assertEquals;
 
@@ -68,7 +69,7 @@ final class ApacheThriftTesterUtil
             Protocol protocol,
             boolean secure)
     {
-        if (!isValidConfiguration(transport)) {
+        if (!isValidConfiguration(transport, protocol)) {
             return 0;
         }
 
@@ -102,7 +103,7 @@ final class ApacheThriftTesterUtil
             Protocol protocol,
             boolean secure)
     {
-        if (!isValidConfiguration(transport)) {
+        if (!isValidConfiguration(transport, protocol)) {
             return 0;
         }
 
@@ -135,7 +136,7 @@ final class ApacheThriftTesterUtil
             Protocol protocol,
             boolean secure)
     {
-        if (!isValidConfiguration(transport)) {
+        if (!isValidConfiguration(transport, protocol)) {
             return 0;
         }
 
@@ -169,17 +170,17 @@ final class ApacheThriftTesterUtil
             Protocol protocol,
             boolean secure)
     {
-        if (!isValidConfiguration(transport)) {
+        if (!isValidConfiguration(transport, protocol)) {
             return 0;
         }
 
         return logDriftClientBinder(address, headerValue, entries, new ApacheThriftClientModule(), filters, transport, protocol, secure);
     }
 
-    private static boolean isValidConfiguration(Transport transport)
+    private static boolean isValidConfiguration(Transport transport, Protocol protocol)
     {
         // Apache thrift client does not support header protocol
-        return transport != HEADER;
+        return transport != HEADER && protocol != FB_COMPACT;
     }
 
     private static ApacheThriftClientConfig.Transport toApacheThriftTransport(Transport transport)

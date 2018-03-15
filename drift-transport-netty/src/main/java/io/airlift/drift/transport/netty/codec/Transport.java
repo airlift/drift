@@ -31,7 +31,7 @@ public enum Transport
         @Override
         public void addFrameHandlers(ChannelPipeline pipeline, Optional<Protocol> protocol, DataSize maxFrameSize, boolean assumeClientsSupportOutOfOrderResponses)
         {
-            TProtocolFactory protocolFactory = protocol.get().createProtocolFactory(this);
+            TProtocolFactory protocolFactory = protocol.get().createProtocolFactory();
             pipeline.addLast("thriftUnframedDecoder", new ThriftUnframedDecoder(protocolFactory, maxFrameSize));
             pipeline.addLast(new SimpleFrameCodec(protocolFactory, assumeClientsSupportOutOfOrderResponses));
         }
@@ -42,7 +42,7 @@ public enum Transport
         {
             pipeline.addLast("frameEncoder", new LengthFieldPrepender(Integer.BYTES));
             pipeline.addLast("frameDecoder", new LengthFieldBasedFrameDecoder(toIntExact(maxFrameSize.toBytes()), 0, Integer.BYTES, 0, Integer.BYTES));
-            TProtocolFactory protocolFactory = protocol.get().createProtocolFactory(this);
+            TProtocolFactory protocolFactory = protocol.get().createProtocolFactory();
             pipeline.addLast(new SimpleFrameCodec(protocolFactory, assumeClientsSupportOutOfOrderResponses));
         }
     },

@@ -43,6 +43,8 @@ import static io.airlift.drift.integration.ClientTestUtils.DRIFT_OK;
 import static io.airlift.drift.integration.ClientTestUtils.HEADER_VALUE;
 import static io.airlift.drift.integration.ClientTestUtils.logDriftClientBinder;
 import static io.airlift.drift.transport.netty.client.DriftNettyMethodInvokerFactory.createStaticDriftNettyMethodInvokerFactory;
+import static io.airlift.drift.transport.netty.codec.Protocol.COMPACT;
+import static io.airlift.drift.transport.netty.codec.Transport.HEADER;
 import static org.testng.Assert.assertEquals;
 
 final class DriftNettyTesterUtil
@@ -67,6 +69,10 @@ final class DriftNettyTesterUtil
             Protocol protocol,
             boolean secure)
     {
+        if (!isValidConfiguration(transport, protocol)) {
+            return 0;
+        }
+
         AddressSelector<?> addressSelector = context -> Optional.of(() -> address);
         DriftNettyClientConfig config = new DriftNettyClientConfig()
                 .setTransport(transport)
@@ -100,6 +106,10 @@ final class DriftNettyTesterUtil
             Protocol protocol,
             boolean secure)
     {
+        if (!isValidConfiguration(transport, protocol)) {
+            return 0;
+        }
+
         AddressSelector<?> addressSelector = context -> Optional.of(() -> address);
         DriftNettyClientConfig config = new DriftNettyClientConfig()
                 .setTransport(transport)
@@ -130,6 +140,10 @@ final class DriftNettyTesterUtil
             Protocol protocol,
             boolean secure)
     {
+        if (!isValidConfiguration(transport, protocol)) {
+            return 0;
+        }
+
         AddressSelector<?> addressSelector = context -> Optional.of(() -> address);
         DriftNettyClientConfig config = new DriftNettyClientConfig()
                 .setTransport(transport)
@@ -163,6 +177,16 @@ final class DriftNettyTesterUtil
             Protocol protocol,
             boolean secure)
     {
+        if (!isValidConfiguration(transport, protocol)) {
+            return 0;
+        }
+
         return logDriftClientBinder(address, headerValue, entries, new DriftNettyClientModule(), filters, transport, protocol, secure);
+    }
+
+    private static boolean isValidConfiguration(Transport transport, Protocol protocol)
+    {
+        // HEADER transport cannot be used with COMPACT protocol
+        return transport != HEADER || protocol != COMPACT;
     }
 }

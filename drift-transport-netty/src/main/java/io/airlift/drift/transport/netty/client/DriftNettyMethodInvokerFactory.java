@@ -33,6 +33,8 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import static io.airlift.drift.transport.netty.codec.Protocol.COMPACT;
+import static io.airlift.drift.transport.netty.codec.Transport.HEADER;
 import static io.airlift.drift.transport.netty.ssl.SslContextFactory.createSslContextFactory;
 import static java.util.Objects.requireNonNull;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
@@ -71,6 +73,9 @@ public class DriftNettyMethodInvokerFactory<I>
     public MethodInvoker createMethodInvoker(I clientIdentity)
     {
         DriftNettyClientConfig clientConfig = clientConfigurationProvider.apply(clientIdentity);
+        if (clientConfig.getTransport() == HEADER && clientConfig.getProtocol() == COMPACT) {
+            throw new IllegalArgumentException("HEADER transport cannot be used with COMPACT protocol, use FB_COMPACT instead");
+        }
         if (clientConfig.getSocksProxy() == null) {
             clientConfig.setSocksProxy(defaultSocksProxy);
         }

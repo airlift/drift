@@ -47,6 +47,7 @@ import static io.airlift.drift.integration.ApacheThriftTesterUtil.apacheThriftTe
 import static io.airlift.drift.integration.ClientTestUtils.MESSAGES;
 import static io.airlift.drift.integration.DriftNettyTesterUtil.driftNettyTestClients;
 import static io.airlift.drift.integration.LegacyApacheThriftTesterUtil.legacyApacheThriftTestClients;
+import static io.airlift.drift.transport.netty.codec.Protocol.FB_COMPACT;
 import static io.airlift.drift.transport.netty.codec.Transport.HEADER;
 import static java.util.Collections.nCopies;
 import static org.testng.Assert.assertEquals;
@@ -102,7 +103,7 @@ public class TestClientsWithApacheServer
             throws Exception
     {
         // Apache server does not support header transport
-        if (transport == HEADER) {
+        if (transport == HEADER || protocol == FB_COMPACT) {
             return 0;
         }
 

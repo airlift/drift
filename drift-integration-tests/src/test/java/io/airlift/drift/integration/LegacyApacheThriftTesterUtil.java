@@ -66,8 +66,10 @@ final class LegacyApacheThriftTesterUtil
             case FRAMED:
                 transportFactory = new TFramedTransport.Factory();
                 break;
-            default:
+            case HEADER:
                 return 0;
+            default:
+                throw new IllegalArgumentException("Unsupported transport " + transportType);
         }
 
         try (TSocket socket = createClientSocket(secure, address)) {
@@ -83,6 +85,8 @@ final class LegacyApacheThriftTesterUtil
                 case COMPACT:
                     protocol = new TCompactProtocol(transport);
                     break;
+                case FB_COMPACT:
+                    return 0;
                 default:
                     throw new IllegalArgumentException("Unsupported protocol " + protocolType);
             }
