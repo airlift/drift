@@ -42,6 +42,7 @@ import static java.util.function.Function.identity;
 public class ThriftServiceMetadata
 {
     private final String name;
+    private final String idlName;
     private final Map<String, ThriftMethodMetadata> methods;
     private final List<String> documentation;
 
@@ -55,6 +56,13 @@ public class ThriftServiceMetadata
         }
         else {
             name = thriftService.value();
+        }
+
+        if (thriftService.idlName().isEmpty()) {
+            idlName = name;
+        }
+        else {
+            idlName = thriftService.idlName();
         }
 
         // A multimap from order to method name. Sorted by key (order), with nulls (i.e. no order) last.
@@ -76,6 +84,11 @@ public class ThriftServiceMetadata
     public String getName()
     {
         return name;
+    }
+
+    public String getIdlName()
+    {
+        return idlName;
     }
 
     public Map<String, ThriftMethodMetadata> getMethods()

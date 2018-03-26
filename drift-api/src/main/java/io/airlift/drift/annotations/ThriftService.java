@@ -31,4 +31,9 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 public @interface ThriftService
 {
     String value() default "";
+
+    /**
+     * Name to use for this service in generated IDL.
+     */
+    String idlName() default "";
 }

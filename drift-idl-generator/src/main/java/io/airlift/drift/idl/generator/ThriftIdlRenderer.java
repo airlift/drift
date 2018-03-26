@@ -207,7 +207,7 @@ public final class ThriftIdlRenderer
     private String renderService(ThriftServiceMetadata service)
     {
         return documentation(service.getDocumentation(), "") +
-                format("service %s {\n", service.getName()) +
+                format("service %s {\n", service.getIdlName()) +
                 service.getMethods().values().stream()
                         .map(this::renderMethod)
                         .collect(joining("\n")) +

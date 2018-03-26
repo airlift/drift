@@ -35,6 +35,7 @@ public class TestThriftIdlGenerator
             throws Exception
     {
         assertGenerated(DriftScribe.class, "scribe", ignored -> { });
+        assertGenerated(RenamedService.class, "renamed", ignored -> { });
         assertGenerated(Fruit.class, "fruit", ignored -> { });
         assertGenerated(TreeNode.class, "tree", ignored -> { });
 
