@@ -63,19 +63,6 @@ public class TCompactProtocol
         TTYPE_TO_COMPACT_TYPE[TType.STRUCT] = Types.STRUCT;
     }
 
-    /**
-     * TProtocolFactory that produces TCompactProtocols.
-     */
-    public static class Factory
-            implements TProtocolFactory
-    {
-        @Override
-        public TProtocol getProtocol(TTransport trans)
-        {
-            return new TCompactProtocol(trans);
-        }
-    }
-
     private static final byte PROTOCOL_ID = (byte) 0x82;
     private static final byte VERSION = 1;
     private static final byte VERSION_MASK = 0x1f; // 0001 1111

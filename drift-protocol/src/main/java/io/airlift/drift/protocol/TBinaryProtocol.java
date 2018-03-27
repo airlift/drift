@@ -41,19 +41,6 @@ public class TBinaryProtocol
     private final TTransport transport;
 
     /**
-     * Factory
-     */
-    public static class Factory
-            implements TProtocolFactory
-    {
-        @Override
-        public TProtocol getProtocol(TTransport transport)
-        {
-            return new TBinaryProtocol(transport);
-        }
-    }
-
-    /**
      * Constructor
      */
     public TBinaryProtocol(TTransport transport)

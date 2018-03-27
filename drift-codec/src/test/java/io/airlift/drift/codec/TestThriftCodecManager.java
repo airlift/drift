@@ -27,9 +27,11 @@ import io.airlift.drift.protocol.TBinaryProtocol;
 import io.airlift.drift.protocol.TCompactProtocol;
 import io.airlift.drift.protocol.TMemoryBuffer;
 import io.airlift.drift.protocol.TProtocol;
-import io.airlift.drift.protocol.TProtocolFactory;
+import io.airlift.drift.protocol.TTransport;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
+
+import java.util.function.Function;
 
 import static io.airlift.drift.codec.metadata.ThriftEnumMetadataBuilder.thriftEnumMetadata;
 import static io.airlift.drift.codec.metadata.ThriftType.BOOL;
@@ -188,11 +190,11 @@ public class TestThriftCodecManager
     private <T> void testRoundTripSerialize(T value)
             throws Exception
     {
-        testRoundTripSerialize(value, new TBinaryProtocol.Factory());
-        testRoundTripSerialize(value, new TCompactProtocol.Factory());
+        testRoundTripSerialize(value, TBinaryProtocol::new);
+        testRoundTripSerialize(value, TCompactProtocol::new);
     }
 
-    private <T> void testRoundTripSerialize(T value, TProtocolFactory protocolFactory)
+    private <T> void testRoundTripSerialize(T value, Function<TTransport, TProtocol> protocolFactory)
             throws Exception
     {
         testRoundTripSerialize(codecManager.getCatalog().getThriftType(value.getClass()), value, protocolFactory);
@@ -201,16 +203,16 @@ public class TestThriftCodecManager
     private <T> void testRoundTripSerialize(ThriftType type, T value)
             throws Exception
     {
-        testRoundTripSerialize(type, value, new TBinaryProtocol.Factory());
-        testRoundTripSerialize(type, value, new TCompactProtocol.Factory());
+        testRoundTripSerialize(type, value, TBinaryProtocol::new);
+        testRoundTripSerialize(type, value, TCompactProtocol::new);
     }
 
-    private <T> void testRoundTripSerialize(ThriftType type, T value, TProtocolFactory protocolFactory)
+    private <T> void testRoundTripSerialize(ThriftType type, T value, Function<TTransport, TProtocol> protocolFactory)
             throws Exception
     {
         // write value
         TMemoryBuffer transport = new TMemoryBuffer(10 * 1024);
-        TProtocol protocol = protocolFactory.getProtocol(transport);
+        TProtocol protocol = protocolFactory.apply(transport);
         codecManager.write(type, value, protocol);
 
         // read value back

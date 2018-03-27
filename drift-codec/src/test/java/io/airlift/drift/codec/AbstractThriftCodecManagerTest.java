@@ -49,7 +49,7 @@ import io.airlift.drift.protocol.TBinaryProtocol;
 import io.airlift.drift.protocol.TCompactProtocol;
 import io.airlift.drift.protocol.TMemoryBuffer;
 import io.airlift.drift.protocol.TProtocol;
-import io.airlift.drift.protocol.TProtocolFactory;
+import io.airlift.drift.protocol.TTransport;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -60,6 +60,7 @@ import java.util.Optional;
 import java.util.OptionalDouble;
 import java.util.OptionalInt;
 import java.util.OptionalLong;
+import java.util.function.Function;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.testng.Assert.assertEquals;
@@ -285,7 +286,7 @@ public abstract class AbstractThriftCodecManagerTest
                 ImmutableMap.of((short) 1, new long[] {30, 31, 32, 33}, (short) 2, new long[] {35, 36, 37, 38}),
                 ImmutableMap.of((short) 1, new double[] {40, 41, 42, 43}, (short) 2, new double[] {45, 46, 47, 48}));
 
-        testRoundTripSerialize(arrayField, new TCompactProtocol.Factory());
+        testRoundTripSerialize(arrayField, TCompactProtocol::new);
     }
 
     @Test
@@ -319,16 +320,16 @@ public abstract class AbstractThriftCodecManagerTest
         optionalField.aListEnumOptional = Optional.of(ImmutableList.of(Fruit.BANANA));
         optionalField.aListCustomEnumOptional = Optional.of(ImmutableList.of(Letter.C));
 
-        testRoundTripSerialize(optionalField, new TBinaryProtocol.Factory());
-        testRoundTripSerialize(optionalField, new TCompactProtocol.Factory());
+        testRoundTripSerialize(optionalField, TBinaryProtocol::new);
+        testRoundTripSerialize(optionalField, TCompactProtocol::new);
     }
 
     @Test
     public void testAllOptionalFieldEmpty()
             throws Exception
     {
-        testRoundTripSerialize(new OptionalField(), new TBinaryProtocol.Factory());
-        testRoundTripSerialize(new OptionalField(), new TCompactProtocol.Factory());
+        testRoundTripSerialize(new OptionalField(), TBinaryProtocol::new);
+        testRoundTripSerialize(new OptionalField(), TCompactProtocol::new);
     }
 
     @Test
@@ -362,16 +363,16 @@ public abstract class AbstractThriftCodecManagerTest
                 Optional.of(ImmutableList.of(Fruit.BANANA)),
                 Optional.of(ImmutableList.of(Letter.C)));
 
-        testRoundTripSerialize(optionalStruct, new TBinaryProtocol.Factory());
-        testRoundTripSerialize(optionalStruct, new TCompactProtocol.Factory());
+        testRoundTripSerialize(optionalStruct, TBinaryProtocol::new);
+        testRoundTripSerialize(optionalStruct, TCompactProtocol::new);
     }
 
     @Test
     public void testAllOptionalStructEmpty()
             throws Exception
     {
-        testRoundTripSerialize(new OptionalStruct(), new TBinaryProtocol.Factory());
-        testRoundTripSerialize(new OptionalStruct(), new TCompactProtocol.Factory());
+        testRoundTripSerialize(new OptionalStruct(), TBinaryProtocol::new);
+        testRoundTripSerialize(new OptionalStruct(), TCompactProtocol::new);
     }
 
     @Test
@@ -379,7 +380,8 @@ public abstract class AbstractThriftCodecManagerTest
             throws Exception
     {
         OneOfEverything one = createOneOfEverything();
-        testRoundTripSerialize(one, new TCompactProtocol.Factory());
+        testRoundTripSerialize(one, TBinaryProtocol::new);
+        testRoundTripSerialize(one, TCompactProtocol::new);
     }
 
     @Test
@@ -415,8 +417,8 @@ public abstract class AbstractThriftCodecManagerTest
         one.aEnum = Fruit.CHERRY;
         one.aStruct = new BonkField("struct", 66);
 
-        testRoundTripSerialize(codec, codec, one, new TCompactProtocol.Factory());
-        testRoundTripSerialize(codec, codec, one, new TBinaryProtocol.Factory());
+        testRoundTripSerialize(codec, codec, one, TCompactProtocol::new);
+        testRoundTripSerialize(codec, codec, one, TBinaryProtocol::new);
     }
 
     @Test
@@ -424,8 +426,8 @@ public abstract class AbstractThriftCodecManagerTest
             throws Exception
     {
         OneOfEverything one = new OneOfEverything();
-        testRoundTripSerialize(one, new TBinaryProtocol.Factory());
-        testRoundTripSerialize(one, new TCompactProtocol.Factory());
+        testRoundTripSerialize(one, TBinaryProtocol::new);
+        testRoundTripSerialize(one, TCompactProtocol::new);
     }
 
     @Test
@@ -712,11 +714,11 @@ public abstract class AbstractThriftCodecManagerTest
     private <T> T testRoundTripSerialize(T value)
             throws Exception
     {
-        testRoundTripSerialize(value, new TBinaryProtocol.Factory());
-        return testRoundTripSerialize(value, new TCompactProtocol.Factory());
+        testRoundTripSerialize(value, TBinaryProtocol::new);
+        return testRoundTripSerialize(value, TCompactProtocol::new);
     }
 
-    private <T> T testRoundTripSerialize(T value, TProtocolFactory protocolFactory)
+    private <T> T testRoundTripSerialize(T value, Function<TTransport, TProtocol> protocolFactory)
             throws Exception
     {
         ThriftCodec<T> readCodec = (ThriftCodec<T>) readCodecManager.getCodec(value.getClass());
@@ -728,11 +730,11 @@ public abstract class AbstractThriftCodecManagerTest
     private <T> T testRoundTripSerialize(TypeToken<T> typeToken, T value)
             throws Exception
     {
-        testRoundTripSerialize(typeToken, value, new TBinaryProtocol.Factory());
-        return testRoundTripSerialize(typeToken, value, new TCompactProtocol.Factory());
+        testRoundTripSerialize(typeToken, value, TBinaryProtocol::new);
+        return testRoundTripSerialize(typeToken, value, TCompactProtocol::new);
     }
 
-    private <T> T testRoundTripSerialize(TypeToken<T> typeToken, T value, TProtocolFactory protocolFactory)
+    private <T> T testRoundTripSerialize(TypeToken<T> typeToken, T value, Function<TTransport, TProtocol> protocolFactory)
             throws Exception
     {
         ThriftCodec<T> readCodec = (ThriftCodec<T>) readCodecManager.getCodec(typeToken.getType());
@@ -744,18 +746,18 @@ public abstract class AbstractThriftCodecManagerTest
     private <T> T testRoundTripSerialize(ThriftCodec<T> readCodec, ThriftCodec<T> writeCodec, T structInstance)
             throws Exception
     {
-        testRoundTripSerialize(readCodec, writeCodec, structInstance, new TBinaryProtocol.Factory());
-        return testRoundTripSerialize(readCodec, writeCodec, structInstance, new TCompactProtocol.Factory());
+        testRoundTripSerialize(readCodec, writeCodec, structInstance, TBinaryProtocol::new);
+        return testRoundTripSerialize(readCodec, writeCodec, structInstance, TCompactProtocol::new);
     }
 
-    private <T> T testRoundTripSerialize(ThriftCodec<T> readCodec, ThriftCodec<T> writeCodec, T structInstance, TProtocolFactory protocolFactory)
+    private <T> T testRoundTripSerialize(ThriftCodec<T> readCodec, ThriftCodec<T> writeCodec, T structInstance, Function<TTransport, TProtocol> protocolFactory)
             throws Exception
     {
         Class<T> structClass = (Class<T>) structInstance.getClass();
         return testRoundTripSerialize(readCodec, writeCodec, structClass, structInstance, protocolFactory);
     }
 
-    private <T> T testRoundTripSerialize(ThriftCodec<T> readCodec, ThriftCodec<T> writeCodec, Type structType, T structInstance, TProtocolFactory protocolFactory)
+    private <T> T testRoundTripSerialize(ThriftCodec<T> readCodec, ThriftCodec<T> writeCodec, Type structType, T structInstance, Function<TTransport, TProtocol> protocolFactory)
             throws Exception
     {
         ThriftCatalog readCatalog = readCodecManager.getCatalog();
@@ -767,7 +769,7 @@ public abstract class AbstractThriftCodecManagerTest
         assertNotNull(writeMetadata);
 
         TMemoryBuffer transport = new TMemoryBuffer(10 * 1024);
-        TProtocol protocol = protocolFactory.getProtocol(transport);
+        TProtocol protocol = protocolFactory.apply(transport);
         writeCodec.write(structInstance, protocol);
 
         T copy = readCodec.read(protocol);
