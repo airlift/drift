@@ -63,19 +63,6 @@ public class TFacebookCompactProtocol
         TTYPE_TO_COMPACT_TYPE[TType.STRUCT] = Types.STRUCT;
     }
 
-    /**
-     * TProtocolFactory that produces TCompactProtocols.
-     */
-    public static class Factory
-            implements TProtocolFactory
-    {
-        @Override
-        public TProtocol getProtocol(TTransport trans)
-        {
-            return new TFacebookCompactProtocol(trans);
-        }
-    }
-
     private static final byte PROTOCOL_ID = (byte) 0x82;
     private static final byte VERSION = 2;
     private static final byte VERSION_MASK = 0x1f; // 0001 1111
