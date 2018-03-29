@@ -26,7 +26,6 @@ import io.airlift.drift.annotations.ThriftMethod;
 import io.airlift.drift.annotations.ThriftService;
 import io.airlift.drift.client.guice.AddressSelectorBinder;
 import io.airlift.drift.client.guice.DefaultClient;
-import io.airlift.drift.codec.guice.ThriftCodecModule;
 import org.testng.annotations.Test;
 
 import java.lang.annotation.Annotation;
@@ -84,7 +83,6 @@ public class TestSimpleAddressSelectorBinder
             throws Exception
     {
         Bootstrap app = new Bootstrap(
-                new ThriftCodecModule(),
                 binder -> addressSelectorBinder.bind(binder, THRIFT_SERVICE_ANNOTATION, "testService"));
 
         LifeCycleManager lifeCycleManager = null;

@@ -36,6 +36,7 @@ import io.airlift.drift.client.stats.JmxMethodInvocationStatsFactory;
 import io.airlift.drift.client.stats.MethodInvocationStatsFactory;
 import io.airlift.drift.client.stats.NullMethodInvocationStatsFactory;
 import io.airlift.drift.codec.ThriftCodecManager;
+import io.airlift.drift.codec.guice.ThriftCodecModule;
 import io.airlift.drift.transport.client.DriftClientConfig;
 import io.airlift.drift.transport.client.MethodInvokerFactory;
 import org.weakref.jmx.MBeanExporter;
@@ -71,6 +72,7 @@ public class DriftClientBinder
     private DriftClientBinder(Binder binder)
     {
         this.binder = requireNonNull(binder, "binder is null").skipSources(this.getClass());
+        binder.install(new ThriftCodecModule());
         binder.install(new DriftClientBinderModule());
     }
 

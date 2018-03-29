@@ -30,7 +30,6 @@ import io.airlift.drift.annotations.ThriftMethod;
 import io.airlift.drift.annotations.ThriftService;
 import io.airlift.drift.annotations.ThriftStruct;
 import io.airlift.drift.codec.ThriftCodecManager;
-import io.airlift.drift.codec.guice.ThriftCodecModule;
 import io.airlift.drift.server.TestingServerTransport.State;
 import io.airlift.drift.server.stats.MethodInvocationStatsFactory;
 import io.airlift.drift.transport.server.ServerTransportFactory;
@@ -124,7 +123,6 @@ public class TestDriftServer
         TestingMethodInvocationStatsFactory statsFactory = new TestingMethodInvocationStatsFactory();
 
         Bootstrap app = new Bootstrap(
-                new ThriftCodecModule(),
                 binder -> binder.bind(TestService.class).toInstance(testService),
                 binder -> driftServerBinder(binder).bindService(TestService.class),
                 binder -> binder.bind(ServerTransportFactory.class).toInstance(serverTransportFactory),
@@ -174,7 +172,6 @@ public class TestDriftServer
         TestingMethodInvocationStatsFactory statsFactory = new TestingMethodInvocationStatsFactory();
 
         Bootstrap app = new Bootstrap(
-                new ThriftCodecModule(),
                 binder -> binder.bind(TestService.class).toInstance(testService),
                 binder -> driftServerBinder(binder).bindService(TestService.class),
                 binder -> driftServerBinder(binder).bindFilter(passThroughFilter),

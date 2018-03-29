@@ -27,7 +27,6 @@ import io.airlift.drift.client.DriftClient;
 import io.airlift.drift.client.MethodInvocationFilter;
 import io.airlift.drift.client.address.AddressSelector;
 import io.airlift.drift.codec.ThriftCodecManager;
-import io.airlift.drift.codec.guice.ThriftCodecModule;
 import io.airlift.drift.integration.scribe.apache.LogEntry;
 import io.airlift.drift.integration.scribe.drift.DriftLogEntry;
 import io.airlift.drift.integration.scribe.drift.DriftResultCode;
@@ -100,7 +99,6 @@ final class ClientTestUtils
         Bootstrap app = new Bootstrap(
                 new MBeanModule(),
                 new TestingJmxModule(),
-                new ThriftCodecModule(),
                 transportModule,
                 binder -> driftClientBinder(binder).bindDriftClient(DriftScribe.class)
                         .withAddressSelector(addressSelector)

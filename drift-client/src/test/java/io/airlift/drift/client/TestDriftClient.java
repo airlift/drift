@@ -33,7 +33,6 @@ import io.airlift.drift.annotations.ThriftStruct;
 import io.airlift.drift.client.address.MockAddressSelector;
 import io.airlift.drift.client.stats.MethodInvocationStatsFactory;
 import io.airlift.drift.codec.ThriftCodecManager;
-import io.airlift.drift.codec.guice.ThriftCodecModule;
 import io.airlift.drift.protocol.TProtocolException;
 import io.airlift.drift.protocol.TTransportException;
 import io.airlift.drift.transport.client.DriftClientConfig;
@@ -141,7 +140,6 @@ public class TestDriftClient
         TestingExceptionClassifier clientClassifier = new TestingExceptionClassifier();
         TestingExceptionClassifier customClientClassifier = new TestingExceptionClassifier();
         Bootstrap app = new Bootstrap(
-                new ThriftCodecModule(),
                 binder -> newSetBinder(binder, ExceptionClassifier.class).addBinding()
                         .toInstance(globalClassifierOne),
                 binder -> newSetBinder(binder, ExceptionClassifier.class).addBinding()
@@ -218,7 +216,6 @@ public class TestDriftClient
         TestingExceptionClassifier clientClassifier = new TestingExceptionClassifier();
         TestingExceptionClassifier customClientClassifier = new TestingExceptionClassifier();
         Bootstrap app = new Bootstrap(
-                new ThriftCodecModule(),
                 binder -> newSetBinder(binder, ExceptionClassifier.class).addBinding()
                         .toInstance(globalClassifierOne),
                 binder -> newSetBinder(binder, ExceptionClassifier.class).addBinding()

@@ -19,7 +19,6 @@ import com.google.inject.Injector;
 import com.google.inject.Scopes;
 import io.airlift.bootstrap.Bootstrap;
 import io.airlift.bootstrap.LifeCycleManager;
-import io.airlift.drift.codec.guice.ThriftCodecModule;
 import io.airlift.drift.transport.netty.client.DriftNettyClientModule;
 import io.airlift.drift.transport.netty.server.DriftNettyServerModule;
 import org.testng.annotations.Test;
@@ -41,7 +40,6 @@ public class TestGuiceIntegration
         int port = findUnusedPort();
 
         Bootstrap bootstrap = new Bootstrap(
-                new ThriftCodecModule(),
                 new DriftNettyServerModule(),
                 new DriftNettyClientModule(),
                 binder -> {

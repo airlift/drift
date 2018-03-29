@@ -19,6 +19,7 @@ import com.google.inject.Binder;
 import com.google.inject.Injector;
 import com.google.inject.Key;
 import com.google.inject.Module;
+import io.airlift.drift.codec.guice.ThriftCodecModule;
 import io.airlift.drift.server.DriftServer;
 import io.airlift.drift.server.DriftService;
 import io.airlift.drift.server.MethodInvocationFilter;
@@ -54,6 +55,7 @@ public class DriftServerBinder
     private DriftServerBinder(Binder binder)
     {
         this.binder = requireNonNull(binder, "binder is null").skipSources(getClass());
+        binder.install(new ThriftCodecModule());
         binder.install(new DriftServerBinderModule());
     }
 
