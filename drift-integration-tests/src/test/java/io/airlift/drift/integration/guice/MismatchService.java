@@ -15,21 +15,15 @@
  */
 package io.airlift.drift.integration.guice;
 
-import java.util.concurrent.atomic.AtomicLong;
+import io.airlift.drift.annotations.ThriftMethod;
+import io.airlift.drift.annotations.ThriftService;
 
-public class PingServiceHandler
-        implements PingService
+@ThriftService("mismatch")
+public interface MismatchService
 {
-    private final AtomicLong invocationCount = new AtomicLong();
+    @ThriftMethod
+    int extraClientArgs(int value, int extra);
 
-    @Override
-    public void ping()
-    {
-        invocationCount.incrementAndGet();
-    }
-
-    public long getInvocationCount()
-    {
-        return invocationCount.get();
-    }
+    @ThriftMethod
+    int extraServerArgs();
 }

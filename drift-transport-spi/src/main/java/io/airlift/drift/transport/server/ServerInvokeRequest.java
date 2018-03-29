@@ -18,9 +18,11 @@ package io.airlift.drift.transport.server;
 import com.google.common.collect.ImmutableMap;
 import io.airlift.drift.transport.MethodMetadata;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import static com.google.common.base.MoreObjects.toStringHelper;
+import static java.util.Collections.unmodifiableMap;
 import static java.util.Objects.requireNonNull;
 
 public final class ServerInvokeRequest
@@ -33,7 +35,7 @@ public final class ServerInvokeRequest
     {
         this.method = requireNonNull(method, "method is null");
         this.headers = ImmutableMap.copyOf(requireNonNull(headers, "headers is null"));
-        this.parameters = ImmutableMap.copyOf(requireNonNull(parameters, "parameters is null"));
+        this.parameters = unmodifiableMap(new HashMap<>(requireNonNull(parameters, "parameters is null")));
     }
 
     public MethodMetadata getMethod()

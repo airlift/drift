@@ -43,10 +43,14 @@ import io.airlift.units.Duration;
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
 
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.OptionalDouble;
+import java.util.OptionalInt;
+import java.util.OptionalLong;
 import java.util.concurrent.ScheduledExecutorService;
 
 import static com.google.common.base.Defaults.defaultValue;
@@ -215,14 +219,31 @@ public class ThriftServerHandler
 
         // set defaults for missing arguments
         for (ParameterMetadata parameter : method.getParameters()) {
-            if (arguments.containsKey(parameter.getFieldId())) {
+            if (!arguments.containsKey(parameter.getFieldId())) {
                 Type argumentType = parameter.getCodec().getType().getJavaType();
 
+                Object defaultValue = null;
                 if (argumentType instanceof Class) {
                     Class<?> argumentClass = (Class<?>) argumentType;
-                    argumentClass = Primitives.unwrap(argumentClass);
-                    arguments.put(parameter.getFieldId(), defaultValue(argumentClass));
+                    if (argumentClass.isPrimitive()) {
+                        defaultValue = defaultValue(Primitives.unwrap(argumentClass));
+                    }
+                    else if (argumentClass == OptionalInt.class) {
+                        defaultValue = OptionalInt.empty();
+                    }
+                    else if (argumentClass == OptionalLong.class) {
+                        defaultValue = OptionalLong.empty();
+                    }
+                    else if (argumentClass == OptionalDouble.class) {
+                        defaultValue = OptionalDouble.empty();
+                    }
                 }
+                else if ((argumentType instanceof ParameterizedType) &&
+                        (((ParameterizedType) argumentType).getRawType().equals(Optional.class))) {
+                    defaultValue = Optional.empty();
+                }
+
+                arguments.put(parameter.getFieldId(), defaultValue);
             }
         }
 
