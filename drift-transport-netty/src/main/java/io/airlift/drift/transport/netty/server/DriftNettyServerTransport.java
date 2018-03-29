@@ -31,7 +31,7 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
 
-import static io.airlift.concurrent.Threads.daemonThreadsNamed;
+import static io.airlift.concurrent.Threads.threadsNamed;
 import static io.airlift.drift.transport.netty.ssl.SslContextFactory.createSslContextFactory;
 import static io.netty.channel.ChannelOption.SO_BACKLOG;
 import static io.netty.channel.ChannelOption.SO_KEEPALIVE;
@@ -57,9 +57,9 @@ public class DriftNettyServerTransport
         requireNonNull(config, "config is null");
         this.port = config.getPort();
 
-        ioGroup = new NioEventLoopGroup(config.getIoThreadCount(), daemonThreadsNamed("drift-server-io-%s"));
+        ioGroup = new NioEventLoopGroup(config.getIoThreadCount(), threadsNamed("drift-server-io-%s"));
 
-        workerGroup = new NioEventLoopGroup(config.getWorkerThreadCount(), daemonThreadsNamed("drift-server-worker-%s"));
+        workerGroup = new NioEventLoopGroup(config.getWorkerThreadCount(), threadsNamed("drift-server-worker-%s"));
 
         Optional<Supplier<SslContext>> sslContext = Optional.empty();
         if (config.isSslEnabled()) {
