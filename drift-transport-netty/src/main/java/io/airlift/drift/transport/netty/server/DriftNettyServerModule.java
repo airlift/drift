@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 Facebook, Inc.
+ * Copyright (C) 2018 Facebook, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,28 +15,20 @@
  */
 package io.airlift.drift.transport.netty.server;
 
-import io.airlift.drift.transport.server.ServerMethodInvoker;
-import io.airlift.drift.transport.server.ServerTransport;
+import com.google.inject.Binder;
+import com.google.inject.Module;
+import com.google.inject.Scopes;
 import io.airlift.drift.transport.server.ServerTransportFactory;
 
-import javax.inject.Inject;
+import static io.airlift.configuration.ConfigBinder.configBinder;
 
-import static java.util.Objects.requireNonNull;
-
-public class DriftNettyServerTransportFactory
-        implements ServerTransportFactory
+public class DriftNettyServerModule
+        implements Module
 {
-    private final DriftNettyServerConfig config;
-
-    @Inject
-    public DriftNettyServerTransportFactory(DriftNettyServerConfig config)
-    {
-        this.config = requireNonNull(config, "config is null");
-    }
-
     @Override
-    public ServerTransport createServerTransport(ServerMethodInvoker methodInvoker)
+    public void configure(Binder binder)
     {
-        return new DriftNettyServerTransport(methodInvoker, config);
+        configBinder(binder).bindConfig(DriftNettyServerConfig.class);
+        binder.bind(ServerTransportFactory.class).to(DriftNettyServerTransportFactory.class).in(Scopes.SINGLETON);
     }
 }
