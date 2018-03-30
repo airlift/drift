@@ -1,4 +1,6 @@
 # Drift
+[![Maven Central](https://img.shields.io/maven-central/v/io.airlift.drift/drift-root.svg?label=Maven%20Central)](https://search.maven.org/#search%7Cga%7C1%7Cg%3A%22io.airlift.drift%22)
+[![Build Status](https://travis-ci.org/airlift/drift.svg?branch=master)](https://travis-ci.org/airlift/drift)
 
 Drift is an easy-to-use, annotation-based Java library for creating Thrift
 clients and serializable types.  The client library is similar to JAX-RS 
