@@ -44,6 +44,7 @@ public final class MethodMetadata
     private final Map<Short, ThriftCodec<Object>> exceptionCodecs;
     private final Map<Class<?>, Short> exceptionIdsByType;
     private final boolean oneway;
+    private final boolean idempotent;
 
     public static MethodMetadata toMethodMetadata(ThriftCodecManager codecManager, ThriftMethodMetadata metadata)
     {
@@ -64,7 +65,8 @@ public final class MethodMetadata
                 parameters,
                 resultCodec,
                 exceptionCodecs,
-                metadata.getOneway());
+                metadata.getOneway(),
+                metadata.isIdempotent());
     }
 
     @SuppressWarnings("unchecked")
@@ -78,7 +80,8 @@ public final class MethodMetadata
             List<ParameterMetadata> parameters,
             ThriftCodec<Object> resultCodec,
             Map<Short, ThriftCodec<Object>> exceptionCodecs,
-            boolean oneway)
+            boolean oneway,
+            boolean idempotent)
     {
         this.name = requireNonNull(name, "name is null");
         this.parameters = ImmutableList.copyOf(requireNonNull(parameters, "parameters is null"));
@@ -93,6 +96,7 @@ public final class MethodMetadata
         this.exceptionIdsByType = exceptions.build();
 
         this.oneway = oneway;
+        this.idempotent = idempotent;
     }
 
     public String getName()
@@ -139,6 +143,11 @@ public final class MethodMetadata
     public boolean isOneway()
     {
         return oneway;
+    }
+
+    public boolean isIdempotent()
+    {
+        return idempotent;
     }
 
     @Override

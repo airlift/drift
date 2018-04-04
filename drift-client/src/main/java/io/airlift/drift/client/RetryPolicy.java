@@ -17,6 +17,7 @@ package io.airlift.drift.client;
 
 import io.airlift.drift.transport.client.ConnectionFailedException;
 import io.airlift.drift.transport.client.DriftClientConfig;
+import io.airlift.drift.transport.client.RequestTimeoutException;
 import io.airlift.units.Duration;
 
 import java.io.InterruptedIOException;
@@ -93,10 +94,16 @@ public class RetryPolicy
         return maxRetryTime;
     }
 
-    public ExceptionClassification classifyException(Throwable throwable)
+    public ExceptionClassification classifyException(Throwable throwable, boolean idempotent)
     {
         if (throwable instanceof ConnectionFailedException) {
             return new ExceptionClassification(Optional.of(TRUE), DOWN);
+        }
+
+        if (idempotent && throwable instanceof RequestTimeoutException) {
+            // We don't know if the server is overloaded, or if this specific
+            // request just takes to long, so just mark the server as normal.
+            return new ExceptionClassification(Optional.of(TRUE), NORMAL);
         }
 
         // interrupted exceptions are always an immediate failure

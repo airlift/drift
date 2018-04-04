@@ -185,7 +185,7 @@ class DriftMethodInvocation<A extends Address>
                 failedConnections++;
             }
 
-            ExceptionClassification exceptionClassification = retryPolicy.classifyException(throwable);
+            ExceptionClassification exceptionClassification = retryPolicy.classifyException(throwable, metadata.isIdempotent());
 
             // update stats based on classification
             if (exceptionClassification.getHostStatus() == NORMAL) {

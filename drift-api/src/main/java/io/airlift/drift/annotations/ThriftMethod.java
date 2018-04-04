@@ -35,4 +35,6 @@ public @interface ThriftMethod
     boolean oneway() default false;
 
     ThriftException[] exception() default {};
+
+    boolean idempotent() default true;
 }

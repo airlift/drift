@@ -210,7 +210,8 @@ public class TestApacheThriftMethodInvoker
                     ImmutableList.of(parameter),
                     (ThriftCodec<Object>) (Object) codecManager.getCodec(DriftResultCode.class),
                     ImmutableMap.of(),
-                    false);
+                    false,
+                    true);
 
             ListenableFuture<Object> future = methodInvoker.invoke(new InvokeRequest(methodMetadata, () -> address, ImmutableMap.of(), ImmutableList.of(entries)));
             assertEquals(future.get(), DRIFT_OK);
@@ -240,7 +241,8 @@ public class TestApacheThriftMethodInvoker
                     ImmutableList.of(parameter),
                     (ThriftCodec<Object>) (Object) codecManager.getCodec(DriftResultCode.class),
                     ImmutableMap.of(),
-                    false);
+                    false,
+                    true);
 
             ListenableFuture<Object> future = methodInvoker.invoke(new InvokeRequest(methodMetadata, () -> address, ImmutableMap.of(), ImmutableList.of(Optional.of(entries))));
             assertEquals(future.get(), DRIFT_OK);

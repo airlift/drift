@@ -103,7 +103,8 @@ public class TestDriftNettyMethodInvoker
                     (ThriftCodec<Object>) CODEC_MANAGER.getCodec(list(CODEC_MANAGER.getCodec(DriftLogEntry.class).getType())))),
             (ThriftCodec<Object>) (Object) CODEC_MANAGER.getCodec(DriftResultCode.class),
             ImmutableMap.of(),
-            false);
+            false,
+            true);
 
     private static final List<LogEntry> MESSAGES = ImmutableList.of(
             new LogEntry("hello", "world"),
@@ -332,7 +333,8 @@ public class TestDriftNettyMethodInvoker
                         ImmutableList.of(),
                         (ThriftCodec<Object>) (Object) new VoidThriftCodec(),
                         ImmutableMap.of(),
-                        false),
+                        false,
+                        true),
                 () -> HostAndPort.fromParts("localhost", 1234),
                 ImmutableMap.of(),
                 ImmutableList.of()));
@@ -368,7 +370,8 @@ public class TestDriftNettyMethodInvoker
                     ImmutableList.of(parameter),
                     (ThriftCodec<Object>) (Object) CODEC_MANAGER.getCodec(DriftResultCode.class),
                     ImmutableMap.of(),
-                    false);
+                    false,
+                    true);
 
             ListenableFuture<Object> future = methodInvoker.invoke(new InvokeRequest(methodMetadata, () -> address, ImmutableMap.of(), ImmutableList.of(Optional.of(entries))));
             assertEquals(future.get(), DRIFT_OK);

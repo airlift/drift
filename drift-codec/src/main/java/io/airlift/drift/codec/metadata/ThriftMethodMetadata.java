@@ -59,6 +59,7 @@ public class ThriftMethodMetadata
     private final Method method;
     private final ImmutableMap<Short, ThriftType> exceptions;
     private final boolean oneway;
+    private final boolean idempotent;
     private final List<String> documentation;
 
     public ThriftMethodMetadata(Method method, ThriftCatalog catalog)
@@ -187,6 +188,7 @@ public class ThriftMethodMetadata
         exceptions = buildExceptionMap(catalog, thriftMethod);
 
         this.oneway = thriftMethod.oneway();
+        this.idempotent = thriftMethod.idempotent();
 
         documentation = getThriftDocumentation(method);
     }
@@ -224,6 +226,11 @@ public class ThriftMethodMetadata
     public boolean getOneway()
     {
         return oneway;
+    }
+
+    public boolean isIdempotent()
+    {
+        return idempotent;
     }
 
     public List<String> getDocumentation()

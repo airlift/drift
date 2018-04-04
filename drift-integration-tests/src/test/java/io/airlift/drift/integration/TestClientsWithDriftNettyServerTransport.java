@@ -134,7 +134,8 @@ public class TestClientsWithDriftNettyServerTransport
                     (ThriftCodec<Object>) CODEC_MANAGER.getCodec(list(CODEC_MANAGER.getCodec(DriftLogEntry.class).getType())))),
             (ThriftCodec<Object>) (Object) CODEC_MANAGER.getCodec(DriftResultCode.class),
             ImmutableMap.of(),
-            false);
+            false,
+            true);
 
     private static class TestServerMethodInvoker
             implements ServerMethodInvoker

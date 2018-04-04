@@ -71,7 +71,8 @@ public class TestDriftMethodInvocation
             ImmutableList.of(),
             (ThriftCodec<Object>) (Object) new ShortThriftCodec(),
             ImmutableMap.of(),
-            false);
+            false,
+            true);
     private static final Error UNEXPECTED_EXCEPTION = new Error("unexpected exception");
 
     @Test(timeOut = 60000)
