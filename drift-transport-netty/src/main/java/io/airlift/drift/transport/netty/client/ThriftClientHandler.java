@@ -29,6 +29,7 @@ import io.airlift.drift.protocol.TTransportException;
 import io.airlift.drift.transport.MethodMetadata;
 import io.airlift.drift.transport.ParameterMetadata;
 import io.airlift.drift.transport.client.DriftApplicationException;
+import io.airlift.drift.transport.client.RequestTimeoutException;
 import io.airlift.drift.transport.netty.codec.Protocol;
 import io.airlift.drift.transport.netty.codec.ThriftFrame;
 import io.airlift.drift.transport.netty.codec.Transport;
@@ -306,7 +307,7 @@ public class ThriftClientHandler
         {
             try {
                 timeout.set(executor.schedule(
-                        () -> onChannelError(new TTransportException("Timed out waiting " + requestTimeout + " to receive response")),
+                        () -> onChannelError(new RequestTimeoutException("Timed out waiting " + requestTimeout + " to receive response")),
                         requestTimeout.toMillis(),
                         MILLISECONDS));
             }

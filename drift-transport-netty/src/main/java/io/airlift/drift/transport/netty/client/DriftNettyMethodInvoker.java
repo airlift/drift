@@ -18,9 +18,9 @@ package io.airlift.drift.transport.netty.client;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListeningScheduledExecutorService;
 import io.airlift.concurrent.MoreFutures;
-import io.airlift.drift.TException;
 import io.airlift.drift.transport.client.InvokeRequest;
 import io.airlift.drift.transport.client.MethodInvoker;
+import io.airlift.drift.transport.client.RequestTimeoutException;
 import io.airlift.log.Logger;
 import io.airlift.units.Duration;
 
@@ -58,7 +58,7 @@ class DriftNettyMethodInvoker
                         // log before throwing as this is likely a bug in Drift or Netty
                         String message = "Invocation response future did not complete after " + invokeTimeout;
                         log.error(message);
-                        throw new TException(message);
+                        throw new RequestTimeoutException(message);
                     },
                     invokeTimeout,
                     delayService);
