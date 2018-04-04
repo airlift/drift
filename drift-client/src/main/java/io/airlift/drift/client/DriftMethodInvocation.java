@@ -46,6 +46,7 @@ import static io.airlift.drift.client.ExceptionClassification.HostStatus.NORMAL;
 import static io.airlift.drift.client.ExceptionClassification.HostStatus.OVERLOADED;
 import static io.airlift.units.Duration.succinctNanos;
 import static java.lang.Boolean.FALSE;
+import static java.lang.String.format;
 import static java.util.Objects.requireNonNull;
 
 @ThreadSafe
@@ -143,7 +144,7 @@ class DriftMethodInvocation<A extends Address>
 
             Optional<A> address = addressSelector.selectAddress(addressSelectionContext);
             if (!address.isPresent()) {
-                fail();
+                fail("No hosts available");
                 return;
             }
 
@@ -202,10 +203,18 @@ class DriftMethodInvocation<A extends Address>
 
             // should retry?
             Duration duration = succinctNanos(ticker.read() - startTime);
-            if (!exceptionClassification.isRetry().orElse(FALSE) ||
-                    invocationAttempts > retryPolicy.getMaxRetries() ||
-                    duration.compareTo(retryPolicy.getMaxRetryTime()) >= 0) {
-                fail();
+            if (!exceptionClassification.isRetry().orElse(FALSE)) {
+                // always store exception if non-retryable, so it is added to the exception chain
+                lastException = throwable;
+                fail("Non-retryable exception");
+                return;
+            }
+            if (invocationAttempts > retryPolicy.getMaxRetries()) {
+                fail(format("Max retry attempts (%s) exceeded", retryPolicy.getMaxRetries()));
+                return;
+            }
+            if (duration.compareTo(retryPolicy.getMaxRetryTime()) >= 0) {
+                fail(format("Max retry time (%s) exceeded", retryPolicy.getMaxRetryTime()));
                 return;
             }
 
@@ -255,15 +264,16 @@ class DriftMethodInvocation<A extends Address>
         }
     }
 
-    private synchronized void fail()
+    private synchronized void fail(String reason)
     {
         Throwable cause = lastException;
         if (cause == null) {
             // There are no hosts or all hosts are marked down
-            cause = new TTransportException("No hosts available");
+            cause = new TTransportException(reason);
         }
 
         RetriesFailedException retriesFailedException = new RetriesFailedException(
+                reason,
                 invocationAttempts,
                 succinctNanos(ticker.read() - startTime),
                 failedConnections,

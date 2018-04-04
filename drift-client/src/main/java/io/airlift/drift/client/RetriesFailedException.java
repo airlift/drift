@@ -28,10 +28,11 @@ public class RetriesFailedException
     private final Duration retryTime;
     private final int overloadedRejects;
 
-    public RetriesFailedException(int invocationAttempts, Duration retryTime, int failedConnections, int overloadedRejects)
+    public RetriesFailedException(String reason, int invocationAttempts, Duration retryTime, int failedConnections, int overloadedRejects)
     {
         super(format(
-                "Invocation retries failed (invocationAttempts: %s, duration: %s, failedConnections: %s, overloadedRejects: %s)",
+                "%s (invocationAttempts: %s, duration: %s, failedConnections: %s, overloadedRejects: %s)",
+                reason,
                 invocationAttempts,
                 retryTime,
                 failedConnections,
