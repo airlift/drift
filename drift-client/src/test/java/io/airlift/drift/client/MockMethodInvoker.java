@@ -27,6 +27,7 @@ import javax.annotation.concurrent.GuardedBy;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 import static java.util.Objects.requireNonNull;
@@ -35,7 +36,7 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 public class MockMethodInvoker
         implements MethodInvoker, Supplier<InvokeRequest>
 {
-    private final Supplier<ListenableFuture<Object>> resultsSupplier;
+    private final Function<InvokeRequest, ListenableFuture<Object>> resultsSupplier;
     private final TestingTicker ticker;
 
     @GuardedBy("this")
@@ -49,7 +50,17 @@ public class MockMethodInvoker
         this(resultsSupplier, new TestingTicker());
     }
 
+    public MockMethodInvoker(Function<InvokeRequest, ListenableFuture<Object>> resultsSupplier)
+    {
+        this(resultsSupplier, new TestingTicker());
+    }
+
     public MockMethodInvoker(Supplier<ListenableFuture<Object>> resultsSupplier, TestingTicker ticker)
+    {
+        this(request -> resultsSupplier.get(), ticker);
+    }
+
+    private MockMethodInvoker(Function<InvokeRequest, ListenableFuture<Object>> resultsSupplier, TestingTicker ticker)
     {
         this.resultsSupplier = requireNonNull(resultsSupplier, "resultsSupplier is null");
         this.ticker = requireNonNull(ticker, "ticker is null");
@@ -70,7 +81,7 @@ public class MockMethodInvoker
     public synchronized ListenableFuture<Object> invoke(InvokeRequest request)
     {
         this.request = request;
-        return resultsSupplier.get();
+        return resultsSupplier.apply(request);
     }
 
     @Override

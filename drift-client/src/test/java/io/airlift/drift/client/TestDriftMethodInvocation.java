@@ -29,6 +29,7 @@ import io.airlift.drift.codec.internal.builtin.ShortThriftCodec;
 import io.airlift.drift.protocol.TTransportException;
 import io.airlift.drift.transport.MethodMetadata;
 import io.airlift.drift.transport.client.Address;
+import io.airlift.drift.transport.client.ConnectionFailedException;
 import io.airlift.drift.transport.client.DriftApplicationException;
 import io.airlift.drift.transport.client.DriftClientConfig;
 import io.airlift.testing.TestingTicker;
@@ -311,11 +312,55 @@ public class TestDriftMethodInvocation
             assertTrue(e.getCause() instanceof TTransportException);
             TTransportException transportException = (TTransportException) e.getCause();
             assertTrue(transportException.getMessage().startsWith("No hosts available"));
-            assertRetriesFailedInformation(transportException, expectedRetries, 0, overloaded ? expectedRetries : 0);
+            assertRetriesFailedInformation(transportException, 0, 0, overloaded ? expectedRetries : 0);
         }
         stat.assertNoHostsAvailable(expectedRetries);
         addressSelector.assertAllDown();
         assertEquals(invoker.getDelays().size(), 0);
+    }
+
+    @Test(timeOut = 60000)
+    public void testConnectionFailed()
+            throws Exception
+    {
+        testConnectionFailed(0, 3);
+        testConnectionFailed(1, 3);
+        testConnectionFailed(10, 3);
+    }
+
+    private static void testConnectionFailed(int expectedInvocationAttempts, int failedConnections)
+            throws Exception
+    {
+        AtomicInteger attempts = new AtomicInteger();
+        MockMethodInvoker invoker = new MockMethodInvoker(request -> {
+            int tries = attempts.getAndIncrement();
+            if (tries < expectedInvocationAttempts) {
+                return immediateFailedFuture(createClassifiedException(true, NORMAL));
+            }
+            if (tries < failedConnections + expectedInvocationAttempts) {
+                return immediateFailedFuture(new ConnectionFailedException(request.getAddress(), new Exception()));
+            }
+            // use down for last exception because it isn't counted as an invocation
+            return immediateFailedFuture(createClassifiedException(false, DOWN));
+        });
+        DriftMethodInvocation<?> methodInvocation = createDriftMethodInvocation(
+                new RetryPolicy(new DriftClientConfig().setMaxRetries(100), new TestingExceptionClassifier()),
+                new TestingMethodInvocationStat(),
+                invoker,
+                new TestingAddressSelector(100),
+                systemTicker());
+
+        try {
+            methodInvocation.get();
+            fail("Expected exception");
+        }
+        catch (ExecutionException e) {
+            assertTrue(e.getCause() instanceof DriftApplicationException);
+            DriftApplicationException applicationException = (DriftApplicationException) e.getCause();
+            assertTrue(applicationException.getCause() instanceof ClassifiedException);
+            ClassifiedException classifiedException = (ClassifiedException) applicationException.getCause();
+            assertRetriesFailedInformation(classifiedException, failedConnections, expectedInvocationAttempts, 0);
+        }
     }
 
     @Test(timeOut = 60000)
@@ -622,13 +667,13 @@ public class TestDriftMethodInvocation
         assertTrue(cause instanceof ClassifiedException);
         ClassifiedException classifiedException = (ClassifiedException) cause;
         assertEquals(classifiedException.getClassification(), exceptionClassification);
-        assertRetriesFailedInformation(classifiedException, expectedRetries + 1, expectedRetries + 1, 0);
+        assertRetriesFailedInformation(classifiedException, 0, expectedRetries + 1, 0);
     }
 
-    private static void assertRetriesFailedInformation(Throwable exception, int expectedConnectionAttempts, int expectedInvocationAttempts, int expectedOverloaded)
+    private static void assertRetriesFailedInformation(Throwable exception, int expectedFailedConnections, int expectedInvocationAttempts, int expectedOverloaded)
     {
         RetriesFailedException retriesFailedException = getRetriesFailedException(exception);
-        assertEquals(retriesFailedException.getConnectionAttempts(), expectedConnectionAttempts);
+        assertEquals(retriesFailedException.getFailedConnections(), expectedFailedConnections);
         assertEquals(retriesFailedException.getInvocationAttempts(), expectedInvocationAttempts);
         assertEquals(retriesFailedException.getOverloadedRejects(), expectedOverloaded);
     }

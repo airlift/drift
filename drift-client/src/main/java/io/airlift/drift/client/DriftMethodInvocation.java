@@ -26,6 +26,7 @@ import io.airlift.drift.client.stats.MethodInvocationStat;
 import io.airlift.drift.protocol.TTransportException;
 import io.airlift.drift.transport.MethodMetadata;
 import io.airlift.drift.transport.client.Address;
+import io.airlift.drift.transport.client.ConnectionFailedException;
 import io.airlift.drift.transport.client.DriftApplicationException;
 import io.airlift.drift.transport.client.InvokeRequest;
 import io.airlift.drift.transport.client.MethodInvoker;
@@ -65,7 +66,7 @@ class DriftMethodInvocation<A extends Address>
     private final long startTime;
 
     @GuardedBy("this")
-    private int connectionAttempts;
+    private int failedConnections;
     @GuardedBy("this")
     private int overloadedRejects;
     @GuardedBy("this")
@@ -150,8 +151,6 @@ class DriftMethodInvocation<A extends Address>
                 stat.recordRetry();
             }
 
-            connectionAttempts++;
-
             long invocationStartTime = ticker.read();
             ListenableFuture<Object> result = invoker.invoke(new InvokeRequest(metadata, address.get(), headers, parameters));
             stat.recordResult(invocationStartTime, result);
@@ -181,6 +180,10 @@ class DriftMethodInvocation<A extends Address>
     private synchronized void handleFailure(A address, Throwable throwable)
     {
         try {
+            if (throwable instanceof ConnectionFailedException) {
+                failedConnections++;
+            }
+
             ExceptionClassification exceptionClassification = retryPolicy.classifyException(throwable);
 
             // update stats based on classification
@@ -263,7 +266,7 @@ class DriftMethodInvocation<A extends Address>
         RetriesFailedException retriesFailedException = new RetriesFailedException(
                 invocationAttempts,
                 succinctNanos(ticker.read() - startTime),
-                connectionAttempts,
+                failedConnections,
                 overloadedRejects);
 
         // attach message exception to the exception thrown to caller

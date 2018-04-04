@@ -24,20 +24,20 @@ public class RetriesFailedException
         extends Exception
 {
     private final int invocationAttempts;
-    private final int connectionAttempts;
+    private final int failedConnections;
     private final Duration retryTime;
     private final int overloadedRejects;
 
-    public RetriesFailedException(int invocationAttempts, Duration retryTime, int connectionAttempts, int overloadedRejects)
+    public RetriesFailedException(int invocationAttempts, Duration retryTime, int failedConnections, int overloadedRejects)
     {
         super(format(
-                "Invocation retries failed (invocationAttempts: %s, duration: %s, connectionAttempts: %s, overloadedRejects: %s)",
+                "Invocation retries failed (invocationAttempts: %s, duration: %s, failedConnections: %s, overloadedRejects: %s)",
                 invocationAttempts,
                 retryTime,
-                connectionAttempts,
+                failedConnections,
                 overloadedRejects));
         this.invocationAttempts = invocationAttempts;
-        this.connectionAttempts = connectionAttempts;
+        this.failedConnections = failedConnections;
         this.retryTime = requireNonNull(retryTime, "retryTime is null");
         this.overloadedRejects = overloadedRejects;
     }
@@ -47,9 +47,9 @@ public class RetriesFailedException
         return invocationAttempts;
     }
 
-    public int getConnectionAttempts()
+    public int getFailedConnections()
     {
-        return connectionAttempts;
+        return failedConnections;
     }
 
     public Duration getRetryTime()
