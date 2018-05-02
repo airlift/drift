@@ -23,7 +23,7 @@ import org.testng.annotations.Test;
 public class TestCompilerThriftCodecFactory
         extends AbstractThriftCodecManagerTest
 {
-    private final ThriftCodecManager manager = new ThriftCodecManager(new CompilerThriftCodecFactory(true));
+    private final ThriftCodecManager manager = new ThriftCodecManager(new CompilerThriftCodecFactory(false));
 
     @Override
     public ThriftCodecManager createReadCodecManager()

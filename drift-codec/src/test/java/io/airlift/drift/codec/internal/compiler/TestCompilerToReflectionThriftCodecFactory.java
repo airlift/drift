@@ -33,6 +33,6 @@ public class TestCompilerToReflectionThriftCodecFactory
     @Override
     public ThriftCodecManager createWriteCodecManager()
     {
-        return new ThriftCodecManager(new CompilerThriftCodecFactory(true));
+        return new ThriftCodecManager(new CompilerThriftCodecFactory(false));
     }
 }

@@ -27,7 +27,7 @@ public class TestReflectionToCompilerThriftCodecFactory
     @Override
     public ThriftCodecManager createReadCodecManager()
     {
-        return new ThriftCodecManager(new CompilerThriftCodecFactory(true));
+        return new ThriftCodecManager(new CompilerThriftCodecFactory(false));
     }
 
     @Override
