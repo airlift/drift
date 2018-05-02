@@ -303,7 +303,9 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
                     <configuration>
-                        <redirectTestOutputToFile>true</redirectTestOutputToFile>
+                        <systemPropertyVariables>
+                            <io.netty.leakDetection.level>PARANOID</io.netty.leakDetection.level>
+                        </systemPropertyVariables>
                     </configuration>
                 </plugin>
 
