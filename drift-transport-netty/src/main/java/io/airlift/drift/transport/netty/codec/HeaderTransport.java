@@ -221,7 +221,7 @@ public final class HeaderTransport
     private static String readString(ByteBuf messageHeader)
     {
         int length = readVariableLengthInt(messageHeader);
-        return messageHeader.readBytes(length).toString(UTF_8);
+        return messageHeader.readCharSequence(length, UTF_8).toString();
     }
 
     private static int readVariableLengthInt(ByteBuf messageHeader)
