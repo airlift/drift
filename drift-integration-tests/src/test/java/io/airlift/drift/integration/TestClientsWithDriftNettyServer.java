@@ -25,6 +25,7 @@ import io.airlift.drift.integration.scribe.drift.DriftScribeService;
 import io.airlift.drift.server.DriftServer;
 import io.airlift.drift.server.DriftService;
 import io.airlift.drift.server.stats.NullMethodInvocationStatsFactory;
+import io.airlift.drift.transport.netty.buffer.TestingPooledByteBufAllocator;
 import io.airlift.drift.transport.netty.codec.Protocol;
 import io.airlift.drift.transport.netty.codec.Transport;
 import io.airlift.drift.transport.netty.server.DriftNettyServerConfig;
@@ -110,8 +111,9 @@ public class TestClientsWithDriftNettyServer
                 .setSslEnabled(true)
                 .setTrustCertificate(ClientTestUtils.getCertificateChainFile())
                 .setKey(ClientTestUtils.getPrivateKeyFile());
+        TestingPooledByteBufAllocator testingAllocator = new TestingPooledByteBufAllocator();
         DriftServer driftServer = new DriftServer(
-                new DriftNettyServerTransportFactory(config),
+                new DriftNettyServerTransportFactory(config, testingAllocator),
                 CODEC_MANAGER,
                 new NullMethodInvocationStatsFactory(),
                 ImmutableSet.of(service),
@@ -125,6 +127,7 @@ public class TestClientsWithDriftNettyServer
         }
         finally {
             driftServer.shutdown();
+            testingAllocator.close();
         }
     }
 }

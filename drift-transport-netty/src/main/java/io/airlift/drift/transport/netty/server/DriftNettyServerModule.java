@@ -15,20 +15,38 @@
  */
 package io.airlift.drift.transport.netty.server;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.inject.Binder;
 import com.google.inject.Module;
 import com.google.inject.Scopes;
 import io.airlift.drift.transport.server.ServerTransportFactory;
+import io.netty.buffer.ByteBufAllocator;
+import io.netty.buffer.PooledByteBufAllocator;
 
 import static io.airlift.configuration.ConfigBinder.configBinder;
+import static java.util.Objects.requireNonNull;
 
 public class DriftNettyServerModule
         implements Module
 {
+    private final ByteBufAllocator allocator;
+
+    public DriftNettyServerModule()
+    {
+        this(PooledByteBufAllocator.DEFAULT);
+    }
+
+    @VisibleForTesting
+    public DriftNettyServerModule(ByteBufAllocator allocator)
+    {
+        this.allocator = requireNonNull(allocator, "allocator is null");
+    }
+
     @Override
     public void configure(Binder binder)
     {
         configBinder(binder).bindConfig(DriftNettyServerConfig.class);
+        binder.bind(ByteBufAllocator.class).toInstance(allocator);
         binder.bind(ServerTransportFactory.class).to(DriftNettyServerTransportFactory.class).in(Scopes.SINGLETON);
     }
 }

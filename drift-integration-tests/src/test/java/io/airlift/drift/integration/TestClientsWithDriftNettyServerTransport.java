@@ -28,6 +28,7 @@ import io.airlift.drift.integration.scribe.drift.DriftLogEntry;
 import io.airlift.drift.integration.scribe.drift.DriftResultCode;
 import io.airlift.drift.transport.MethodMetadata;
 import io.airlift.drift.transport.ParameterMetadata;
+import io.airlift.drift.transport.netty.buffer.TestingPooledByteBufAllocator;
 import io.airlift.drift.transport.netty.codec.Protocol;
 import io.airlift.drift.transport.netty.codec.Transport;
 import io.airlift.drift.transport.netty.server.DriftNettyServerConfig;
@@ -60,14 +61,12 @@ public class TestClientsWithDriftNettyServerTransport
 {
     @Test
     public void testDriftServer()
-            throws Exception
     {
         testDriftServer(ImmutableList.of());
     }
 
     @Test
     public void testHandlersWithDriftServer()
-            throws Exception
     {
         TestFilter firstFilter = new TestFilter();
         TestFilter secondFilter = new TestFilter();
@@ -80,7 +79,6 @@ public class TestClientsWithDriftNettyServerTransport
     }
 
     private static int testDriftServer(List<MethodInvocationFilter> filters)
-            throws Exception
     {
         TestServerMethodInvoker methodInvoker = new TestServerMethodInvoker();
 
@@ -102,13 +100,13 @@ public class TestClientsWithDriftNettyServerTransport
     }
 
     private static int testDriftServer(ServerMethodInvoker methodInvoker, List<ToIntFunction<HostAndPort>> clients)
-            throws Exception
     {
         DriftNettyServerConfig config = new DriftNettyServerConfig()
                 .setSslEnabled(true)
                 .setTrustCertificate(ClientTestUtils.getCertificateChainFile())
                 .setKey(ClientTestUtils.getPrivateKeyFile());
-        ServerTransport serverTransport = new DriftNettyServerTransportFactory(config).createServerTransport(methodInvoker);
+        TestingPooledByteBufAllocator testingAllocator = new TestingPooledByteBufAllocator();
+        ServerTransport serverTransport = new DriftNettyServerTransportFactory(config, testingAllocator).createServerTransport(methodInvoker);
         try {
             serverTransport.start();
 
@@ -122,6 +120,7 @@ public class TestClientsWithDriftNettyServerTransport
         }
         finally {
             serverTransport.shutdown();
+            testingAllocator.close();
         }
     }
 

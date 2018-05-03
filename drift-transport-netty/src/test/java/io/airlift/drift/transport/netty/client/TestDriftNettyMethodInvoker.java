@@ -30,6 +30,7 @@ import io.airlift.drift.transport.MethodMetadata;
 import io.airlift.drift.transport.ParameterMetadata;
 import io.airlift.drift.transport.client.InvokeRequest;
 import io.airlift.drift.transport.client.MethodInvoker;
+import io.airlift.drift.transport.netty.buffer.TestingPooledByteBufAllocator;
 import io.airlift.drift.transport.netty.client.ConnectionManager.ConnectionParameters;
 import io.airlift.drift.transport.netty.codec.Protocol;
 import io.airlift.drift.transport.netty.codec.Transport;
@@ -207,7 +208,8 @@ public class TestDriftNettyMethodInvoker
     private static int testMethodInvoker(ServerMethodInvoker methodInvoker, List<ToIntFunction<HostAndPort>> clients)
             throws Exception
     {
-        ServerTransport serverTransport = new DriftNettyServerTransportFactory(new DriftNettyServerConfig()).createServerTransport(methodInvoker);
+        TestingPooledByteBufAllocator testingAllocator = new TestingPooledByteBufAllocator();
+        ServerTransport serverTransport = new DriftNettyServerTransportFactory(new DriftNettyServerConfig(), testingAllocator).createServerTransport(methodInvoker);
         try {
             serverTransport.start();
 
@@ -221,6 +223,7 @@ public class TestDriftNettyMethodInvoker
         }
         finally {
             serverTransport.shutdown();
+            testingAllocator.close();
         }
     }
 
@@ -297,9 +300,11 @@ public class TestDriftNettyMethodInvoker
                 .setTransport(transport)
                 .setProtocol(protocol);
 
-        try (DriftNettyMethodInvokerFactory<Void> methodInvokerFactory = new DriftNettyMethodInvokerFactory<>(
-                new DriftNettyConnectionFactoryConfig().setConnectionPoolEnabled(true),
-                clientIdentity -> config)) {
+        try (TestingPooledByteBufAllocator testingAllocator = new TestingPooledByteBufAllocator();
+                DriftNettyMethodInvokerFactory<Void> methodInvokerFactory = new DriftNettyMethodInvokerFactory<>(
+                        new DriftNettyConnectionFactoryConfig().setConnectionPoolEnabled(true),
+                        clientIdentity -> config,
+                        testingAllocator)) {
             MethodInvoker methodInvoker = methodInvokerFactory.createMethodInvoker(null);
 
             ListenableFuture<Object> future = methodInvoker.invoke(new InvokeRequest(LOG_METHOD_METADATA, () -> address, ImmutableMap.of(), ImmutableList.of(entries)));
@@ -370,9 +375,11 @@ public class TestDriftNettyMethodInvoker
     private static int logNiftyInvocationHandlerOptional(HostAndPort address, List<DriftLogEntry> entries)
     {
         DriftNettyClientConfig config = new DriftNettyClientConfig();
-        try (DriftNettyMethodInvokerFactory<Void> methodInvokerFactory = new DriftNettyMethodInvokerFactory<>(
-                new DriftNettyConnectionFactoryConfig().setConnectionPoolEnabled(true),
-                clientIdentity -> config)) {
+        try (TestingPooledByteBufAllocator testingAllocator = new TestingPooledByteBufAllocator();
+                DriftNettyMethodInvokerFactory<Void> methodInvokerFactory = new DriftNettyMethodInvokerFactory<>(
+                        new DriftNettyConnectionFactoryConfig().setConnectionPoolEnabled(true),
+                        clientIdentity -> config,
+                        testingAllocator)) {
             MethodInvoker methodInvoker = methodInvokerFactory.createMethodInvoker(null);
 
             ThriftType optionalType = optional(list(CODEC_MANAGER.getCatalog().getThriftType(DriftLogEntry.class)));

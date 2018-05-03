@@ -18,6 +18,7 @@ package io.airlift.drift.transport.netty.server;
 import io.airlift.drift.transport.server.ServerMethodInvoker;
 import io.airlift.drift.transport.server.ServerTransport;
 import io.airlift.drift.transport.server.ServerTransportFactory;
+import io.netty.buffer.ByteBufAllocator;
 
 import javax.inject.Inject;
 
@@ -27,16 +28,18 @@ public class DriftNettyServerTransportFactory
         implements ServerTransportFactory
 {
     private final DriftNettyServerConfig config;
+    private final ByteBufAllocator allocator;
 
     @Inject
-    public DriftNettyServerTransportFactory(DriftNettyServerConfig config)
+    public DriftNettyServerTransportFactory(DriftNettyServerConfig config, ByteBufAllocator allocator)
     {
         this.config = requireNonNull(config, "config is null");
+        this.allocator = requireNonNull(allocator, "allocator is null");
     }
 
     @Override
     public ServerTransport createServerTransport(ServerMethodInvoker methodInvoker)
     {
-        return new DriftNettyServerTransport(methodInvoker, config);
+        return new DriftNettyServerTransport(methodInvoker, config, allocator);
     }
 }

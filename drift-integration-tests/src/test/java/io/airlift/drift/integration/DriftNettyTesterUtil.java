@@ -25,6 +25,7 @@ import io.airlift.drift.integration.scribe.drift.DriftAsyncScribe;
 import io.airlift.drift.integration.scribe.drift.DriftLogEntry;
 import io.airlift.drift.integration.scribe.drift.DriftScribe;
 import io.airlift.drift.transport.client.DriftClientConfig;
+import io.airlift.drift.transport.netty.buffer.TestingPooledByteBufAllocator;
 import io.airlift.drift.transport.netty.client.DriftNettyClientConfig;
 import io.airlift.drift.transport.netty.client.DriftNettyClientModule;
 import io.airlift.drift.transport.netty.client.DriftNettyConnectionFactoryConfig;
@@ -80,9 +81,11 @@ final class DriftNettyTesterUtil
                 .setTrustCertificate(ClientTestUtils.getCertificateChainFile())
                 .setSslEnabled(secure);
 
-        try (DriftNettyMethodInvokerFactory<String> methodInvokerFactory = new DriftNettyMethodInvokerFactory<>(
-                new DriftNettyConnectionFactoryConfig().setConnectionPoolEnabled(true),
-                clientIdentity -> config)) {
+        try (TestingPooledByteBufAllocator testingAllocator = new TestingPooledByteBufAllocator();
+                DriftNettyMethodInvokerFactory<String> methodInvokerFactory = new DriftNettyMethodInvokerFactory<>(
+                        new DriftNettyConnectionFactoryConfig().setConnectionPoolEnabled(true),
+                        clientIdentity -> config,
+                        testingAllocator)) {
             DriftClientFactoryManager<String> clientFactoryManager = new DriftClientFactoryManager<>(CODEC_MANAGER, methodInvokerFactory);
             DriftClientFactory proxyFactory = clientFactoryManager.createDriftClientFactory("clientIdentity", addressSelector, NORMAL_RESULT);
 
@@ -116,7 +119,8 @@ final class DriftNettyTesterUtil
                 .setTrustCertificate(ClientTestUtils.getCertificateChainFile())
                 .setSslEnabled(secure);
 
-        try (DriftNettyMethodInvokerFactory<?> methodInvokerFactory = createStaticDriftNettyMethodInvokerFactory(config)) {
+        try (TestingPooledByteBufAllocator testingAllocator = new TestingPooledByteBufAllocator();
+                DriftNettyMethodInvokerFactory<?> methodInvokerFactory = createStaticDriftNettyMethodInvokerFactory(config, testingAllocator)) {
             DriftClientFactory proxyFactory = new DriftClientFactory(CODEC_MANAGER, methodInvokerFactory, addressSelector, NORMAL_RESULT);
 
             DriftScribe scribe = proxyFactory.createDriftClient(DriftScribe.class, Optional.empty(), filters, new DriftClientConfig()).get();
@@ -149,9 +153,11 @@ final class DriftNettyTesterUtil
                 .setTrustCertificate(ClientTestUtils.getCertificateChainFile())
                 .setSslEnabled(secure);
 
-        try (DriftNettyMethodInvokerFactory<String> methodInvokerFactory = new DriftNettyMethodInvokerFactory<>(
-                new DriftNettyConnectionFactoryConfig().setConnectionPoolEnabled(true),
-                clientIdentity -> config)) {
+        try (TestingPooledByteBufAllocator testingAllocator = new TestingPooledByteBufAllocator();
+                DriftNettyMethodInvokerFactory<String> methodInvokerFactory = new DriftNettyMethodInvokerFactory<>(
+                        new DriftNettyConnectionFactoryConfig().setConnectionPoolEnabled(true),
+                        clientIdentity -> config,
+                        testingAllocator)) {
             DriftClientFactoryManager<String> proxyFactoryManager = new DriftClientFactoryManager<>(CODEC_MANAGER, methodInvokerFactory);
             DriftClientFactory proxyFactory = proxyFactoryManager.createDriftClientFactory("myFactory", addressSelector, NORMAL_RESULT);
 
@@ -178,7 +184,9 @@ final class DriftNettyTesterUtil
             return 0;
         }
 
-        return logDriftClientBinder(address, headerValue, entries, new DriftNettyClientModule(), filters, transport, protocol, secure);
+        try (TestingPooledByteBufAllocator testingAllocator = new TestingPooledByteBufAllocator()) {
+            return logDriftClientBinder(address, headerValue, entries, new DriftNettyClientModule(testingAllocator), filters, transport, protocol, secure);
+        }
     }
 
     private static boolean isValidConfiguration(Transport transport, Protocol protocol)

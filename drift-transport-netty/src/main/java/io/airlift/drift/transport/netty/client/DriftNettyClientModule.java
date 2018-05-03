@@ -15,6 +15,7 @@
  */
 package io.airlift.drift.transport.netty.client;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.inject.Binder;
 import com.google.inject.Injector;
 import com.google.inject.Key;
@@ -23,6 +24,7 @@ import com.google.inject.Scopes;
 import com.google.inject.TypeLiteral;
 import io.airlift.drift.transport.client.DriftClientConfig;
 import io.airlift.drift.transport.client.MethodInvokerFactory;
+import io.netty.buffer.ByteBufAllocator;
 
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
@@ -32,10 +34,24 @@ import java.lang.annotation.Annotation;
 
 import static com.google.common.base.Preconditions.checkState;
 import static io.airlift.configuration.ConfigBinder.configBinder;
+import static java.util.Objects.requireNonNull;
 
 public class DriftNettyClientModule
         implements Module
 {
+    private final ByteBufAllocator allocator;
+
+    public DriftNettyClientModule()
+    {
+        this(ByteBufAllocator.DEFAULT);
+    }
+
+    @VisibleForTesting
+    public DriftNettyClientModule(ByteBufAllocator allocator)
+    {
+        this.allocator = requireNonNull(allocator, "allocator is null");
+    }
+
     @Override
     public void configure(Binder binder)
     {
@@ -46,6 +62,7 @@ public class DriftNettyClientModule
             }
         });
 
+        binder.bind(ByteBufAllocator.class).toInstance(allocator);
         binder.bind(new TypeLiteral<MethodInvokerFactory<Annotation>>() {})
                 .toProvider(MethodInvokerFactoryProvider.class)
                 .in(Scopes.SINGLETON);
@@ -85,7 +102,8 @@ public class DriftNettyClientModule
 
             factory = new DriftNettyMethodInvokerFactory<>(
                     injector.getInstance(DriftNettyConnectionFactoryConfig.class),
-                    annotation -> injector.getInstance(Key.get(DriftNettyClientConfig.class, annotation)));
+                    annotation -> injector.getInstance(Key.get(DriftNettyClientConfig.class, annotation)),
+                    injector.getInstance(ByteBufAllocator.class));
 
             return factory;
         }

@@ -15,6 +15,7 @@
  */
 package io.airlift.drift.transport.netty.client;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.net.HostAndPort;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import io.airlift.drift.transport.client.MethodInvoker;
@@ -22,11 +23,11 @@ import io.airlift.drift.transport.client.MethodInvokerFactory;
 import io.airlift.drift.transport.netty.client.ConnectionManager.ConnectionParameters;
 import io.airlift.drift.transport.netty.ssl.SslContextFactory;
 import io.airlift.drift.transport.netty.ssl.SslContextFactory.SslContextParameters;
+import io.netty.buffer.ByteBufAllocator;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 
 import javax.annotation.PreDestroy;
-import javax.inject.Inject;
 
 import java.io.Closeable;
 import java.util.Optional;
@@ -50,11 +51,19 @@ public class DriftNettyMethodInvokerFactory<I>
 
     public static DriftNettyMethodInvokerFactory<?> createStaticDriftNettyMethodInvokerFactory(DriftNettyClientConfig clientConfig)
     {
-        return new DriftNettyMethodInvokerFactory<>(new DriftNettyConnectionFactoryConfig(), clientIdentity -> clientConfig);
+        return createStaticDriftNettyMethodInvokerFactory(clientConfig, ByteBufAllocator.DEFAULT);
     }
 
-    @Inject
-    public DriftNettyMethodInvokerFactory(DriftNettyConnectionFactoryConfig factoryConfig, Function<I, DriftNettyClientConfig> clientConfigurationProvider)
+    @VisibleForTesting
+    public static DriftNettyMethodInvokerFactory<?> createStaticDriftNettyMethodInvokerFactory(DriftNettyClientConfig clientConfig, ByteBufAllocator allocator)
+    {
+        return new DriftNettyMethodInvokerFactory<>(new DriftNettyConnectionFactoryConfig(), clientIdentity -> clientConfig, allocator);
+    }
+
+    public DriftNettyMethodInvokerFactory(
+            DriftNettyConnectionFactoryConfig factoryConfig,
+            Function<I, DriftNettyClientConfig> clientConfigurationProvider,
+            ByteBufAllocator allocator)
     {
         requireNonNull(factoryConfig, "factoryConfig is null");
 
@@ -67,7 +76,7 @@ public class DriftNettyMethodInvokerFactory<I>
         this.sslContextFactory = createSslContextFactory(true, factoryConfig.getSslContextRefreshTime(), group);
         this.defaultSocksProxy = Optional.ofNullable(factoryConfig.getSocksProxy());
 
-        ConnectionManager connectionManager = new ConnectionFactory(group, sslContextFactory);
+        ConnectionManager connectionManager = new ConnectionFactory(group, sslContextFactory, allocator);
         if (factoryConfig.isConnectionPoolEnabled()) {
             connectionManager = new ConnectionPool(connectionManager, group, factoryConfig.getConnectionPoolMaxSize(), factoryConfig.getConnectionPoolIdleTimeout());
         }

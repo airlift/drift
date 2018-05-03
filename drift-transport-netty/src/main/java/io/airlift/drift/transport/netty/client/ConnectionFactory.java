@@ -19,6 +19,7 @@ import com.google.common.net.HostAndPort;
 import io.airlift.drift.protocol.TTransportException;
 import io.airlift.drift.transport.netty.ssl.SslContextFactory;
 import io.netty.bootstrap.Bootstrap;
+import io.netty.buffer.ByteBufAllocator;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
@@ -30,6 +31,7 @@ import io.netty.util.concurrent.Promise;
 import java.net.InetSocketAddress;
 
 import static com.google.common.primitives.Ints.saturatedCast;
+import static io.netty.channel.ChannelOption.ALLOCATOR;
 import static io.netty.channel.ChannelOption.CONNECT_TIMEOUT_MILLIS;
 import static java.util.Objects.requireNonNull;
 
@@ -38,11 +40,13 @@ class ConnectionFactory
 {
     private final EventLoopGroup group;
     private final SslContextFactory sslContextFactory;
+    private final ByteBufAllocator allocator;
 
-    ConnectionFactory(EventLoopGroup group, SslContextFactory sslContextFactory)
+    ConnectionFactory(EventLoopGroup group, SslContextFactory sslContextFactory, ByteBufAllocator allocator)
     {
         this.group = requireNonNull(group, "group is null");
         this.sslContextFactory = requireNonNull(sslContextFactory, "sslContextFactory is null");
+        this.allocator = requireNonNull(allocator, "allocator is null");
     }
 
     @Override
@@ -52,6 +56,7 @@ class ConnectionFactory
             Bootstrap bootstrap = new Bootstrap()
                     .group(group)
                     .channel(NioSocketChannel.class)
+                    .option(ALLOCATOR, allocator)
                     .option(CONNECT_TIMEOUT_MILLIS, saturatedCast(connectionParameters.getConnectTimeout().toMillis()))
                     .handler(new ThriftClientInitializer(
                             connectionParameters.getTransport(),

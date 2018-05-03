@@ -25,6 +25,7 @@ import io.airlift.drift.codec.ThriftCodec;
 import io.airlift.drift.codec.ThriftCodecManager;
 import io.airlift.drift.transport.MethodMetadata;
 import io.airlift.drift.transport.ParameterMetadata;
+import io.airlift.drift.transport.netty.buffer.TestingPooledByteBufAllocator;
 import io.airlift.drift.transport.netty.scribe.apache.LogEntry;
 import io.airlift.drift.transport.netty.scribe.apache.ResultCode;
 import io.airlift.drift.transport.netty.scribe.apache.scribe.Log_args;
@@ -224,7 +225,8 @@ public class TestDriftNettyServerTransport
     {
         DriftNettyServerConfig config = new DriftNettyServerConfig()
                 .setAssumeClientsSupportOutOfOrderResponses(assumeClientsSupportOutOfOrderResponses);
-        ServerTransport serverTransport = new DriftNettyServerTransportFactory(config).createServerTransport(methodInvoker);
+        TestingPooledByteBufAllocator testingAllocator = new TestingPooledByteBufAllocator();
+        ServerTransport serverTransport = new DriftNettyServerTransportFactory(config, testingAllocator).createServerTransport(methodInvoker);
         try {
             serverTransport.start();
 
@@ -238,6 +240,7 @@ public class TestDriftNettyServerTransport
         }
         finally {
             serverTransport.shutdown();
+            testingAllocator.close();
         }
     }
 

@@ -19,6 +19,7 @@ import io.airlift.drift.transport.netty.ssl.SslContextFactory;
 import io.airlift.drift.transport.server.ServerMethodInvoker;
 import io.airlift.drift.transport.server.ServerTransport;
 import io.netty.bootstrap.ServerBootstrap;
+import io.netty.buffer.ByteBufAllocator;
 import io.netty.channel.Channel;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -33,6 +34,7 @@ import java.util.function.Supplier;
 
 import static io.airlift.concurrent.Threads.threadsNamed;
 import static io.airlift.drift.transport.netty.ssl.SslContextFactory.createSslContextFactory;
+import static io.netty.channel.ChannelOption.ALLOCATOR;
 import static io.netty.channel.ChannelOption.SO_BACKLOG;
 import static io.netty.channel.ChannelOption.SO_KEEPALIVE;
 import static java.util.Objects.requireNonNull;
@@ -51,7 +53,7 @@ public class DriftNettyServerTransport
 
     private final AtomicBoolean running = new AtomicBoolean();
 
-    public DriftNettyServerTransport(ServerMethodInvoker methodInvoker, DriftNettyServerConfig config)
+    public DriftNettyServerTransport(ServerMethodInvoker methodInvoker, DriftNettyServerConfig config, ByteBufAllocator allocator)
     {
         requireNonNull(methodInvoker, "methodInvoker is null");
         requireNonNull(config, "config is null");
@@ -91,6 +93,7 @@ public class DriftNettyServerTransport
                 .channel(NioServerSocketChannel.class)
                 .childHandler(serverInitializer)
                 .option(SO_BACKLOG, config.getAcceptBacklog())
+                .option(ALLOCATOR, allocator)
                 .childOption(SO_KEEPALIVE, true)
                 .validate();
     }

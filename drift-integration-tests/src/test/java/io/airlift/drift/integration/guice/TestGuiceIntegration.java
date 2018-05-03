@@ -21,6 +21,7 @@ import io.airlift.bootstrap.LifeCycleManager;
 import io.airlift.drift.integration.guice.EchoService.EmptyOptionalException;
 import io.airlift.drift.integration.guice.EchoService.NullValueException;
 import io.airlift.drift.integration.scribe.drift.DriftLogEntry;
+import io.airlift.drift.transport.netty.buffer.TestingPooledByteBufAllocator;
 import io.airlift.drift.transport.netty.client.DriftNettyClientModule;
 import io.airlift.drift.transport.netty.server.DriftNettyServerModule;
 import org.testng.annotations.Test;
@@ -50,9 +51,10 @@ public class TestGuiceIntegration
     {
         int port = findUnusedPort();
 
+        TestingPooledByteBufAllocator testingAllocator = new TestingPooledByteBufAllocator();
         Bootstrap bootstrap = new Bootstrap(
-                new DriftNettyServerModule(),
-                new DriftNettyClientModule(),
+                new DriftNettyServerModule(testingAllocator),
+                new DriftNettyClientModule(testingAllocator),
                 binder -> {
                     driftServerBinder(binder).bindService(EchoServiceHandler.class);
                     driftServerBinder(binder).bindService(MismatchServiceHandler.class);
@@ -80,6 +82,7 @@ public class TestGuiceIntegration
         }
         finally {
             lifeCycleManager.stop();
+            testingAllocator.close();
         }
     }
 
