@@ -41,6 +41,7 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.function.Supplier;
 
 import static com.google.common.reflect.Reflection.newProxy;
+import static io.airlift.drift.client.ExceptionClassifier.NORMAL_RESULT;
 import static io.airlift.drift.client.FilteredMethodInvoker.createFilteredMethodInvoker;
 import static io.airlift.drift.transport.MethodMetadata.toMethodMetadata;
 import static java.util.Objects.requireNonNull;
@@ -80,6 +81,14 @@ public class DriftClientFactory
                 addressSelector,
                 exceptionClassifier,
                 new NullMethodInvocationStatsFactory());
+    }
+
+    public DriftClientFactory(
+            ThriftCodecManager codecManager,
+            MethodInvokerFactory<?> invokerFactory,
+            AddressSelector<? extends Address> addressSelector)
+    {
+        this(codecManager, invokerFactory, addressSelector, NORMAL_RESULT);
     }
 
     public <T> DriftClient<T> createDriftClient(Class<T> clientInterface)

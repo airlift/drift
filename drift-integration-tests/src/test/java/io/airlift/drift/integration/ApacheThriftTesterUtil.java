@@ -115,7 +115,7 @@ final class ApacheThriftTesterUtil
                 .setSslEnabled(secure);
 
         try (ApacheThriftMethodInvokerFactory<?> methodInvokerFactory = createStaticApacheThriftMethodInvokerFactory(config)) {
-            DriftClientFactory proxyFactory = new DriftClientFactory(CODEC_MANAGER, methodInvokerFactory, addressSelector, NORMAL_RESULT);
+            DriftClientFactory proxyFactory = new DriftClientFactory(CODEC_MANAGER, methodInvokerFactory, addressSelector);
 
             DriftScribe scribe = proxyFactory.createDriftClient(DriftScribe.class, Optional.empty(), filters, new DriftClientConfig()).get();
 
