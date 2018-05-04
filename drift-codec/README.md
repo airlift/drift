@@ -5,7 +5,7 @@ from Thrift.  This library is similar to JaxB (XML) and Jackson (JSON), but
 for Thrift.  Drift codec supports field, method, constructor, and builder
 injection.
 
-# Structs 
+# Structs
 
 To make a Java class a Thrift struct simply add the `@ThriftStruct` annotation.
 Drift will assume the Java class and the Thrift struct have the same name, so
@@ -19,19 +19,21 @@ The simplest way to add a Thrift field is to annotate a public Java field with
 Thrift field have the same name, so if they don't just add a name to the
 annotation like this: `@ThriftField(value = 1, name="myFieldName")`.
 
-    @ThriftStruct
-    public class Bonk
+```java
+@ThriftStruct
+public class Bonk
+{
+    @ThriftField(1)
+    public String message;
+
+    @ThriftField(2)
+    public int type;
+
+    public BonkField()
     {
-        @ThriftField(1)
-        public String message;
-
-        @ThriftField(2)
-        public int type;
-
-        public BonkField()
-        {
-        }
-    } 
+    }
+}
+```
 
 ## Beans
 
@@ -40,40 +42,42 @@ the getters and setters.  Drift will link the getter and setter by name, so you
 only need to specify the Thrift field id on one of them.  You can override the
 Thrift field name in the annotation if necessary.
 
-    @ThriftStruct
-    public class Bonk
+```java
+@ThriftStruct
+public class Bonk
+{
+    private String message;
+    private int type;
+
+    @ThriftField(1)
+    public String getMessage()
     {
-        private String message;
-        private int type;
-
-        @ThriftField(1)
-        public String getMessage()
-        {
-            return message;
-        }
-
-        @ThriftField
-        public void setMessage(String message)
-        {
-            this.message = message;
-        }
-
-        @ThriftField(2)
-        public int getType()
-        {
-            return type;
-        }
-
-        @ThriftField
-        public void setType(int type)
-        {
-            this.type = type;
-        }
+        return message;
     }
- 
+
+    @ThriftField
+    public void setMessage(String message)
+    {
+        this.message = message;
+    }
+
+    @ThriftField(2)
+    public int getType()
+    {
+        return type;
+    }
+
+    @ThriftField
+    public void setType(int type)
+    {
+        this.type = type;
+    }
+}
+```
+
 ## Constructor
 
-Drift support immutable Java objects using constructor injection.  Simply,
+Drift supports immutable Java objects using constructor injection.  Simply,
 annotate the constructor you want Drift to use with `@ThriftConstructor`, and
 Drift will automatically supply the constructor with the specified fields.
 Assuming you have compiled with debug symbols on, the parameters are
@@ -81,32 +85,33 @@ automatically matched to a Thrift field (getter or Java field) by name.
 Otherwise, you will need to annotate the parameters with
 `@ThriftField(name = "myName")`.
 
-    @Immutable
-    @ThriftStruct
-    public class Bonk
+```java
+@ThriftStruct
+public class Bonk
+{
+    private final String message;
+    private final int type;
+
+    @ThriftConstructor
+    public Bonk(String message, int type)
     {
-        private final String message;
-        private final int type;
-
-        @ThriftConstructor
-        public Bonk(String message, int type)
-        {
-            this.message = message;
-            this.type = type;
-        }
-
-        @ThriftField(1)
-        public String getMessage()
-        {
-            return message;
-        }
-
-        @ThriftField(2)
-        public int getType()
-        {
-            return type;
-        }
+        this.message = message;
+        this.type = type;
     }
+
+    @ThriftField(1)
+    public String getMessage()
+    {
+        return message;
+    }
+
+    @ThriftField(2)
+    public int getType()
+    {
+        return type;
+    }
+}
+```
 
 ## Builder
 
@@ -117,57 +122,58 @@ with `@ThriftConstructor` on the builder class.  The builder can use field,
 method and/or constructor injection in addition to injection into the factory
 method itself.
 
-    @Immutable
-    @ThriftStruct(builder = Builder.class)
-    public class Bonk
-    {
-        private final String message;
-        private final int type;
+```java
+@ThriftStruct(builder = Builder.class)
+public class Bonk
+{
+    private final String message;
+    private final int type;
 
-        public Bonk(String message, int type)
+    public Bonk(String message, int type)
+    {
+        this.message = message;
+        this.type = type;
+    }
+
+    @ThriftField(1)
+    public String getMessage()
+    {
+        return message;
+    }
+
+    @ThriftField(2)
+    public int getType()
+    {
+        return type;
+    }
+
+    public static class Builder
+    {
+        private String message;
+        private int type;
+
+        @ThriftField
+        public Builder setMessage(String message)
         {
             this.message = message;
+            return this;
+        }
+
+        @ThriftField
+        public Builder setType(int type)
+        {
             this.type = type;
+            return this;
         }
 
-        @ThriftField(1)
-        public String getMessage()
+        @ThriftConstructor
+        public Bonk create()
         {
-            return message;
-        }
-
-        @ThriftField(2)
-        public int getType()
-        {
-            return type;
-        }
-
-        public static class Builder
-        {
-            private String message;
-            private int type;
-
-            @ThriftField
-            public Builder setMessage(String message)
-            {
-                this.message = message;
-                return this;
-            }
-
-            @ThriftField
-            public Builder setType(int type)
-            {
-                this.type = type;
-                return this;
-            }
-
-            @ThriftConstructor
-            public Bonk create()
-            {
-                return new Bonk(message, type);
-            }
+            return new Bonk(message, type);
         }
     }
+}
+```
 
 # Enumerations
 
@@ -177,46 +183,46 @@ annotated with `@ThriftEnumValue` that supplies an int value.
 Drift does *not* support the potentially error-prone method of using
 the Java ordinal for automatic mapping.
 
-    @ThriftEnum
-    public enum Letter
+```java
+@ThriftEnum
+public enum Letter
+{
+    A(65), B(66), C(67), D(68);
+
+    private final int asciiValue;
+
+    Letter(int asciiValue)
     {
-        A(65), B(66), C(67), D(68);
-
-        private final int asciiValue;
-
-        Letter(int asciiValue)
-        {
-            this.asciiValue = asciiValue;
-        }
-
-        @ThriftEnumValue
-        public int getAsciiValue()
-        {
-            return asciiValue;
-        }
+        this.asciiValue = asciiValue;
     }
+
+    @ThriftEnumValue
+    public int getAsciiValue()
+    {
+        return asciiValue;
+    }
+}
+```
 
 # Guice Support
 
-A `ThriftCodec` can be bound into Guice adding the `ThriftCodecModule` to the injector and bind the codec with the fluent `ThriftCodecBinder` as follows:
+A `ThriftCodec` can be bound into Guice adding the `ThriftCodecModule` to the injector
+and bind the codec with the fluent `ThriftCodecBinder` as follows:
 
-    Injector injector = Guice.createInjector(Stage.PRODUCTION,
-            new ThriftCodecModule(),
-            new Module()
-            {
-                @Override
-                public void configure(Binder binder)
-                {
-                    thriftServerBinder(binder).bindThriftCodec(Bonk.class);
-                }
-            });
-      
-Then, simply add the `ThriftCodec` type to any `@Inject` annotated field or method.  Like this:
+```java
+Injector injector = Guice.createInjector(Stage.PRODUCTION,
+        new ThriftCodecModule(),
+        binder -> thriftCodecBinder(binder).bindThriftCodec(Bonk.class));
+```
 
-    @Inject
-    private ThriftCodec<Bonk> bonkCodec;
-    
-    public void write(Bonk bonk, TProtocol protocol) throws Exception
-    {
-        bonkCodec.write(nwq TProtocolWriter(protocol));
-    }
+Then, simply add the `ThriftCodec` type to any `@Inject` annotated field, method or constructor:
+
+```java
+@Inject
+private ThriftCodec<Bonk> bonkCodec;
+
+public void write(Bonk bonk, TProtocol protocol) throws Exception
+{
+    bonkCodec.write(bonk, protocol);
+}
+```

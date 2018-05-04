@@ -4,9 +4,10 @@ Drift Client is a simple library for creating Thrift clients using annotations.
 
 ## Implementing a Client
 
-In Drift, a Thrift client is simply a Java interface annotated with `@ThriftService`. In 
+In Drift, a Thrift client is simply a Java interface annotated with `@ThriftService`. In
 addition to annotating the interface directly, Drift supports annotations on super interfaces.
 For example, the following describes a Scribe client:
+
 ```java
 @ThriftService
 public interface Scribe
@@ -15,8 +16,10 @@ public interface Scribe
     ResultCode log(List<LogEntry> messages);
 }
 ```
+
 To make the client method asynchronous, simply change the return type of the
 corresponding method to a `ListenableFuture`, as shown here:
+
 ```java
 @ThriftService
 public interface Scribe
@@ -25,6 +28,7 @@ public interface Scribe
     ListenableFuture<List<Integer>> getValues();
 }
 ```
+
 The future will be completed when the server returns a value. When adding listeners
 that do non-trivial work when the future is completed, keep in mind that if you do not
 provide an executor for listeners to run on, they will run on the NIO threads, and
@@ -38,6 +42,7 @@ parameters are numbered starting with `1`. If you do not specify a name, Drift
 will attempt to determine the names automatically. For this to work, the code
 must be compiled with parameter names enabled (pass the `-parameters` option to `javac`).
 If you want to use a different ID or name, simply annotate the parameter as follows:
+
  ```java
 @ThriftService
 public interface Scribe
@@ -54,6 +59,7 @@ zero being a standard return and exceptions be stored in higher number fields.
 If the Java method throws only one exception annotated with `@ThriftStruct`,
 Drift will assume the result struct field id is `1`. Otherwise, you will need to
 add the extremely verbose `@ThriftException` annotations as follows:
+
 ```java
 @ThriftMethod(exception = {
       @ThriftException(type = MyException.class, id = 1),
@@ -67,7 +73,7 @@ void doSomething() throws MyException, MyOther;
 A Drift client is thread safe and concurrent, so it can be used by multiple threads
 at the same time.  The user of the client simply calls methods on the interface and Drift
 manages address selection and connection pooling.  For example:
-  
+
 ```java
 // create client factory (only create this expensive object once)
 DriftClientFactory clientFactory = // see below
@@ -76,27 +82,35 @@ DriftClientFactory clientFactory = // see below
 Scribe scribe = clientFactory.createDriftClient(Scribe.class);
 
 // use client
-scribe.log(Arrays.asList(new LogEntry("category", "message")));
+scribe.log(ImmutableList.of(new LogEntry("category", "message")));
 ```
 
 A Drift client can either be created manually using a static factory or injected using Guice.
 
 ## Static Drift Client Factory
 
-The following code manually constructs a `DriftClientFactory` using the Netty transport:    
+The following code manually constructs a `DriftClientFactory` using the Netty transport:
+
 ```java
+// server address
+List<HostAndPort> addresses = ImmutableList.of(HostAndPort.fromParts("localhost", 1234));
+
 // expensive services that should only be created once
 ThriftCodecManager codecManager = new ThriftCodecManager();
-AddressSelector addressSelector = new SimpleAddressSelector(scribeHostAddresses);
+AddressSelector addressSelector = new SimpleAddressSelector(addresses);
 DriftNettyClientConfig config = new DriftNettyClientConfig();
-// methodInvokerFactory must be closed 
-DriftNettyMethodInvokerFactory<?> methodInvokerFactory = DriftNettyMethodInvokerFactory.createStaticDriftNettyMethodInvokerFactory(config);
+
+// methodInvokerFactory must be closed
+DriftNettyMethodInvokerFactory<?> methodInvokerFactory = DriftNettyMethodInvokerFactory
+        .createStaticDriftNettyMethodInvokerFactory(config);
+
+// client factory
 DriftClientFactory clientFactory = new DriftClientFactory(codecManager, methodInvokerFactory, addressSelector);
 ```
 
-As you can see, the construction of a `DriftClientFactory` requires a few supporting 
+As you can see, the construction of a `DriftClientFactory` requires a few supporting
 services, which are described below.
-  
+
 ### ThriftCodecManager
 
 A `ThriftCodecManager` caches the description of every Thrift type used by the clients.  Extracting
@@ -105,7 +119,7 @@ all the clients you will need.
 
 ### AddressSelector
 
-An `AddressSelector` selects host addresses for the client to connect to. Typically, 
+An `AddressSelector` selects host addresses for the client to connect to. Typically,
 this service tracks all hosts running the service and selects a random subset to try
 for an  invocation. The `AddressSelector` is also notified of addresses that failed to
 connect, allowing it to perform simple tracking of host state.
@@ -119,36 +133,31 @@ method is typically provided to shutdown the pools.
 
 There are currently two transport implementations of `MethodInvokerFactory`.  Drift Netty, which
 is used in the example above, provides `DriftNettyMethodInvokerFactory`, and Apache Thrift provides
-`ApacheThriftMethodInvokerFactory`.  Each transport requires sightly different configuration, 
+`ApacheThriftMethodInvokerFactory`.  Each transport requires sightly different configuration,
 so each transport provides a different configuration class.
 
 ## Guice Support
 
 Drift includes optional support for binding clients into Guice.
 
-To bind a client, add the `ThriftClientModule` and a transport implementation module (e.g.,
-`DriftNettyClientModule` or `ApacheThriftClientModule`), and bind the clients with the fluent 
-`DriftClientBinder`.  The following binds a `Scribe` client that will connect to 
-`example.com:1234` by default.
+To bind a client, add a transport implementation module (e.g., `DriftNettyClientModule` or
+`ApacheThriftClientModule`), and bind the clients with the fluent `DriftClientBinder`.
+The following binds a `Scribe` client that will connect to `example.com:1234` by default:
 
 ```java
+// server address
+List<HostAndPort> addresses = ImmutableList.of(HostAndPort.fromParts("localhost", 1234));
+
 // see io.airlift.bootstrap.Bootstrap for a simpler system to create Guice services with configuration
 Injector injector = Guice.createInjector(Stage.PRODUCTION,
-        new ConfigurationModule(new ConfigurationFactory(ImmutableMap.<>of())),
-        new ThriftCodecModule(),
+        new ConfigurationModule(new ConfigurationFactory(ImmutableMap.of())),
         new DriftNettyClientModule(),
-        new Module()
-        {
-            @Override
-            public void configure(Binder binder)
-            {
-                driftClientBinder(binder).bindDriftClient(Scribe.class)
-                        .withAddressSelector(simpleAddressSelector(HostAndPort.fromParts("example.com", 1234)));
-            }
-        });
+        binder -> driftClientBinder(binder).bindDriftClient(Scribe.class)
+                .withAddressSelector(simpleAddressSelector(addresses)));
 ```
 
-Then, Guice can inject a Thrift client implementation.  For example:
+Then, Guice can inject a Thrift client implementation:
+
 ```java
 @Inject
 public MyClass(Scribe scribeClient)

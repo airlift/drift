@@ -3,11 +3,11 @@
 [![Build Status](https://travis-ci.org/airlift/drift.svg?branch=master)](https://travis-ci.org/airlift/drift)
 
 Drift is an easy-to-use, annotation-based Java library for creating Thrift
-clients and serializable types.  The client library is similar to JAX-RS 
+clients and serializable types.  The client library is similar to JAX-RS
 (HTTP Rest) and the serialization library is similar to JaxB (XML) and Jackson
 (JSON), but for Thrift.
 
-## Example 
+## Example
 
 The following interface defines a client for a Scribe server:
 
@@ -20,8 +20,8 @@ public interface Scribe
 }
 ```
 
-The `log` method above uses the `LogEntry` Thrift struct which is defined as follows:   
- 
+The `log` method above uses the `LogEntry` Thrift struct which is defined as follows:
+
 ```java
 @ThriftStruct
 public class LogEntry
@@ -52,20 +52,15 @@ public class LogEntry
 
 An instance of the Scribe client can be created using a `DriftClientFactory`:
 ```java
-// expensive services that should only be created once
-ThriftCodecManager codecManager = new ThriftCodecManager();
-AddressSelector addressSelector = new SimpleAddressSelector(scribeHostAddresses);
-DriftNettyClientConfig config = new DriftNettyClientConfig();
-// methodInvokerFactory must be closed 
-DriftNettyMethodInvokerFactory<?> methodInvokerFactory = DriftNettyMethodInvokerFactory.createStaticDriftNettyMethodInvokerFactory(config);
-DriftClientFactory clientFactory = new DriftClientFactory(codecManager, methodInvokerFactory, addressSelector);
-
-// create a client (cached also)
+// create a client
 Scribe scribe = clientFactory.createDriftClient(Scribe.class);
 
 // use client
 scribe.log(Arrays.asList(new LogEntry("category", "message")));
 ```
 
-See [Drift Codec](drift-codec) for more information on annotating Thrift types,
-and [Drift Client](drift-client) for more information on Thrift client usage. 
+# Detailed Documentation
+
+* [Drift Codec](drift-codec) -- Thrift type annotations and serialization
+* [Drift Client](drift-client) -- Thrift client usage
+* [Drift Server](drift-server) -- Thrift server usage
