@@ -25,6 +25,7 @@ import io.airlift.units.Duration;
 
 import java.io.File;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -68,8 +69,20 @@ public class SslContextFactory
             Duration sessionTimeout,
             List<String> ciphers)
     {
+        return get(new SslContextConfig(
+                trustCertificatesFile,
+                clientCertificatesFile,
+                privateKeyFile,
+                privateKeyPassword,
+                sessionCacheSize,
+                sessionTimeout,
+                ciphers));
+    }
+
+    public ReloadableSslContext get(SslContextConfig sslContextConfig)
+    {
         try {
-            return cache.getUnchecked(new SslContextConfig(trustCertificatesFile, clientCertificatesFile, privateKeyFile, privateKeyPassword, sessionCacheSize, sessionTimeout, ciphers));
+            return cache.getUnchecked(sslContextConfig);
         }
         catch (UncheckedExecutionException | ExecutionError e) {
             throw new RuntimeException("Error initializing SSL context", e.getCause());
@@ -81,7 +94,7 @@ public class SslContextFactory
         cache.asMap().values().forEach(ReloadableSslContext::reload);
     }
 
-    private static class SslContextConfig
+    public static class SslContextConfig
     {
         private final File trustCertificatesFile;
         private final Optional<File> clientCertificatesFile;
@@ -142,6 +155,31 @@ public class SslContextFactory
         public List<String> getCiphers()
         {
             return ciphers;
+        }
+
+        @Override
+        public boolean equals(Object o)
+        {
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
+            SslContextConfig that = (SslContextConfig) o;
+            return sessionCacheSize == that.sessionCacheSize &&
+                    Objects.equals(trustCertificatesFile, that.trustCertificatesFile) &&
+                    Objects.equals(clientCertificatesFile, that.clientCertificatesFile) &&
+                    Objects.equals(privateKeyFile, that.privateKeyFile) &&
+                    Objects.equals(privateKeyPassword, that.privateKeyPassword) &&
+                    Objects.equals(sessionTimeout, that.sessionTimeout) &&
+                    Objects.equals(ciphers, that.ciphers);
+        }
+
+        @Override
+        public int hashCode()
+        {
+            return Objects.hash(trustCertificatesFile, clientCertificatesFile, privateKeyFile, privateKeyPassword, sessionCacheSize, sessionTimeout, ciphers);
         }
     }
 }

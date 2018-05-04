@@ -19,11 +19,11 @@ import com.google.common.net.HostAndPort;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import io.airlift.drift.transport.client.MethodInvoker;
 import io.airlift.drift.transport.client.MethodInvokerFactory;
+import io.airlift.drift.transport.netty.client.ConnectionManager.ConnectionParameters;
 import io.airlift.drift.transport.netty.ssl.SslContextFactory;
-import io.airlift.units.Duration;
+import io.airlift.drift.transport.netty.ssl.SslContextFactory.SslContextConfig;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
-import io.netty.handler.ssl.SslContext;
 
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
@@ -31,14 +31,12 @@ import javax.inject.Inject;
 import java.io.Closeable;
 import java.util.Optional;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 import static io.airlift.drift.transport.netty.codec.Protocol.COMPACT;
 import static io.airlift.drift.transport.netty.codec.Transport.HEADER;
 import static io.airlift.drift.transport.netty.ssl.SslContextFactory.createSslContextFactory;
 import static java.util.Objects.requireNonNull;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
-import static java.util.concurrent.TimeUnit.SECONDS;
 
 public class DriftNettyMethodInvokerFactory<I>
         implements MethodInvokerFactory<I>, Closeable
@@ -47,7 +45,8 @@ public class DriftNettyMethodInvokerFactory<I>
 
     private final EventLoopGroup group;
     private final SslContextFactory sslContextFactory;
-    private final HostAndPort defaultSocksProxy;
+    private final Optional<HostAndPort> defaultSocksProxy;
+    private final ConnectionManager connectionManager;
 
     public static DriftNettyMethodInvokerFactory<?> createStaticDriftNettyMethodInvokerFactory(DriftNettyClientConfig clientConfig)
     {
@@ -66,54 +65,25 @@ public class DriftNettyMethodInvokerFactory<I>
 
         this.clientConfigurationProvider = requireNonNull(clientConfigurationProvider, "clientConfigurationProvider is null");
         this.sslContextFactory = createSslContextFactory(true, factoryConfig.getSslContextRefreshTime(), group);
-        this.defaultSocksProxy = factoryConfig.getSocksProxy();
+        this.defaultSocksProxy = Optional.ofNullable(factoryConfig.getSocksProxy());
+
+        ConnectionManager connectionManager = new ConnectionFactory(group, sslContextFactory);
+        if (factoryConfig.isConnectionPoolEnabled()) {
+            connectionManager = new ConnectionPool(connectionManager, group, factoryConfig.getConnectionPoolMaxSize(), factoryConfig.getConnectionPoolIdleTimeout());
+        }
+        this.connectionManager = connectionManager;
     }
 
     @Override
     public MethodInvoker createMethodInvoker(I clientIdentity)
     {
-        DriftNettyClientConfig clientConfig = clientConfigurationProvider.apply(clientIdentity);
-        if (clientConfig.getTransport() == HEADER && clientConfig.getProtocol() == COMPACT) {
-            throw new IllegalArgumentException("HEADER transport cannot be used with COMPACT protocol, use FB_COMPACT instead");
-        }
-        if (clientConfig.getSocksProxy() == null) {
-            clientConfig.setSocksProxy(defaultSocksProxy);
-        }
+        ConnectionParameters clientConfig = toConnectionConfig(clientConfigurationProvider.apply(clientIdentity));
 
-        Optional<Supplier<SslContext>> sslContext = Optional.empty();
-        if (clientConfig.isSslEnabled()) {
-            sslContext = Optional.of(sslContextFactory.get(
-                    clientConfig.getTrustCertificate(),
-                    Optional.ofNullable(clientConfig.getKey()),
-                    Optional.ofNullable(clientConfig.getKey()),
-                    Optional.ofNullable(clientConfig.getKeyPassword()),
-                    clientConfig.getSessionCacheSize(),
-                    clientConfig.getSessionTimeout(),
-                    clientConfig.getCiphers()));
+        // validate ssl context configuration is valid
+        clientConfig.getSslContextConfig()
+                .ifPresent(sslContextConfig -> sslContextFactory.get(sslContextConfig).get());
 
-            // validate ssl context configuration is valid
-            sslContext.get().get();
-        }
-
-        ConnectionManager connectionManager = new ConnectionFactory(
-                group,
-                clientConfig.getTransport(),
-                clientConfig.getProtocol(),
-                clientConfig.getMaxFrameSize(),
-                sslContext,
-                clientConfig);
-        if (clientConfig.isPoolEnabled()) {
-            connectionManager = new ConnectionPool(connectionManager, group, clientConfig);
-        }
-
-        // an invocation should complete long before this
-        Duration invokeTimeout = new Duration(
-                SECONDS.toMillis(10) +
-                        clientConfig.getConnectTimeout().toMillis() +
-                        clientConfig.getRequestTimeout().toMillis(),
-                MILLISECONDS);
-
-        return new DriftNettyMethodInvoker(connectionManager, group, invokeTimeout);
+        return new DriftNettyMethodInvoker(clientConfig, connectionManager, group);
     }
 
     @PreDestroy
@@ -121,10 +91,48 @@ public class DriftNettyMethodInvokerFactory<I>
     public void close()
     {
         try {
-            group.shutdownGracefully(0, 0, MILLISECONDS).await();
+            connectionManager.close();
         }
-        catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
+        finally {
+            try {
+                group.shutdownGracefully(0, 0, MILLISECONDS).await();
+            }
+            catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
         }
+    }
+
+    private ConnectionParameters toConnectionConfig(DriftNettyClientConfig clientConfig)
+    {
+        if (clientConfig.getTransport() == HEADER && clientConfig.getProtocol() == COMPACT) {
+            throw new IllegalArgumentException("HEADER transport cannot be used with COMPACT protocol, use FB_COMPACT instead");
+        }
+
+        Optional<SslContextConfig> sslContextConfig = Optional.empty();
+        if (clientConfig.isSslEnabled()) {
+            sslContextConfig = Optional.of(new SslContextConfig(
+                    clientConfig.getTrustCertificate(),
+                    Optional.ofNullable(clientConfig.getKey()),
+                    Optional.ofNullable(clientConfig.getKey()),
+                    Optional.ofNullable(clientConfig.getKeyPassword()),
+                    clientConfig.getSessionCacheSize(),
+                    clientConfig.getSessionTimeout(),
+                    clientConfig.getCiphers()));
+        }
+
+        Optional<HostAndPort> socksProxy = Optional.ofNullable(clientConfig.getSocksProxy());
+        if (!socksProxy.isPresent()) {
+            socksProxy = defaultSocksProxy;
+        }
+
+        return new ConnectionParameters(
+                clientConfig.getTransport(),
+                clientConfig.getProtocol(),
+                clientConfig.getMaxFrameSize(),
+                clientConfig.getConnectTimeout(),
+                clientConfig.getRequestTimeout(),
+                socksProxy,
+                sslContextConfig);
     }
 }

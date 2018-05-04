@@ -50,8 +50,6 @@ public class DriftNettyClientConfig
 
     private HostAndPort socksProxy;
 
-    private boolean poolEnabled;
-
     private boolean sslEnabled;
     private List<String> ciphers = ImmutableList.of();
 
@@ -137,18 +135,6 @@ public class DriftNettyClientConfig
     public DriftNettyClientConfig setMaxFrameSize(DataSize maxFrameSize)
     {
         this.maxFrameSize = maxFrameSize;
-        return this;
-    }
-
-    public boolean isPoolEnabled()
-    {
-        return poolEnabled;
-    }
-
-    @Config("thrift.client.pool.enabled")
-    public DriftNettyClientConfig setPoolEnabled(boolean poolEnabled)
-    {
-        this.poolEnabled = poolEnabled;
         return this;
     }
 

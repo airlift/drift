@@ -17,23 +17,17 @@ package io.airlift.drift.transport.netty.client;
 
 import com.google.common.net.HostAndPort;
 import io.airlift.drift.protocol.TTransportException;
-import io.airlift.drift.transport.netty.codec.Protocol;
-import io.airlift.drift.transport.netty.codec.Transport;
-import io.airlift.units.DataSize;
-import io.airlift.units.Duration;
+import io.airlift.drift.transport.netty.ssl.SslContextFactory;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import io.netty.handler.ssl.SslContext;
 import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.Promise;
 
 import java.net.InetSocketAddress;
-import java.util.Optional;
-import java.util.function.Supplier;
 
 import static com.google.common.primitives.Ints.saturatedCast;
 import static io.netty.channel.ChannelOption.CONNECT_TIMEOUT_MILLIS;
@@ -43,50 +37,29 @@ class ConnectionFactory
         implements ConnectionManager
 {
     private final EventLoopGroup group;
-    private final Transport transport;
-    private final Protocol protocol;
-    private final DataSize maxFrameSize;
-    private final Optional<Supplier<SslContext>> sslContextSupplier;
+    private final SslContextFactory sslContextFactory;
 
-    private final Duration connectTimeout;
-    private final Duration requestTimeout;
-    private final Optional<HostAndPort> socksProxy;
-
-    ConnectionFactory(
-            EventLoopGroup group,
-            Transport transport,
-            Protocol protocol,
-            DataSize maxFrameSize,
-            Optional<Supplier<SslContext>> sslContextSupplier,
-            DriftNettyClientConfig clientConfig)
+    ConnectionFactory(EventLoopGroup group, SslContextFactory sslContextFactory)
     {
         this.group = requireNonNull(group, "group is null");
-        this.transport = requireNonNull(transport, "transport is null");
-        this.protocol = requireNonNull(protocol, "protocol is null");
-        this.maxFrameSize = requireNonNull(maxFrameSize, "maxFrameSize is null");
-        this.sslContextSupplier = requireNonNull(sslContextSupplier, "sslContextSupplier is null");
-
-        requireNonNull(clientConfig, "clientConfig is null");
-        this.connectTimeout = clientConfig.getConnectTimeout();
-        this.requestTimeout = clientConfig.getRequestTimeout();
-        this.socksProxy = Optional.ofNullable(clientConfig.getSocksProxy());
+        this.sslContextFactory = requireNonNull(sslContextFactory, "sslContextFactory is null");
     }
 
     @Override
-    public Future<Channel> getConnection(HostAndPort address)
+    public Future<Channel> getConnection(ConnectionParameters connectionParameters, HostAndPort address)
     {
         try {
             Bootstrap bootstrap = new Bootstrap()
                     .group(group)
                     .channel(NioSocketChannel.class)
-                    .option(CONNECT_TIMEOUT_MILLIS, saturatedCast(connectTimeout.toMillis()))
+                    .option(CONNECT_TIMEOUT_MILLIS, saturatedCast(connectionParameters.getConnectTimeout().toMillis()))
                     .handler(new ThriftClientInitializer(
-                            transport,
-                            protocol,
-                            maxFrameSize,
-                            requestTimeout,
-                            socksProxy,
-                            sslContextSupplier));
+                            connectionParameters.getTransport(),
+                            connectionParameters.getProtocol(),
+                            connectionParameters.getMaxFrameSize(),
+                            connectionParameters.getRequestTimeout(),
+                            connectionParameters.getSocksProxy(),
+                            connectionParameters.getSslContextConfig().map(sslContextFactory::get)));
 
             Promise<Channel> promise = group.next().newPromise();
             bootstrap.connect(new InetSocketAddress(address.getHost(), address.getPort()))
@@ -117,4 +90,7 @@ class ConnectionFactory
     {
         connection.close();
     }
+
+    @Override
+    public void close() {}
 }

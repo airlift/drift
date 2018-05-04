@@ -77,12 +77,11 @@ final class DriftNettyTesterUtil
         DriftNettyClientConfig config = new DriftNettyClientConfig()
                 .setTransport(transport)
                 .setProtocol(protocol)
-                .setPoolEnabled(true)
                 .setTrustCertificate(ClientTestUtils.getCertificateChainFile())
                 .setSslEnabled(secure);
 
         try (DriftNettyMethodInvokerFactory<String> methodInvokerFactory = new DriftNettyMethodInvokerFactory<>(
-                new DriftNettyConnectionFactoryConfig(),
+                new DriftNettyConnectionFactoryConfig().setConnectionPoolEnabled(true),
                 clientIdentity -> config)) {
             DriftClientFactoryManager<String> clientFactoryManager = new DriftClientFactoryManager<>(CODEC_MANAGER, methodInvokerFactory);
             DriftClientFactory proxyFactory = clientFactoryManager.createDriftClientFactory("clientIdentity", addressSelector, NORMAL_RESULT);
@@ -114,7 +113,6 @@ final class DriftNettyTesterUtil
         DriftNettyClientConfig config = new DriftNettyClientConfig()
                 .setTransport(transport)
                 .setProtocol(protocol)
-                .setPoolEnabled(true)
                 .setTrustCertificate(ClientTestUtils.getCertificateChainFile())
                 .setSslEnabled(secure);
 
@@ -148,12 +146,11 @@ final class DriftNettyTesterUtil
         DriftNettyClientConfig config = new DriftNettyClientConfig()
                 .setTransport(transport)
                 .setProtocol(protocol)
-                .setPoolEnabled(true)
                 .setTrustCertificate(ClientTestUtils.getCertificateChainFile())
                 .setSslEnabled(secure);
 
         try (DriftNettyMethodInvokerFactory<String> methodInvokerFactory = new DriftNettyMethodInvokerFactory<>(
-                new DriftNettyConnectionFactoryConfig(),
+                new DriftNettyConnectionFactoryConfig().setConnectionPoolEnabled(true),
                 clientIdentity -> config)) {
             DriftClientFactoryManager<String> proxyFactoryManager = new DriftClientFactoryManager<>(CODEC_MANAGER, methodInvokerFactory);
             DriftClientFactory proxyFactory = proxyFactoryManager.createDriftClientFactory("myFactory", addressSelector, NORMAL_RESULT);

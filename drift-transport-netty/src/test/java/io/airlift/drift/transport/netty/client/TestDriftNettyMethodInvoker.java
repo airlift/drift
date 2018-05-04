@@ -30,6 +30,7 @@ import io.airlift.drift.transport.MethodMetadata;
 import io.airlift.drift.transport.ParameterMetadata;
 import io.airlift.drift.transport.client.InvokeRequest;
 import io.airlift.drift.transport.client.MethodInvoker;
+import io.airlift.drift.transport.netty.client.ConnectionManager.ConnectionParameters;
 import io.airlift.drift.transport.netty.codec.Protocol;
 import io.airlift.drift.transport.netty.codec.Transport;
 import io.airlift.drift.transport.netty.scribe.apache.LogEntry;
@@ -46,6 +47,8 @@ import io.airlift.drift.transport.netty.server.DriftNettyServerTransportFactory;
 import io.airlift.drift.transport.server.ServerInvokeRequest;
 import io.airlift.drift.transport.server.ServerMethodInvoker;
 import io.airlift.drift.transport.server.ServerTransport;
+import io.airlift.units.DataSize;
+import io.airlift.units.DataSize.Unit;
 import io.airlift.units.Duration;
 import io.netty.channel.Channel;
 import io.netty.util.concurrent.DefaultEventExecutor;
@@ -84,6 +87,8 @@ import static io.airlift.concurrent.Threads.daemonThreadsNamed;
 import static io.airlift.drift.TApplicationException.Type.UNSUPPORTED_CLIENT_TYPE;
 import static io.airlift.drift.codec.metadata.ThriftType.list;
 import static io.airlift.drift.codec.metadata.ThriftType.optional;
+import static io.airlift.drift.transport.netty.codec.Protocol.BINARY;
+import static io.airlift.drift.transport.netty.codec.Transport.FRAMED;
 import static io.airlift.testing.Assertions.assertInstanceOf;
 import static java.util.Collections.nCopies;
 import static java.util.concurrent.Executors.newSingleThreadScheduledExecutor;
@@ -133,7 +138,7 @@ public class TestDriftNettyMethodInvoker
                 address -> logThrift(address, MESSAGES, new TFramedTransport.Factory(), new TBinaryProtocol.Factory()),
                 address -> logThriftAsync(address, MESSAGES),
                 address -> logNiftyInvocationHandlerOptional(address, DRIFT_MESSAGES),
-                address -> logNiftyInvocationHandler(address, DRIFT_MESSAGES, Transport.FRAMED, Protocol.BINARY)));
+                address -> logNiftyInvocationHandler(address, DRIFT_MESSAGES, FRAMED, BINARY)));
 
         return newArrayList(concat(nCopies(invocationCount, MESSAGES)));
     }
@@ -187,13 +192,13 @@ public class TestDriftNettyMethodInvoker
                 address -> logThrift(address, MESSAGES, new TFramedTransport.Factory(), new TBinaryProtocol.Factory()),
                 address -> logThrift(address, MESSAGES, new TFramedTransport.Factory(), new TCompactProtocol.Factory()),
                 address -> logThriftAsync(address, MESSAGES),
-                address -> logNiftyInvocationHandler(address, DRIFT_MESSAGES, Transport.UNFRAMED, Protocol.BINARY),
+                address -> logNiftyInvocationHandler(address, DRIFT_MESSAGES, Transport.UNFRAMED, BINARY),
                 address -> logNiftyInvocationHandler(address, DRIFT_MESSAGES, Transport.UNFRAMED, Protocol.COMPACT),
                 address -> logNiftyInvocationHandler(address, DRIFT_MESSAGES, Transport.UNFRAMED, Protocol.FB_COMPACT),
-                address -> logNiftyInvocationHandler(address, DRIFT_MESSAGES, Transport.FRAMED, Protocol.BINARY),
-                address -> logNiftyInvocationHandler(address, DRIFT_MESSAGES, Transport.FRAMED, Protocol.COMPACT),
-                address -> logNiftyInvocationHandler(address, DRIFT_MESSAGES, Transport.FRAMED, Protocol.FB_COMPACT),
-                address -> logNiftyInvocationHandler(address, DRIFT_MESSAGES, Transport.HEADER, Protocol.BINARY),
+                address -> logNiftyInvocationHandler(address, DRIFT_MESSAGES, FRAMED, BINARY),
+                address -> logNiftyInvocationHandler(address, DRIFT_MESSAGES, FRAMED, Protocol.COMPACT),
+                address -> logNiftyInvocationHandler(address, DRIFT_MESSAGES, FRAMED, Protocol.FB_COMPACT),
+                address -> logNiftyInvocationHandler(address, DRIFT_MESSAGES, Transport.HEADER, BINARY),
                 address -> logNiftyInvocationHandler(address, DRIFT_MESSAGES, Transport.HEADER, Protocol.FB_COMPACT)));
 
         return newArrayList(concat(nCopies(invocationCount, DRIFT_MESSAGES)));
@@ -290,9 +295,11 @@ public class TestDriftNettyMethodInvoker
     {
         DriftNettyClientConfig config = new DriftNettyClientConfig()
                 .setTransport(transport)
-                .setProtocol(protocol)
-                .setPoolEnabled(true);
-        try (DriftNettyMethodInvokerFactory<Void> methodInvokerFactory = new DriftNettyMethodInvokerFactory<>(new DriftNettyConnectionFactoryConfig(), clientIdentity -> config)) {
+                .setProtocol(protocol);
+
+        try (DriftNettyMethodInvokerFactory<Void> methodInvokerFactory = new DriftNettyMethodInvokerFactory<>(
+                new DriftNettyConnectionFactoryConfig().setConnectionPoolEnabled(true),
+                clientIdentity -> config)) {
             MethodInvoker methodInvoker = methodInvokerFactory.createMethodInvoker(null);
 
             ListenableFuture<Object> future = methodInvoker.invoke(new InvokeRequest(LOG_METHOD_METADATA, () -> address, ImmutableMap.of(), ImmutableList.of(entries)));
@@ -323,9 +330,17 @@ public class TestDriftNettyMethodInvoker
         ScheduledExecutorService executor = newSingleThreadScheduledExecutor(daemonThreadsNamed("test-timeout"));
 
         DriftNettyMethodInvoker invoker = new DriftNettyMethodInvoker(
+                new ConnectionParameters(
+                        FRAMED,
+                        BINARY,
+                        new DataSize(16, Unit.MEGABYTE),
+                        new Duration(11, MILLISECONDS),
+                        new Duration(13, MILLISECONDS),
+                        Optional.empty(),
+                        Optional.empty()),
                 new HangingConnectionManager(),
                 executor,
-                new Duration(20, MILLISECONDS));
+                new Duration(17, MILLISECONDS));
 
         ListenableFuture<Object> response = invoker.invoke(new InvokeRequest(
                 new MethodMetadata(
@@ -345,7 +360,7 @@ public class TestDriftNettyMethodInvoker
         }
         catch (ExecutionException e) {
             assertInstanceOf(e.getCause(), io.airlift.drift.TException.class);
-            assertEquals(e.getCause().getMessage(), "Invocation response future did not complete after 20.00ms");
+            assertEquals(e.getCause().getMessage(), "Invocation response future did not complete after 41.00ms");
         }
         finally {
             executor.shutdown();
@@ -354,9 +369,10 @@ public class TestDriftNettyMethodInvoker
 
     private static int logNiftyInvocationHandlerOptional(HostAndPort address, List<DriftLogEntry> entries)
     {
-        DriftNettyClientConfig config = new DriftNettyClientConfig()
-                .setPoolEnabled(true);
-        try (DriftNettyMethodInvokerFactory<Void> methodInvokerFactory = new DriftNettyMethodInvokerFactory<>(new DriftNettyConnectionFactoryConfig(), clientIdentity -> config)) {
+        DriftNettyClientConfig config = new DriftNettyClientConfig();
+        try (DriftNettyMethodInvokerFactory<Void> methodInvokerFactory = new DriftNettyMethodInvokerFactory<>(
+                new DriftNettyConnectionFactoryConfig().setConnectionPoolEnabled(true),
+                clientIdentity -> config)) {
             MethodInvoker methodInvoker = methodInvokerFactory.createMethodInvoker(null);
 
             ThriftType optionalType = optional(list(CODEC_MANAGER.getCatalog().getThriftType(DriftLogEntry.class)));
@@ -404,7 +420,7 @@ public class TestDriftNettyMethodInvoker
             implements ConnectionManager
     {
         @Override
-        public Future<Channel> getConnection(HostAndPort address)
+        public Future<Channel> getConnection(ConnectionParameters connectionParameters, HostAndPort address)
         {
             return new DefaultEventExecutor().newPromise();
         }
@@ -414,6 +430,9 @@ public class TestDriftNettyMethodInvoker
         {
             throw new UnsupportedOperationException();
         }
+
+        @Override
+        public void close() {}
     }
 
     private static class TestServerMethodInvoker

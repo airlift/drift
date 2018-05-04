@@ -21,6 +21,7 @@ import com.google.common.util.concurrent.Futures;
 import io.airlift.drift.TException;
 import io.airlift.drift.transport.client.ConnectionFailedException;
 import io.airlift.drift.transport.client.InvokeRequest;
+import io.airlift.drift.transport.netty.client.ConnectionManager.ConnectionParameters;
 import io.airlift.drift.transport.netty.client.ThriftClientHandler.ThriftRequest;
 import io.netty.channel.Channel;
 import io.netty.util.concurrent.Future;
@@ -34,6 +35,7 @@ class InvocationResponseFuture
         extends AbstractFuture<Object>
 {
     private final InvokeRequest request;
+    private final ConnectionParameters connectionParameters;
     private final ConnectionManager connectionManager;
 
     @GuardedBy("this")
@@ -42,17 +44,18 @@ class InvocationResponseFuture
     @GuardedBy("this")
     private ThriftRequest invocationFuture;
 
-    static InvocationResponseFuture createInvocationResponseFuture(InvokeRequest request, ConnectionManager connectionManager)
+    static InvocationResponseFuture createInvocationResponseFuture(InvokeRequest request, ConnectionParameters connectionParameters, ConnectionManager connectionManager)
     {
-        InvocationResponseFuture future = new InvocationResponseFuture(request, connectionManager);
+        InvocationResponseFuture future = new InvocationResponseFuture(request, connectionParameters, connectionManager);
         // invocation can not be started from constructor, because it may start threads that can call back into the unpublished object
         future.tryConnect();
         return future;
     }
 
-    private InvocationResponseFuture(InvokeRequest request, ConnectionManager connectionManager)
+    private InvocationResponseFuture(InvokeRequest request, ConnectionParameters connectionParameters, ConnectionManager connectionManager)
     {
         this.request = requireNonNull(request, "request is null");
+        this.connectionParameters = requireNonNull(connectionParameters, "connectionConfig is null");
         this.connectionManager = requireNonNull(connectionManager, "connectionManager is null");
 
         // if this invocation is canceled, cancel the tasks
@@ -66,7 +69,7 @@ class InvocationResponseFuture
     private synchronized void tryConnect()
     {
         try {
-            connectionFuture = connectionManager.getConnection(request.getAddress().getHostAndPort());
+            connectionFuture = connectionManager.getConnection(connectionParameters, request.getAddress().getHostAndPort());
             connectionFuture.addListener(channelFuture -> {
                 try {
                     if (channelFuture.isSuccess()) {

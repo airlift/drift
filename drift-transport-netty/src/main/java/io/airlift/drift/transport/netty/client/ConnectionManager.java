@@ -16,12 +16,118 @@
 package io.airlift.drift.transport.netty.client;
 
 import com.google.common.net.HostAndPort;
+import io.airlift.drift.transport.netty.codec.Protocol;
+import io.airlift.drift.transport.netty.codec.Transport;
+import io.airlift.drift.transport.netty.ssl.SslContextFactory.SslContextConfig;
+import io.airlift.units.DataSize;
+import io.airlift.units.Duration;
 import io.netty.channel.Channel;
 import io.netty.util.concurrent.Future;
 
+import java.io.Closeable;
+import java.util.Objects;
+import java.util.Optional;
+
+import static java.util.Objects.requireNonNull;
+
 interface ConnectionManager
+        extends Closeable
 {
-    Future<Channel> getConnection(HostAndPort address);
+    Future<Channel> getConnection(ConnectionParameters connectionParameters, HostAndPort address);
 
     void returnConnection(Channel connection);
+
+    @Override
+    void close();
+
+    class ConnectionParameters
+    {
+        private final Transport transport;
+        private final Protocol protocol;
+        private final DataSize maxFrameSize;
+
+        private final Duration connectTimeout;
+        private final Duration requestTimeout;
+
+        private final Optional<HostAndPort> socksProxy;
+        private final Optional<SslContextConfig> sslContextConfig;
+
+        public ConnectionParameters(
+                Transport transport,
+                Protocol protocol,
+                DataSize maxFrameSize,
+                Duration connectTimeout,
+                Duration requestTimeout,
+                Optional<HostAndPort> socksProxy,
+                Optional<SslContextConfig> sslContextConfig)
+        {
+            this.transport = requireNonNull(transport, "transport is null");
+            this.protocol = requireNonNull(protocol, "protocol is null");
+            this.maxFrameSize = requireNonNull(maxFrameSize, "maxFrameSize is null");
+            this.connectTimeout = requireNonNull(connectTimeout, "connectTimeout is null");
+            this.requestTimeout = requireNonNull(requestTimeout, "requestTimeout is null");
+            this.socksProxy = requireNonNull(socksProxy, "socksProxy is null");
+            this.sslContextConfig = requireNonNull(sslContextConfig, "sslContextConfig is null");
+        }
+
+        public Transport getTransport()
+        {
+            return transport;
+        }
+
+        public Protocol getProtocol()
+        {
+            return protocol;
+        }
+
+        public DataSize getMaxFrameSize()
+        {
+            return maxFrameSize;
+        }
+
+        public Duration getConnectTimeout()
+        {
+            return connectTimeout;
+        }
+
+        public Duration getRequestTimeout()
+        {
+            return requestTimeout;
+        }
+
+        public Optional<HostAndPort> getSocksProxy()
+        {
+            return socksProxy;
+        }
+
+        public Optional<SslContextConfig> getSslContextConfig()
+        {
+            return sslContextConfig;
+        }
+
+        @Override
+        public boolean equals(Object o)
+        {
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
+            ConnectionParameters that = (ConnectionParameters) o;
+            return transport == that.transport &&
+                    protocol == that.protocol &&
+                    Objects.equals(maxFrameSize, that.maxFrameSize) &&
+                    Objects.equals(connectTimeout, that.connectTimeout) &&
+                    Objects.equals(requestTimeout, that.requestTimeout) &&
+                    Objects.equals(socksProxy, that.socksProxy) &&
+                    Objects.equals(sslContextConfig, that.sslContextConfig);
+        }
+
+        @Override
+        public int hashCode()
+        {
+            return Objects.hash(transport, protocol, maxFrameSize, connectTimeout, requestTimeout, socksProxy, sslContextConfig);
+        }
+    }
 }

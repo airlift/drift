@@ -21,50 +21,49 @@ import com.google.common.cache.LoadingCache;
 import com.google.common.net.HostAndPort;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import io.airlift.drift.protocol.TTransportException;
+import io.airlift.units.Duration;
 import io.netty.channel.Channel;
 import io.netty.channel.EventLoopGroup;
 import io.netty.util.concurrent.Future;
 
 import javax.annotation.concurrent.GuardedBy;
 
-import java.io.Closeable;
+import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import static java.util.Objects.requireNonNull;
 import static java.util.concurrent.Executors.newSingleThreadScheduledExecutor;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 class ConnectionPool
-        implements ConnectionManager, Closeable
+        implements ConnectionManager
 {
     private final ConnectionManager connectionFactory;
     private final EventLoopGroup group;
 
-    private final LoadingCache<HostAndPort, Future<Channel>> cachedConnections;
+    private final LoadingCache<ConnectionKey, Future<Channel>> cachedConnections;
     private final ScheduledExecutorService maintenanceThread;
 
     @GuardedBy("this")
     private boolean closed;
 
-    public ConnectionPool(ConnectionManager connectionFactory, EventLoopGroup group, DriftNettyClientConfig config)
+    public ConnectionPool(ConnectionManager connectionFactory, EventLoopGroup group, int maxSize, Duration idleTimeout)
     {
-        this.connectionFactory = connectionFactory;
+        this.connectionFactory = requireNonNull(connectionFactory, "connectionFactory is null");
         this.group = requireNonNull(group, "group is null");
-        requireNonNull(config, "config is null");
 
-        // todo from config
         cachedConnections = CacheBuilder.newBuilder()
-                .maximumSize(100)
-                .expireAfterAccess(10, TimeUnit.MINUTES)
-                .<HostAndPort, Future<Channel>>removalListener(notification -> closeConnection(notification.getValue()))
-                .build(new CacheLoader<HostAndPort, Future<Channel>>()
+                .maximumSize(maxSize)
+                .expireAfterAccess(idleTimeout.toMillis(), MILLISECONDS)
+                .<ConnectionKey, Future<Channel>>removalListener(notification -> closeConnection(notification.getValue()))
+                .build(new CacheLoader<ConnectionKey, Future<Channel>>()
                 {
                     @Override
-                    public Future<Channel> load(HostAndPort address)
-                            throws Exception
+                    public Future<Channel> load(ConnectionKey connectionKey)
                     {
-                        return createConnection(address);
+                        return createConnection(connectionKey.getConnectionParameters(), connectionKey.getAddress());
                     }
                 });
 
@@ -77,7 +76,7 @@ class ConnectionPool
     }
 
     @Override
-    public Future<Channel> getConnection(HostAndPort address)
+    public Future<Channel> getConnection(ConnectionParameters connectionParameters, HostAndPort address)
     {
         Future<Channel> future;
         synchronized (this) {
@@ -86,7 +85,7 @@ class ConnectionPool
             }
 
             try {
-                future = cachedConnections.get(address);
+                future = cachedConnections.get(new ConnectionKey(connectionParameters, address));
             }
             catch (ExecutionException e) {
                 throw new RuntimeException(e);
@@ -96,7 +95,7 @@ class ConnectionPool
         // check if connection is failed
         if (isFailed(future)) {
             // remove failed connection
-            cachedConnections.asMap().remove(address, future);
+            cachedConnections.asMap().remove(new ConnectionKey(connectionParameters, address), future);
         }
         return future;
     }
@@ -122,9 +121,9 @@ class ConnectionPool
         }
     }
 
-    private Future<Channel> createConnection(HostAndPort address)
+    private Future<Channel> createConnection(ConnectionParameters connectionParameters, HostAndPort address)
     {
-        return connectionFactory.getConnection(address);
+        return connectionFactory.getConnection(connectionParameters, address);
     }
 
     private static void closeConnection(Future<Channel> future)
@@ -148,6 +147,48 @@ class ConnectionPool
         }
         catch (Exception e) {
             return true;
+        }
+    }
+
+    private static class ConnectionKey
+    {
+        private final ConnectionParameters connectionParameters;
+        private final HostAndPort address;
+
+        public ConnectionKey(ConnectionParameters connectionParameters, HostAndPort address)
+        {
+            this.connectionParameters = connectionParameters;
+            this.address = address;
+        }
+
+        public ConnectionParameters getConnectionParameters()
+        {
+            return connectionParameters;
+        }
+
+        public HostAndPort getAddress()
+        {
+            return address;
+        }
+
+        @Override
+        public boolean equals(Object o)
+        {
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
+            ConnectionKey that = (ConnectionKey) o;
+            return Objects.equals(connectionParameters, that.connectionParameters) &&
+                    Objects.equals(address, that.address);
+        }
+
+        @Override
+        public int hashCode()
+        {
+            return Objects.hash(connectionParameters, address);
         }
     }
 }

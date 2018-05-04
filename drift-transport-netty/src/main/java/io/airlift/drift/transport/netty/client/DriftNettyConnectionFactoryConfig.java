@@ -20,6 +20,10 @@ import io.airlift.configuration.Config;
 import io.airlift.units.Duration;
 import io.airlift.units.MinDuration;
 
+import javax.validation.constraints.Min;
+
+import java.util.concurrent.TimeUnit;
+
 import static java.util.concurrent.TimeUnit.MINUTES;
 
 public class DriftNettyConnectionFactoryConfig
@@ -27,6 +31,11 @@ public class DriftNettyConnectionFactoryConfig
     private static final int DEFAULT_THREAD_COUNT = Runtime.getRuntime().availableProcessors() * 2;
 
     private int threadCount = DEFAULT_THREAD_COUNT;
+
+    private boolean connectionPoolEnabled;
+    private int connectionPoolMaxSize = 1000;
+    private Duration connectionPoolIdleTimeout = new Duration(1, TimeUnit.MINUTES);
+
     private Duration sslContextRefreshTime = new Duration(1, MINUTES);
     private HostAndPort socksProxy;
 
@@ -39,6 +48,43 @@ public class DriftNettyConnectionFactoryConfig
     public DriftNettyConnectionFactoryConfig setThreadCount(int threadCount)
     {
         this.threadCount = threadCount;
+        return this;
+    }
+
+    public boolean isConnectionPoolEnabled()
+    {
+        return connectionPoolEnabled;
+    }
+
+    @Config("thrift.client.connection-pool.enabled")
+    public DriftNettyConnectionFactoryConfig setConnectionPoolEnabled(boolean connectionPoolEnabled)
+    {
+        this.connectionPoolEnabled = connectionPoolEnabled;
+        return this;
+    }
+
+    @Min(1)
+    public int getConnectionPoolMaxSize()
+    {
+        return connectionPoolMaxSize;
+    }
+
+    @Config("thrift.client.connection-pool.max-size")
+    public DriftNettyConnectionFactoryConfig setConnectionPoolMaxSize(int connectionPoolMaxSize)
+    {
+        this.connectionPoolMaxSize = connectionPoolMaxSize;
+        return this;
+    }
+
+    @MinDuration("1s")
+    public Duration getConnectionPoolIdleTimeout()
+    {
+        return connectionPoolIdleTimeout;
+    }
+    @Config("thrift.client.connection-pool.idle-timeout")
+    public DriftNettyConnectionFactoryConfig setConnectionPoolIdleTimeout(Duration connectionPoolIdleTimeout)
+    {
+        this.connectionPoolIdleTimeout = connectionPoolIdleTimeout;
         return this;
     }
 
