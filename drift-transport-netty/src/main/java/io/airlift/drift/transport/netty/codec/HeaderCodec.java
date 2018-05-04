@@ -25,7 +25,6 @@ public class HeaderCodec
 {
     @Override
     public void channelRead(ChannelHandlerContext context, Object message)
-            throws Exception
     {
         if (message instanceof ByteBuf) {
             ByteBuf request = (ByteBuf) message;
@@ -39,7 +38,6 @@ public class HeaderCodec
 
     @Override
     public void write(ChannelHandlerContext context, Object message, ChannelPromise promise)
-            throws Exception
     {
         if (message instanceof ThriftFrame) {
             context.write(HeaderTransport.encodeFrame((ThriftFrame) message), promise);

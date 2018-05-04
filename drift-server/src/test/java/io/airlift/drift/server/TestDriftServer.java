@@ -114,7 +114,6 @@ public class TestDriftServer
 
     @Test
     public void testGuiceServer()
-            throws Exception
     {
         ResultsSupplier resultsSupplier = new ResultsSupplier();
         TestService testService = new TestService(resultsSupplier);
@@ -160,7 +159,6 @@ public class TestDriftServer
 
     @Test
     public void testGuiceServerFilter()
-            throws Exception
     {
         ResultsSupplier resultsSupplier = new ResultsSupplier();
         PassThroughFilter passThroughFilter = new PassThroughFilter();
@@ -268,7 +266,6 @@ public class TestDriftServer
             TestingMethodInvocationStatsFactory statsFactory,
             Optional<String> qualifier,
             Throwable testException)
-            throws ExecutionException
     {
         String name = "exception-" + testException.getClass().getName();
 

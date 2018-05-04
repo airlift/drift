@@ -54,14 +54,12 @@ public class TestClientsWithDriftNettyServer
 
     @Test
     public void testDriftServer()
-            throws Exception
     {
         testDriftServer(ImmutableList.of());
     }
 
     @Test
     public void testHandlersWithDriftServer()
-            throws Exception
     {
         TestFilter firstFilter = new TestFilter();
         TestFilter secondFilter = new TestFilter();
@@ -74,7 +72,6 @@ public class TestClientsWithDriftNettyServer
     }
 
     private static int testDriftServer(List<MethodInvocationFilter> filters)
-            throws Exception
     {
         DriftScribeService scribeService = new DriftScribeService();
         AtomicInteger invocationCount = new AtomicInteger();
@@ -105,7 +102,6 @@ public class TestClientsWithDriftNettyServer
     }
 
     private static void testDriftServer(DriftService service, Consumer<HostAndPort> task)
-            throws Exception
     {
         DriftNettyServerConfig config = new DriftNettyServerConfig()
                 .setSslEnabled(true)

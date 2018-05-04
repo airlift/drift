@@ -55,6 +55,7 @@ import static io.airlift.drift.codec.metadata.ReflectionHelper.getAllDeclaredMet
 import static io.airlift.drift.codec.metadata.ReflectionHelper.resolveFieldTypes;
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.toCollection;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 
@@ -484,9 +485,9 @@ public abstract class AbstractThriftMetadataBuilder
 
             // fields must have an id
             if (!entry.getKey().isPresent()) {
-                Set<String> sortedFields = new TreeSet<>(fields.stream()
+                Set<String> sortedFields = fields.stream()
                         .map(FieldMetadata::getOrExtractThriftFieldName)
-                        .collect(toSet()));
+                        .collect(toCollection(TreeSet::new));
                 for (String fieldName : sortedFields) {
                     // only report errors for fields that don't have conflicting ids
                     if (!fieldsWithConflictingIds.contains(fieldName)) {

@@ -71,13 +71,12 @@ public abstract class AbstractThriftCodecManagerTest
     private ThriftCodecManager readCodecManager;
     private ThriftCodecManager writeCodecManager;
 
-    public abstract ThriftCodecManager createReadCodecManager();
+    protected abstract ThriftCodecManager createReadCodecManager();
 
-    public abstract ThriftCodecManager createWriteCodecManager();
+    protected abstract ThriftCodecManager createWriteCodecManager();
 
     @BeforeMethod
     protected void setUp()
-            throws Exception
     {
         readCodecManager = createReadCodecManager();
         writeCodecManager = createWriteCodecManager();

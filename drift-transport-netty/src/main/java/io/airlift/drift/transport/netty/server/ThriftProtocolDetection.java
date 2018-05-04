@@ -68,7 +68,6 @@ public class ThriftProtocolDetection
     // This method is an exception to the normal reference counted rules and buffer should not be released
     @Override
     protected void decode(ChannelHandlerContext context, ByteBuf in, List<Object> out)
-            throws Exception
     {
         // minimum bytes required to detect framing
         if (in.readableBytes() < 4) {
@@ -94,7 +93,7 @@ public class ThriftProtocolDetection
                 return;
             }
 
-            switchToTransport(context, UNFRAMED, Optional.of(protocol.get()));
+            switchToTransport(context, UNFRAMED, protocol);
             return;
         }
 
@@ -116,7 +115,7 @@ public class ThriftProtocolDetection
             return;
         }
 
-        switchToTransport(context, FRAMED, Optional.of(protocol.get()));
+        switchToTransport(context, FRAMED, protocol);
     }
 
     private static Optional<Protocol> detectProtocol(int magic)

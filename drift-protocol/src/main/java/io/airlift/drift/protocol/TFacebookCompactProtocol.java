@@ -149,7 +149,6 @@ public class TFacebookCompactProtocol
      */
     @Override
     public void writeStructBegin(TStruct struct)
-            throws TException
     {
         lastField.push(lastFieldId);
         lastFieldId = 0;
@@ -162,7 +161,6 @@ public class TFacebookCompactProtocol
      */
     @Override
     public void writeStructEnd()
-            throws TException
     {
         lastFieldId = lastField.pop();
     }
@@ -531,7 +529,6 @@ public class TFacebookCompactProtocol
      */
     @Override
     public TStruct readStructBegin()
-            throws TException
     {
         lastField.push(lastFieldId);
         lastFieldId = 0;
@@ -544,7 +541,6 @@ public class TFacebookCompactProtocol
      */
     @Override
     public void readStructEnd()
-            throws TException
     {
         // consume the last field we read off the wire.
         lastFieldId = lastField.pop();

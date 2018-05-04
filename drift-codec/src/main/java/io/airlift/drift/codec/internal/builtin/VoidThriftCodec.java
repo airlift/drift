@@ -39,11 +39,9 @@ public class VoidThriftCodec
 
     /**
      * Always returns null without reading anything from the stream.
-     * @param protocol
      */
     @Override
     public Void read(TProtocolReader protocol)
-            throws Exception
     {
         requireNonNull(protocol, "protocol is null");
         return null;
@@ -54,7 +52,6 @@ public class VoidThriftCodec
      */
     @Override
     public void write(Void value, TProtocolWriter protocol)
-            throws Exception
     {
         requireNonNull(protocol, "protocol is null");
     }

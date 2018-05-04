@@ -163,7 +163,6 @@ public class ThriftClientHandler
 
     @Override
     public void channelRead(ChannelHandlerContext context, Object message)
-            throws Exception
     {
         if (message instanceof ThriftFrame) {
             messageReceived(context, (ThriftFrame) message);
@@ -199,7 +198,6 @@ public class ThriftClientHandler
 
     @Override
     public void channelInactive(ChannelHandlerContext context)
-            throws Exception
     {
         onError(context, new TTransportException("Client was disconnected by server"), Optional.empty());
     }

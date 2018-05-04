@@ -56,7 +56,6 @@ public class TestThriftCodecManager
 
     @BeforeMethod
     protected void setUp()
-            throws Exception
     {
         codecManager = new ThriftCodecManager((codecManager, metadata) -> {
             throw new UnsupportedOperationException();

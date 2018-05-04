@@ -97,7 +97,6 @@ public class TestDriftNettyServerTransport
 
     @Test
     public void testOutOfOrderNot()
-            throws Exception
     {
         TestingServerMethodInvoker methodInvoker = new TestingServerMethodInvoker();
         int invocationCount = testServerMethodInvoker(methodInvoker, true, ImmutableList.of(
@@ -158,7 +157,6 @@ public class TestDriftNettyServerTransport
 
     @Test
     public void testOutOfOrderNotSupported()
-            throws Exception
     {
         TestingServerMethodInvoker methodInvoker = new TestingServerMethodInvoker();
         int invocationCount = testServerMethodInvoker(methodInvoker, false, ImmutableList.of(
@@ -221,7 +219,6 @@ public class TestDriftNettyServerTransport
     }
 
     private static int testServerMethodInvoker(ServerMethodInvoker methodInvoker, boolean assumeClientsSupportOutOfOrderResponses, List<ToIntFunction<HostAndPort>> clients)
-            throws Exception
     {
         DriftNettyServerConfig config = new DriftNettyServerConfig()
                 .setAssumeClientsSupportOutOfOrderResponses(assumeClientsSupportOutOfOrderResponses);

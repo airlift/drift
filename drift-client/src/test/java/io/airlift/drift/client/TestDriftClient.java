@@ -129,7 +129,6 @@ public class TestDriftClient
 
     @Test
     public void testGuiceClient()
-            throws Exception
     {
         TestingMethodInvocationStatsFactory statsFactory = new TestingMethodInvocationStatsFactory();
         ResultsSupplier resultsSupplier = new ResultsSupplier();
@@ -203,7 +202,6 @@ public class TestDriftClient
 
     @Test
     public void testGuiceClientFilter()
-            throws Exception
     {
         TestingMethodInvocationStatsFactory statsFactory = new TestingMethodInvocationStatsFactory();
         ResultsSupplier resultsSupplier = new ResultsSupplier();

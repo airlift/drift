@@ -177,7 +177,6 @@ public class TestDriftNettyMethodInvoker
 
     @Test
     public void testDriftNettyService()
-            throws Exception
     {
         TestServerMethodInvoker methodInvoker = new TestServerMethodInvoker();
         List<DriftLogEntry> expectedMessages = testMethodInvoker(methodInvoker);
@@ -185,7 +184,6 @@ public class TestDriftNettyMethodInvoker
     }
 
     private static List<DriftLogEntry> testMethodInvoker(ServerMethodInvoker methodInvoker)
-            throws Exception
     {
         int invocationCount = testMethodInvoker(methodInvoker, ImmutableList.of(
                 address -> logThrift(address, MESSAGES, new TTransportFactory(), new TBinaryProtocol.Factory()),
@@ -206,7 +204,6 @@ public class TestDriftNettyMethodInvoker
     }
 
     private static int testMethodInvoker(ServerMethodInvoker methodInvoker, List<ToIntFunction<HostAndPort>> clients)
-            throws Exception
     {
         TestingPooledByteBufAllocator testingAllocator = new TestingPooledByteBufAllocator();
         ServerTransport serverTransport = new DriftNettyServerTransportFactory(new DriftNettyServerConfig(), testingAllocator).createServerTransport(methodInvoker);

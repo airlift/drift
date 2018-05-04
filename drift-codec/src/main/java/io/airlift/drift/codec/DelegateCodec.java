@@ -65,7 +65,7 @@ public class DelegateCodec<T>
     {
         ThriftCodec<T> codec = codecManager.getCachedCodecIfPresent(typeToken);
         if (codec == null) {
-            throw new IllegalStateException("Tried to encodec/decode using a DelegateCodec before the target codec was built (likely a bug in recursive type support)");
+            throw new IllegalStateException("Tried to encode/decode using a DelegateCodec before the target codec was built (likely a bug in recursive type support)");
         }
         return codec;
     }

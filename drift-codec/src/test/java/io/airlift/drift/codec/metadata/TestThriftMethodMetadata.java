@@ -105,42 +105,36 @@ public class TestThriftMethodMetadata
 
     @Test
     public void testNoExceptions()
-            throws Exception
     {
         assertExceptions("noExceptions");
     }
 
     @Test
     public void testAnnotatedExceptions()
-            throws Exception
     {
         assertExceptions("annotatedExceptions", ExceptionA.class, ExceptionB.class);
     }
 
     @Test
     public void testInferredException()
-            throws Exception
     {
         assertExceptions("inferredException", ExceptionA.class);
     }
 
     @Test
     public void testInferredExceptionWithTException()
-            throws Exception
     {
         assertExceptions("inferredExceptionWithTException", ExceptionA.class);
     }
 
     @Test(expectedExceptions = IllegalArgumentException.class, expectedExceptionsMessageRegExp = "ThriftMethod \\[.*\\.nonThriftException] exception \\[IllegalArgumentException] is not annotated with @ThriftStruct")
     public void testNonThriftException()
-            throws Exception
     {
         assertExceptions("nonThriftException");
     }
 
     @Test(expectedExceptions = IllegalArgumentException.class, expectedExceptionsMessageRegExp = "ThriftMethod \\[.*\\.invalidInferredException] annotation must declare exception mapping when more than one custom exception is thrown")
     public void testInvalidInferredException()
-            throws Exception
     {
         assertExceptions("invalidInferredException");
     }

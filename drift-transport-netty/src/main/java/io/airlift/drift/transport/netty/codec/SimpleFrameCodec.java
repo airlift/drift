@@ -78,7 +78,6 @@ public class SimpleFrameCodec
 
     @Override
     public void write(ChannelHandlerContext context, Object message, ChannelPromise promise)
-            throws Exception
     {
         if (message instanceof ThriftFrame) {
             // strip the underlying message from the frame

@@ -126,7 +126,6 @@ public final class ThriftCodecManager
         {
             @Override
             public ThriftCodec<?> load(ThriftType type)
-                    throws Exception
             {
                 try {
                     // When we need to load a codec for a type the first time, we push it on the

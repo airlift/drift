@@ -28,7 +28,6 @@ public class TestToString
 {
     @Test
     public void testToString()
-            throws Exception
     {
         assertToString(BonkBuilder.class);
         assertToString(UnionBean.class);

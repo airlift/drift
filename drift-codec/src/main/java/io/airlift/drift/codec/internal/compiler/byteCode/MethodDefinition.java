@@ -243,7 +243,7 @@ public class MethodDefinition
             methodNode.signature = genericMethodSignature(returnType, parameters);
         }
 
-        methodNode.exceptions = new ArrayList<String>();
+        methodNode.exceptions = new ArrayList<>();
         for (ParameterizedType exception : exceptions) {
             methodNode.exceptions.add(exception.getClassName());
         }

@@ -37,7 +37,7 @@ public class ThriftFrame
 
     public ThriftFrame(int sequenceId, ByteBuf message, Map<String, String> headers, Transport transport, Protocol protocol, boolean supportOutOfOrderResponse)
     {
-        this.sequenceId = requireNonNull(sequenceId, "sequenceId is null");
+        this.sequenceId = sequenceId;
         this.message = requireNonNull(message, "message is null");
         this.headers = requireNonNull(headers, "headers is null");
         this.transport = requireNonNull(transport, "transport is null");

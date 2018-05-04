@@ -54,7 +54,7 @@ An instance of the Scribe client can be created using a `DriftClientFactory`:
 ```java
 // expensive services that should only be created once
 ThriftCodecManager codecManager = new ThriftCodecManager();
-AddressSelector addressSelector = new SimpleAddressSelector(scribeHostAddreses);
+AddressSelector addressSelector = new SimpleAddressSelector(scribeHostAddresses);
 DriftNettyClientConfig config = new DriftNettyClientConfig();
 // methodInvokerFactory must be closed 
 DriftNettyMethodInvokerFactory<?> methodInvokerFactory = DriftNettyMethodInvokerFactory.createStaticDriftNettyMethodInvokerFactory(config);

@@ -82,7 +82,6 @@ public class ThriftServerHandler
 
     @Override
     public void channelRead(ChannelHandlerContext context, Object message)
-            throws Exception
     {
         if (message instanceof ThriftFrame) {
             messageReceived(context, (ThriftFrame) message);

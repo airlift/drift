@@ -28,7 +28,6 @@ public class TestThriftUnionMetadataBuilder
 {
     @Test
     public void testNoId()
-            throws Exception
     {
         ThriftUnionMetadataBuilder builder = new ThriftUnionMetadataBuilder(new ThriftCatalog(), NoId.class);
 
@@ -67,7 +66,6 @@ public class TestThriftUnionMetadataBuilder
 
     @Test
     public void testMultipleIds()
-            throws Exception
     {
         ThriftUnionMetadataBuilder builder = new ThriftUnionMetadataBuilder(new ThriftCatalog(), MultipleIds.class);
 
@@ -119,7 +117,6 @@ public class TestThriftUnionMetadataBuilder
 
     @Test
     public void testMultipleNames()
-            throws Exception
     {
         ThriftUnionMetadataBuilder builder = new ThriftUnionMetadataBuilder(new ThriftCatalog(), MultipleNames.class);
 
@@ -160,7 +157,6 @@ public class TestThriftUnionMetadataBuilder
 
     @Test
     public void testUnsupportedType()
-            throws Exception
     {
         ThriftUnionMetadataBuilder builder = new ThriftUnionMetadataBuilder(new ThriftCatalog(), UnsupportedJavaType.class);
 
@@ -193,7 +189,6 @@ public class TestThriftUnionMetadataBuilder
 
     @Test
     public void testMultipleTypes()
-            throws Exception
     {
         ThriftUnionMetadataBuilder builder = new ThriftUnionMetadataBuilder(new ThriftCatalog(), MultipleTypes.class);
 

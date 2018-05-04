@@ -238,17 +238,13 @@ public class ThriftCatalog
             // at this point, we've just finished processing and caching the originally requested
             // type. There may be some unresolved type references we should revisit now.
             Deque<Type> unresolvedJavaTypes = deferredTypesWorkList.get();
-            do {
-                if (unresolvedJavaTypes.isEmpty()) {
-                    break;
-                }
+            while (!unresolvedJavaTypes.isEmpty()) {
                 Type unresolvedJavaType = unresolvedJavaTypes.pop();
                 if (!typeCache.containsKey(unresolvedJavaType)) {
                     ThriftType resolvedThriftType = buildThriftTypeInternal(unresolvedJavaType);
                     typeCache.putIfAbsent(unresolvedJavaType, resolvedThriftType);
                 }
             }
-            while (true);
         }
         return thriftType;
     }
@@ -293,7 +289,7 @@ public class ThriftCatalog
         if (rawType.isArray()) {
             Class<?> elementType = rawType.getComponentType();
             if (elementType == byte.class) {
-                // byte[] is encoded as BINARY and requires a coersion
+                // byte[] is encoded as BINARY and requires a coercion
                 return coercions.get(javaType).getThriftType();
             }
             return array(getCollectionElementThriftTypeReference(elementType));
@@ -327,7 +323,7 @@ public class ThriftCatalog
 
         if (ListenableFuture.class.isAssignableFrom(rawType)) {
             Type returnType = getFutureReturnType(javaType);
-            // TODO: check that we aren't recursing through multiple futures
+            // TODO: check that we don't recurse through multiple futures
             // TODO: find a way to restrict this to return values only
             return getThriftType(returnType);
         }

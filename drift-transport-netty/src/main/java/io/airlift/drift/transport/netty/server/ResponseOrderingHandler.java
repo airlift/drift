@@ -25,7 +25,6 @@ public class ResponseOrderingHandler
 {
     @Override
     public void channelRead(ChannelHandlerContext context, Object message)
-            throws Exception
     {
         if (message instanceof ThriftFrame) {
             ThriftFrame thriftFrame = (ThriftFrame) message;
@@ -38,7 +37,6 @@ public class ResponseOrderingHandler
 
     @Override
     public void write(ChannelHandlerContext context, Object message, ChannelPromise promise)
-            throws Exception
     {
         if (message instanceof ThriftFrame) {
             // always re-enable auto read

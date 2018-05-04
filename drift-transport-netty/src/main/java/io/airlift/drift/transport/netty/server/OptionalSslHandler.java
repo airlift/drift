@@ -47,7 +47,6 @@ public class OptionalSslHandler
 
     @Override
     protected void decode(ChannelHandlerContext context, ByteBuf in, List<Object> out)
-            throws Exception
     {
         // minimum bytes required to detect ssl
         if (in.readableBytes() < SSL_RECORD_HEADER_LENGTH) {

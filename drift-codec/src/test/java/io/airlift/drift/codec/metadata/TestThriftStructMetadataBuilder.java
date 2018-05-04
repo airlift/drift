@@ -31,7 +31,6 @@ public class TestThriftStructMetadataBuilder
 {
     @Test
     public void testNoId()
-            throws Exception
     {
         ThriftStructMetadataBuilder builder = new ThriftStructMetadataBuilder(new ThriftCatalog(), NoId.class);
 
@@ -67,7 +66,6 @@ public class TestThriftStructMetadataBuilder
 
     @Test
     public void testMultipleIds()
-            throws Exception
     {
         ThriftStructMetadataBuilder builder = new ThriftStructMetadataBuilder(new ThriftCatalog(), MultipleIds.class);
 
@@ -114,7 +112,6 @@ public class TestThriftStructMetadataBuilder
 
     @Test
     public void testMultipleNames()
-            throws Exception
     {
         ThriftStructMetadataBuilder builder = new ThriftStructMetadataBuilder(new ThriftCatalog(), MultipleNames.class);
 
@@ -150,7 +147,6 @@ public class TestThriftStructMetadataBuilder
 
     @Test
     public void testUnsupportedType()
-            throws Exception
     {
         ThriftStructMetadataBuilder builder = new ThriftStructMetadataBuilder(new ThriftCatalog(), UnsupportedJavaType.class);
 
@@ -178,7 +174,6 @@ public class TestThriftStructMetadataBuilder
 
     @Test
     public void testMultipleTypes()
-            throws Exception
     {
         ThriftStructMetadataBuilder builder = new ThriftStructMetadataBuilder(new ThriftCatalog(), MultipleTypes.class);
 
@@ -281,7 +276,7 @@ public class TestThriftStructMetadataBuilder
     }
 
     @Test
-    public void testMulitpleRequiredness()
+    public void testMultipleRequiredness()
     {
         ThriftStructMetadataBuilder builder = new ThriftStructMetadataBuilder(new ThriftCatalog(), MultipleRequiredness.class);
 
