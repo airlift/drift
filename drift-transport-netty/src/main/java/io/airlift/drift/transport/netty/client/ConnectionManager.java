@@ -18,7 +18,7 @@ package io.airlift.drift.transport.netty.client;
 import com.google.common.net.HostAndPort;
 import io.airlift.drift.transport.netty.codec.Protocol;
 import io.airlift.drift.transport.netty.codec.Transport;
-import io.airlift.drift.transport.netty.ssl.SslContextFactory.SslContextConfig;
+import io.airlift.drift.transport.netty.ssl.SslContextFactory.SslContextParameters;
 import io.airlift.units.DataSize;
 import io.airlift.units.Duration;
 import io.netty.channel.Channel;
@@ -50,7 +50,7 @@ interface ConnectionManager
         private final Duration requestTimeout;
 
         private final Optional<HostAndPort> socksProxy;
-        private final Optional<SslContextConfig> sslContextConfig;
+        private final Optional<SslContextParameters> sslContextParameters;
 
         public ConnectionParameters(
                 Transport transport,
@@ -59,7 +59,7 @@ interface ConnectionManager
                 Duration connectTimeout,
                 Duration requestTimeout,
                 Optional<HostAndPort> socksProxy,
-                Optional<SslContextConfig> sslContextConfig)
+                Optional<SslContextParameters> sslContextParameters)
         {
             this.transport = requireNonNull(transport, "transport is null");
             this.protocol = requireNonNull(protocol, "protocol is null");
@@ -67,7 +67,7 @@ interface ConnectionManager
             this.connectTimeout = requireNonNull(connectTimeout, "connectTimeout is null");
             this.requestTimeout = requireNonNull(requestTimeout, "requestTimeout is null");
             this.socksProxy = requireNonNull(socksProxy, "socksProxy is null");
-            this.sslContextConfig = requireNonNull(sslContextConfig, "sslContextConfig is null");
+            this.sslContextParameters = requireNonNull(sslContextParameters, "sslContextParameters is null");
         }
 
         public Transport getTransport()
@@ -100,9 +100,9 @@ interface ConnectionManager
             return socksProxy;
         }
 
-        public Optional<SslContextConfig> getSslContextConfig()
+        public Optional<SslContextParameters> getSslContextParameters()
         {
-            return sslContextConfig;
+            return sslContextParameters;
         }
 
         @Override
@@ -121,13 +121,13 @@ interface ConnectionManager
                     Objects.equals(connectTimeout, that.connectTimeout) &&
                     Objects.equals(requestTimeout, that.requestTimeout) &&
                     Objects.equals(socksProxy, that.socksProxy) &&
-                    Objects.equals(sslContextConfig, that.sslContextConfig);
+                    Objects.equals(sslContextParameters, that.sslContextParameters);
         }
 
         @Override
         public int hashCode()
         {
-            return Objects.hash(transport, protocol, maxFrameSize, connectTimeout, requestTimeout, socksProxy, sslContextConfig);
+            return Objects.hash(transport, protocol, maxFrameSize, connectTimeout, requestTimeout, socksProxy, sslContextParameters);
         }
     }
 }

@@ -35,7 +35,7 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 public class SslContextFactory
 {
-    private final LoadingCache<SslContextConfig, ReloadableSslContext> cache;
+    private final LoadingCache<SslContextParameters, ReloadableSslContext> cache;
 
     public static SslContextFactory createSslContextFactory(boolean forClient, Duration refreshTime, ScheduledExecutorService scheduledExecutor)
     {
@@ -69,7 +69,7 @@ public class SslContextFactory
             Duration sessionTimeout,
             List<String> ciphers)
     {
-        return get(new SslContextConfig(
+        return get(new SslContextParameters(
                 trustCertificatesFile,
                 clientCertificatesFile,
                 privateKeyFile,
@@ -79,10 +79,10 @@ public class SslContextFactory
                 ciphers));
     }
 
-    public ReloadableSslContext get(SslContextConfig sslContextConfig)
+    public ReloadableSslContext get(SslContextParameters sslContextParameters)
     {
         try {
-            return cache.getUnchecked(sslContextConfig);
+            return cache.getUnchecked(sslContextParameters);
         }
         catch (UncheckedExecutionException | ExecutionError e) {
             throw new RuntimeException("Error initializing SSL context", e.getCause());
@@ -94,7 +94,7 @@ public class SslContextFactory
         cache.asMap().values().forEach(ReloadableSslContext::reload);
     }
 
-    public static class SslContextConfig
+    public static class SslContextParameters
     {
         private final File trustCertificatesFile;
         private final Optional<File> clientCertificatesFile;
@@ -105,7 +105,7 @@ public class SslContextFactory
         private final Duration sessionTimeout;
         private final List<String> ciphers;
 
-        public SslContextConfig(
+        public SslContextParameters(
                 File trustCertificatesFile,
                 Optional<File> clientCertificatesFile,
                 Optional<File> privateKeyFile,
@@ -166,7 +166,7 @@ public class SslContextFactory
             if (o == null || getClass() != o.getClass()) {
                 return false;
             }
-            SslContextConfig that = (SslContextConfig) o;
+            SslContextParameters that = (SslContextParameters) o;
             return sessionCacheSize == that.sessionCacheSize &&
                     Objects.equals(trustCertificatesFile, that.trustCertificatesFile) &&
                     Objects.equals(clientCertificatesFile, that.clientCertificatesFile) &&

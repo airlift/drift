@@ -59,7 +59,7 @@ class ConnectionFactory
                             connectionParameters.getMaxFrameSize(),
                             connectionParameters.getRequestTimeout(),
                             connectionParameters.getSocksProxy(),
-                            connectionParameters.getSslContextConfig().map(sslContextFactory::get)));
+                            connectionParameters.getSslContextParameters().map(sslContextFactory::get)));
 
             Promise<Channel> promise = group.next().newPromise();
             bootstrap.connect(new InetSocketAddress(address.getHost(), address.getPort()))

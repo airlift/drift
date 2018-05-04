@@ -21,7 +21,7 @@ import io.airlift.drift.transport.client.MethodInvoker;
 import io.airlift.drift.transport.client.MethodInvokerFactory;
 import io.airlift.drift.transport.netty.client.ConnectionManager.ConnectionParameters;
 import io.airlift.drift.transport.netty.ssl.SslContextFactory;
-import io.airlift.drift.transport.netty.ssl.SslContextFactory.SslContextConfig;
+import io.airlift.drift.transport.netty.ssl.SslContextFactory.SslContextParameters;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 
@@ -80,8 +80,8 @@ public class DriftNettyMethodInvokerFactory<I>
         ConnectionParameters clientConfig = toConnectionConfig(clientConfigurationProvider.apply(clientIdentity));
 
         // validate ssl context configuration is valid
-        clientConfig.getSslContextConfig()
-                .ifPresent(sslContextConfig -> sslContextFactory.get(sslContextConfig).get());
+        clientConfig.getSslContextParameters()
+                .ifPresent(sslContextParameters -> sslContextFactory.get(sslContextParameters).get());
 
         return new DriftNettyMethodInvoker(clientConfig, connectionManager, group);
     }
@@ -109,9 +109,9 @@ public class DriftNettyMethodInvokerFactory<I>
             throw new IllegalArgumentException("HEADER transport cannot be used with COMPACT protocol, use FB_COMPACT instead");
         }
 
-        Optional<SslContextConfig> sslContextConfig = Optional.empty();
+        Optional<SslContextParameters> sslContextConfig = Optional.empty();
         if (clientConfig.isSslEnabled()) {
-            sslContextConfig = Optional.of(new SslContextConfig(
+            sslContextConfig = Optional.of(new SslContextParameters(
                     clientConfig.getTrustCertificate(),
                     Optional.ofNullable(clientConfig.getKey()),
                     Optional.ofNullable(clientConfig.getKey()),
