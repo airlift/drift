@@ -102,30 +102,31 @@ class InvocationResponseFuture
             invocationFuture = new ThriftRequest(request.getMethod(), request.getParameters(), request.getHeaders());
             channel.writeAndFlush(invocationFuture);
             Futures.addCallback(invocationFuture, new FutureCallback<Object>()
-            {
-                @Override
-                public void onSuccess(Object result)
-                {
-                    try {
-                        connectionManager.returnConnection(channel);
-                        set(result);
-                    }
-                    catch (Throwable t) {
-                        fatalError(t);
-                    }
-                }
+                    {
+                        @Override
+                        public void onSuccess(Object result)
+                        {
+                            try {
+                                connectionManager.returnConnection(channel);
+                                set(result);
+                            }
+                            catch (Throwable t) {
+                                fatalError(t);
+                            }
+                        }
 
-                @Override
-                public void onFailure(Throwable t)
-                {
-                    try {
-                        connectionManager.returnConnection(channel);
-                    }
-                    finally {
-                        fatalError(t);
-                    }
-                }
-            });
+                        @Override
+                        public void onFailure(Throwable t)
+                        {
+                            try {
+                                connectionManager.returnConnection(channel);
+                            }
+                            finally {
+                                fatalError(t);
+                            }
+                        }
+                    },
+                    directExecutor());
         }
         catch (Throwable t) {
             try {

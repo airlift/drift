@@ -33,6 +33,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 
+import static com.google.common.util.concurrent.MoreExecutors.directExecutor;
 import static io.airlift.drift.TApplicationException.Type.UNKNOWN_METHOD;
 import static java.util.Arrays.asList;
 import static java.util.Objects.requireNonNull;
@@ -149,19 +150,20 @@ class DriftInvocationHandler
     {
         SettableFuture<Object> result = SettableFuture.create();
         Futures.addCallback(future, new FutureCallback<Object>()
-        {
-            @Override
-            public void onSuccess(Object value)
-            {
-                result.set(value);
-            }
+                {
+                    @Override
+                    public void onSuccess(Object value)
+                    {
+                        result.set(value);
+                    }
 
-            @Override
-            public void onFailure(Throwable t)
-            {
-                result.setException(unwrapUserException(t));
-            }
-        });
+                    @Override
+                    public void onFailure(Throwable t)
+                    {
+                        result.setException(unwrapUserException(t));
+                    }
+                },
+                directExecutor());
         return result;
     }
 

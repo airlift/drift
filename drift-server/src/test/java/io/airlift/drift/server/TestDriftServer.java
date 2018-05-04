@@ -41,6 +41,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Supplier;
 
 import static com.google.common.util.concurrent.Futures.getDone;
+import static com.google.common.util.concurrent.MoreExecutors.directExecutor;
 import static com.google.inject.multibindings.OptionalBinder.newOptionalBinder;
 import static io.airlift.drift.server.TestingInvocationTarget.combineTestingInvocationTarget;
 import static io.airlift.drift.server.guice.DriftServerBinder.driftServerBinder;
@@ -343,7 +344,7 @@ public class TestDriftServer
             this.methodName = "testAsync";
             this.id = id;
             this.name = name;
-            return Futures.transform(resultsSupplier.get(), String::valueOf);
+            return Futures.transform(resultsSupplier.get(), String::valueOf, directExecutor());
         }
 
         @Override

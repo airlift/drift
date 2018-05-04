@@ -154,7 +154,7 @@ public final class ReloadableSslContext
             length = newLength;
 
             // check if contents changed
-            HashCode newHashCode = Files.hash(file, sha256());
+            HashCode newHashCode = Files.asByteSource(file).hash(sha256());
             if (Objects.equals(hashCode, newHashCode)) {
                 return false;
             }

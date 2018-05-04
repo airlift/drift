@@ -158,19 +158,20 @@ class DriftMethodInvocation<A extends Address>
             currentTask = result;
 
             Futures.addCallback(result, new FutureCallback<Object>()
-            {
-                @Override
-                public void onSuccess(Object result)
-                {
-                    set(result);
-                }
+                    {
+                        @Override
+                        public void onSuccess(Object result)
+                        {
+                            set(result);
+                        }
 
-                @Override
-                public void onFailure(Throwable t)
-                {
-                    handleFailure(address.get(), t);
-                }
-            });
+                        @Override
+                        public void onFailure(Throwable t)
+                        {
+                            handleFailure(address.get(), t);
+                        }
+                    },
+                    directExecutor());
         }
         catch (Throwable t) {
             // this should never happen, but ensure that invocation always finishes
@@ -236,20 +237,21 @@ class DriftMethodInvocation<A extends Address>
             ListenableFuture<?> delay = invoker.delay(backoffDelay);
             currentTask = delay;
             Futures.addCallback(delay, new FutureCallback<Object>()
-            {
-                @Override
-                public void onSuccess(Object result)
-                {
-                    nextAttempt();
-                }
+                    {
+                        @Override
+                        public void onSuccess(Object result)
+                        {
+                            nextAttempt();
+                        }
 
-                @Override
-                public void onFailure(Throwable throwable)
-                {
-                    // this should never happen in a delay future
-                    unexpectedError(throwable);
-                }
-            });
+                        @Override
+                        public void onFailure(Throwable throwable)
+                        {
+                            // this should never happen in a delay future
+                            unexpectedError(throwable);
+                        }
+                    },
+                    directExecutor());
         }
         catch (Throwable t) {
             // this should never happen, but ensure that invocation always finishes

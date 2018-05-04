@@ -107,7 +107,7 @@ public final class PemReader
     private static List<X509Certificate> readCertificateChain(File certificateChainFile)
             throws IOException, GeneralSecurityException
     {
-        String contents = Files.toString(certificateChainFile, US_ASCII);
+        String contents = Files.asCharSource(certificateChainFile, US_ASCII).read();
 
         Matcher matcher = CERT_PATTERN.matcher(contents);
         CertificateFactory certificateFactory = CertificateFactory.getInstance("X.509");
@@ -126,7 +126,7 @@ public final class PemReader
     private static PKCS8EncodedKeySpec readPrivateKey(File keyFile, Optional<String> keyPassword)
             throws IOException, GeneralSecurityException
     {
-        String content = Files.toString(keyFile, US_ASCII);
+        String content = Files.asCharSource(keyFile, US_ASCII).read();
 
         Matcher matcher = KEY_PATTERN.matcher(content);
         if (!matcher.find()) {

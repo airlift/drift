@@ -56,6 +56,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import static com.google.common.base.Defaults.defaultValue;
 import static com.google.common.util.concurrent.Futures.immediateFailedFuture;
 import static com.google.common.util.concurrent.Futures.immediateFuture;
+import static com.google.common.util.concurrent.MoreExecutors.directExecutor;
 import static io.airlift.drift.TApplicationException.Type.INTERNAL_ERROR;
 import static io.airlift.drift.TApplicationException.Type.INVALID_MESSAGE_TYPE;
 import static io.airlift.drift.TApplicationException.Type.UNKNOWN_METHOD;
@@ -102,19 +103,20 @@ public class ThriftServerHandler
                     frame.getHeaders(),
                     frame.isSupportOutOfOrderResponse());
             Futures.addCallback(response, new FutureCallback<ThriftFrame>()
-            {
-                @Override
-                public void onSuccess(ThriftFrame result)
-                {
-                    context.writeAndFlush(result);
-                }
+                    {
+                        @Override
+                        public void onSuccess(ThriftFrame result)
+                        {
+                            context.writeAndFlush(result);
+                        }
 
-                @Override
-                public void onFailure(Throwable t)
-                {
-                    context.disconnect();
-                }
-            });
+                        @Override
+                        public void onFailure(Throwable t)
+                        {
+                            context.disconnect();
+                        }
+                    },
+                    directExecutor());
         }
         catch (Exception e) {
             log.error(e, "Exception processing request");
@@ -176,23 +178,30 @@ public class ThriftServerHandler
 
         ListenableFuture<Object> result = methodInvoker.invoke(new ServerInvokeRequest(method, headers, parameters));
         methodInvoker.recordResult(message.getName(), start, result);
-        ListenableFuture<ThriftFrame> encodedResult = Futures.transformAsync(result, value -> {
-            try {
-                return immediateFuture(writeSuccessResponse(context, method, transport, protocol, message.getSequenceId(), supportOutOfOrderResponse, value));
-            }
-            catch (Exception e) {
-                return immediateFailedFuture(e);
-            }
-        });
+        ListenableFuture<ThriftFrame> encodedResult = Futures.transformAsync(
+                result,
+                value -> {
+                    try {
+                        return immediateFuture(writeSuccessResponse(context, method, transport, protocol, message.getSequenceId(), supportOutOfOrderResponse, value));
+                    }
+                    catch (Exception e) {
+                        return immediateFailedFuture(e);
+                    }
+                },
+                directExecutor());
         encodedResult = Futures.withTimeout(encodedResult, requestTimeout.toMillis(), MILLISECONDS, timeoutExecutor);
-        encodedResult = Futures.catchingAsync(encodedResult, Exception.class, exception -> {
-            try {
-                return immediateFuture(writeExceptionResponse(context, method, transport, protocol, message.getSequenceId(), supportOutOfOrderResponse, exception));
-            }
-            catch (Exception e) {
-                return immediateFailedFuture(e);
-            }
-        });
+        encodedResult = Futures.catchingAsync(
+                encodedResult,
+                Exception.class,
+                exception -> {
+                    try {
+                        return immediateFuture(writeExceptionResponse(context, method, transport, protocol, message.getSequenceId(), supportOutOfOrderResponse, exception));
+                    }
+                    catch (Exception e) {
+                        return immediateFailedFuture(e);
+                    }
+                },
+                directExecutor());
         return encodedResult;
     }
 
