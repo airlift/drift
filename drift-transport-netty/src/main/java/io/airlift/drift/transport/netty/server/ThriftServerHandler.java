@@ -17,6 +17,7 @@ package io.airlift.drift.transport.netty.server;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.primitives.Primitives;
+import com.google.common.util.concurrent.FluentFuture;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
@@ -178,31 +179,29 @@ public class ThriftServerHandler
 
         ListenableFuture<Object> result = methodInvoker.invoke(new ServerInvokeRequest(method, headers, parameters));
         methodInvoker.recordResult(message.getName(), start, result);
-        ListenableFuture<ThriftFrame> encodedResult = Futures.transformAsync(
-                result,
-                value -> {
-                    try {
-                        return immediateFuture(writeSuccessResponse(context, method, transport, protocol, message.getSequenceId(), supportOutOfOrderResponse, value));
-                    }
-                    catch (Exception e) {
-                        return immediateFailedFuture(e);
-                    }
-                },
-                directExecutor());
-        encodedResult = Futures.withTimeout(encodedResult, requestTimeout.toMillis(), MILLISECONDS, timeoutExecutor);
-        encodedResult = Futures.catchingAsync(
-                encodedResult,
-                Exception.class,
-                exception -> {
-                    try {
-                        return immediateFuture(writeExceptionResponse(context, method, transport, protocol, message.getSequenceId(), supportOutOfOrderResponse, exception));
-                    }
-                    catch (Exception e) {
-                        return immediateFailedFuture(e);
-                    }
-                },
-                directExecutor());
-        return encodedResult;
+        return FluentFuture.from(result)
+                .transformAsync(
+                        value -> {
+                            try {
+                                return immediateFuture(writeSuccessResponse(context, method, transport, protocol, message.getSequenceId(), supportOutOfOrderResponse, value));
+                            }
+                            catch (Exception e) {
+                                return immediateFailedFuture(e);
+                            }
+                        },
+                        directExecutor())
+                .withTimeout(requestTimeout.toMillis(), MILLISECONDS, timeoutExecutor)
+                .catchingAsync(
+                        Exception.class,
+                        exception -> {
+                            try {
+                                return immediateFuture(writeExceptionResponse(context, method, transport, protocol, message.getSequenceId(), supportOutOfOrderResponse, exception));
+                            }
+                            catch (Exception e) {
+                                return immediateFailedFuture(e);
+                            }
+                        },
+                        directExecutor());
     }
 
     private static Map<Short, Object> readArguments(MethodMetadata method, TProtocolReader protocol)
