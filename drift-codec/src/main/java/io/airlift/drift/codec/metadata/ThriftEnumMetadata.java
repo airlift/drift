@@ -122,11 +122,6 @@ public class ThriftEnumMetadata<T extends Enum<T>>
         return enumClass;
     }
 
-    public boolean hasExplicitThriftValue()
-    {
-        return byEnumValue != null;
-    }
-
     public Map<Integer, T> getByEnumValue()
     {
         return byEnumValue;

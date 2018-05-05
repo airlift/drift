@@ -53,19 +53,9 @@ public class EnumThriftCodec<T extends Enum<T>>
             throws Exception
     {
         int enumValue = protocol.readI32();
-        if (enumValue >= 0) {
-            if (enumMetadata.hasExplicitThriftValue()) {
-                T enumConstant = enumMetadata.getByEnumValue().get(enumValue);
-                if (enumConstant != null) {
-                    return enumConstant;
-                }
-            }
-            else {
-                T[] enumConstants = enumMetadata.getEnumClass().getEnumConstants();
-                if (enumValue < enumConstants.length) {
-                    return enumConstants[enumValue];
-                }
-            }
+        T enumConstant = enumMetadata.getByEnumValue().get(enumValue);
+        if (enumConstant != null) {
+            return enumConstant;
         }
         // unknown, throw unknown value exception
         throw new UnknownEnumValueException(
@@ -80,14 +70,6 @@ public class EnumThriftCodec<T extends Enum<T>>
             throws Exception
     {
         requireNonNull(enumConstant, "enumConstant is null");
-
-        int enumValue;
-        if (enumMetadata.hasExplicitThriftValue()) {
-            enumValue = enumMetadata.getByEnumConstant().get(enumConstant);
-        }
-        else {
-            enumValue = enumConstant.ordinal();
-        }
-        protocol.writeI32(enumValue);
+        protocol.writeI32(enumMetadata.getByEnumConstant().get(enumConstant));
     }
 }
