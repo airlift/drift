@@ -183,6 +183,11 @@ annotated with `@ThriftEnumValue` that supplies an int value.
 Drift does *not* support the potentially error-prone method of using
 the Java ordinal for automatic mapping.
 
+One enumeration constant may be annotated with `@ThriftEnumUnknownValue`,
+and this constant will be used when an unknown value is encountered during
+deserialization.  If no enum constant is designated as the unknown value,
+an exception will be thrown instead.
+
 ```java
 @ThriftEnum
 public enum Letter

@@ -25,6 +25,7 @@ import io.airlift.drift.codec.metadata.ThriftEnumMetadata;
 import io.airlift.drift.codec.metadata.ThriftType;
 import io.airlift.drift.protocol.TBinaryProtocol;
 import io.airlift.drift.protocol.TCompactProtocol;
+import io.airlift.drift.protocol.TFacebookCompactProtocol;
 import io.airlift.drift.protocol.TMemoryBuffer;
 import io.airlift.drift.protocol.TProtocol;
 import io.airlift.drift.protocol.TTransport;
@@ -108,6 +109,13 @@ public class TestThriftCodecManager
         testRoundTripSerialize(enumType(letterEnumMetadata), Letter.C);
         testRoundTripSerialize(list(enumType(fruitEnumMetadata)), ImmutableList.copyOf(Fruit.values()));
         testRoundTripSerialize(list(enumType(letterEnumMetadata)), ImmutableList.copyOf(Letter.values()));
+
+        testRoundTripSerialize(I32, 500, enumType(letterEnumMetadata), Letter.UNKNOWN);
+        testRoundTripSerialize(
+                list(I32.coerceTo(Integer.class)),
+                ImmutableList.of(-100, -1, 0, 1, 67, 65, 66, 1000),
+                list(enumType(letterEnumMetadata)),
+                ImmutableList.of(Letter.UNKNOWN, Letter.UNKNOWN, Letter.UNKNOWN, Letter.UNKNOWN, Letter.C, Letter.A, Letter.B, Letter.UNKNOWN));
     }
 
     @Test
@@ -189,36 +197,37 @@ public class TestThriftCodecManager
     private <T> void testRoundTripSerialize(T value)
             throws Exception
     {
-        testRoundTripSerialize(value, TBinaryProtocol::new);
-        testRoundTripSerialize(value, TCompactProtocol::new);
-    }
-
-    private <T> void testRoundTripSerialize(T value, Function<TTransport, TProtocol> protocolFactory)
-            throws Exception
-    {
-        testRoundTripSerialize(codecManager.getCatalog().getThriftType(value.getClass()), value, protocolFactory);
+        ThriftType type = codecManager.getCatalog().getThriftType(value.getClass());
+        testRoundTripSerialize(type, value);
     }
 
     private <T> void testRoundTripSerialize(ThriftType type, T value)
             throws Exception
     {
-        testRoundTripSerialize(type, value, TBinaryProtocol::new);
-        testRoundTripSerialize(type, value, TCompactProtocol::new);
+        testRoundTripSerialize(type, value, type, value);
     }
 
-    private <T> void testRoundTripSerialize(ThriftType type, T value, Function<TTransport, TProtocol> protocolFactory)
+    private <T> void testRoundTripSerialize(ThriftType actualType, T actualValue, ThriftType expectedType, T expectedValue)
+            throws Exception
+    {
+        testRoundTripSerialize(actualType, actualValue, expectedType, expectedValue, TBinaryProtocol::new);
+        testRoundTripSerialize(actualType, actualValue, expectedType, expectedValue, TCompactProtocol::new);
+        testRoundTripSerialize(actualType, actualValue, expectedType, expectedValue, TFacebookCompactProtocol::new);
+    }
+
+    private <T> void testRoundTripSerialize(ThriftType actualType, T actualValue, ThriftType expectedType, T expectedValue, Function<TTransport, TProtocol> protocolFactory)
             throws Exception
     {
         // write value
         TMemoryBuffer transport = new TMemoryBuffer(10 * 1024);
         TProtocol protocol = protocolFactory.apply(transport);
-        codecManager.write(type, value, protocol);
+        codecManager.write(actualType, actualValue, protocol);
 
         // read value back
-        T copy = (T) codecManager.read(type, protocol);
+        T copy = (T) codecManager.read(expectedType, protocol);
         assertNotNull(copy);
 
         // verify they are the same
-        assertEquals(copy, value);
+        assertEquals(copy, expectedValue);
     }
 }

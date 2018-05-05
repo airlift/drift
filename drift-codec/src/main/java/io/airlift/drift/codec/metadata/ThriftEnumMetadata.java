@@ -17,6 +17,7 @@ package io.airlift.drift.codec.metadata;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import io.airlift.drift.annotations.ThriftEnumUnknownValue;
 import io.airlift.drift.annotations.ThriftEnumValue;
 
 import javax.annotation.concurrent.Immutable;
@@ -26,6 +27,7 @@ import java.lang.reflect.Modifier;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 
 import static com.google.common.base.MoreObjects.toStringHelper;
@@ -39,6 +41,7 @@ public class ThriftEnumMetadata<T extends Enum<T>>
     private final Class<T> enumClass;
     private final Map<Integer, T> byEnumValue;
     private final Map<T, Integer> byEnumConstant;
+    private final Optional<T> unknownEnumConstant;
     private final String enumName;
     private final ImmutableList<String> documentation;
     private final ImmutableMap<T, ImmutableList<String>> elementDocs;
@@ -91,6 +94,7 @@ public class ThriftEnumMetadata<T extends Enum<T>>
         ImmutableMap.Builder<T, ImmutableList<String>> elementDocs = ImmutableMap.builder();
         ImmutableMap.Builder<Integer, T> byEnumValue = ImmutableMap.builder();
         ImmutableMap.Builder<T, Integer> byEnumConstant = ImmutableMap.builder();
+        Optional<T> unknownEnumConstant = Optional.empty();
         for (T enumConstant : enumClass.getEnumConstants()) {
             Integer value;
             try {
@@ -104,12 +108,28 @@ public class ThriftEnumMetadata<T extends Enum<T>>
 
             byEnumValue.put(value, enumConstant);
             byEnumConstant.put(enumConstant, value);
+
+            if (isThriftEnumUnknownValue(enumClass, enumConstant)) {
+                checkArgument(!unknownEnumConstant.isPresent(), "Enum class %s has multiple constants annotated with @ThriftEnumUnknownValue", enumClass.getName());
+                unknownEnumConstant = Optional.of(enumConstant);
+            }
             elementDocs.put(enumConstant, ThriftCatalog.getThriftDocumentation(enumConstant));
         }
         this.byEnumValue = byEnumValue.build();
         this.byEnumConstant = byEnumConstant.build();
+        this.unknownEnumConstant = unknownEnumConstant;
         this.elementDocs = elementDocs.build();
         this.documentation = ThriftCatalog.getThriftDocumentation(enumClass);
+    }
+
+    private static <T extends Enum<T>> boolean isThriftEnumUnknownValue(Class<T> enumClass, T enumConstant)
+    {
+        try {
+            return enumConstant.getClass().getField(enumConstant.name()).isAnnotationPresent(ThriftEnumUnknownValue.class);
+        }
+        catch (NoSuchFieldException ignored) {
+            throw new IllegalArgumentException(format("Enum class %s does not have field for enum constant: %s", enumClass.getName(), enumConstant));
+        }
     }
 
     public String getEnumName()
@@ -130,6 +150,11 @@ public class ThriftEnumMetadata<T extends Enum<T>>
     public Map<T, Integer> getByEnumConstant()
     {
         return byEnumConstant;
+    }
+
+    public Optional<T> getUnknownEnumConstant()
+    {
+        return unknownEnumConstant;
     }
 
     public ImmutableList<String> getDocumentation()

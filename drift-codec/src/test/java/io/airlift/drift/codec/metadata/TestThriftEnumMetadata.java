@@ -17,9 +17,12 @@ package io.airlift.drift.codec.metadata;
 
 import com.google.common.collect.ImmutableMap;
 import io.airlift.drift.annotations.ThriftEnum;
+import io.airlift.drift.annotations.ThriftEnumUnknownValue;
 import io.airlift.drift.annotations.ThriftEnumValue;
 import io.airlift.drift.codec.Letter;
 import org.testng.annotations.Test;
+
+import java.util.Optional;
 
 import static io.airlift.drift.codec.metadata.ThriftEnumMetadataBuilder.thriftEnumMetadata;
 import static org.testng.Assert.assertEquals;
@@ -37,13 +40,16 @@ public class TestThriftEnumMetadata
                 .put(Letter.B, 66)
                 .put(Letter.C, 67)
                 .put(Letter.D, 68)
+                .put(Letter.UNKNOWN, -1)
                 .build());
         assertEquals(metadata.getByEnumValue(), ImmutableMap.<Integer, Letter>builder()
                 .put(65, Letter.A)
                 .put(66, Letter.B)
                 .put(67, Letter.C)
                 .put(68, Letter.D)
+                .put(-1, Letter.UNKNOWN)
                 .build());
+        assertEquals(metadata.getUnknownEnumConstant(), Optional.of(Letter.UNKNOWN));
     }
 
     @Test(expectedExceptions = IllegalArgumentException.class, expectedExceptionsMessageRegExp = "Enum class .*MissingEnumAnnotation is not annotated with @ThriftEnum")
@@ -68,6 +74,12 @@ public class TestThriftEnumMetadata
     public void testDuplicateValues()
     {
         thriftEnumMetadata(DuplicateValues.class);
+    }
+
+    @Test(expectedExceptions = IllegalArgumentException.class, expectedExceptionsMessageRegExp = "Enum class .*MultipleUnknownValues has multiple constants annotated with @ThriftEnumUnknownValue")
+    public void testMultipleUnknownValues()
+    {
+        thriftEnumMetadata(MultipleUnknownValues.class);
     }
 
     public enum MissingEnumAnnotation
@@ -114,6 +126,21 @@ public class TestThriftEnumMetadata
         public int value()
         {
             return 42;
+        }
+    }
+
+    @ThriftEnum
+    public enum MultipleUnknownValues
+    {
+        @ThriftEnumUnknownValue
+        FOO,
+        @ThriftEnumUnknownValue
+        BAR;
+
+        @ThriftEnumValue
+        public int value()
+        {
+            return this.ordinal();
         }
     }
 }

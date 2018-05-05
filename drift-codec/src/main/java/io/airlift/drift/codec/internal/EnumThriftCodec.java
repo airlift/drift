@@ -23,6 +23,7 @@ import io.airlift.drift.protocol.TProtocolWriter;
 
 import javax.annotation.concurrent.Immutable;
 
+import static java.lang.String.format;
 import static java.util.Objects.requireNonNull;
 
 /**
@@ -57,12 +58,8 @@ public class EnumThriftCodec<T extends Enum<T>>
         if (enumConstant != null) {
             return enumConstant;
         }
-        // unknown, throw unknown value exception
-        throw new UnknownEnumValueException(
-                String.format(
-                        "Enum %s does not have a value for %s",
-                        enumMetadata.getEnumClass(),
-                        enumValue));
+        return enumMetadata.getUnknownEnumConstant()
+                .orElseThrow(() -> new UnknownEnumValueException(format("Enum %s does not have a constant for value: %s", enumMetadata.getEnumClass().getName(), enumValue)));
     }
 
     @Override

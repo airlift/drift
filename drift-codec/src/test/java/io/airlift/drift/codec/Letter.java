@@ -16,12 +16,13 @@
 package io.airlift.drift.codec;
 
 import io.airlift.drift.annotations.ThriftEnum;
+import io.airlift.drift.annotations.ThriftEnumUnknownValue;
 import io.airlift.drift.annotations.ThriftEnumValue;
 
 @ThriftEnum
 public enum Letter
 {
-    A(65), B(66), C(67), D(68);
+    A(65), B(66), C(67), D(68), @ThriftEnumUnknownValue UNKNOWN(-1);
 
     private final int asciiValue;
 
