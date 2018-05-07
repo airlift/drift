@@ -15,6 +15,7 @@
  */
 package io.airlift.drift.client;
 
+import io.airlift.drift.protocol.TTransportException;
 import io.airlift.drift.transport.client.ConnectionFailedException;
 import io.airlift.drift.transport.client.DriftClientConfig;
 import io.airlift.drift.transport.client.RequestTimeoutException;
@@ -111,7 +112,19 @@ public class RetryPolicy
             return new ExceptionClassification(Optional.of(false), NORMAL);
         }
 
-        return exceptionClassifier.classifyException(throwable);
+        // allow classifier to return a hard result
+        ExceptionClassification result = exceptionClassifier.classifyException(throwable);
+        if (result.isRetry().isPresent()) {
+            return result;
+        }
+
+        if (idempotent && throwable instanceof TTransportException) {
+            // We don't know if there is a problem with this server or if this
+            // is a general network error, so just mark the server as normal.
+            return new ExceptionClassification(Optional.of(TRUE), NORMAL);
+        }
+
+        return result;
     }
 
     @Override

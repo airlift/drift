@@ -59,6 +59,7 @@ import static com.google.common.base.Throwables.getCausalChain;
 import static com.google.common.base.Throwables.getRootCause;
 import static com.google.inject.multibindings.Multibinder.newSetBinder;
 import static com.google.inject.multibindings.OptionalBinder.newOptionalBinder;
+import static io.airlift.drift.client.ExceptionClassification.HostStatus.NORMAL;
 import static io.airlift.drift.client.ExceptionClassifier.mergeExceptionClassifiers;
 import static io.airlift.drift.client.guice.DriftClientBinder.driftClientBinder;
 import static io.airlift.drift.client.guice.MethodInvocationFilterBinder.staticFilterBinder;
@@ -543,7 +544,7 @@ public class TestDriftClient
         public ExceptionClassification classifyException(Throwable throwable)
         {
             lastException.set(throwable);
-            return ExceptionClassification.NORMAL_EXCEPTION;
+            return new ExceptionClassification(Optional.of(false), NORMAL);
         }
     }
 }
