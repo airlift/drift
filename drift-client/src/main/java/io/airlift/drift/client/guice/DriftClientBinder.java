@@ -193,11 +193,10 @@ public class DriftClientBinder
 
             AddressSelector<?> addressSelector = injector.getInstance(Key.get(AddressSelector.class, clientAnnotation));
 
-            ImmutableList.Builder<ExceptionClassifier> exceptionClassifiers = ImmutableList.builder();
-            injector.getInstance(Key.get(new TypeLiteral<Optional<ExceptionClassifier>>(){}, clientAnnotation))
-                    .ifPresent(exceptionClassifiers::add);
-            exceptionClassifiers.addAll(injector.getInstance(Key.get(SET_EXCEPTION_CLASSIFIER_TYPE)));
-            ExceptionClassifier exceptionClassifier = mergeExceptionClassifiers(exceptionClassifiers.build());
+            ExceptionClassifier exceptionClassifier = mergeExceptionClassifiers(ImmutableList.<ExceptionClassifier>builder()
+                    .addAll(injector.getInstance(Key.get(SET_EXCEPTION_CLASSIFIER_TYPE, clientAnnotation))) // per-client
+                    .addAll(injector.getInstance(Key.get(SET_EXCEPTION_CLASSIFIER_TYPE))) // global
+                    .build());
 
             List<MethodInvocationFilter> filters = ImmutableList.copyOf(injector.getInstance(Key.get(SET_METHOD_INVOCATION_FILTERS_TYPE, clientAnnotation)));
 

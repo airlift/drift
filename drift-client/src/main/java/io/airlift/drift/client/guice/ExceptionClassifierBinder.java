@@ -15,12 +15,13 @@
  */
 package io.airlift.drift.client.guice;
 
-import com.google.inject.Binder;
+import com.google.inject.multibindings.Multibinder;
+import io.airlift.drift.client.ExceptionClassifier;
 
 import java.lang.annotation.Annotation;
 
 @FunctionalInterface
 public interface ExceptionClassifierBinder
 {
-    void bind(Binder binder, Annotation annotation, String prefix);
+    void bind(Multibinder<ExceptionClassifier> binder, Annotation annotation, String prefix);
 }

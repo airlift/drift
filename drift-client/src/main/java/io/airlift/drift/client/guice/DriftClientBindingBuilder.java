@@ -16,7 +16,6 @@
 package io.airlift.drift.client.guice;
 
 import com.google.inject.Binder;
-import com.google.inject.Key;
 import com.google.inject.multibindings.Multibinder;
 import io.airlift.drift.client.ExceptionClassifier;
 import io.airlift.drift.client.MethodInvocationFilter;
@@ -25,7 +24,6 @@ import io.airlift.drift.client.address.AddressSelector;
 import java.lang.annotation.Annotation;
 
 import static com.google.inject.multibindings.Multibinder.newSetBinder;
-import static com.google.inject.multibindings.OptionalBinder.newOptionalBinder;
 import static java.util.Objects.requireNonNull;
 
 public class DriftClientBindingBuilder
@@ -42,7 +40,7 @@ public class DriftClientBindingBuilder
         // add MethodInvocationFilter extension binding point
         filterBinder();
         // add ExceptionClassifier extension binding point
-        newOptionalBinder(binder, Key.get(ExceptionClassifier.class, annotation));
+        classifierBinder();
     }
 
     public DriftClientBindingBuilder withMethodInvocationFilter(MethodInvocationFilterBinder filterBinder)
@@ -67,20 +65,23 @@ public class DriftClientBindingBuilder
 
     public DriftClientBindingBuilder withExceptionClassifier(ExceptionClassifier exceptionClassifier)
     {
-        binder.bind(ExceptionClassifier.class)
-                .annotatedWith(annotation)
-                .toInstance(exceptionClassifier);
+        classifierBinder().addBinding().toInstance(exceptionClassifier);
         return this;
     }
 
-    public DriftClientBindingBuilder withExceptionClassifier(ExceptionClassifierBinder selectorBinder)
+    public DriftClientBindingBuilder withExceptionClassifier(ExceptionClassifierBinder classifierBinder)
     {
-        selectorBinder.bind(binder, annotation, prefix);
+        classifierBinder.bind(classifierBinder(), annotation, prefix);
         return this;
     }
 
     private Multibinder<MethodInvocationFilter> filterBinder()
     {
         return newSetBinder(binder, MethodInvocationFilter.class, annotation);
+    }
+
+    private Multibinder<ExceptionClassifier> classifierBinder()
+    {
+        return newSetBinder(binder, ExceptionClassifier.class, annotation);
     }
 }
