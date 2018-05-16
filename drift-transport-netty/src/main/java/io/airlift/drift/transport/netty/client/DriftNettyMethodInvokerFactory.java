@@ -62,6 +62,14 @@ public class DriftNettyMethodInvokerFactory<I>
 
     public DriftNettyMethodInvokerFactory(
             DriftNettyConnectionFactoryConfig factoryConfig,
+            Function<I, DriftNettyClientConfig> clientConfigurationProvider)
+    {
+        this(factoryConfig, clientConfigurationProvider, ByteBufAllocator.DEFAULT);
+    }
+
+    @VisibleForTesting
+    public DriftNettyMethodInvokerFactory(
+            DriftNettyConnectionFactoryConfig factoryConfig,
             Function<I, DriftNettyClientConfig> clientConfigurationProvider,
             ByteBufAllocator allocator)
     {
