@@ -15,6 +15,7 @@
  */
 package io.airlift.drift.transport.netty.server;
 
+import com.google.common.annotations.VisibleForTesting;
 import io.airlift.drift.transport.netty.ssl.SslContextFactory;
 import io.airlift.drift.transport.server.ServerMethodInvoker;
 import io.airlift.drift.transport.server.ServerTransport;
@@ -53,6 +54,12 @@ public class DriftNettyServerTransport
 
     private final AtomicBoolean running = new AtomicBoolean();
 
+    public DriftNettyServerTransport(ServerMethodInvoker methodInvoker, DriftNettyServerConfig config)
+    {
+        this(methodInvoker, config, ByteBufAllocator.DEFAULT);
+    }
+
+    @VisibleForTesting
     public DriftNettyServerTransport(ServerMethodInvoker methodInvoker, DriftNettyServerConfig config, ByteBufAllocator allocator)
     {
         requireNonNull(methodInvoker, "methodInvoker is null");
