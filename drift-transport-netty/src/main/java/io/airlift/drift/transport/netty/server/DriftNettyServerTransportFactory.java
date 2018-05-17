@@ -30,6 +30,11 @@ public class DriftNettyServerTransportFactory
     private final DriftNettyServerConfig config;
     private final ByteBufAllocator allocator;
 
+    public DriftNettyServerTransportFactory(DriftNettyServerConfig config)
+    {
+        this(config, ByteBufAllocator.DEFAULT);
+    }
+
     @Inject
     public DriftNettyServerTransportFactory(DriftNettyServerConfig config, ByteBufAllocator allocator)
     {
