@@ -18,6 +18,8 @@ package io.airlift.drift.integration.guice;
 import com.google.inject.Injector;
 import io.airlift.bootstrap.Bootstrap;
 import io.airlift.bootstrap.LifeCycleManager;
+import io.airlift.drift.client.ExceptionClassification;
+import io.airlift.drift.client.RetriesFailedException;
 import io.airlift.drift.integration.guice.EchoService.EmptyOptionalException;
 import io.airlift.drift.integration.guice.EchoService.NullValueException;
 import io.airlift.drift.integration.scribe.drift.DriftLogEntry;
@@ -33,15 +35,19 @@ import java.util.OptionalDouble;
 import java.util.OptionalInt;
 import java.util.OptionalLong;
 
+import static io.airlift.drift.client.ExceptionClassification.HostStatus.NORMAL;
+import static io.airlift.drift.client.ExceptionClassification.NORMAL_EXCEPTION;
 import static io.airlift.drift.client.address.SimpleAddressSelectorBinder.simpleAddressSelector;
 import static io.airlift.drift.client.guice.DriftClientBinder.driftClientBinder;
 import static io.airlift.drift.server.guice.DriftServerBinder.driftServerBinder;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Arrays.asList;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertThrows;
 import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.fail;
 
 public class TestGuiceIntegration
 {
@@ -58,8 +64,17 @@ public class TestGuiceIntegration
                 binder -> {
                     driftServerBinder(binder).bindService(EchoServiceHandler.class);
                     driftServerBinder(binder).bindService(MismatchServiceHandler.class);
+                    driftServerBinder(binder).bindService(ThrowingServiceHandler.class);
                     driftClientBinder(binder).bindDriftClient(EchoService.class).withAddressSelector(simpleAddressSelector());
                     driftClientBinder(binder).bindDriftClient(MismatchService.class).withAddressSelector(simpleAddressSelector());
+                    driftClientBinder(binder).bindDriftClient(ThrowingService.class).withAddressSelector(simpleAddressSelector())
+                            .withExceptionClassifier(t -> {
+                                if (t instanceof ExampleException) {
+                                    boolean retryable = ((ExampleException) t).isRetryable();
+                                    return new ExceptionClassification(Optional.of(retryable), NORMAL);
+                                }
+                                return NORMAL_EXCEPTION;
+                            });
                 });
 
         Injector injector = bootstrap
@@ -67,18 +82,24 @@ public class TestGuiceIntegration
                 .setRequiredConfigurationProperty("thrift.server.port", String.valueOf(port))
                 .setRequiredConfigurationProperty("echo.thrift.client.addresses", "localhost:" + port)
                 .setRequiredConfigurationProperty("mismatch.thrift.client.addresses", "localhost:" + port)
+                .setRequiredConfigurationProperty("throwing.thrift.client.addresses", "localhost:" + port)
+                .setRequiredConfigurationProperty("throwing.thrift.client.min-backoff-delay", "1ms")
+                .setRequiredConfigurationProperty("throwing.thrift.client.backoff-scale-factor", "1.0")
                 .doNotInitializeLogging()
                 .initialize();
 
         LifeCycleManager lifeCycleManager = injector.getInstance(LifeCycleManager.class);
         EchoService echoService = injector.getInstance(EchoService.class);
         MismatchService mismatchService = injector.getInstance(MismatchService.class);
+        ThrowingService throwingService = injector.getInstance(ThrowingService.class);
 
         try {
             assertEchoService(echoService);
 
             assertEquals(mismatchService.extraClientArgs(123, 456), 123);
             assertEquals(mismatchService.extraServerArgs(), 42);
+
+            assertThrowingService(throwingService);
         }
         finally {
             lifeCycleManager.stop();
@@ -169,6 +190,37 @@ public class TestGuiceIntegration
         assertEquals(service.echoOptionalListString(Optional.of(asList("hello", "world"))), asList("hello", "world"));
         assertThrows(EmptyOptionalException.class, () -> service.echoOptionalListString(Optional.empty()));
         assertThrows(EmptyOptionalException.class, () -> service.echoOptionalListString(null));
+    }
+
+    private static void assertThrowingService(ThrowingService service)
+    {
+        try {
+            service.fail("no-retry", false);
+            fail("expected exception");
+        }
+        catch (ExampleException e) {
+            assertEquals(e.getMessage(), "no-retry");
+            assertFalse(e.isRetryable());
+            assertEquals(e.getSuppressed().length, 1);
+            Throwable t = e.getSuppressed()[0];
+            assertThat(t).isInstanceOf(RetriesFailedException.class)
+                    .hasMessageContaining("Non-retryable exception")
+                    .hasMessageContaining("invocationAttempts: 1,");
+        }
+
+        try {
+            service.fail("can-retry", true);
+            fail("expected exception");
+        }
+        catch (ExampleException e) {
+            assertEquals(e.getMessage(), "can-retry");
+            assertTrue(e.isRetryable());
+            assertEquals(e.getSuppressed().length, 1);
+            Throwable t = e.getSuppressed()[0];
+            assertThat(t).isInstanceOf(RetriesFailedException.class)
+                    .hasMessageContaining("Max retry attempts (5) exceeded")
+                    .hasMessageContaining("invocationAttempts: 6,");
+        }
     }
 
     private static int findUnusedPort()

@@ -167,7 +167,7 @@ class DriftInvocationHandler
         return result;
     }
 
-    private static Throwable unwrapUserException(Throwable t)
+    static Throwable unwrapUserException(Throwable t)
     {
         // unwrap deserialized user exception
         return (t instanceof DriftApplicationException) ? t.getCause() : t;

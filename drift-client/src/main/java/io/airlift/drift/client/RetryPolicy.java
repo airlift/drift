@@ -26,6 +26,7 @@ import java.util.Optional;
 
 import static com.google.common.base.MoreObjects.toStringHelper;
 import static com.google.common.base.Preconditions.checkArgument;
+import static io.airlift.drift.client.DriftInvocationHandler.unwrapUserException;
 import static io.airlift.drift.client.ExceptionClassification.HostStatus.DOWN;
 import static io.airlift.drift.client.ExceptionClassification.HostStatus.NORMAL;
 import static io.airlift.drift.client.ExceptionClassifier.NORMAL_RESULT;
@@ -113,7 +114,7 @@ public class RetryPolicy
         }
 
         // allow classifier to return a hard result
-        ExceptionClassification result = exceptionClassifier.classifyException(throwable);
+        ExceptionClassification result = exceptionClassifier.classifyException(unwrapUserException(throwable));
         if (result.isRetry().isPresent()) {
             return result;
         }
