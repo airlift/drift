@@ -31,7 +31,6 @@ import io.airlift.drift.integration.scribe.apache.LogEntry;
 import io.airlift.drift.integration.scribe.drift.DriftLogEntry;
 import io.airlift.drift.integration.scribe.drift.DriftResultCode;
 import io.airlift.drift.integration.scribe.drift.DriftScribe;
-import io.airlift.drift.transport.apache.client.PemReader;
 import io.airlift.drift.transport.netty.codec.Protocol;
 import io.airlift.drift.transport.netty.codec.Transport;
 import io.airlift.jmx.testing.TestingJmxModule;
@@ -55,7 +54,8 @@ import java.util.stream.Collectors;
 
 import static io.airlift.drift.client.guice.DriftClientBinder.driftClientBinder;
 import static io.airlift.drift.client.guice.MethodInvocationFilterBinder.staticFilterBinder;
-import static io.airlift.drift.transport.apache.client.PemReader.loadTrustStore;
+import static io.airlift.security.pem.PemReader.loadKeyStore;
+import static io.airlift.security.pem.PemReader.loadTrustStore;
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.ElementType.PARAMETER;
@@ -171,7 +171,7 @@ final class ClientTestUtils
         trustManagerFactory.init(loadTrustStore(getCertificateChainFile()));
 
         KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
-        keyManagerFactory.init(PemReader.loadKeyStore(getPrivateKeyFile(), getPrivateKeyFile(), Optional.empty()), new char[0]);
+        keyManagerFactory.init(loadKeyStore(getPrivateKeyFile(), getPrivateKeyFile(), Optional.empty()), new char[0]);
 
         SSLContext sslContext = SSLContext.getInstance("TLS");
         sslContext.init(keyManagerFactory.getKeyManagers(), trustManagerFactory.getTrustManagers(), null);
