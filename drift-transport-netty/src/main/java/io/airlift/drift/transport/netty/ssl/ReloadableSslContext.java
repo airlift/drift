@@ -25,6 +25,9 @@ import io.netty.handler.ssl.SslContextBuilder;
 import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.security.GeneralSecurityException;
+import java.security.PrivateKey;
+import java.security.cert.X509Certificate;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -32,6 +35,8 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 
 import static com.google.common.hash.Hashing.sha256;
+import static io.airlift.security.pem.PemReader.loadPrivateKey;
+import static io.airlift.security.pem.PemReader.readCertificateChain;
 import static java.util.Objects.requireNonNull;
 import static java.util.concurrent.TimeUnit.SECONDS;
 
@@ -93,22 +98,30 @@ public final class ReloadableSslContext
                 privateKeyModified = privateKeyFileWatch.get().updateState();
             }
             if (trustCertificateModified || clientCertificateModified || privateKeyModified) {
+                PrivateKey privateKey = null;
+                if (privateKeyFileWatch.isPresent()) {
+                    privateKey = loadPrivateKey(privateKeyFileWatch.get().getFile(), privateKeyPassword);
+                }
+
+                X509Certificate[] certificateChain = null;
+                if (clientCertificatesFileWatch.isPresent()) {
+                    certificateChain = readCertificateChain(clientCertificatesFileWatch.get().getFile())
+                            .toArray(new X509Certificate[0]);
+                }
+
                 SslContextBuilder sslContextBuilder;
                 if (forClient) {
-                    sslContextBuilder = SslContextBuilder.forClient()
-                            .keyManager(
-                                    clientCertificatesFileWatch.map(FileWatch::getFile).orElse(null),
-                                    privateKeyFileWatch.map(FileWatch::getFile).orElse(null),
-                                    privateKeyPassword.orElse(null));
+                    sslContextBuilder = SslContextBuilder.forClient().keyManager(privateKey, certificateChain);
                 }
                 else {
-                    sslContextBuilder = SslContextBuilder.forServer(
-                            clientCertificatesFileWatch.map(FileWatch::getFile).orElse(null),
-                            privateKeyFileWatch.map(FileWatch::getFile).orElse(null),
-                            privateKeyPassword.orElse(null));
+                    sslContextBuilder = SslContextBuilder.forServer(privateKey, certificateChain);
                 }
+
+                X509Certificate[] trustChain = readCertificateChain(trustCertificatesFileWatch.getFile())
+                        .toArray(new X509Certificate[0]);
+
                 sslContextBuilder
-                        .trustManager(trustCertificatesFileWatch.getFile())
+                        .trustManager(trustChain)
                         .sessionCacheSize(sessionCacheSize)
                         .sessionTimeout(sessionTimeout.roundTo(SECONDS));
                 if (!ciphers.isEmpty()) {
@@ -116,6 +129,9 @@ public final class ReloadableSslContext
                 }
                 sslContext.set(new SslContextHolder(sslContextBuilder.build()));
             }
+        }
+        catch (GeneralSecurityException e) {
+            sslContext.set(new SslContextHolder(new UncheckedIOException(new IOException(e))));
         }
         catch (IOException e) {
             sslContext.set(new SslContextHolder(new UncheckedIOException(e)));
