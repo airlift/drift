@@ -323,7 +323,7 @@ public class TestDriftMethodInvocation
         stat.assertNoHostsAvailable(expectedRetries);
         addressSelector.assertAllDown();
         assertEquals(invoker.getDelays().size(), 0);
-        assertEquals(attemptedAddresses, addressSelector.getLastExcluded());
+        assertEquals(attemptedAddresses, addressSelector.getLastAttemptedSet());
     }
 
     @Test(timeOut = 60000)
@@ -537,10 +537,10 @@ public class TestDriftMethodInvocation
                 new TestingAddressSelector(100)
                 {
                     @Override
-                    public synchronized Optional<Address> selectAddress(Optional<String> addressSelectionContext, Set<Address> excluded)
+                    public synchronized Optional<Address> selectAddress(Optional<String> addressSelectionContext, Set<Address> attempted)
                     {
                         if (attempts.get() < expectedRetries) {
-                            return super.selectAddress(addressSelectionContext, excluded);
+                            return super.selectAddress(addressSelectionContext, attempted);
                         }
                         throw UNEXPECTED_EXCEPTION;
                     }
@@ -767,7 +767,7 @@ public class TestDriftMethodInvocation
         private int addressCount;
 
         @GuardedBy("this")
-        private Set<Address> lastExcluded = ImmutableSet.of();
+        private Set<Address> lastAttemptedSet = ImmutableSet.of();
 
         public TestingAddressSelector(int maxAddresses)
         {
@@ -781,9 +781,9 @@ public class TestDriftMethodInvocation
         }
 
         @Override
-        public synchronized Optional<Address> selectAddress(Optional<String> addressSelectionContext, Set<Address> excluded)
+        public synchronized Optional<Address> selectAddress(Optional<String> addressSelectionContext, Set<Address> attempted)
         {
-            lastExcluded = ImmutableSet.copyOf(excluded);
+            lastAttemptedSet = ImmutableSet.copyOf(attempted);
             if (addressCount >= maxAddresses) {
                 return Optional.empty();
             }
@@ -804,9 +804,9 @@ public class TestDriftMethodInvocation
                     .collect(toImmutableList()));
         }
 
-        public synchronized Set<Address> getLastExcluded()
+        public synchronized Set<Address> getLastAttemptedSet()
         {
-            return lastExcluded;
+            return lastAttemptedSet;
         }
     }
 

@@ -25,7 +25,7 @@ public interface AddressSelector<A extends Address>
     @Deprecated
     Optional<A> selectAddress(Optional<String> addressSelectionContext);
 
-    default Optional<A> selectAddress(Optional<String> addressSelectionContext, Set<A> excluded)
+    default Optional<A> selectAddress(Optional<String> addressSelectionContext, Set<A> attempted)
     {
         return selectAddress(addressSelectionContext);
     }

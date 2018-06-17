@@ -31,6 +31,7 @@ public class SimpleAddressSelectorConfig
     private static final Splitter SPLITTER = Splitter.on(',').trimResults().omitEmptyStrings();
 
     private List<HostAndPort> addresses;
+    private boolean retrySameAddress = true;
 
     @NotNull
     public List<HostAndPort> getAddresses()
@@ -55,6 +56,18 @@ public class SimpleAddressSelectorConfig
     public SimpleAddressSelectorConfig setAddressesList(List<HostAndPort> addresses)
     {
         this.addresses = ImmutableList.copyOf(addresses);
+        return this;
+    }
+
+    public boolean isRetrySameAddress()
+    {
+        return retrySameAddress;
+    }
+
+    @Config("thrift.client.retry-same-address")
+    public SimpleAddressSelectorConfig setRetrySameAddress(boolean retrySameAddress)
+    {
+        this.retrySameAddress = retrySameAddress;
         return this;
     }
 }

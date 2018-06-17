@@ -32,7 +32,8 @@ public class TestSimpleAddressSelectorConfig
     public void testDefaults()
     {
         assertRecordedDefaults(recordDefaults(SimpleAddressSelectorConfig.class)
-                .setAddresses(null));
+                .setAddresses(null)
+                .setRetrySameAddress(true));
     }
 
     @Test
@@ -40,12 +41,14 @@ public class TestSimpleAddressSelectorConfig
     {
         Map<String, String> properties = new ImmutableMap.Builder<String, String>()
                 .put("thrift.client.addresses", "abc:8080,xyz:8888")
+                .put("thrift.client.retry-same-address", "false")
                 .build();
 
         SimpleAddressSelectorConfig expected = new SimpleAddressSelectorConfig()
                 .setAddressesList(ImmutableList.of(
                         HostAndPort.fromParts("abc", 8080),
-                        HostAndPort.fromParts("xyz", 8888)));
+                        HostAndPort.fromParts("xyz", 8888)))
+                .setRetrySameAddress(false);
 
         assertFullMapping(properties, expected);
     }
