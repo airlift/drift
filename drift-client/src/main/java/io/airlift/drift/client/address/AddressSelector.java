@@ -18,10 +18,17 @@ package io.airlift.drift.client.address;
 import io.airlift.drift.transport.client.Address;
 
 import java.util.Optional;
+import java.util.Set;
 
 public interface AddressSelector<A extends Address>
 {
+    @Deprecated
     Optional<A> selectAddress(Optional<String> addressSelectionContext);
+
+    default Optional<A> selectAddress(Optional<String> addressSelectionContext, Set<A> excluded)
+    {
+        return selectAddress(addressSelectionContext);
+    }
 
     default void markdown(A address) {}
 }

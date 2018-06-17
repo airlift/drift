@@ -18,6 +18,7 @@ package io.airlift.drift.client;
 import com.google.common.base.Ticker;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.net.HostAndPort;
 import com.google.common.util.concurrent.AbstractFuture;
 import com.google.common.util.concurrent.ListenableFuture;
@@ -41,6 +42,7 @@ import javax.annotation.concurrent.GuardedBy;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -49,6 +51,7 @@ import java.util.stream.IntStream;
 
 import static com.google.common.base.Ticker.systemTicker;
 import static com.google.common.collect.ImmutableList.toImmutableList;
+import static com.google.common.collect.Sets.newConcurrentHashSet;
 import static com.google.common.util.concurrent.Futures.immediateFailedFuture;
 import static com.google.common.util.concurrent.Futures.immediateFuture;
 import static io.airlift.drift.client.ExceptionClassification.HostStatus.DOWN;
@@ -293,8 +296,10 @@ public class TestDriftMethodInvocation
         TestingMethodInvocationStat stat = new TestingMethodInvocationStat();
         AtomicInteger attempts = new AtomicInteger();
         TestingAddressSelector addressSelector = new TestingAddressSelector(expectedRetries);
-        MockMethodInvoker invoker = new MockMethodInvoker(() -> {
+        Set<Address> attemptedAddresses = newConcurrentHashSet();
+        MockMethodInvoker invoker = new MockMethodInvoker(request -> {
             attempts.getAndIncrement();
+            attemptedAddresses.add(request.getAddress());
             return immediateFailedFuture(createClassifiedException(true, overloaded ? OVERLOADED : DOWN));
         });
         DriftMethodInvocation<?> methodInvocation = createDriftMethodInvocation(
@@ -318,6 +323,7 @@ public class TestDriftMethodInvocation
         stat.assertNoHostsAvailable(expectedRetries);
         addressSelector.assertAllDown();
         assertEquals(invoker.getDelays().size(), 0);
+        assertEquals(attemptedAddresses, addressSelector.getLastExcluded());
     }
 
     @Test(timeOut = 60000)
@@ -531,10 +537,10 @@ public class TestDriftMethodInvocation
                 new TestingAddressSelector(100)
                 {
                     @Override
-                    public synchronized Optional<Address> selectAddress(Optional<String> addressSelectionContext)
+                    public synchronized Optional<Address> selectAddress(Optional<String> addressSelectionContext, Set<Address> excluded)
                     {
                         if (attempts.get() < expectedRetries) {
-                            return super.selectAddress(addressSelectionContext);
+                            return super.selectAddress(addressSelectionContext, excluded);
                         }
                         throw UNEXPECTED_EXCEPTION;
                     }
@@ -760,6 +766,9 @@ public class TestDriftMethodInvocation
         @GuardedBy("this")
         private int addressCount;
 
+        @GuardedBy("this")
+        private Set<Address> lastExcluded = ImmutableSet.of();
+
         public TestingAddressSelector(int maxAddresses)
         {
             this.maxAddresses = maxAddresses;
@@ -768,6 +777,13 @@ public class TestDriftMethodInvocation
         @Override
         public synchronized Optional<Address> selectAddress(Optional<String> addressSelectionContext)
         {
+            return selectAddress(addressSelectionContext, ImmutableSet.of());
+        }
+
+        @Override
+        public synchronized Optional<Address> selectAddress(Optional<String> addressSelectionContext, Set<Address> excluded)
+        {
+            lastExcluded = ImmutableSet.copyOf(excluded);
             if (addressCount >= maxAddresses) {
                 return Optional.empty();
             }
@@ -786,6 +802,11 @@ public class TestDriftMethodInvocation
             assertEquals(markdownHosts, IntStream.range(0, addressCount)
                     .mapToObj(i -> HostAndPort.fromParts("localhost", 20_000 + i))
                     .collect(toImmutableList()));
+        }
+
+        public synchronized Set<Address> getLastExcluded()
+        {
+            return lastExcluded;
         }
     }
 

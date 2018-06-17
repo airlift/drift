@@ -36,9 +36,11 @@ import io.airlift.units.Duration;
 import javax.annotation.concurrent.GuardedBy;
 import javax.annotation.concurrent.ThreadSafe;
 
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import static com.google.common.util.concurrent.MoreExecutors.directExecutor;
 import static io.airlift.drift.client.ExceptionClassification.HostStatus.DOWN;
@@ -66,6 +68,8 @@ class DriftMethodInvocation<A extends Address>
     private final Ticker ticker;
     private final long startTime;
 
+    @GuardedBy("this")
+    private Set<A> attemptedAddresses = new LinkedHashSet<>();
     @GuardedBy("this")
     private int failedConnections;
     @GuardedBy("this")
@@ -142,7 +146,7 @@ class DriftMethodInvocation<A extends Address>
                 return;
             }
 
-            Optional<A> address = addressSelector.selectAddress(addressSelectionContext);
+            Optional<A> address = addressSelector.selectAddress(addressSelectionContext, attemptedAddresses);
             if (!address.isPresent()) {
                 fail("No hosts available");
                 return;
@@ -189,6 +193,7 @@ class DriftMethodInvocation<A extends Address>
             ExceptionClassification exceptionClassification = retryPolicy.classifyException(throwable, metadata.isIdempotent());
 
             // update stats based on classification
+            attemptedAddresses.add(address);
             if (exceptionClassification.getHostStatus() == NORMAL) {
                 // only store exception if the server is in a normal state
                 lastException = throwable;
