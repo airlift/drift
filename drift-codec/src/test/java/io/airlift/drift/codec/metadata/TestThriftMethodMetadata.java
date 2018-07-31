@@ -20,6 +20,7 @@ import io.airlift.drift.TException;
 import io.airlift.drift.annotations.ThriftException;
 import io.airlift.drift.annotations.ThriftField;
 import io.airlift.drift.annotations.ThriftHeader;
+import io.airlift.drift.annotations.ThriftId;
 import io.airlift.drift.annotations.ThriftMethod;
 import io.airlift.drift.annotations.ThriftStruct;
 import org.testng.annotations.Test;
@@ -112,7 +113,8 @@ public class TestThriftMethodMetadata
     @Test
     public void testAnnotatedExceptions()
     {
-        assertExceptions("annotatedExceptions", ExceptionA.class, ExceptionB.class);
+        assertExceptions("annotatedExceptionsMethod", ExceptionA.class, ExceptionB.class);
+        assertExceptions("annotatedExceptionsThrows", ExceptionA.class, ExceptionB.class);
     }
 
     @Test
@@ -151,10 +153,22 @@ public class TestThriftMethodMetadata
         assertExceptions("testDuplicateExceptionType");
     }
 
-    @Test(expectedExceptions = IllegalArgumentException.class, expectedExceptionsMessageRegExp = "ThriftMethod \\[.*\\.testDuplicateExceptionField] exception list contains multiple values for field ID \\[2]")
-    public void testInvalidExceptionDuplicateField()
+    @Test(expectedExceptions = IllegalArgumentException.class, expectedExceptionsMessageRegExp = "ThriftMethod \\[.*\\.testDuplicateExceptionFieldMethod] exception list contains multiple values for field ID \\[3]")
+    public void testDuplicateExceptionFieldMethod()
     {
-        assertExceptions("testDuplicateExceptionField");
+        assertExceptions("testDuplicateExceptionFieldMethod");
+    }
+
+    @Test(expectedExceptions = IllegalArgumentException.class, expectedExceptionsMessageRegExp = "ThriftMethod \\[.*\\.testDuplicateExceptionFieldThrows] exception list contains multiple values for field ID \\[4]")
+    public void testDuplicateExceptionFieldThrows()
+    {
+        assertExceptions("testDuplicateExceptionFieldThrows");
+    }
+
+    @Test(expectedExceptions = IllegalArgumentException.class, expectedExceptionsMessageRegExp = "ThriftMethod \\[.*\\.testExceptionMixedAnnotationStyle] uses a mix of @ThriftException and @ThriftId")
+    public void testExceptionMixedAnnotationStyle()
+    {
+        assertExceptions("testExceptionMixedAnnotationStyle");
     }
 
     @SafeVarargs
@@ -241,8 +255,12 @@ public class TestThriftMethodMetadata
         void noExceptions();
 
         @ThriftMethod(exception = {@ThriftException(id = 1, type = ExceptionA.class), @ThriftException(id = 2, type = ExceptionB.class)})
-        void annotatedExceptions()
+        void annotatedExceptionsMethod()
                 throws ExceptionA, ExceptionB;
+
+        @ThriftMethod
+        void annotatedExceptionsThrows()
+                throws @ThriftId(1) ExceptionA, @ThriftId(2) ExceptionB;
 
         @ThriftMethod
         void inferredException()
@@ -272,11 +290,19 @@ public class TestThriftMethodMetadata
                 throws ExceptionA;
 
         @ThriftMethod(exception = {
-                @ThriftException(id = 2, type = ExceptionA.class),
-                @ThriftException(id = 2, type = ExceptionB.class),
+                @ThriftException(id = 3, type = ExceptionA.class),
+                @ThriftException(id = 3, type = ExceptionB.class),
         })
-        void testDuplicateExceptionField()
+        void testDuplicateExceptionFieldMethod()
                 throws ExceptionA, ExceptionB;
+
+        @ThriftMethod
+        void testDuplicateExceptionFieldThrows()
+                throws @ThriftId(4) ExceptionA, @ThriftId(4) ExceptionB;
+
+        @ThriftMethod(exception = @ThriftException(id = 5, type = ExceptionA.class))
+        void testExceptionMixedAnnotationStyle()
+                throws ExceptionA, @ThriftId(6) ExceptionB;
     }
 
     @ThriftStruct

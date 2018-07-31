@@ -58,14 +58,22 @@ As with method parameters, Thrift encodes the response as a struct with field
 zero being a standard return and exceptions be stored in higher number fields.
 If the Java method throws only one exception annotated with `@ThriftStruct`,
 Drift will assume the result struct field id is `1`. Otherwise, you will need to
-add the extremely verbose `@ThriftException` annotations as follows:
+add the `@ThriftId` annotation to the exception declaration:
+
+```java
+@ThriftMethod
+void doSomething() throws @ThriftId(1) MyException, @ThriftId(2) MyOther;
+```
+
+For asynchronous methods, which do not directly throw exceptions, you will need
+to use the ``@ThriftException`` annotation:
 
 ```java
 @ThriftMethod(exception = {
       @ThriftException(type = MyException.class, id = 1),
       @ThriftException(type = MyOther.class, id = 2),
 })
-void doSomething() throws MyException, MyOther;
+ListenableFuture<Void> doSomething();
 ```
 
 ## Using a Client

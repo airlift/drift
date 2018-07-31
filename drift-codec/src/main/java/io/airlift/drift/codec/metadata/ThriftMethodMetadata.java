@@ -24,6 +24,7 @@ import io.airlift.drift.TException;
 import io.airlift.drift.annotations.ThriftException;
 import io.airlift.drift.annotations.ThriftField;
 import io.airlift.drift.annotations.ThriftHeader;
+import io.airlift.drift.annotations.ThriftId;
 import io.airlift.drift.annotations.ThriftIdlAnnotation;
 import io.airlift.drift.annotations.ThriftMethod;
 import io.airlift.drift.annotations.ThriftStruct;
@@ -31,6 +32,7 @@ import io.airlift.drift.annotations.ThriftStruct;
 import javax.annotation.concurrent.Immutable;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.AnnotatedType;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
@@ -243,6 +245,10 @@ public class ThriftMethodMetadata
 
     private ImmutableMap<Short, ThriftType> buildExceptionMap(ThriftCatalog catalog, ThriftMethod thriftMethod)
     {
+        boolean mixedStyle = (thriftMethod.exception().length > 0) &&
+                stream(method.getAnnotatedExceptionTypes()).anyMatch(type -> type.isAnnotationPresent(ThriftId.class));
+        checkArgument(!mixedStyle, "ThriftMethod [%s] uses a mix of @ThriftException and @ThriftId", methodName(method));
+
         Map<Short, ThriftType> exceptions = new HashMap<>();
         Set<Type> exceptionTypes = new HashSet<>();
 
@@ -251,6 +257,19 @@ public class ThriftMethodMetadata
             checkArgument(!exceptionTypes.contains(thriftException.type()), "ThriftMethod [%s] exception list contains multiple values for type [%s]", methodName(method), thriftException.type().getSimpleName());
             exceptions.put(thriftException.id(), catalog.getThriftType(thriftException.type()));
             exceptionTypes.add(thriftException.type());
+        }
+
+        Class<?>[] allExceptionClasses = method.getExceptionTypes();
+        AnnotatedType[] exceptionAnnotations = method.getAnnotatedExceptionTypes();
+        for (int i = 0; i < allExceptionClasses.length; i++) {
+            Class<?> exception = allExceptionClasses[i];
+            ThriftId thriftId = exceptionAnnotations[i].getAnnotation(ThriftId.class);
+            if (thriftId != null) {
+                checkArgument(!exceptions.containsKey(thriftId.value()), "ThriftMethod [%s] exception list contains multiple values for field ID [%s]", methodName(method), thriftId.value());
+                checkArgument(!exceptionTypes.contains(exception), "ThriftMethod [%s] exception list contains multiple values for type [%s]", methodName(method), exception.getSimpleName());
+                exceptions.put(thriftId.value(), catalog.getThriftType(exception));
+                exceptionTypes.add(exception);
+            }
         }
 
         // the built-in exception types don't need special treatment
