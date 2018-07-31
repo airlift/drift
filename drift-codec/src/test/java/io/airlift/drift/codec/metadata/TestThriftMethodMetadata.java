@@ -133,10 +133,16 @@ public class TestThriftMethodMetadata
         assertExceptions("nonThriftException");
     }
 
-    @Test(expectedExceptions = IllegalArgumentException.class, expectedExceptionsMessageRegExp = "ThriftMethod \\[.*\\.invalidInferredException] annotation must declare exception mapping when more than one custom exception is thrown")
-    public void testInvalidInferredException()
+    @Test(expectedExceptions = IllegalArgumentException.class, expectedExceptionsMessageRegExp = "ThriftMethod \\[.*\\.invalidInferredExceptionFirst] annotation must declare exception mapping when more than one custom exception is thrown")
+    public void testInvalidInferredExceptionFirst()
     {
-        assertExceptions("invalidInferredException");
+        assertExceptions("invalidInferredExceptionFirst");
+    }
+
+    @Test(expectedExceptions = IllegalArgumentException.class, expectedExceptionsMessageRegExp = "ThriftMethod \\[.*\\.invalidInferredExceptionSecond] annotation must declare exception mapping when more than one custom exception is thrown")
+    public void testInvalidInferredExceptionSecond()
+    {
+        assertExceptions("invalidInferredExceptionSecond");
     }
 
     @SafeVarargs
@@ -239,7 +245,11 @@ public class TestThriftMethodMetadata
                 throws IllegalArgumentException;
 
         @ThriftMethod(exception = @ThriftException(id = 1, type = ExceptionA.class))
-        void invalidInferredException()
+        void invalidInferredExceptionFirst()
+                throws ExceptionA, ExceptionB;
+
+        @ThriftMethod(exception = @ThriftException(id = 1, type = ExceptionB.class))
+        void invalidInferredExceptionSecond()
                 throws ExceptionA, ExceptionB;
     }
 
