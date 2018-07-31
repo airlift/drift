@@ -30,6 +30,4 @@ public @interface ThriftException
     Class<? extends Throwable> type();
 
     short id();
-
-    String name() default "";
 }
