@@ -16,7 +16,7 @@
 package io.airlift.drift.idl.generator;
 
 import io.airlift.drift.annotations.ThriftDocumentation;
-import io.airlift.drift.annotations.ThriftException;
+import io.airlift.drift.annotations.ThriftId;
 import io.airlift.drift.annotations.ThriftMethod;
 import io.airlift.drift.annotations.ThriftOrder;
 import io.airlift.drift.annotations.ThriftService;
@@ -39,22 +39,20 @@ public interface DriftScribe
             "@param messages the list of messages to send",
     })
     @ThriftOrder(1)
-    @ThriftMethod(exception = {
-            @ThriftException(id = 1, type = ScribeDataException.class),
-            @ThriftException(id = 2, type = ScribeTransportException.class),
-    })
+    @ThriftMethod
     DriftResultCode log(List<DriftLogEntry> messages)
-            throws ScribeDataException, ScribeTransportException;
+            throws
+            @ThriftId(1) ScribeDataException,
+            @ThriftId(2) ScribeTransportException;
 
     @ThriftDocumentation("Send a formatted message to Scribe.")
     @ThriftOrder(2)
-    @ThriftMethod(exception = {
-            @ThriftException(id = 1, type = ScribeDataException.class),
-            @ThriftException(id = 2, type = ScribeTransportException.class),
-            @ThriftException(id = 3, type = ScribeMessageException.class),
-    })
+    @ThriftMethod
     DriftResultCode logFormattedMessage(String format, Map<String, DriftLogEntry> messages, int maxSize)
-            throws ScribeDataException, ScribeTransportException;
+            throws
+            @ThriftId(1) ScribeDataException,
+            @ThriftId(2) ScribeTransportException,
+            @ThriftId(3) ScribeMessageException;
 
     @ThriftDocumentation("Check if service is up")
     @ThriftOrder(3)
