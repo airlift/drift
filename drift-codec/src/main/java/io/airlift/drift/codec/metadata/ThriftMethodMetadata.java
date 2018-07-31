@@ -47,7 +47,9 @@ import static io.airlift.drift.annotations.ThriftField.Requiredness;
 import static io.airlift.drift.codec.metadata.FieldKind.THRIFT_FIELD;
 import static io.airlift.drift.codec.metadata.ReflectionHelper.extractParameterNames;
 import static io.airlift.drift.codec.metadata.ThriftCatalog.getThriftDocumentation;
+import static java.util.Arrays.stream;
 import static java.util.Objects.requireNonNull;
+import static java.util.stream.Collectors.toList;
 
 @Immutable
 public class ThriftMethodMetadata
@@ -242,7 +244,6 @@ public class ThriftMethodMetadata
     {
         ImmutableMap.Builder<Short, ThriftType> exceptions = ImmutableMap.builder();
         Set<Type> exceptionTypes = new HashSet<>();
-        int customExceptionCount = 0;
 
         if (thriftMethod.exception().length > 0) {
             for (ThriftException thriftException : thriftMethod.exception()) {
@@ -251,20 +252,18 @@ public class ThriftMethodMetadata
             }
         }
 
-        for (Class<?> exceptionClass : method.getExceptionTypes()) {
-            if (exceptionClass.isAssignableFrom(TException.class)) {
-                // the built-in exception types don't need special treatment
-                continue;
-            }
+        // the built-in exception types don't need special treatment
+        List<Class<?>> exceptionClasses = stream(method.getExceptionTypes())
+                .filter(exception -> !exception.isAssignableFrom(TException.class))
+                .collect(toList());
 
+        for (Class<?> exceptionClass : exceptionClasses) {
             checkArgument(exceptionClass.isAnnotationPresent(ThriftStruct.class), "ThriftMethod [%s] exception [%s] is not annotated with @ThriftStruct", methodName(method), exceptionClass.getSimpleName());
-
-            customExceptionCount++;
 
             if (!exceptionTypes.contains(exceptionClass)) {
                 // there is no ordering guarantee for exception types,
                 // so we can only infer the id if there is a single custom exception
-                checkArgument(customExceptionCount <= 1, "ThriftMethod [%s] annotation must declare exception mapping when more than one custom exception is thrown", methodName(method));
+                checkArgument(exceptionClasses.size() == 1, "ThriftMethod [%s] annotation must declare exception mapping when more than one custom exception is thrown", methodName(method));
                 exceptions.put((short) 1, catalog.getThriftType(exceptionClass));
             }
         }
