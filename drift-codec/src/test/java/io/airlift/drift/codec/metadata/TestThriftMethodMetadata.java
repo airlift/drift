@@ -145,6 +145,18 @@ public class TestThriftMethodMetadata
         assertExceptions("invalidInferredExceptionSecond");
     }
 
+    @Test(expectedExceptions = IllegalArgumentException.class, expectedExceptionsMessageRegExp = "ThriftMethod \\[.*\\.testDuplicateExceptionType] exception list contains multiple values for type \\[ExceptionA]")
+    public void testInvalidExceptionDuplicateType()
+    {
+        assertExceptions("testDuplicateExceptionType");
+    }
+
+    @Test(expectedExceptions = IllegalArgumentException.class, expectedExceptionsMessageRegExp = "ThriftMethod \\[.*\\.testDuplicateExceptionField] exception list contains multiple values for field ID \\[2]")
+    public void testInvalidExceptionDuplicateField()
+    {
+        assertExceptions("testDuplicateExceptionField");
+    }
+
     @SafeVarargs
     private static void assertExceptions(String methodName, Class<? extends Exception>... expectedExceptions)
     {
@@ -250,6 +262,20 @@ public class TestThriftMethodMetadata
 
         @ThriftMethod(exception = @ThriftException(id = 1, type = ExceptionB.class))
         void invalidInferredExceptionSecond()
+                throws ExceptionA, ExceptionB;
+
+        @ThriftMethod(exception = {
+                @ThriftException(id = 1, type = ExceptionA.class),
+                @ThriftException(id = 2, type = ExceptionA.class),
+        })
+        void testDuplicateExceptionType()
+                throws ExceptionA;
+
+        @ThriftMethod(exception = {
+                @ThriftException(id = 2, type = ExceptionA.class),
+                @ThriftException(id = 2, type = ExceptionB.class),
+        })
+        void testDuplicateExceptionField()
                 throws ExceptionA, ExceptionB;
     }
 

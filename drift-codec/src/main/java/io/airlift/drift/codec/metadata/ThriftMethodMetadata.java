@@ -34,6 +34,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -242,14 +243,14 @@ public class ThriftMethodMetadata
 
     private ImmutableMap<Short, ThriftType> buildExceptionMap(ThriftCatalog catalog, ThriftMethod thriftMethod)
     {
-        ImmutableMap.Builder<Short, ThriftType> exceptions = ImmutableMap.builder();
+        Map<Short, ThriftType> exceptions = new HashMap<>();
         Set<Type> exceptionTypes = new HashSet<>();
 
-        if (thriftMethod.exception().length > 0) {
-            for (ThriftException thriftException : thriftMethod.exception()) {
-                exceptions.put(thriftException.id(), catalog.getThriftType(thriftException.type()));
-                checkArgument(exceptionTypes.add(thriftException.type()), "ThriftMethod [%s] exception list contains more than one value for %s", methodName(method), thriftException.type());
-            }
+        for (ThriftException thriftException : thriftMethod.exception()) {
+            checkArgument(!exceptions.containsKey(thriftException.id()), "ThriftMethod [%s] exception list contains multiple values for field ID [%s]", methodName(method), thriftException.id());
+            checkArgument(!exceptionTypes.contains(thriftException.type()), "ThriftMethod [%s] exception list contains multiple values for type [%s]", methodName(method), thriftException.type().getSimpleName());
+            exceptions.put(thriftException.id(), catalog.getThriftType(thriftException.type()));
+            exceptionTypes.add(thriftException.type());
         }
 
         // the built-in exception types don't need special treatment
@@ -268,7 +269,7 @@ public class ThriftMethodMetadata
             }
         }
 
-        return exceptions.build();
+        return ImmutableMap.copyOf(exceptions);
     }
 
     public boolean isAsync()
