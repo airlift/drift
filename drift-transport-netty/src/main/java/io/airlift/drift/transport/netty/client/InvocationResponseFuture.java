@@ -24,6 +24,7 @@ import io.airlift.drift.transport.client.InvokeRequest;
 import io.airlift.drift.transport.netty.client.ConnectionManager.ConnectionParameters;
 import io.airlift.drift.transport.netty.client.ThriftClientHandler.ThriftRequest;
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
 import io.netty.util.concurrent.Future;
 
 import javax.annotation.concurrent.GuardedBy;
@@ -100,7 +101,6 @@ class InvocationResponseFuture
 
         try {
             invocationFuture = new ThriftRequest(request.getMethod(), request.getParameters(), request.getHeaders());
-            channel.writeAndFlush(invocationFuture);
             Futures.addCallback(invocationFuture, new FutureCallback<Object>()
                     {
                         @Override
@@ -127,6 +127,18 @@ class InvocationResponseFuture
                         }
                     },
                     directExecutor());
+
+            ChannelFuture sendFuture = channel.writeAndFlush(invocationFuture);
+            sendFuture.addListener(channelFuture -> {
+                try {
+                    if (!channelFuture.isSuccess()) {
+                        fatalError(channelFuture.cause());
+                    }
+                }
+                catch (Throwable t) {
+                    fatalError(t);
+                }
+            });
         }
         catch (Throwable t) {
             try {
