@@ -19,6 +19,7 @@ import com.google.common.util.concurrent.AbstractFuture;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import io.airlift.drift.TException;
+import io.airlift.drift.protocol.TTransportException;
 import io.airlift.drift.transport.client.ConnectionFailedException;
 import io.airlift.drift.transport.client.InvokeRequest;
 import io.airlift.drift.transport.netty.client.ConnectionManager.ConnectionParameters;
@@ -28,6 +29,8 @@ import io.netty.channel.ChannelFuture;
 import io.netty.util.concurrent.Future;
 
 import javax.annotation.concurrent.GuardedBy;
+
+import java.io.IOException;
 
 import static com.google.common.util.concurrent.MoreExecutors.directExecutor;
 import static java.util.Objects.requireNonNull;
@@ -162,6 +165,9 @@ class InvocationResponseFuture
 
     private void fatalError(Throwable throwable)
     {
+        if (throwable instanceof IOException) {
+            throwable = new TTransportException(throwable);
+        }
         // exception in the future is expected to be a TException
         if (!(throwable instanceof Error) && !(throwable instanceof TException)) {
             throwable = new TException(throwable);
