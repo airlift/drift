@@ -118,6 +118,8 @@ public class ThriftClientHandler
         if (!thriftRequest.isOneway()) {
             if (pendingRequests.putIfAbsent(sequenceId, requestHandler) != null) {
                 requestHandler.onChannelError(new TTransportException("Another request with the same sequenceId is already in progress"));
+                requestBuffer.release();
+                return;
             }
         }
 
