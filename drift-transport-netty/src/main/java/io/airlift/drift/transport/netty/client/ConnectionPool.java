@@ -15,9 +15,8 @@
  */
 package io.airlift.drift.transport.netty.client;
 
+import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
 import com.google.common.net.HostAndPort;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import io.airlift.drift.protocol.TTransportException;
@@ -43,7 +42,7 @@ class ConnectionPool
     private final ConnectionManager connectionFactory;
     private final EventLoopGroup group;
 
-    private final LoadingCache<ConnectionKey, Future<Channel>> cachedConnections;
+    private final Cache<ConnectionKey, Future<Channel>> cachedConnections;
     private final ScheduledExecutorService maintenanceThread;
 
     @GuardedBy("this")
@@ -58,14 +57,7 @@ class ConnectionPool
                 .maximumSize(maxSize)
                 .expireAfterAccess(idleTimeout.toMillis(), MILLISECONDS)
                 .<ConnectionKey, Future<Channel>>removalListener(notification -> closeConnection(notification.getValue()))
-                .build(new CacheLoader<ConnectionKey, Future<Channel>>()
-                {
-                    @Override
-                    public Future<Channel> load(ConnectionKey connectionKey)
-                    {
-                        return createConnection(connectionKey.getConnectionParameters(), connectionKey.getAddress());
-                    }
-                });
+                .build();
 
         maintenanceThread = newSingleThreadScheduledExecutor(new ThreadFactoryBuilder()
                 .setNameFormat("drift-connection-maintenance-%s")
@@ -78,6 +70,8 @@ class ConnectionPool
     @Override
     public Future<Channel> getConnection(ConnectionParameters connectionParameters, HostAndPort address)
     {
+        ConnectionKey key = new ConnectionKey(connectionParameters, address);
+
         Future<Channel> future;
         synchronized (this) {
             if (closed) {
@@ -85,7 +79,7 @@ class ConnectionPool
             }
 
             try {
-                future = cachedConnections.get(new ConnectionKey(connectionParameters, address));
+                future = cachedConnections.get(key, () -> createConnection(key));
             }
             catch (ExecutionException e) {
                 throw new RuntimeException(e);
@@ -95,8 +89,22 @@ class ConnectionPool
         // check if connection is failed
         if (isFailed(future)) {
             // remove failed connection
-            cachedConnections.asMap().remove(new ConnectionKey(connectionParameters, address), future);
+            cachedConnections.asMap().remove(key, future);
         }
+        return future;
+    }
+
+    private Future<Channel> createConnection(ConnectionKey key)
+    {
+        Future<Channel> future = connectionFactory.getConnection(key.getConnectionParameters(), key.getAddress());
+
+        // remove connection from cache when it is closed
+        future.addListener(channelFuture -> {
+            if (future.isSuccess()) {
+                future.getNow().closeFuture().addListener(closeFuture -> cachedConnections.asMap().remove(key, future));
+            }
+        });
+
         return future;
     }
 
@@ -119,11 +127,6 @@ class ConnectionPool
         finally {
             maintenanceThread.shutdownNow();
         }
-    }
-
-    private Future<Channel> createConnection(ConnectionParameters connectionParameters, HostAndPort address)
-    {
-        return connectionFactory.getConnection(connectionParameters, address);
     }
 
     private static void closeConnection(Future<Channel> future)
