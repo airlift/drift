@@ -143,6 +143,7 @@ public class ThriftClientHandler
         }
         catch (Throwable t) {
             onError(context, t, Optional.of(requestHandler));
+            requestBuffer.release();
         }
     }
 
