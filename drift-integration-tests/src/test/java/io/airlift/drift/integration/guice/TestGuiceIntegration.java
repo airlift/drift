@@ -52,7 +52,20 @@ import static org.testng.Assert.fail;
 public class TestGuiceIntegration
 {
     @Test
-    public void test()
+    public void testWithoutPooling()
+            throws Exception
+    {
+        test(false);
+    }
+
+    @Test
+    public void testWithPooling()
+            throws Exception
+    {
+        test(true);
+    }
+
+    private static void test(boolean pooling)
             throws Exception
     {
         int port = findUnusedPort();
@@ -80,6 +93,7 @@ public class TestGuiceIntegration
         Injector injector = bootstrap
                 .strictConfig()
                 .setRequiredConfigurationProperty("thrift.server.port", String.valueOf(port))
+                .setRequiredConfigurationProperty("thrift.client.connection-pool.enabled", String.valueOf(pooling))
                 .setRequiredConfigurationProperty("echo.thrift.client.addresses", "localhost:" + port)
                 .setRequiredConfigurationProperty("mismatch.thrift.client.addresses", "localhost:" + port)
                 .setRequiredConfigurationProperty("throwing.thrift.client.addresses", "localhost:" + port)
