@@ -26,6 +26,8 @@ import java.util.Deque;
 
 import static java.lang.Double.doubleToLongBits;
 import static java.lang.Double.longBitsToDouble;
+import static java.lang.Float.floatToIntBits;
+import static java.lang.Float.intBitsToFloat;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Objects.requireNonNull;
 
@@ -46,7 +48,7 @@ public class TFacebookCompactProtocol
     private static final TStruct ANONYMOUS_STRUCT = new TStruct("");
     private static final TField TSTOP = new TField("", TType.STOP, (short) 0);
 
-    private static final byte[] TTYPE_TO_COMPACT_TYPE = new byte[16];
+    private static final byte[] TTYPE_TO_COMPACT_TYPE = new byte[20];
 
     static {
         TTYPE_TO_COMPACT_TYPE[TType.STOP] = TType.STOP;
@@ -55,6 +57,7 @@ public class TFacebookCompactProtocol
         TTYPE_TO_COMPACT_TYPE[TType.I16] = Types.I16;
         TTYPE_TO_COMPACT_TYPE[TType.I32] = Types.I32;
         TTYPE_TO_COMPACT_TYPE[TType.I64] = Types.I64;
+        TTYPE_TO_COMPACT_TYPE[TType.FLOAT] = Types.FLOAT;
         TTYPE_TO_COMPACT_TYPE[TType.DOUBLE] = Types.DOUBLE;
         TTYPE_TO_COMPACT_TYPE[TType.STRING] = Types.BINARY;
         TTYPE_TO_COMPACT_TYPE[TType.LIST] = Types.LIST;
@@ -87,6 +90,7 @@ public class TFacebookCompactProtocol
         public static final byte SET = 0x0A;
         public static final byte MAP = 0x0B;
         public static final byte STRUCT = 0x0C;
+        public static final byte FLOAT = 0x0D;
     }
 
     /**
@@ -320,6 +324,18 @@ public class TFacebookCompactProtocol
     }
 
     /**
+     * Write a float to the wire as 4 bytes.
+     */
+    @Override
+    public void writeFloat(float value)
+            throws TException
+    {
+        byte[] data = {0, 0, 0, 0};
+        fixedIntToBytes(floatToIntBits(value), data);
+        transport.write(data);
+    }
+
+    /**
      * Write a double to the wire as 8 bytes.
      */
     @Override
@@ -473,6 +489,17 @@ public class TFacebookCompactProtocol
         buf[5] = (byte) ((n >> 16) & 0xff);
         buf[6] = (byte) ((n >> 8) & 0xff);
         buf[7] = (byte) (n & 0xff);
+    }
+
+    /**
+     * Convert an int into big-endian bytes in buf
+     */
+    private static void fixedIntToBytes(int n, byte[] buf)
+    {
+        buf[0] = (byte) ((n >> 24) & 0xff);
+        buf[1] = (byte) ((n >> 16) & 0xff);
+        buf[2] = (byte) ((n >> 8) & 0xff);
+        buf[3] = (byte) (n & 0xff);
     }
 
     private final byte[] byteDirectBuffer = new byte[1];
@@ -693,6 +720,19 @@ public class TFacebookCompactProtocol
         return zigzagToLong(readVarint64());
     }
 
+    private final byte[] floatBuf = new byte[4];
+
+    /**
+     * No magic here - just read a float off the wire.
+     */
+    @Override
+    public float readFloat()
+            throws TException
+    {
+        transport.read(floatBuf, 0, 4);
+        return intBitsToFloat(bytesToInt(floatBuf));
+    }
+
     private final byte[] doubleBuf = new byte[8];
 
     /**
@@ -861,6 +901,14 @@ public class TFacebookCompactProtocol
                 (bytes[7] & 0xffL);
     }
 
+    private static int bytesToInt(byte[] bytes)
+    {
+        return ((bytes[0] & 0xff) << 24) |
+                ((bytes[1] & 0xff) << 16) |
+                ((bytes[2] & 0xff) << 8) |
+                ((bytes[3] & 0xff));
+    }
+
     //
     // type testing and converting
     //
@@ -892,6 +940,8 @@ public class TFacebookCompactProtocol
                 return TType.I32;
             case Types.I64:
                 return TType.I64;
+            case Types.FLOAT:
+                return TType.FLOAT;
             case Types.DOUBLE:
                 return TType.DOUBLE;
             case Types.BINARY:

@@ -256,6 +256,13 @@ public class ThriftToDriftProtocolWriter
     }
 
     @Override
+    public void writeFloat(float value)
+            throws TException
+    {
+        throw new TException("float is not supported");
+    }
+
+    @Override
     public void writeDouble(double value)
             throws TException
     {
