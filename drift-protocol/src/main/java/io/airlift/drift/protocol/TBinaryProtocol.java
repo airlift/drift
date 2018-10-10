@@ -24,6 +24,8 @@ import java.nio.ByteBuffer;
 
 import static java.lang.Double.doubleToLongBits;
 import static java.lang.Double.longBitsToDouble;
+import static java.lang.Float.floatToIntBits;
+import static java.lang.Float.intBitsToFloat;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Objects.requireNonNull;
 
@@ -174,6 +176,13 @@ public class TBinaryProtocol
         i64out[6] = (byte) (0xff & (value >> 8));
         i64out[7] = (byte) (0xff & (value));
         transport.write(i64out, 0, 8);
+    }
+
+    @Override
+    public void writeFloat(float value)
+            throws TException
+    {
+        writeI32(floatToIntBits(value));
     }
 
     @Override
@@ -343,6 +352,13 @@ public class TBinaryProtocol
                 ((long) (buf[off + 5] & 0xff) << 16) |
                 ((long) (buf[off + 6] & 0xff) << 8) |
                 ((long) (buf[off + 7] & 0xff));
+    }
+
+    @Override
+    public float readFloat()
+            throws TException
+    {
+        return intBitsToFloat(readI32());
     }
 
     @Override

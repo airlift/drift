@@ -75,6 +75,9 @@ public interface TProtocolWriter
     void writeI64(long value)
             throws TException;
 
+    void writeFloat(float value)
+            throws TException;
+
     void writeDouble(double value)
             throws TException;
 

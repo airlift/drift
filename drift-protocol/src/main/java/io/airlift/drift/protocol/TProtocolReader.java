@@ -72,6 +72,9 @@ public interface TProtocolReader
     long readI64()
             throws TException;
 
+    float readFloat()
+            throws TException;
+
     double readDouble()
             throws TException;
 

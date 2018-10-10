@@ -250,6 +250,13 @@ public class ThriftToDriftProtocolReader
     }
 
     @Override
+    public float readFloat()
+            throws TException
+    {
+        throw new TException("float is not supported");
+    }
+
+    @Override
     public double readDouble()
             throws TException
     {

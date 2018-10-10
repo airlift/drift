@@ -42,6 +42,9 @@ public final class TProtocolUtil
             case TType.I64:
                 protocol.readI64();
                 return;
+            case TType.FLOAT:
+                protocol.readFloat();
+                return;
             case TType.DOUBLE:
                 protocol.readDouble();
                 return;
