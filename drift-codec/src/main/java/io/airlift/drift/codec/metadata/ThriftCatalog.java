@@ -80,7 +80,7 @@ import static java.util.stream.Collectors.joining;
  * created.
  */
 @ThreadSafe
-public class ThriftCatalog
+public final class ThriftCatalog
 {
     private final MetadataErrors.Monitor monitor;
     private final ConcurrentMap<Type, ThriftStructMetadata> structs = new ConcurrentHashMap<>();
