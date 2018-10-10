@@ -75,6 +75,11 @@ struct OneOfEverything {
   63: map<Combined, string> aUnionKeyMap;
   64: map<string, Combined> aUnionValueMap;
   70: binary aByteArray;
+  80: float aFloat;
+  81: set<float> aFloatSet;
+  82: list<double> aFloatList;
+  83: map<string, float> aFloatValueMap;
+  84: map<float, string> aFloatKeyMap;
   100: set<list<map<string, Bonk>>> aSetOfListsOfMaps;
   101: map<list<string>, set<Bonk>> aMapOfListToSet;
 }

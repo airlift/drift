@@ -100,6 +100,7 @@ import static io.airlift.drift.codec.ThriftProtocolType.BOOL;
 import static io.airlift.drift.codec.ThriftProtocolType.BYTE;
 import static io.airlift.drift.codec.ThriftProtocolType.DOUBLE;
 import static io.airlift.drift.codec.ThriftProtocolType.ENUM;
+import static io.airlift.drift.codec.ThriftProtocolType.FLOAT;
 import static io.airlift.drift.codec.ThriftProtocolType.I16;
 import static io.airlift.drift.codec.ThriftProtocolType.I32;
 import static io.airlift.drift.codec.ThriftProtocolType.I64;
@@ -1097,6 +1098,7 @@ public class ThriftCodecByteCodeGenerator<T>
         switch (typeRef.getProtocolType()) {
             case BOOL:
             case BYTE:
+            case FLOAT:
             case DOUBLE:
             case I16:
             case I32:
@@ -1146,6 +1148,7 @@ public class ThriftCodecByteCodeGenerator<T>
         try {
             writeBuilder.put(BOOL, ProtocolWriter.class.getMethod("writeBoolField", String.class, short.class, boolean.class));
             writeBuilder.put(BYTE, ProtocolWriter.class.getMethod("writeByteField", String.class, short.class, byte.class));
+            writeBuilder.put(FLOAT, ProtocolWriter.class.getMethod("writeFloatField", String.class, short.class, float.class));
             writeBuilder.put(DOUBLE, ProtocolWriter.class.getMethod("writeDoubleField", String.class, short.class, double.class));
             writeBuilder.put(I16, ProtocolWriter.class.getMethod("writeI16Field", String.class, short.class, short.class));
             writeBuilder.put(I32, ProtocolWriter.class.getMethod("writeI32Field", String.class, short.class, int.class));
@@ -1160,6 +1163,7 @@ public class ThriftCodecByteCodeGenerator<T>
 
             readBuilder.put(BOOL, ProtocolReader.class.getMethod("readBoolField"));
             readBuilder.put(BYTE, ProtocolReader.class.getMethod("readByteField"));
+            readBuilder.put(FLOAT, ProtocolReader.class.getMethod("readFloatField"));
             readBuilder.put(DOUBLE, ProtocolReader.class.getMethod("readDoubleField"));
             readBuilder.put(I16, ProtocolReader.class.getMethod("readI16Field"));
             readBuilder.put(I32, ProtocolReader.class.getMethod("readI32Field"));

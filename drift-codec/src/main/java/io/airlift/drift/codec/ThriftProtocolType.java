@@ -22,6 +22,7 @@ public enum ThriftProtocolType
     UNKNOWN(TType.STOP),
     BOOL(TType.BOOL),
     BYTE(TType.BYTE),
+    FLOAT(TType.FLOAT),
     DOUBLE(TType.DOUBLE),
     I16(TType.I16),
     I32(TType.I32),

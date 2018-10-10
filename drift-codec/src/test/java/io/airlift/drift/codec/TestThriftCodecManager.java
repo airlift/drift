@@ -38,6 +38,7 @@ import static io.airlift.drift.codec.metadata.ThriftEnumMetadataBuilder.thriftEn
 import static io.airlift.drift.codec.metadata.ThriftType.BOOL;
 import static io.airlift.drift.codec.metadata.ThriftType.BYTE;
 import static io.airlift.drift.codec.metadata.ThriftType.DOUBLE;
+import static io.airlift.drift.codec.metadata.ThriftType.FLOAT;
 import static io.airlift.drift.codec.metadata.ThriftType.I16;
 import static io.airlift.drift.codec.metadata.ThriftType.I32;
 import static io.airlift.drift.codec.metadata.ThriftType.I64;
@@ -77,6 +78,7 @@ public class TestThriftCodecManager
         testRoundTripSerialize((short) 1000);
         testRoundTripSerialize(10000);
         testRoundTripSerialize((long) 10000000);
+        testRoundTripSerialize(13.13f);
         testRoundTripSerialize(42.42d);
         testRoundTripSerialize("some string");
         testRoundTripSerialize(UTF8_TEST_STRING);
@@ -92,6 +94,7 @@ public class TestThriftCodecManager
         testRoundTripSerialize(I16, (short) 1000);
         testRoundTripSerialize(I32, 10000);
         testRoundTripSerialize(I64, (long) 10000000);
+        testRoundTripSerialize(FLOAT, 13.13f);
         testRoundTripSerialize(DOUBLE, 42.42d);
         testRoundTripSerialize(STRING, "some string");
         testRoundTripSerialize(STRING, UTF8_TEST_STRING);

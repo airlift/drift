@@ -151,6 +151,18 @@ public class ProtocolReader
         return fieldValue;
     }
 
+    public float readFloatField()
+            throws TException
+    {
+        if (!checkReadState(TType.FLOAT)) {
+            return 0;
+        }
+        currentField = null;
+        float fieldValue = protocol.readFloat();
+        protocol.readFieldEnd();
+        return fieldValue;
+    }
+
     public double readDoubleField()
             throws TException
     {
@@ -373,6 +385,12 @@ public class ProtocolReader
         return protocol.readI64();
     }
 
+    public float readFloat()
+            throws TException
+    {
+        return protocol.readFloat();
+    }
+
     public double readDouble()
             throws TException
     {
@@ -428,6 +446,18 @@ public class ProtocolReader
         long[] array = new long[list.getSize()];
         for (int i = 0; i < list.getSize(); i++) {
             array[i] = readI64();
+        }
+        protocol.readListEnd();
+        return array;
+    }
+
+    public float[] readFloatArray()
+            throws TException
+    {
+        TList list = protocol.readListBegin();
+        float[] array = new float[list.getSize()];
+        for (int i = 0; i < list.getSize(); i++) {
+            array[i] = readFloat();
         }
         protocol.readListEnd();
         return array;

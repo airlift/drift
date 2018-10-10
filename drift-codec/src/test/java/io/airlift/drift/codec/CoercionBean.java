@@ -18,7 +18,6 @@ package io.airlift.drift.codec;
 import io.airlift.drift.annotations.ThriftField;
 import io.airlift.drift.annotations.ThriftStruct;
 
-import java.util.List;
 import java.util.Objects;
 
 import static com.google.common.base.MoreObjects.toStringHelper;
@@ -34,9 +33,6 @@ public final class CoercionBean
     private Float floatValue;
     private Double doubleValue;
 
-    private float primitiveFloat;
-    private List<Float> floatList;
-
     public CoercionBean()
     {
     }
@@ -48,9 +44,7 @@ public final class CoercionBean
             Integer integerValue,
             Long longValue,
             Float floatValue,
-            Double doubleValue,
-            float primitiveFloat,
-            List<Float> floatList)
+            Double doubleValue)
     {
         this.booleanValue = booleanValue;
         this.byteValue = byteValue;
@@ -59,8 +53,6 @@ public final class CoercionBean
         this.longValue = longValue;
         this.floatValue = floatValue;
         this.doubleValue = doubleValue;
-        this.primitiveFloat = primitiveFloat;
-        this.floatList = floatList;
     }
 
     @ThriftField(1)
@@ -147,30 +139,6 @@ public final class CoercionBean
         this.doubleValue = doubleValue;
     }
 
-    @ThriftField(8)
-    public float getPrimitiveFloat()
-    {
-        return primitiveFloat;
-    }
-
-    @ThriftField
-    public void setPrimitiveFloat(float primitiveFloat)
-    {
-        this.primitiveFloat = primitiveFloat;
-    }
-
-    @ThriftField(9)
-    public List<Float> getFloatList()
-    {
-        return floatList;
-    }
-
-    @ThriftField
-    public void setFloatList(List<Float> floatList)
-    {
-        this.floatList = floatList;
-    }
-
     @Override
     public boolean equals(Object o)
     {
@@ -181,21 +149,19 @@ public final class CoercionBean
             return false;
         }
         CoercionBean that = (CoercionBean) o;
-        return Float.compare(that.primitiveFloat, primitiveFloat) == 0 &&
-                Objects.equals(booleanValue, that.booleanValue) &&
+        return Objects.equals(booleanValue, that.booleanValue) &&
                 Objects.equals(byteValue, that.byteValue) &&
                 Objects.equals(shortValue, that.shortValue) &&
                 Objects.equals(integerValue, that.integerValue) &&
                 Objects.equals(longValue, that.longValue) &&
                 Objects.equals(floatValue, that.floatValue) &&
-                Objects.equals(doubleValue, that.doubleValue) &&
-                Objects.equals(floatList, that.floatList);
+                Objects.equals(doubleValue, that.doubleValue);
     }
 
     @Override
     public int hashCode()
     {
-        return Objects.hash(booleanValue, byteValue, shortValue, integerValue, longValue, floatValue, doubleValue, primitiveFloat, floatList);
+        return Objects.hash(booleanValue, byteValue, shortValue, integerValue, longValue, floatValue, doubleValue);
     }
 
     @Override
@@ -209,8 +175,6 @@ public final class CoercionBean
                 .add("longValue", longValue)
                 .add("floatValue", floatValue)
                 .add("doubleValue", doubleValue)
-                .add("primitiveFloat", primitiveFloat)
-                .add("floatList", floatList)
                 .toString();
     }
 }

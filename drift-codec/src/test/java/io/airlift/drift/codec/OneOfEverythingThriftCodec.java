@@ -57,6 +57,7 @@ public class OneOfEverythingThriftCodec
         short aShort = 0;
         int aInt = 0;
         long aLong = 0;
+        float aFloat = 0;
         double aDouble = 0;
         String aString = null;
         BonkField aStruct = null;
@@ -81,6 +82,9 @@ public class OneOfEverythingThriftCodec
                     break;
                 case 5:
                     aLong = reader.readI64Field();
+                    break;
+                case 80:
+                    aFloat = reader.readFloatField();
                     break;
                 case 6:
                     aDouble = reader.readDoubleField();
@@ -108,6 +112,7 @@ public class OneOfEverythingThriftCodec
         oneOfEverything.aShort = aShort;
         oneOfEverything.aInt = aInt;
         oneOfEverything.aLong = aLong;
+        oneOfEverything.aFloat = aFloat;
         oneOfEverything.aDouble = aDouble;
         oneOfEverything.aString = aString;
         oneOfEverything.aStruct = aStruct;
@@ -129,6 +134,7 @@ public class OneOfEverythingThriftCodec
         writer.writeI16Field("aShort", (short) 3, oneOfEverything.aShort);
         writer.writeI32Field("aInt", (short) 4, oneOfEverything.aInt);
         writer.writeI64Field("aLong", (short) 5, oneOfEverything.aLong);
+        writer.writeFloatField("aFloat", (short) 80, oneOfEverything.aFloat);
         writer.writeDoubleField("aDouble", (short) 6, oneOfEverything.aDouble);
         writer.writeStringField("aString", (short) 7, oneOfEverything.aString);
         writer.writeStructField("aStruct", (short) 8, aStructCodec, oneOfEverything.aStruct);

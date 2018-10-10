@@ -150,6 +150,14 @@ public class TestGuiceIntegration
         assertEquals(service.echoLong(Long.MIN_VALUE), Long.MIN_VALUE);
         assertEquals(service.echoLong(Long.MAX_VALUE), Long.MAX_VALUE);
 
+        assertEquals(service.echoFloat(123.456f), 123.456f);
+        assertEquals(service.echoFloat(-456.123f), -456.123f);
+        assertEquals(service.echoFloat(0.0f), 0.0f);
+        assertEquals(service.echoFloat(-0.0f), -0.0f);
+        assertEquals(service.echoFloat(Float.NEGATIVE_INFINITY), Float.NEGATIVE_INFINITY);
+        assertEquals(service.echoFloat(Float.POSITIVE_INFINITY), Float.POSITIVE_INFINITY);
+        assertEquals(service.echoFloat(Float.NaN), Float.NaN);
+
         assertEquals(service.echoDouble(123.456), 123.456);
         assertEquals(service.echoDouble(-456.123), -456.123);
         assertEquals(service.echoDouble(0.0), 0.0);

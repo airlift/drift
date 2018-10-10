@@ -45,6 +45,7 @@ public final class IsSetBean
         isSetBean.aShort = 0;
         isSetBean.aInteger = 0;
         isSetBean.aLong = 0L;
+        isSetBean.aFloat = 0.0f;
         isSetBean.aDouble = 0.0d;
         isSetBean.aString = "";
         isSetBean.aStruct = new BonkField();
@@ -69,6 +70,9 @@ public final class IsSetBean
 
     public Long aLong;
     public boolean isLongSet;
+
+    public Float aFloat;
+    public boolean isFloatSet;
 
     public Double aDouble;
     public boolean isDoubleSet;
@@ -154,6 +158,19 @@ public final class IsSetBean
     {
         this.isLongSet = true;
         this.aLong = aLong;
+    }
+
+    @ThriftField(12)
+    public Float getAFloat()
+    {
+        return aFloat;
+    }
+
+    @ThriftField
+    public void setAFloat(Float aFloat)
+    {
+        this.isFloatSet = true;
+        this.aFloat = aFloat;
     }
 
     @ThriftField(6)
@@ -259,6 +276,11 @@ public final class IsSetBean
         return isLongSet;
     }
 
+    public boolean isFloatSet()
+    {
+        return isFloatSet;
+    }
+
     public boolean isDoubleSet()
     {
         return isDoubleSet;
@@ -304,6 +326,7 @@ public final class IsSetBean
                 Objects.equals(aShort, isSetBean.aShort) &&
                 Objects.equals(aInteger, isSetBean.aInteger) &&
                 Objects.equals(aLong, isSetBean.aLong) &&
+                Objects.equals(aFloat, isSetBean.aFloat) &&
                 Objects.equals(aDouble, isSetBean.aDouble) &&
                 Objects.equals(aString, isSetBean.aString) &&
                 Objects.equals(aStruct, isSetBean.aStruct) &&
@@ -316,6 +339,6 @@ public final class IsSetBean
     @Override
     public int hashCode()
     {
-        return Objects.hash(aBoolean, aByte, aShort, aInteger, aLong, aDouble, aString, aStruct, aSet, aList, aMap, field);
+        return Objects.hash(aBoolean, aByte, aShort, aInteger, aLong, aFloat, aDouble, aString, aStruct, aSet, aList, aMap, field);
     }
 }

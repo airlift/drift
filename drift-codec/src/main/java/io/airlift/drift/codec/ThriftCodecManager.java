@@ -29,6 +29,8 @@ import io.airlift.drift.codec.internal.builtin.ByteBufferThriftCodec;
 import io.airlift.drift.codec.internal.builtin.ByteThriftCodec;
 import io.airlift.drift.codec.internal.builtin.DoubleArrayThriftCodec;
 import io.airlift.drift.codec.internal.builtin.DoubleThriftCodec;
+import io.airlift.drift.codec.internal.builtin.FloatArrayThriftCodec;
+import io.airlift.drift.codec.internal.builtin.FloatThriftCodec;
 import io.airlift.drift.codec.internal.builtin.IntArrayThriftCodec;
 import io.airlift.drift.codec.internal.builtin.IntegerThriftCodec;
 import io.airlift.drift.codec.internal.builtin.ListThriftCodec;
@@ -170,6 +172,7 @@ public final class ThriftCodecManager
         addBuiltinCodec(new ShortThriftCodec());
         addBuiltinCodec(new IntegerThriftCodec());
         addBuiltinCodec(new LongThriftCodec());
+        addBuiltinCodec(new FloatThriftCodec());
         addBuiltinCodec(new DoubleThriftCodec());
         addBuiltinCodec(new ByteBufferThriftCodec());
         addBuiltinCodec(new StringThriftCodec());
@@ -178,6 +181,7 @@ public final class ThriftCodecManager
         addBuiltinCodec(new ShortArrayThriftCodec());
         addBuiltinCodec(new IntArrayThriftCodec());
         addBuiltinCodec(new LongArrayThriftCodec());
+        addBuiltinCodec(new FloatArrayThriftCodec());
         addBuiltinCodec(new DoubleArrayThriftCodec());
 
         // these codecs use non-built-in types that must be registered with the type catalog

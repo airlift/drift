@@ -58,6 +58,7 @@ import static io.airlift.drift.codec.metadata.ThriftType.BINARY;
 import static io.airlift.drift.codec.metadata.ThriftType.BOOL;
 import static io.airlift.drift.codec.metadata.ThriftType.BYTE;
 import static io.airlift.drift.codec.metadata.ThriftType.DOUBLE;
+import static io.airlift.drift.codec.metadata.ThriftType.FLOAT;
 import static io.airlift.drift.codec.metadata.ThriftType.I16;
 import static io.airlift.drift.codec.metadata.ThriftType.I32;
 import static io.airlift.drift.codec.metadata.ThriftType.I64;
@@ -273,6 +274,9 @@ public class ThriftCatalog
         if (long.class == rawType) {
             return I64;
         }
+        if (float.class == rawType) {
+            return FLOAT;
+        }
         if (double.class == rawType) {
             return DOUBLE;
         }
@@ -452,6 +456,9 @@ public class ThriftCatalog
         }
         if (long.class == rawType) {
             return ThriftProtocolType.I64;
+        }
+        if (float.class == rawType) {
+            return ThriftProtocolType.FLOAT;
         }
         if (double.class == rawType) {
             return ThriftProtocolType.DOUBLE;

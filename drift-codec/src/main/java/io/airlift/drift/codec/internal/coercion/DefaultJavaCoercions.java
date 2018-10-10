@@ -87,25 +87,13 @@ public final class DefaultJavaCoercions
     }
 
     @FromThrift
-    public static float doubleToPrimitiveFloat(double value)
-    {
-        return (float) value;
-    }
-
-    @ToThrift
-    public static double primitiveFloatToDouble(float value)
+    public static Float floatToBoxedFloat(float value)
     {
         return value;
     }
 
-    @FromThrift
-    public static Float doubleToBoxedFloat(double value)
-    {
-        return (float) value;
-    }
-
     @ToThrift
-    public static double boxedFloatToDouble(Float value)
+    public static float boxedFloatToFloat(Float value)
     {
         return value;
     }

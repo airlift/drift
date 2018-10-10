@@ -411,6 +411,7 @@ public abstract class AbstractThriftCodecManagerTest
         one.aShort = 22;
         one.aInt = 33;
         one.aLong = 44;
+        one.aFloat = 66;
         one.aDouble = 55;
         one.aString = "message";
         one.aEnum = Fruit.CHERRY;
@@ -440,9 +441,7 @@ public abstract class AbstractThriftCodecManagerTest
                 3,
                 4L,
                 5.5f,
-                6.6d,
-                7.7f,
-                ImmutableList.of(1.1f, 2.2f, 3.3f));
+                6.6d);
 
         testRoundTripSerialize(coercion);
     }
@@ -786,6 +785,7 @@ public abstract class AbstractThriftCodecManagerTest
         one.aShort = 22;
         one.aInt = 33;
         one.aLong = 44;
+        one.aFloat = 66;
         one.aDouble = 55;
         one.aString = "message";
         one.aStruct = new BonkField("struct", 66);
@@ -797,6 +797,7 @@ public abstract class AbstractThriftCodecManagerTest
         one.aShortSet = ImmutableSet.of((short) -1, (short) 0, (short) 1);
         one.aIntegerSet = ImmutableSet.of(-1, 0, 1);
         one.aLongSet = ImmutableSet.of(-1L, 0L, 1L);
+        one.aFloatSet = ImmutableSet.of(-13.2f, 0.0f, 13.2f);
         one.aDoubleSet = ImmutableSet.of(-42.1d, 0.0d, 42.1d);
         one.aStringSet = ImmutableSet.of("a", "string", "set");
         one.aStructSet = ImmutableSet.of(new BonkField("message", 42), new BonkField("other", 11));
@@ -808,6 +809,7 @@ public abstract class AbstractThriftCodecManagerTest
         one.aShortList = ImmutableList.of((short) -1, (short) 0, (short) 1);
         one.aIntegerList = ImmutableList.of(-1, 0, 1);
         one.aLongList = ImmutableList.of(-1L, 0L, 1L);
+        one.aFloatList = ImmutableList.of(-13.2f, 0.0f, 13.2f);
         one.aDoubleList = ImmutableList.of(-42.1d, 0.0d, 42.1d);
         one.aStringList = ImmutableList.of("a", "string", "list");
         one.aStructList = ImmutableList.of(new BonkField("message", 42), new BonkField("other", 11));
@@ -819,6 +821,7 @@ public abstract class AbstractThriftCodecManagerTest
         one.aShortValueMap = ImmutableMap.of("-1", (short) -1, "0", (short) 0, "1", (short) 1);
         one.aIntegerValueMap = ImmutableMap.of("-1", -1, "0", 0, "1", 1);
         one.aLongValueMap = ImmutableMap.of("-1", -1L, "0", 0L, "1", 1L);
+        one.aFloatValueMap = ImmutableMap.of("neg", -13.2f, "0", 0.0f, "pos", 13.2f);
         one.aDoubleValueMap = ImmutableMap.of("neg", -42.1d, "0", 0.0d, "pos", 42.1d);
         one.aStringValueMap = ImmutableMap.of("1", "a", "2", "string", "3", "map");
         one.aStructValueMap = ImmutableMap.of("main", new BonkField("message", 42), "other", new BonkField("other", 11));
@@ -830,6 +833,7 @@ public abstract class AbstractThriftCodecManagerTest
         one.aShortKeyMap = ImmutableMap.copyOf(HashBiMap.create(one.aShortValueMap).inverse());
         one.aIntegerKeyMap = ImmutableMap.copyOf(HashBiMap.create(one.aIntegerValueMap).inverse());
         one.aLongKeyMap = ImmutableMap.copyOf(HashBiMap.create(one.aLongValueMap).inverse());
+        one.aFloatKeyMap = ImmutableMap.copyOf(HashBiMap.create(one.aFloatValueMap).inverse());
         one.aDoubleKeyMap = ImmutableMap.copyOf(HashBiMap.create(one.aDoubleValueMap).inverse());
         one.aStringKeyMap = ImmutableMap.copyOf(HashBiMap.create(one.aStringValueMap).inverse());
         one.aStructKeyMap = ImmutableMap.copyOf(HashBiMap.create(one.aStructValueMap).inverse());
@@ -841,6 +845,7 @@ public abstract class AbstractThriftCodecManagerTest
         one.aShortOptional = Optional.of((short) -1);
         one.aIntegerOptional = Optional.of(-1);
         one.aLongOptional = Optional.of(-1L);
+        one.aFloatOptional = Optional.of(-13.2f);
         one.aDoubleOptional = Optional.of(-42.1d);
         one.aStringOptional = Optional.of("a");
         one.aStructOptional = Optional.of(new BonkField("message", 42));

@@ -36,6 +36,8 @@ public class ThriftTypeRenderer
                 return "bool";
             case BYTE:
                 return "byte";
+            case FLOAT:
+                return "float";
             case DOUBLE:
                 return "double";
             case I16:

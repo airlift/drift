@@ -48,6 +48,9 @@ public interface EchoService
     long echoLong(long value);
 
     @ThriftMethod
+    float echoFloat(float value);
+
+    @ThriftMethod
     double echoDouble(double value);
 
     @ThriftMethod

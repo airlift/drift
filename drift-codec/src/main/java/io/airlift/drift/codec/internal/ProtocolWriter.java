@@ -94,6 +94,14 @@ public class ProtocolWriter
         protocol.writeFieldEnd();
     }
 
+    public void writeFloatField(String name, short id, float flt)
+            throws TException
+    {
+        protocol.writeFieldBegin(new TField(name, TType.FLOAT, id));
+        protocol.writeFloat(flt);
+        protocol.writeFieldEnd();
+    }
+
     public void writeDoubleField(String name, short id, double dub)
             throws TException
     {
@@ -297,6 +305,12 @@ public class ProtocolWriter
         protocol.writeI64(i64);
     }
 
+    public void writeFloat(float flt)
+            throws TException
+    {
+        protocol.writeFloat(flt);
+    }
+
     public void writeDouble(double dub)
             throws TException
     {
@@ -348,6 +362,16 @@ public class ProtocolWriter
         protocol.writeListBegin(new TList(TType.I64, array.length));
         for (long i64 : array) {
             writeI64(i64);
+        }
+        protocol.writeListEnd();
+    }
+
+    public void writeFloatArray(float[] array)
+            throws TException
+    {
+        protocol.writeListBegin(new TList(TType.FLOAT, array.length));
+        for (float floatValue : array) {
+            writeFloat(floatValue);
         }
         protocol.writeListEnd();
     }

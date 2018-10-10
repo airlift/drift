@@ -39,6 +39,8 @@ public final class OneOfEverything
     public int aInt;
     @ThriftField(5)
     public long aLong;
+    @ThriftField(80)
+    public float aFloat;
     @ThriftField(6)
     public double aDouble;
     @ThriftField(7)
@@ -60,6 +62,8 @@ public final class OneOfEverything
     public Set<Integer> aIntegerSet;
     @ThriftField(15)
     public Set<Long> aLongSet;
+    @ThriftField(81)
+    public Set<Float> aFloatSet;
     @ThriftField(16)
     public Set<Double> aDoubleSet;
     @ThriftField(17)
@@ -81,6 +85,8 @@ public final class OneOfEverything
     public List<Integer> aIntegerList;
     @ThriftField(25)
     public List<Long> aLongList;
+    @ThriftField(82)
+    public List<Float> aFloatList;
     @ThriftField(26)
     public List<Double> aDoubleList;
     @ThriftField(27)
@@ -102,6 +108,8 @@ public final class OneOfEverything
     public Map<String, Integer> aIntegerValueMap;
     @ThriftField(35)
     public Map<String, Long> aLongValueMap;
+    @ThriftField(83)
+    public Map<String, Float> aFloatValueMap;
     @ThriftField(36)
     public Map<String, Double> aDoubleValueMap;
     @ThriftField(37)
@@ -123,6 +131,8 @@ public final class OneOfEverything
     public Map<Integer, String> aIntegerKeyMap;
     @ThriftField(45)
     public Map<Long, String> aLongKeyMap;
+    @ThriftField(84)
+    public Map<Float, String> aFloatKeyMap;
     @ThriftField(46)
     public Map<Double, String> aDoubleKeyMap;
     @ThriftField(47)
@@ -144,6 +154,8 @@ public final class OneOfEverything
     public Optional<Integer> aIntegerOptional = Optional.empty();
     @ThriftField(55)
     public Optional<Long> aLongOptional = Optional.empty();
+    @ThriftField(85)
+    public Optional<Float> aFloatOptional = Optional.empty();
     @ThriftField(56)
     public Optional<Double> aDoubleOptional = Optional.empty();
     @ThriftField(57)
@@ -186,6 +198,7 @@ public final class OneOfEverything
                 aShort == that.aShort &&
                 aInt == that.aInt &&
                 aLong == that.aLong &&
+                Float.compare(that.aFloat, aFloat) == 0 &&
                 Double.compare(that.aDouble, aDouble) == 0 &&
                 Objects.equals(aString, that.aString) &&
                 Objects.equals(aStruct, that.aStruct) &&
@@ -196,6 +209,7 @@ public final class OneOfEverything
                 Objects.equals(aShortSet, that.aShortSet) &&
                 Objects.equals(aIntegerSet, that.aIntegerSet) &&
                 Objects.equals(aLongSet, that.aLongSet) &&
+                Objects.equals(aFloatSet, that.aFloatSet) &&
                 Objects.equals(aDoubleSet, that.aDoubleSet) &&
                 Objects.equals(aStringSet, that.aStringSet) &&
                 Objects.equals(aStructSet, that.aStructSet) &&
@@ -206,6 +220,7 @@ public final class OneOfEverything
                 Objects.equals(aShortList, that.aShortList) &&
                 Objects.equals(aIntegerList, that.aIntegerList) &&
                 Objects.equals(aLongList, that.aLongList) &&
+                Objects.equals(aFloatList, that.aFloatList) &&
                 Objects.equals(aDoubleList, that.aDoubleList) &&
                 Objects.equals(aStringList, that.aStringList) &&
                 Objects.equals(aStructList, that.aStructList) &&
@@ -216,6 +231,7 @@ public final class OneOfEverything
                 Objects.equals(aShortValueMap, that.aShortValueMap) &&
                 Objects.equals(aIntegerValueMap, that.aIntegerValueMap) &&
                 Objects.equals(aLongValueMap, that.aLongValueMap) &&
+                Objects.equals(aFloatValueMap, that.aFloatValueMap) &&
                 Objects.equals(aDoubleValueMap, that.aDoubleValueMap) &&
                 Objects.equals(aStringValueMap, that.aStringValueMap) &&
                 Objects.equals(aStructValueMap, that.aStructValueMap) &&
@@ -226,6 +242,7 @@ public final class OneOfEverything
                 Objects.equals(aShortKeyMap, that.aShortKeyMap) &&
                 Objects.equals(aIntegerKeyMap, that.aIntegerKeyMap) &&
                 Objects.equals(aLongKeyMap, that.aLongKeyMap) &&
+                Objects.equals(aFloatKeyMap, that.aFloatKeyMap) &&
                 Objects.equals(aDoubleKeyMap, that.aDoubleKeyMap) &&
                 Objects.equals(aStringKeyMap, that.aStringKeyMap) &&
                 Objects.equals(aStructKeyMap, that.aStructKeyMap) &&
@@ -236,6 +253,7 @@ public final class OneOfEverything
                 Objects.equals(aShortOptional, that.aShortOptional) &&
                 Objects.equals(aIntegerOptional, that.aIntegerOptional) &&
                 Objects.equals(aLongOptional, that.aLongOptional) &&
+                Objects.equals(aFloatOptional, that.aFloatOptional) &&
                 Objects.equals(aDoubleOptional, that.aDoubleOptional) &&
                 Objects.equals(aStringOptional, that.aStringOptional) &&
                 Objects.equals(aStructOptional, that.aStructOptional) &&
@@ -259,6 +277,7 @@ public final class OneOfEverything
                 aShort,
                 aInt,
                 aLong,
+                aFloat,
                 aDouble,
                 aString,
                 aStruct,
@@ -269,6 +288,7 @@ public final class OneOfEverything
                 aShortSet,
                 aIntegerSet,
                 aLongSet,
+                aFloatSet,
                 aDoubleSet,
                 aStringSet,
                 aStructSet,
@@ -279,6 +299,7 @@ public final class OneOfEverything
                 aShortList,
                 aIntegerList,
                 aLongList,
+                aFloatList,
                 aDoubleList,
                 aStringList,
                 aStructList,
@@ -289,6 +310,7 @@ public final class OneOfEverything
                 aShortValueMap,
                 aIntegerValueMap,
                 aLongValueMap,
+                aFloatValueMap,
                 aDoubleValueMap,
                 aStringValueMap,
                 aStructValueMap,
@@ -299,6 +321,7 @@ public final class OneOfEverything
                 aShortKeyMap,
                 aIntegerKeyMap,
                 aLongKeyMap,
+                aFloatKeyMap,
                 aDoubleKeyMap,
                 aStringKeyMap,
                 aStructKeyMap,
@@ -309,6 +332,7 @@ public final class OneOfEverything
                 aShortOptional,
                 aIntegerOptional,
                 aLongOptional,
+                aFloatOptional,
                 aDoubleOptional,
                 aStringOptional,
                 aStructOptional,
@@ -332,6 +356,7 @@ public final class OneOfEverything
                 .add("aShort", aShort)
                 .add("aInt", aInt)
                 .add("aLong", aLong)
+                .add("aFloat", aFloat)
                 .add("aDouble", aDouble)
                 .add("aString", aString)
                 .add("aStruct", aStruct)
@@ -342,6 +367,7 @@ public final class OneOfEverything
                 .add("aShortSet", aShortSet)
                 .add("aIntegerSet", aIntegerSet)
                 .add("aLongSet", aLongSet)
+                .add("aFloatSet", aFloatSet)
                 .add("aDoubleSet", aDoubleSet)
                 .add("aStringSet", aStringSet)
                 .add("aStructSet", aStructSet)
@@ -352,6 +378,7 @@ public final class OneOfEverything
                 .add("aShortList", aShortList)
                 .add("aIntegerList", aIntegerList)
                 .add("aLongList", aLongList)
+                .add("aFloatList", aFloatList)
                 .add("aDoubleList", aDoubleList)
                 .add("aStringList", aStringList)
                 .add("aStructList", aStructList)
@@ -362,6 +389,7 @@ public final class OneOfEverything
                 .add("aShortValueMap", aShortValueMap)
                 .add("aIntegerValueMap", aIntegerValueMap)
                 .add("aLongValueMap", aLongValueMap)
+                .add("aFloatValueMap", aFloatValueMap)
                 .add("aDoubleValueMap", aDoubleValueMap)
                 .add("aStringValueMap", aStringValueMap)
                 .add("aStructValueMap", aStructValueMap)
@@ -372,6 +400,7 @@ public final class OneOfEverything
                 .add("aShortKeyMap", aShortKeyMap)
                 .add("aIntegerKeyMap", aIntegerKeyMap)
                 .add("aLongKeyMap", aLongKeyMap)
+                .add("aFloatKeyMap", aFloatKeyMap)
                 .add("aDoubleKeyMap", aDoubleKeyMap)
                 .add("aStringKeyMap", aStringKeyMap)
                 .add("aStructKeyMap", aStructKeyMap)
@@ -382,6 +411,7 @@ public final class OneOfEverything
                 .add("aShortOptional", aShortOptional)
                 .add("aIntegerOptional", aIntegerOptional)
                 .add("aLongOptional", aLongOptional)
+                .add("aFloatOptional", aFloatOptional)
                 .add("aDoubleOptional", aDoubleOptional)
                 .add("aStringOptional", aStringOptional)
                 .add("aStructOptional", aStructOptional)

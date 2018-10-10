@@ -63,6 +63,12 @@ public class EchoServiceHandler
     }
 
     @Override
+    public float echoFloat(float value)
+    {
+        return value;
+    }
+
+    @Override
     public double echoDouble(double value)
     {
         return value;

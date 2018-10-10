@@ -35,6 +35,8 @@ public final class OneOfEverything
     public int aInt;
     @ThriftField(5)
     public long aLong;
+    @ThriftField(80)
+    public float aFloat;
     @ThriftField(6)
     public double aDouble;
     @ThriftField(7)
@@ -56,6 +58,8 @@ public final class OneOfEverything
     public Set<Integer> aIntegerSet;
     @ThriftField(15)
     public Set<Long> aLongSet;
+    @ThriftField(81)
+    public Set<Float> aFloatSet;
     @ThriftField(16)
     public Set<Double> aDoubleSet;
     @ThriftField(17)
@@ -77,6 +81,8 @@ public final class OneOfEverything
     public List<Integer> aIntegerList;
     @ThriftField(25)
     public List<Long> aLongList;
+    @ThriftField(82)
+    public List<Double> aFloatList;
     @ThriftField(26)
     public List<Double> aDoubleList;
     @ThriftField(27)
@@ -98,6 +104,8 @@ public final class OneOfEverything
     public Map<String, Integer> aIntegerValueMap;
     @ThriftField(35)
     public Map<String, Long> aLongValueMap;
+    @ThriftField(83)
+    public Map<String, Float> aFloatValueMap;
     @ThriftField(36)
     public Map<String, Double> aDoubleValueMap;
     @ThriftField(37)
@@ -119,6 +127,8 @@ public final class OneOfEverything
     public Map<Integer, String> aIntegerKeyMap;
     @ThriftField(45)
     public Map<Long, String> aLongKeyMap;
+    @ThriftField(84)
+    public Map<Float, String> aFloatKeyMap;
     @ThriftField(46)
     public Map<Double, String> aDoubleKeyMap;
     @ThriftField(47)

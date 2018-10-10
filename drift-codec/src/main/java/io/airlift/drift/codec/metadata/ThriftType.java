@@ -41,6 +41,7 @@ public class ThriftType
 {
     public static final ThriftType BOOL = new ThriftType(ThriftProtocolType.BOOL, boolean.class);
     public static final ThriftType BYTE = new ThriftType(ThriftProtocolType.BYTE, byte.class);
+    public static final ThriftType FLOAT = new ThriftType(ThriftProtocolType.FLOAT, float.class);
     public static final ThriftType DOUBLE = new ThriftType(ThriftProtocolType.DOUBLE, double.class);
     public static final ThriftType I16 = new ThriftType(ThriftProtocolType.I16, short.class);
     public static final ThriftType I32 = new ThriftType(ThriftProtocolType.I32, int.class);
@@ -51,6 +52,7 @@ public class ThriftType
 
     public static final ThriftTypeReference BOOL_REF = new DefaultThriftTypeReference(BOOL);
     public static final ThriftTypeReference BYTE_REF = new DefaultThriftTypeReference(BYTE);
+    public static final ThriftTypeReference FLOAT_REF = new DefaultThriftTypeReference(FLOAT);
     public static final ThriftTypeReference DOUBLE_REF = new DefaultThriftTypeReference(DOUBLE);
     public static final ThriftTypeReference I16_REF = new DefaultThriftTypeReference(I16);
     public static final ThriftTypeReference I32_REF = new DefaultThriftTypeReference(I32);
