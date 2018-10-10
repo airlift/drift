@@ -319,16 +319,14 @@ public abstract class AbstractThriftCodecManagerTest
         optionalField.aListEnumOptional = Optional.of(ImmutableList.of(Fruit.BANANA));
         optionalField.aListCustomEnumOptional = Optional.of(ImmutableList.of(Letter.C));
 
-        testRoundTripSerialize(optionalField, TBinaryProtocol::new);
-        testRoundTripSerialize(optionalField, TCompactProtocol::new);
+        testRoundTripSerialize(optionalField);
     }
 
     @Test
     public void testAllOptionalFieldEmpty()
             throws Exception
     {
-        testRoundTripSerialize(new OptionalField(), TBinaryProtocol::new);
-        testRoundTripSerialize(new OptionalField(), TCompactProtocol::new);
+        testRoundTripSerialize(new OptionalField());
     }
 
     @Test
@@ -362,25 +360,21 @@ public abstract class AbstractThriftCodecManagerTest
                 Optional.of(ImmutableList.of(Fruit.BANANA)),
                 Optional.of(ImmutableList.of(Letter.C)));
 
-        testRoundTripSerialize(optionalStruct, TBinaryProtocol::new);
-        testRoundTripSerialize(optionalStruct, TCompactProtocol::new);
+        testRoundTripSerialize(optionalStruct);
     }
 
     @Test
     public void testAllOptionalStructEmpty()
             throws Exception
     {
-        testRoundTripSerialize(new OptionalStruct(), TBinaryProtocol::new);
-        testRoundTripSerialize(new OptionalStruct(), TCompactProtocol::new);
+        testRoundTripSerialize(new OptionalStruct());
     }
 
     @Test
     public void testOneOfEverythingField()
             throws Exception
     {
-        OneOfEverything one = createOneOfEverything();
-        testRoundTripSerialize(one, TBinaryProtocol::new);
-        testRoundTripSerialize(one, TCompactProtocol::new);
+        testRoundTripSerialize(createOneOfEverything());
     }
 
     @Test
@@ -416,17 +410,14 @@ public abstract class AbstractThriftCodecManagerTest
         one.aEnum = Fruit.CHERRY;
         one.aStruct = new BonkField("struct", 66);
 
-        testRoundTripSerialize(codec, codec, one, TCompactProtocol::new);
-        testRoundTripSerialize(codec, codec, one, TBinaryProtocol::new);
+        testRoundTripSerialize(codec, codec, one);
     }
 
     @Test
     public void testOneOfEverythingFieldEmpty()
             throws Exception
     {
-        OneOfEverything one = new OneOfEverything();
-        testRoundTripSerialize(one, TBinaryProtocol::new);
-        testRoundTripSerialize(one, TCompactProtocol::new);
+        testRoundTripSerialize(new OneOfEverything());
     }
 
     @Test
