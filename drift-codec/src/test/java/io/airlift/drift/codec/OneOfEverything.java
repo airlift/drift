@@ -22,6 +22,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.OptionalDouble;
+import java.util.OptionalInt;
+import java.util.OptionalLong;
 import java.util.Set;
 
 import static com.google.common.base.MoreObjects.toStringHelper;
@@ -154,6 +157,12 @@ public final class OneOfEverything
     public Optional<Fruit> aEnumOptional = Optional.empty();
     @ThriftField(60)
     public Optional<Letter> aCustomEnumOptional = Optional.empty();
+    @ThriftField(61)
+    public OptionalDouble aOptionalDouble = OptionalDouble.empty();
+    @ThriftField(62)
+    public OptionalInt aOptionalInt = OptionalInt.empty();
+    @ThriftField(63)
+    public OptionalLong aOptionalLong = OptionalLong.empty();
 
     @ThriftField(70)
     public UnionField aUnion;
@@ -241,6 +250,9 @@ public final class OneOfEverything
                 Objects.equals(aStructOptional, that.aStructOptional) &&
                 Objects.equals(aEnumOptional, that.aEnumOptional) &&
                 Objects.equals(aCustomEnumOptional, that.aCustomEnumOptional) &&
+                Objects.equals(aOptionalDouble, that.aOptionalDouble) &&
+                Objects.equals(aOptionalInt, that.aOptionalInt) &&
+                Objects.equals(aOptionalLong, that.aOptionalLong) &&
                 Objects.equals(aUnion, that.aUnion) &&
                 Objects.equals(aUnionSet, that.aUnionSet) &&
                 Objects.equals(aUnionList, that.aUnionList) &&
@@ -314,6 +326,9 @@ public final class OneOfEverything
                 aStructOptional,
                 aEnumOptional,
                 aCustomEnumOptional,
+                aOptionalDouble,
+                aOptionalInt,
+                aOptionalLong,
                 aUnion,
                 aUnionSet,
                 aUnionList,
@@ -387,6 +402,9 @@ public final class OneOfEverything
                 .add("aStructOptional", aStructOptional)
                 .add("aEnumOptional", aEnumOptional)
                 .add("aCustomEnumOptional", aCustomEnumOptional)
+                .add("aOptionalDouble", aOptionalDouble)
+                .add("aOptionalInt", aOptionalInt)
+                .add("aOptionalLong", aOptionalLong)
                 .add("aUnion", aUnion)
                 .add("aUnionSet", aUnionSet)
                 .add("aUnionList", aUnionList)
