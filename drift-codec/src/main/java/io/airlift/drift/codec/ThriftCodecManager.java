@@ -179,11 +179,9 @@ public final class ThriftCodecManager
         addBuiltinCodec(new IntArrayThriftCodec());
         addBuiltinCodec(new LongArrayThriftCodec());
         addBuiltinCodec(new DoubleArrayThriftCodec());
-
-        // these codecs use non-built-in types that must be registered with the type catalog
-        addCodec(new OptionalDoubleThriftCodec());
-        addCodec(new OptionalIntThriftCodec());
-        addCodec(new OptionalLongThriftCodec());
+        addBuiltinCodec(new OptionalDoubleThriftCodec());
+        addBuiltinCodec(new OptionalIntThriftCodec());
+        addBuiltinCodec(new OptionalLongThriftCodec());
 
         for (ThriftCodec<?> codec : codecs) {
             addCodec(codec);

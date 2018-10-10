@@ -25,6 +25,9 @@ import io.airlift.drift.annotations.ThriftOrder;
 import io.airlift.drift.annotations.ThriftStruct;
 import io.airlift.drift.annotations.ThriftUnion;
 import io.airlift.drift.codec.ThriftProtocolType;
+import io.airlift.drift.codec.internal.builtin.OptionalDoubleThriftCodec;
+import io.airlift.drift.codec.internal.builtin.OptionalIntThriftCodec;
+import io.airlift.drift.codec.internal.builtin.OptionalLongThriftCodec;
 import io.airlift.drift.codec.internal.coercion.DefaultJavaCoercions;
 import io.airlift.drift.codec.internal.coercion.FromThrift;
 import io.airlift.drift.codec.internal.coercion.ToThrift;
@@ -111,6 +114,9 @@ public final class ThriftCatalog
     {
         this.monitor = monitor;
         addDefaultCoercions(DefaultJavaCoercions.class);
+        addThriftType(new OptionalDoubleThriftCodec().getType());
+        addThriftType(new OptionalIntThriftCodec().getType());
+        addThriftType(new OptionalLongThriftCodec().getType());
     }
 
     @VisibleForTesting

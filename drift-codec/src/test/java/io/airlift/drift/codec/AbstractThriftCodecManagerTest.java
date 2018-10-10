@@ -846,6 +846,9 @@ public abstract class AbstractThriftCodecManagerTest
         one.aStructOptional = Optional.of(new BonkField("message", 42));
         one.aEnumOptional = Optional.of(Fruit.BANANA);
         one.aCustomEnumOptional = Optional.of(Letter.C);
+        one.aOptionalDouble = OptionalDouble.of(87.6d);
+        one.aOptionalInt = OptionalInt.of(Integer.MAX_VALUE - 10);
+        one.aOptionalLong = OptionalLong.of(Long.MAX_VALUE - 20);
 
         one.aSetOfListsOfMaps = ImmutableSet.of(
                 ImmutableList.of(
