@@ -47,6 +47,7 @@ import io.airlift.drift.codec.recursion.WithIdlRecursiveAnnotation;
 import io.airlift.drift.codec.recursion.WithoutRecursiveAnnotation;
 import io.airlift.drift.protocol.TBinaryProtocol;
 import io.airlift.drift.protocol.TCompactProtocol;
+import io.airlift.drift.protocol.TFacebookCompactProtocol;
 import io.airlift.drift.protocol.TMemoryBuffer;
 import io.airlift.drift.protocol.TProtocol;
 import io.airlift.drift.protocol.TTransport;
@@ -60,6 +61,7 @@ import java.util.Optional;
 import java.util.OptionalDouble;
 import java.util.OptionalInt;
 import java.util.OptionalLong;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -446,13 +448,15 @@ public abstract class AbstractThriftCodecManagerTest
         assertAllFieldsSet(full, false);
         // manually set full bean
         full.field = ByteBuffer.wrap("full".getBytes(UTF_8));
-        full = testRoundTripSerialize(full);
-        assertAllFieldsSet(full, true);
+        testRoundTripSerialize(full, result -> {
+            assertAllFieldsSet(result, true);
+        });
 
         IsSetBean empty = IsSetBean.createEmpty();
         assertAllFieldsSet(empty, false);
-        empty = testRoundTripSerialize(empty);
-        assertAllFieldsSet(empty, false);
+        testRoundTripSerialize(empty, result -> {
+            assertAllFieldsSet(result, false);
+        });
     }
 
     @Test
@@ -701,11 +705,18 @@ public abstract class AbstractThriftCodecManagerTest
         assertEquals(!ByteBuffer.wrap("empty".getBytes(UTF_8)).equals(isSetBean.field), expected);
     }
 
-    private <T> T testRoundTripSerialize(T value)
+    private <T> void testRoundTripSerialize(T value)
             throws Exception
     {
-        testRoundTripSerialize(value, TBinaryProtocol::new);
-        return testRoundTripSerialize(value, TCompactProtocol::new);
+        testRoundTripSerialize(value, x -> {});
+    }
+
+    private <T> void testRoundTripSerialize(T value, Consumer<T> consumer)
+            throws Exception
+    {
+        consumer.accept(testRoundTripSerialize(value, TBinaryProtocol::new));
+        consumer.accept(testRoundTripSerialize(value, TCompactProtocol::new));
+        consumer.accept(testRoundTripSerialize(value, TFacebookCompactProtocol::new));
     }
 
     private <T> T testRoundTripSerialize(T value, Function<TTransport, TProtocol> protocolFactory)
@@ -717,27 +728,29 @@ public abstract class AbstractThriftCodecManagerTest
         return testRoundTripSerialize(readCodec, writeCodec, value, protocolFactory);
     }
 
-    private <T> T testRoundTripSerialize(TypeToken<T> typeToken, T value)
+    private <T> void testRoundTripSerialize(TypeToken<T> typeToken, T value)
             throws Exception
     {
         testRoundTripSerialize(typeToken, value, TBinaryProtocol::new);
-        return testRoundTripSerialize(typeToken, value, TCompactProtocol::new);
+        testRoundTripSerialize(typeToken, value, TCompactProtocol::new);
+        testRoundTripSerialize(typeToken, value, TFacebookCompactProtocol::new);
     }
 
-    private <T> T testRoundTripSerialize(TypeToken<T> typeToken, T value, Function<TTransport, TProtocol> protocolFactory)
+    private <T> void testRoundTripSerialize(TypeToken<T> typeToken, T value, Function<TTransport, TProtocol> protocolFactory)
             throws Exception
     {
         ThriftCodec<T> readCodec = (ThriftCodec<T>) readCodecManager.getCodec(typeToken.getType());
         ThriftCodec<T> writeCodec = (ThriftCodec<T>) writeCodecManager.getCodec(typeToken.getType());
 
-        return testRoundTripSerialize(readCodec, writeCodec, typeToken.getType(), value, protocolFactory);
+        testRoundTripSerialize(readCodec, writeCodec, typeToken.getType(), value, protocolFactory);
     }
 
-    private <T> T testRoundTripSerialize(ThriftCodec<T> readCodec, ThriftCodec<T> writeCodec, T structInstance)
+    private <T> void testRoundTripSerialize(ThriftCodec<T> readCodec, ThriftCodec<T> writeCodec, T structInstance)
             throws Exception
     {
         testRoundTripSerialize(readCodec, writeCodec, structInstance, TBinaryProtocol::new);
-        return testRoundTripSerialize(readCodec, writeCodec, structInstance, TCompactProtocol::new);
+        testRoundTripSerialize(readCodec, writeCodec, structInstance, TCompactProtocol::new);
+        testRoundTripSerialize(readCodec, writeCodec, structInstance, TFacebookCompactProtocol::new);
     }
 
     private <T> T testRoundTripSerialize(ThriftCodec<T> readCodec, ThriftCodec<T> writeCodec, T structInstance, Function<TTransport, TProtocol> protocolFactory)
