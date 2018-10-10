@@ -96,6 +96,7 @@ public class OneOfEverythingThriftCodec
                     break;
                 case 60:
                     aUnion = reader.readStructField(aUnionCodec);
+                    break;
                 default:
                     reader.skipFieldData();
             }
