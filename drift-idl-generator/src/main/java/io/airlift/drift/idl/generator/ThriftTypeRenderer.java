@@ -60,7 +60,7 @@ public class ThriftTypeRenderer
             case BINARY:
                 return "binary";
         }
-        throw new IllegalStateException("Bad protocol type" + type.getProtocolType());
+        throw new IllegalStateException("Bad protocol type: " + type.getProtocolType());
     }
 
     private String prefix(ThriftType type)
