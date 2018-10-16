@@ -15,31 +15,57 @@
  */
 package io.airlift.drift.transport.netty.buffer;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.CompositeByteBuf;
 import io.netty.buffer.PooledByteBufAllocator;
+import io.netty.util.ResourceLeakDetector;
 
 import javax.annotation.concurrent.GuardedBy;
 
 import java.io.Closeable;
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import static com.google.common.collect.ImmutableList.toImmutableList;
-
+/**
+ * This is a custom ByteBufAllocator that tracks outstanding allocations and
+ * throws from the close() method if it detects any leaked buffers.
+ *
+ * Never use this class in production, it will cause your server to run out
+ * of memory! This is because it holds strong references to all allocated
+ * buffers and doesn't release them until close() is called at the end of a
+ * unit test.
+ */
 public class TestingPooledByteBufAllocator
         extends PooledByteBufAllocator
         implements Closeable
 {
-    public TestingPooledByteBufAllocator()
+    /**
+     * Call this instead of the constructor. It will turn on netty's
+     * built-in resource leak tracking before creating the test allocator.
+     * When the test allocator's <code>close()</code> method is called,
+     * the resource leak tracking setting will be reverted to its
+     * original value.
+     * @return a new <code>TestingPooledByteBufAllocator</code>.
+     */
+    public static TestingPooledByteBufAllocator newAllocator()
+    {
+        ResourceLeakDetector.Level oldLevel = ResourceLeakDetector.getLevel();
+        ResourceLeakDetector.setLevel(ResourceLeakDetector.Level.PARANOID);
+        return new TestingPooledByteBufAllocator(oldLevel);
+    }
+
+    private TestingPooledByteBufAllocator(ResourceLeakDetector.Level oldLevel)
     {
         super(false);
+        this.oldLevel = oldLevel;
     }
 
     @GuardedBy("this")
-    private final List<WeakReference<ByteBuf>> trackedBuffers = new ArrayList<>();
+    private final List<ByteBuf> trackedBuffers = new ArrayList<>();
+
+    private final ResourceLeakDetector.Level oldLevel;
 
     @Override
     protected ByteBuf newHeapBuffer(int initialCapacity, int maxCapacity)
@@ -65,35 +91,42 @@ public class TestingPooledByteBufAllocator
         return track(super.compositeDirectBuffer(maxNumComponents));
     }
 
-    public synchronized List<ByteBuf> getReferencedBuffers()
-    {
-        return trackedBuffers.stream()
-                .map(WeakReference::get)
-                .filter(Objects::nonNull)
-                .filter(byteBuf -> byteBuf.refCnt() > 0)
-                .collect(toImmutableList());
-    }
-
     private synchronized CompositeByteBuf track(CompositeByteBuf byteBuf)
     {
-        trackedBuffers.add(new WeakReference<>(byteBuf));
-        trackedBuffers.removeIf(byteBufWeakReference -> byteBufWeakReference.get() == null);
+        trackedBuffers.add(byteBuf);
         return byteBuf;
     }
 
     private synchronized ByteBuf track(ByteBuf byteBuf)
     {
-        trackedBuffers.add(new WeakReference<>(byteBuf));
-        trackedBuffers.removeIf(byteBufWeakReference -> byteBufWeakReference.get() == null);
+        trackedBuffers.add(byteBuf);
         return byteBuf;
     }
 
     @Override
+    @SuppressFBWarnings(value = "DM_GC", justification = "Netty's leak detection only works on GC'ed buffers")
     public void close()
     {
-        List<ByteBuf> referencedBuffers = getReferencedBuffers();
-        if (!referencedBuffers.isEmpty()) {
-            throw new AssertionError("LEAK");
+        try {
+            long referencedBuffersCount;
+            synchronized (this) {
+                referencedBuffersCount = trackedBuffers.stream()
+                        .filter(Objects::nonNull)
+                        .filter(byteBuf -> byteBuf.refCnt() > 0)
+                        .count();
+                trackedBuffers.clear(); // Make tracked buffers eligible for GC
+            }
+            // Throw an error if there were any leaked buffers
+            if (referencedBuffersCount > 0) {
+                // Trigger a GC. This will hopefully (but not necessarily) print
+                // details about detected leaks to standard error before the error
+                // is thrown.
+                System.gc();
+                throw new AssertionError("LEAK");
+            }
+        }
+        finally {
+            ResourceLeakDetector.setLevel(oldLevel);
         }
     }
 }

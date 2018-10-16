@@ -107,7 +107,7 @@ public class TestClientsWithDriftNettyServer
                 .setSslEnabled(true)
                 .setTrustCertificate(ClientTestUtils.getCertificateChainFile())
                 .setKey(ClientTestUtils.getPrivateKeyFile());
-        TestingPooledByteBufAllocator testingAllocator = new TestingPooledByteBufAllocator();
+        TestingPooledByteBufAllocator testingAllocator = TestingPooledByteBufAllocator.newAllocator();
         DriftServer driftServer = new DriftServer(
                 new DriftNettyServerTransportFactory(config, testingAllocator),
                 CODEC_MANAGER,

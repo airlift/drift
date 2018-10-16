@@ -81,7 +81,7 @@ final class DriftNettyTesterUtil
                 .setTrustCertificate(ClientTestUtils.getCertificateChainFile())
                 .setSslEnabled(secure);
 
-        try (TestingPooledByteBufAllocator testingAllocator = new TestingPooledByteBufAllocator();
+        try (TestingPooledByteBufAllocator testingAllocator = TestingPooledByteBufAllocator.newAllocator();
                 DriftNettyMethodInvokerFactory<String> methodInvokerFactory = new DriftNettyMethodInvokerFactory<>(
                         new DriftNettyConnectionFactoryConfig().setConnectionPoolEnabled(true),
                         clientIdentity -> config,
@@ -119,7 +119,7 @@ final class DriftNettyTesterUtil
                 .setTrustCertificate(ClientTestUtils.getCertificateChainFile())
                 .setSslEnabled(secure);
 
-        try (TestingPooledByteBufAllocator testingAllocator = new TestingPooledByteBufAllocator();
+        try (TestingPooledByteBufAllocator testingAllocator = TestingPooledByteBufAllocator.newAllocator();
                 DriftNettyMethodInvokerFactory<?> methodInvokerFactory = createStaticDriftNettyMethodInvokerFactory(config, testingAllocator)) {
             DriftClientFactory proxyFactory = new DriftClientFactory(CODEC_MANAGER, methodInvokerFactory, addressSelector);
 
@@ -153,7 +153,7 @@ final class DriftNettyTesterUtil
                 .setTrustCertificate(ClientTestUtils.getCertificateChainFile())
                 .setSslEnabled(secure);
 
-        try (TestingPooledByteBufAllocator testingAllocator = new TestingPooledByteBufAllocator();
+        try (TestingPooledByteBufAllocator testingAllocator = TestingPooledByteBufAllocator.newAllocator();
                 DriftNettyMethodInvokerFactory<String> methodInvokerFactory = new DriftNettyMethodInvokerFactory<>(
                         new DriftNettyConnectionFactoryConfig().setConnectionPoolEnabled(true),
                         clientIdentity -> config,
@@ -184,7 +184,7 @@ final class DriftNettyTesterUtil
             return 0;
         }
 
-        try (TestingPooledByteBufAllocator testingAllocator = new TestingPooledByteBufAllocator()) {
+        try (TestingPooledByteBufAllocator testingAllocator = TestingPooledByteBufAllocator.newAllocator()) {
             return logDriftClientBinder(address, headerValue, entries, new DriftNettyClientModule(testingAllocator), filters, transport, protocol, secure);
         }
     }

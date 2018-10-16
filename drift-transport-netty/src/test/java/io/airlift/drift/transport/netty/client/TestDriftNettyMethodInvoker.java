@@ -205,7 +205,7 @@ public class TestDriftNettyMethodInvoker
 
     private static int testMethodInvoker(ServerMethodInvoker methodInvoker, List<ToIntFunction<HostAndPort>> clients)
     {
-        TestingPooledByteBufAllocator testingAllocator = new TestingPooledByteBufAllocator();
+        TestingPooledByteBufAllocator testingAllocator = TestingPooledByteBufAllocator.newAllocator();
         ServerTransport serverTransport = new DriftNettyServerTransportFactory(new DriftNettyServerConfig(), testingAllocator).createServerTransport(methodInvoker);
         try {
             serverTransport.start();
@@ -297,7 +297,7 @@ public class TestDriftNettyMethodInvoker
                 .setTransport(transport)
                 .setProtocol(protocol);
 
-        try (TestingPooledByteBufAllocator testingAllocator = new TestingPooledByteBufAllocator();
+        try (TestingPooledByteBufAllocator testingAllocator = TestingPooledByteBufAllocator.newAllocator();
                 DriftNettyMethodInvokerFactory<Void> methodInvokerFactory = new DriftNettyMethodInvokerFactory<>(
                         new DriftNettyConnectionFactoryConfig().setConnectionPoolEnabled(true),
                         clientIdentity -> config,
@@ -372,7 +372,7 @@ public class TestDriftNettyMethodInvoker
     private static int logNiftyInvocationHandlerOptional(HostAndPort address, List<DriftLogEntry> entries)
     {
         DriftNettyClientConfig config = new DriftNettyClientConfig();
-        try (TestingPooledByteBufAllocator testingAllocator = new TestingPooledByteBufAllocator();
+        try (TestingPooledByteBufAllocator testingAllocator = TestingPooledByteBufAllocator.newAllocator();
                 DriftNettyMethodInvokerFactory<Void> methodInvokerFactory = new DriftNettyMethodInvokerFactory<>(
                         new DriftNettyConnectionFactoryConfig().setConnectionPoolEnabled(true),
                         clientIdentity -> config,

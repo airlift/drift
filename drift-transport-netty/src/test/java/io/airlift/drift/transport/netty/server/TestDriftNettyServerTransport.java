@@ -222,7 +222,7 @@ public class TestDriftNettyServerTransport
     {
         DriftNettyServerConfig config = new DriftNettyServerConfig()
                 .setAssumeClientsSupportOutOfOrderResponses(assumeClientsSupportOutOfOrderResponses);
-        TestingPooledByteBufAllocator testingAllocator = new TestingPooledByteBufAllocator();
+        TestingPooledByteBufAllocator testingAllocator = TestingPooledByteBufAllocator.newAllocator();
         ServerTransport serverTransport = new DriftNettyServerTransportFactory(config, testingAllocator).createServerTransport(methodInvoker);
         try {
             serverTransport.start();

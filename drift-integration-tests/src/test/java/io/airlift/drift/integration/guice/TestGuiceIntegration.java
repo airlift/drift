@@ -70,7 +70,7 @@ public class TestGuiceIntegration
     {
         int port = findUnusedPort();
 
-        TestingPooledByteBufAllocator testingAllocator = new TestingPooledByteBufAllocator();
+        TestingPooledByteBufAllocator testingAllocator = TestingPooledByteBufAllocator.newAllocator();
         Bootstrap bootstrap = new Bootstrap(
                 new DriftNettyServerModule(testingAllocator),
                 new DriftNettyClientModule(testingAllocator),
