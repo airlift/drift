@@ -69,7 +69,7 @@ class DriftMethodInvocation<A extends Address>
     private final long startTime;
 
     @GuardedBy("this")
-    private Set<A> attemptedAddresses = new LinkedHashSet<>();
+    private final Set<A> attemptedAddresses = new LinkedHashSet<>();
     @GuardedBy("this")
     private int failedConnections;
     @GuardedBy("this")

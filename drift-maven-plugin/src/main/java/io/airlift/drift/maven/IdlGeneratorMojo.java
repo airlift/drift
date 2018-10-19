@@ -152,7 +152,7 @@ public class IdlGeneratorMojo
                 urls.add(fileToUrl(artifact.getFile()));
             }
         }
-        return new URLClassLoader(urls.toArray(new URL[urls.size()]), Thread.currentThread().getContextClassLoader());
+        return new URLClassLoader(urls.toArray(new URL[0]), Thread.currentThread().getContextClassLoader());
     }
 
     private static URL fileToUrl(File file)

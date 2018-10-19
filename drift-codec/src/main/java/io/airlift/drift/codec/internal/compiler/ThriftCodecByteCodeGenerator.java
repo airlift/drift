@@ -1068,7 +1068,7 @@ public class ThriftCodecByteCodeGenerator<T>
 
         public Object[] getValues()
         {
-            return values.toArray(new Object[values.size()]);
+            return values.toArray(new Object[0]);
         }
 
         public Class<?>[] getTypes()

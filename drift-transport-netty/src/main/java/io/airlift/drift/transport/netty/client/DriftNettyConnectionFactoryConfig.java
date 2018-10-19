@@ -22,8 +22,6 @@ import io.airlift.units.MinDuration;
 
 import javax.validation.constraints.Min;
 
-import java.util.concurrent.TimeUnit;
-
 import static java.util.concurrent.TimeUnit.MINUTES;
 
 public class DriftNettyConnectionFactoryConfig
@@ -34,7 +32,7 @@ public class DriftNettyConnectionFactoryConfig
 
     private boolean connectionPoolEnabled;
     private int connectionPoolMaxSize = 1000;
-    private Duration connectionPoolIdleTimeout = new Duration(1, TimeUnit.MINUTES);
+    private Duration connectionPoolIdleTimeout = new Duration(1, MINUTES);
 
     private Duration sslContextRefreshTime = new Duration(1, MINUTES);
     private HostAndPort socksProxy;
@@ -81,6 +79,7 @@ public class DriftNettyConnectionFactoryConfig
     {
         return connectionPoolIdleTimeout;
     }
+
     @Config("thrift.client.connection-pool.idle-timeout")
     public DriftNettyConnectionFactoryConfig setConnectionPoolIdleTimeout(Duration connectionPoolIdleTimeout)
     {
