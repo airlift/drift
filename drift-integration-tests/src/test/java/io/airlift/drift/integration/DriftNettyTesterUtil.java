@@ -83,7 +83,7 @@ final class DriftNettyTesterUtil
 
         try (TestingPooledByteBufAllocator testingAllocator = new TestingPooledByteBufAllocator();
                 DriftNettyMethodInvokerFactory<String> methodInvokerFactory = new DriftNettyMethodInvokerFactory<>(
-                        new DriftNettyConnectionFactoryConfig().setConnectionPoolEnabled(true),
+                        new DriftNettyConnectionFactoryConfig(),
                         clientIdentity -> config,
                         testingAllocator)) {
             DriftClientFactoryManager<String> clientFactoryManager = new DriftClientFactoryManager<>(CODEC_MANAGER, methodInvokerFactory);
@@ -155,7 +155,7 @@ final class DriftNettyTesterUtil
 
         try (TestingPooledByteBufAllocator testingAllocator = new TestingPooledByteBufAllocator();
                 DriftNettyMethodInvokerFactory<String> methodInvokerFactory = new DriftNettyMethodInvokerFactory<>(
-                        new DriftNettyConnectionFactoryConfig().setConnectionPoolEnabled(true),
+                        new DriftNettyConnectionFactoryConfig(),
                         clientIdentity -> config,
                         testingAllocator)) {
             DriftClientFactoryManager<String> proxyFactoryManager = new DriftClientFactoryManager<>(CODEC_MANAGER, methodInvokerFactory);

@@ -34,7 +34,7 @@ public class TestDriftNettyConnectionFactoryConfig
     {
         assertRecordedDefaults(recordDefaults(DriftNettyConnectionFactoryConfig.class)
                 .setThreadCount(Runtime.getRuntime().availableProcessors() * 2)
-                .setConnectionPoolEnabled(false)
+                .setConnectionPoolEnabled(true)
                 .setConnectionPoolMaxSize(1000)
                 .setConnectionPoolIdleTimeout(new Duration(1, MINUTES))
                 .setSslContextRefreshTime(new Duration(1, MINUTES))
@@ -46,7 +46,7 @@ public class TestDriftNettyConnectionFactoryConfig
     {
         Map<String, String> properties = new ImmutableMap.Builder<String, String>()
                 .put("thrift.client.thread-count", "99")
-                .put("thrift.client.connection-pool.enabled", "true")
+                .put("thrift.client.connection-pool.enabled", "false")
                 .put("thrift.client.connection-pool.max-size", "555")
                 .put("thrift.client.connection-pool.idle-timeout", "7m")
                 .put("thrift.client.ssl-context.refresh-time", "33m")
@@ -55,7 +55,7 @@ public class TestDriftNettyConnectionFactoryConfig
 
         DriftNettyConnectionFactoryConfig expected = new DriftNettyConnectionFactoryConfig()
                 .setThreadCount(99)
-                .setConnectionPoolEnabled(true)
+                .setConnectionPoolEnabled(false)
                 .setConnectionPoolMaxSize(555)
                 .setConnectionPoolIdleTimeout(new Duration(7, MINUTES))
                 .setSslContextRefreshTime(new Duration(33, MINUTES))

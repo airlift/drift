@@ -30,7 +30,7 @@ public class DriftNettyConnectionFactoryConfig
 
     private int threadCount = DEFAULT_THREAD_COUNT;
 
-    private boolean connectionPoolEnabled;
+    private boolean connectionPoolEnabled = true;
     private int connectionPoolMaxSize = 1000;
     private Duration connectionPoolIdleTimeout = new Duration(1, MINUTES);
 
