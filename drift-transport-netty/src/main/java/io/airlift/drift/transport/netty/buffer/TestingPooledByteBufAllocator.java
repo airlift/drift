@@ -32,11 +32,11 @@ import static io.netty.util.ResourceLeakDetector.Level.PARANOID;
 
 /**
  * This is a custom {@link ByteBufAllocator} that tracks outstanding allocations and
- * throws from the {@link #close)} method if it detects any leaked buffers.
+ * throws from the {@link #close()} method if it detects any leaked buffers.
  * <p>
  * Never use this class in production, it will cause your server to run out
  * of memory! This is because it holds strong references to all allocated
- * buffers and doesn't release them until {@link #close)} is called at the end of a
+ * buffers and doesn't release them until {@link #close()} is called at the end of a
  * unit test.
  */
 public class TestingPooledByteBufAllocator
