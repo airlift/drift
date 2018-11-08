@@ -18,6 +18,7 @@ package io.airlift.drift.client;
 import io.airlift.drift.protocol.TTransportException;
 import io.airlift.drift.transport.client.ConnectionFailedException;
 import io.airlift.drift.transport.client.DriftClientConfig;
+import io.airlift.drift.transport.client.FrameTooLargeException;
 import io.airlift.drift.transport.client.RequestTimeoutException;
 import io.airlift.units.Duration;
 
@@ -30,6 +31,7 @@ import static io.airlift.drift.client.DriftInvocationHandler.unwrapUserException
 import static io.airlift.drift.client.ExceptionClassification.HostStatus.DOWN;
 import static io.airlift.drift.client.ExceptionClassification.HostStatus.NORMAL;
 import static io.airlift.drift.client.ExceptionClassifier.NORMAL_RESULT;
+import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 import static java.lang.Math.min;
 import static java.util.Objects.requireNonNull;
@@ -108,9 +110,13 @@ public class RetryPolicy
             return new ExceptionClassification(Optional.of(TRUE), NORMAL);
         }
 
+        if (throwable instanceof FrameTooLargeException) {
+            return new ExceptionClassification(Optional.of(FALSE), NORMAL);
+        }
+
         // interrupted exceptions are always an immediate failure
         if (throwable instanceof InterruptedException || throwable instanceof InterruptedIOException) {
-            return new ExceptionClassification(Optional.of(false), NORMAL);
+            return new ExceptionClassification(Optional.of(FALSE), NORMAL);
         }
 
         // allow classifier to return a hard result
