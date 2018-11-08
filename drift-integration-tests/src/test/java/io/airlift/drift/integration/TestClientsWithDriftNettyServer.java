@@ -61,8 +61,8 @@ public class TestClientsWithDriftNettyServer
     @Test
     public void testHandlersWithDriftServer()
     {
-        TestFilter firstFilter = new TestFilter();
-        TestFilter secondFilter = new TestFilter();
+        TestingFilter firstFilter = new TestingFilter();
+        TestingFilter secondFilter = new TestingFilter();
         List<MethodInvocationFilter> filters = ImmutableList.of(firstFilter, secondFilter);
 
         int invocationCount = testDriftServer(filters);
