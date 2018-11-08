@@ -15,6 +15,8 @@
  */
 package io.airlift.drift.integration.guice;
 
+import static java.lang.Math.toIntExact;
+
 public class ThrowingServiceHandler
         implements ThrowingService
 {
@@ -23,5 +25,11 @@ public class ThrowingServiceHandler
             throws ExampleException
     {
         throw new ExampleException(message, retryable);
+    }
+
+    @Override
+    public byte[] generateTooLargeFrame()
+    {
+        return new byte[toIntExact(MAX_FRAME_SIZE.toBytes()) + 1];
     }
 }

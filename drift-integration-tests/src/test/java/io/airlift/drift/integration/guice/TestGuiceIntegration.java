@@ -18,11 +18,13 @@ package io.airlift.drift.integration.guice;
 import com.google.inject.Injector;
 import io.airlift.bootstrap.Bootstrap;
 import io.airlift.bootstrap.LifeCycleManager;
+import io.airlift.drift.TException;
 import io.airlift.drift.client.ExceptionClassification;
 import io.airlift.drift.client.RetriesFailedException;
 import io.airlift.drift.integration.guice.EchoService.EmptyOptionalException;
 import io.airlift.drift.integration.guice.EchoService.NullValueException;
 import io.airlift.drift.integration.scribe.drift.DriftLogEntry;
+import io.airlift.drift.transport.client.FrameTooLargeException;
 import io.airlift.drift.transport.netty.buffer.TestingPooledByteBufAllocator;
 import io.airlift.drift.transport.netty.client.DriftNettyClientModule;
 import io.airlift.drift.transport.netty.server.DriftNettyServerModule;
@@ -99,6 +101,7 @@ public class TestGuiceIntegration
                 .setRequiredConfigurationProperty("throwing.thrift.client.addresses", "localhost:" + port)
                 .setRequiredConfigurationProperty("throwing.thrift.client.min-backoff-delay", "1ms")
                 .setRequiredConfigurationProperty("throwing.thrift.client.backoff-scale-factor", "1.0")
+                .setRequiredConfigurationProperty("throwing.thrift.client.max-frame-size", ThrowingService.MAX_FRAME_SIZE.toString())
                 .doNotInitializeLogging()
                 .initialize();
 
@@ -234,6 +237,20 @@ public class TestGuiceIntegration
             assertThat(t).isInstanceOf(RetriesFailedException.class)
                     .hasMessageContaining("Max retry attempts (5) exceeded")
                     .hasMessageContaining("invocationAttempts: 6,");
+        }
+
+        try {
+            service.generateTooLargeFrame();
+            fail("expected exception");
+        }
+        catch (TException e) {
+            assertThat(e).isInstanceOf(FrameTooLargeException.class)
+                    .hasMessageContaining("Adjusted frame length exceeds");
+            assertEquals(e.getSuppressed().length, 1);
+            Throwable t = e.getSuppressed()[0];
+            assertThat(t).isInstanceOf(RetriesFailedException.class)
+                    .hasMessageContaining("Non-retryable exception")
+                    .hasMessageContaining("invocationAttempts: 1,");
         }
     }
 

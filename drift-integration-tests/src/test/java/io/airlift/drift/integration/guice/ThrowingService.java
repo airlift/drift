@@ -15,13 +15,23 @@
  */
 package io.airlift.drift.integration.guice;
 
+import io.airlift.drift.TException;
 import io.airlift.drift.annotations.ThriftMethod;
 import io.airlift.drift.annotations.ThriftService;
+import io.airlift.units.DataSize;
+
+import static io.airlift.units.DataSize.Unit.KILOBYTE;
 
 @ThriftService("throwing")
 public interface ThrowingService
 {
+    DataSize MAX_FRAME_SIZE = new DataSize(10, KILOBYTE);
+
     @ThriftMethod
     void fail(String message, boolean retryable)
             throws ExampleException;
+
+    @ThriftMethod
+    byte[] generateTooLargeFrame()
+            throws TException;
 }
