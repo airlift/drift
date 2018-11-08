@@ -25,7 +25,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static com.google.common.util.concurrent.MoreExecutors.directExecutor;
 import static org.testng.Assert.assertEquals;
 
-class TestFilter
+class TestingFilter
         implements MethodInvocationFilter
 {
     private final AtomicInteger requestCount = new AtomicInteger();
