@@ -29,6 +29,7 @@ import io.airlift.drift.protocol.TTransportException;
 import io.airlift.drift.transport.MethodMetadata;
 import io.airlift.drift.transport.ParameterMetadata;
 import io.airlift.drift.transport.client.DriftApplicationException;
+import io.airlift.drift.transport.client.FrameTooLargeException;
 import io.airlift.drift.transport.client.RequestTimeoutException;
 import io.airlift.drift.transport.netty.codec.Protocol;
 import io.airlift.drift.transport.netty.codec.ThriftFrame;
@@ -42,6 +43,7 @@ import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPromise;
+import io.netty.handler.codec.TooLongFrameException;
 import io.netty.util.concurrent.EventExecutor;
 import io.netty.util.concurrent.ScheduledFuture;
 
@@ -210,6 +212,9 @@ public class ThriftClientHandler
         TException thriftException;
         if (throwable instanceof TException) {
             thriftException = (TException) throwable;
+        }
+        else if (throwable instanceof TooLongFrameException) {
+            thriftException = new FrameTooLargeException(throwable.getMessage(), throwable);
         }
         else {
             thriftException = new TTransportException(throwable);
