@@ -102,6 +102,7 @@ public class ThriftServerHandler
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause)
     {
+        ctx.close();
         // Don't log connection closed exceptions
         if (!isConnectionClosed(cause)) {
             log.error(cause);
