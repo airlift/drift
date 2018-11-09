@@ -44,6 +44,7 @@ import io.airlift.units.Duration;
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
 
+import java.io.IOException;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.HashMap;
@@ -53,8 +54,10 @@ import java.util.OptionalDouble;
 import java.util.OptionalInt;
 import java.util.OptionalLong;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.regex.Pattern;
 
 import static com.google.common.base.Defaults.defaultValue;
+import static com.google.common.base.Strings.nullToEmpty;
 import static com.google.common.util.concurrent.Futures.immediateFailedFuture;
 import static com.google.common.util.concurrent.Futures.immediateFuture;
 import static com.google.common.util.concurrent.MoreExecutors.directExecutor;
@@ -65,11 +68,15 @@ import static io.airlift.drift.protocol.TMessageType.EXCEPTION;
 import static io.airlift.drift.protocol.TMessageType.REPLY;
 import static java.util.Objects.requireNonNull;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static java.util.regex.Pattern.CASE_INSENSITIVE;
 
 public class ThriftServerHandler
         extends ChannelDuplexHandler
 {
     private static final Logger log = Logger.get(ThriftServerHandler.class);
+
+    private static final Pattern CONNECTION_CLOSED_MESSAGE = Pattern.compile(
+            "^.*(?:connection.*(?:reset|closed|abort|broken)|broken.*pipe).*$", CASE_INSENSITIVE);
 
     private final ServerMethodInvoker methodInvoker;
     private final ScheduledExecutorService timeoutExecutor;
@@ -90,6 +97,15 @@ public class ThriftServerHandler
             return;
         }
         context.fireChannelRead(message);
+    }
+
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause)
+    {
+        // Don't log connection closed exceptions
+        if (!isConnectionClosed(cause)) {
+            log.error(cause);
+        }
     }
 
     private void messageReceived(ChannelHandlerContext context, ThriftFrame frame)
@@ -397,5 +413,22 @@ public class ThriftServerHandler
         writer.writeStructEnd();
 
         protocolWriter.writeMessageEnd();
+    }
+
+    /*
+     * There is no good way of detecting connection closed exception
+     *
+     * This implementation is a simplified version of the implementation proposed
+     * in Netty: io.netty.handler.ssl.SslHandler#exceptionCaught
+     *
+     * This implementation ony checks a message with the regex, and doesn't do any
+     * more sophisticated matching, as the regex works in most of the cases.
+     */
+    private boolean isConnectionClosed(Throwable t)
+    {
+        if (t instanceof IOException) {
+            return CONNECTION_CLOSED_MESSAGE.matcher(nullToEmpty(t.getMessage())).matches();
+        }
+        return false;
     }
 }
