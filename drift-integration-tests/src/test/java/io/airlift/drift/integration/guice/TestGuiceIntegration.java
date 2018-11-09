@@ -212,6 +212,21 @@ public class TestGuiceIntegration
     private static void assertThrowingService(ThrowingService service)
     {
         try {
+            // make sure requests work after the server sends a frame that is too large
+            service.generateTooLargeFrame();
+            fail("expected exception");
+        }
+        catch (TException e) {
+            assertThat(e).isInstanceOf(FrameTooLargeException.class)
+                    .hasMessageContaining("Adjusted frame length exceeds");
+            assertEquals(e.getSuppressed().length, 1);
+            Throwable t = e.getSuppressed()[0];
+            assertThat(t).isInstanceOf(RetriesFailedException.class)
+                    .hasMessageContaining("Non-retryable exception")
+                    .hasMessageContaining("invocationAttempts: 1,");
+        }
+
+        try {
             service.fail("no-retry", false);
             fail("expected exception");
         }
@@ -237,20 +252,6 @@ public class TestGuiceIntegration
             assertThat(t).isInstanceOf(RetriesFailedException.class)
                     .hasMessageContaining("Max retry attempts (5) exceeded")
                     .hasMessageContaining("invocationAttempts: 6,");
-        }
-
-        try {
-            service.generateTooLargeFrame();
-            fail("expected exception");
-        }
-        catch (TException e) {
-            assertThat(e).isInstanceOf(FrameTooLargeException.class)
-                    .hasMessageContaining("Adjusted frame length exceeds");
-            assertEquals(e.getSuppressed().length, 1);
-            Throwable t = e.getSuppressed()[0];
-            assertThat(t).isInstanceOf(RetriesFailedException.class)
-                    .hasMessageContaining("Non-retryable exception")
-                    .hasMessageContaining("invocationAttempts: 1,");
         }
     }
 

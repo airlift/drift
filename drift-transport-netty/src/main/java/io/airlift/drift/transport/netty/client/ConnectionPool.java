@@ -69,26 +69,34 @@ class ConnectionPool
     {
         ConnectionKey key = new ConnectionKey(connectionParameters, address);
 
-        Future<Channel> future;
-        synchronized (this) {
-            if (closed) {
-                return group.next().newFailedFuture(new TTransportException("Connection pool is closed"));
-            }
+        while (true) {
+            synchronized (this) {
+                if (closed) {
+                    return group.next().newFailedFuture(new TTransportException("Connection pool is closed"));
+                }
 
-            try {
-                future = cachedConnections.get(key, () -> createConnection(key));
-            }
-            catch (ExecutionException e) {
-                throw new RuntimeException(e);
+                Future<Channel> future;
+                try {
+                    future = cachedConnections.get(key, () -> createConnection(key));
+                }
+                catch (ExecutionException e) {
+                    throw new RuntimeException(e);
+                }
+
+                // connection is still opening
+                if (!future.isDone()) {
+                    return future;
+                }
+
+                // check if connection is failed or closed
+                if (future.getNow().isOpen()) {
+                    return future;
+                }
+
+                // remove dead connection from cache
+                cachedConnections.asMap().remove(key, future);
             }
         }
-
-        // check if connection is failed
-        if (isFailed(future)) {
-            // remove failed connection
-            cachedConnections.asMap().remove(key, future);
-        }
-        return future;
     }
 
     private Future<Channel> createConnection(ConnectionKey key)
@@ -134,20 +142,6 @@ class ConnectionPool
                 channel.close();
             }
         });
-    }
-
-    private static boolean isFailed(Future<?> future)
-    {
-        if (!future.isDone()) {
-            return false;
-        }
-        try {
-            future.get();
-            return false;
-        }
-        catch (Exception e) {
-            return true;
-        }
     }
 
     private static class ConnectionKey
