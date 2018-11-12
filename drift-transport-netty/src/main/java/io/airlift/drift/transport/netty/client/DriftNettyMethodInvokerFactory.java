@@ -17,7 +17,6 @@ package io.airlift.drift.transport.netty.client;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.net.HostAndPort;
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import io.airlift.drift.transport.client.MethodInvoker;
 import io.airlift.drift.transport.client.MethodInvokerFactory;
 import io.airlift.drift.transport.netty.client.ConnectionManager.ConnectionParameters;
@@ -33,6 +32,7 @@ import java.io.Closeable;
 import java.util.Optional;
 import java.util.function.Function;
 
+import static io.airlift.concurrent.Threads.daemonThreadsNamed;
 import static io.airlift.drift.transport.netty.codec.Protocol.COMPACT;
 import static io.airlift.drift.transport.netty.codec.Transport.HEADER;
 import static io.airlift.drift.transport.netty.ssl.SslContextFactory.createSslContextFactory;
@@ -75,10 +75,7 @@ public class DriftNettyMethodInvokerFactory<I>
     {
         requireNonNull(factoryConfig, "factoryConfig is null");
 
-        group = new NioEventLoopGroup(factoryConfig.getThreadCount(), new ThreadFactoryBuilder()
-                .setNameFormat("drift-client-%s")
-                .setDaemon(true)
-                .build());
+        group = new NioEventLoopGroup(factoryConfig.getThreadCount(), daemonThreadsNamed("drift-client-%s"));
 
         this.clientConfigurationProvider = requireNonNull(clientConfigurationProvider, "clientConfigurationProvider is null");
         this.sslContextFactory = createSslContextFactory(true, factoryConfig.getSslContextRefreshTime(), group);
