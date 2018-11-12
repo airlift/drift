@@ -18,7 +18,6 @@ package io.airlift.drift.transport.netty.client;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.net.HostAndPort;
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import io.airlift.drift.protocol.TTransportException;
 import io.airlift.units.Duration;
 import io.netty.channel.Channel;
@@ -32,6 +31,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import static io.airlift.concurrent.Threads.daemonThreadsNamed;
 import static java.util.Objects.requireNonNull;
 import static java.util.concurrent.Executors.newSingleThreadScheduledExecutor;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
@@ -43,7 +43,9 @@ class ConnectionPool
     private final EventLoopGroup group;
 
     private final Cache<ConnectionKey, Future<Channel>> cachedConnections;
-    private final ScheduledExecutorService maintenanceThread;
+
+    private final ScheduledExecutorService maintenanceThread =
+            newSingleThreadScheduledExecutor(daemonThreadsNamed("drift-connection-maintenance"));
 
     @GuardedBy("this")
     private boolean closed;
@@ -58,11 +60,6 @@ class ConnectionPool
                 .expireAfterAccess(idleTimeout.toMillis(), MILLISECONDS)
                 .<ConnectionKey, Future<Channel>>removalListener(notification -> closeConnection(notification.getValue()))
                 .build();
-
-        maintenanceThread = newSingleThreadScheduledExecutor(new ThreadFactoryBuilder()
-                .setNameFormat("drift-connection-maintenance-%s")
-                .setDaemon(true)
-                .build());
 
         maintenanceThread.scheduleWithFixedDelay(cachedConnections::cleanUp, 1, 1, TimeUnit.SECONDS);
     }
