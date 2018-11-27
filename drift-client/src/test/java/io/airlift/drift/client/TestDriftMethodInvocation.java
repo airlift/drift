@@ -25,6 +25,7 @@ import com.google.common.util.concurrent.ListenableFuture;
 import io.airlift.drift.TException;
 import io.airlift.drift.client.ExceptionClassification.HostStatus;
 import io.airlift.drift.client.address.AddressSelector;
+import io.airlift.drift.client.address.SimpleAddressSelector.SimpleAddress;
 import io.airlift.drift.codec.ThriftCodec;
 import io.airlift.drift.codec.internal.builtin.ShortThriftCodec;
 import io.airlift.drift.protocol.TTransportException;
@@ -39,7 +40,7 @@ import org.testng.annotations.Test;
 
 import javax.annotation.concurrent.GuardedBy;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -368,6 +369,57 @@ public class TestDriftMethodInvocation
             ClassifiedException classifiedException = (ClassifiedException) applicationException.getCause();
             assertRetriesFailedInformation(classifiedException, failedConnections, expectedInvocationAttempts, 0);
         }
+    }
+
+    @Test
+    public void testConnectionFailedDelay()
+            throws Exception
+    {
+        testConnectionFailedDelay(0, 0, 0);
+        testConnectionFailedDelay(1, 1, 0);
+        testConnectionFailedDelay(10, 1, 0);
+        testConnectionFailedDelay(1, 2, 1);
+        testConnectionFailedDelay(2, 2, 2);
+        testConnectionFailedDelay(10, 2, 10);
+        testConnectionFailedDelay(10, 5, 40);
+    }
+
+    private static void testConnectionFailedDelay(int numberOfAddresses, int numberOfRetriesPerAddress, int expectedDelays)
+            throws Exception
+    {
+        testConnectionFailedDelay(false, numberOfAddresses, numberOfRetriesPerAddress, expectedDelays);
+        testConnectionFailedDelay(true, numberOfAddresses, numberOfRetriesPerAddress, expectedDelays);
+    }
+
+    private static void testConnectionFailedDelay(boolean overloaded, int numberOfAddresses, int numberOfRetriesPerAddress, int expectedDelays)
+            throws Exception
+    {
+        ImmutableList.Builder<Address> addresses = ImmutableList.builder();
+        for (int i = 0; i < numberOfAddresses; i++) {
+            Address address = createTestingAddress(20_000 + i);
+            for (int j = 0; j < numberOfRetriesPerAddress; j++) {
+                addresses.add(address);
+            }
+        }
+
+        MockMethodInvoker invoker = new MockMethodInvoker(request -> immediateFailedFuture(createClassifiedException(true, overloaded ? OVERLOADED : DOWN)));
+        DriftMethodInvocation<?> methodInvocation = createDriftMethodInvocation(
+                new RetryPolicy(new DriftClientConfig(), new TestingExceptionClassifier()),
+                new TestingMethodInvocationStat(),
+                invoker,
+                new TestingAddressSelector(addresses.build()),
+                systemTicker());
+
+        try {
+            methodInvocation.get();
+            fail("Expected exception");
+        }
+        catch (ExecutionException e) {
+            assertTrue(e.getCause() instanceof TTransportException);
+            TTransportException transportException = (TTransportException) e.getCause();
+            assertTrue(transportException.getMessage().startsWith("No hosts available"));
+        }
+        assertEquals(invoker.getDelays().size(), expectedDelays);
     }
 
     @Test(timeOut = 60000)
@@ -711,6 +763,11 @@ public class TestDriftMethodInvocation
                 .collect(toImmutableList()));
     }
 
+    private static Address createTestingAddress(int port)
+    {
+        return new SimpleAddress(HostAndPort.fromParts("localhost", port));
+    }
+
     private static class TestingExceptionClassifier
             implements ExceptionClassifier
     {
@@ -758,10 +815,10 @@ public class TestDriftMethodInvocation
     public static class TestingAddressSelector
             implements AddressSelector<Address>
     {
-        private final int maxAddresses;
+        private List<Address> addresses;
 
         @GuardedBy("this")
-        private final List<HostAndPort> markdownHosts = new ArrayList<>();
+        private final Set<Address> markdownHosts = new HashSet<>();
 
         @GuardedBy("this")
         private int addressCount;
@@ -771,7 +828,19 @@ public class TestDriftMethodInvocation
 
         public TestingAddressSelector(int maxAddresses)
         {
-            this.maxAddresses = maxAddresses;
+            this(createAddresses(maxAddresses));
+        }
+
+        private static List<Address> createAddresses(int count)
+        {
+            return IntStream.range(0, count)
+                    .mapToObj(i -> createTestingAddress(20_000 + i))
+                    .collect(toImmutableList());
+        }
+
+        public TestingAddressSelector(List<Address> addresses)
+        {
+            this.addresses = ImmutableList.copyOf(requireNonNull(addresses, "addresses is null"));
         }
 
         @Override
@@ -784,24 +853,21 @@ public class TestDriftMethodInvocation
         public synchronized Optional<Address> selectAddress(Optional<String> addressSelectionContext, Set<Address> attempted)
         {
             lastAttemptedSet = ImmutableSet.copyOf(attempted);
-            if (addressCount >= maxAddresses) {
+            if (addressCount >= addresses.size()) {
                 return Optional.empty();
             }
-            HostAndPort hostAndPort = HostAndPort.fromParts("localhost", 20_000 + addressCount++);
-            return Optional.of(() -> hostAndPort);
+            return Optional.of(addresses.get(addressCount++));
         }
 
         @Override
         public synchronized void markdown(Address address)
         {
-            markdownHosts.add(address.getHostAndPort());
+            markdownHosts.add(address);
         }
 
         public synchronized void assertAllDown()
         {
-            assertEquals(markdownHosts, IntStream.range(0, addressCount)
-                    .mapToObj(i -> HostAndPort.fromParts("localhost", 20_000 + i))
-                    .collect(toImmutableList()));
+            assertEquals(markdownHosts, ImmutableSet.copyOf(addresses));
         }
 
         public synchronized Set<Address> getLastAttemptedSet()
