@@ -16,6 +16,8 @@
 package io.airlift.drift.client;
 
 import com.google.common.base.Ticker;
+import com.google.common.collect.HashMultiset;
+import com.google.common.collect.Multiset;
 import com.google.common.util.concurrent.AbstractFuture;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
@@ -71,6 +73,8 @@ class DriftMethodInvocation<A extends Address>
     @GuardedBy("this")
     private final Set<A> attemptedAddresses = new LinkedHashSet<>();
     @GuardedBy("this")
+    private final Multiset<A> failedConnectionAttempts = HashMultiset.create();
+    @GuardedBy("this")
     private int failedConnections;
     @GuardedBy("this")
     private int overloadedRejects;
@@ -104,7 +108,7 @@ class DriftMethodInvocation<A extends Address>
                 stat,
                 ticker);
         // invocation can not be started from constructor, because it may start threads that can call back into the unpublished object
-        invocation.nextAttempt();
+        invocation.nextAttempt(true);
         return invocation;
     }
 
@@ -138,7 +142,7 @@ class DriftMethodInvocation<A extends Address>
         }, directExecutor());
     }
 
-    private synchronized void nextAttempt()
+    private synchronized void nextAttempt(boolean noConnectDelay)
     {
         try {
             // request was already canceled
@@ -156,8 +160,32 @@ class DriftMethodInvocation<A extends Address>
                 stat.recordRetry();
             }
 
+            if (noConnectDelay) {
+                invoke(address.get());
+                return;
+            }
+
+            int connectionFailuresCount = failedConnectionAttempts.count(address.get());
+            if (connectionFailuresCount == 0) {
+                invoke(address.get());
+                return;
+            }
+
+            Duration connectDelay = retryPolicy.getBackoffDelay(connectionFailuresCount);
+            log.debug("Failed connection to %s with attempt %s, will retry in %s", address.get(), connectionFailuresCount, connectDelay);
+            schedule(connectDelay, () -> invoke(address.get()));
+        }
+        catch (Throwable t) {
+            // this should never happen, but ensure that invocation always finishes
+            unexpectedError(t);
+        }
+    }
+
+    private synchronized void invoke(A address)
+    {
+        try {
             long invocationStartTime = ticker.read();
-            ListenableFuture<Object> result = invoker.invoke(new InvokeRequest(metadata, address.get(), headers, parameters));
+            ListenableFuture<Object> result = invoker.invoke(new InvokeRequest(metadata, address, headers, parameters));
             stat.recordResult(invocationStartTime, result);
             currentTask = result;
 
@@ -166,13 +194,14 @@ class DriftMethodInvocation<A extends Address>
                         @Override
                         public void onSuccess(Object result)
                         {
+                            resetConnectionFailures(address);
                             set(result);
                         }
 
                         @Override
                         public void onFailure(Throwable t)
                         {
-                            handleFailure(address.get(), t);
+                            handleFailure(address, t);
                         }
                     },
                     directExecutor());
@@ -181,6 +210,11 @@ class DriftMethodInvocation<A extends Address>
             // this should never happen, but ensure that invocation always finishes
             unexpectedError(t);
         }
+    }
+
+    private synchronized void resetConnectionFailures(A address)
+    {
+        failedConnectionAttempts.setCount(address, 0);
     }
 
     private synchronized void handleFailure(A address, Throwable throwable)
@@ -199,12 +233,12 @@ class DriftMethodInvocation<A extends Address>
                 lastException = throwable;
                 invocationAttempts++;
             }
-            else if (exceptionClassification.getHostStatus() == DOWN) {
+            else if (exceptionClassification.getHostStatus() == DOWN || exceptionClassification.getHostStatus() == OVERLOADED) {
                 addressSelector.markdown(address);
-            }
-            else if (exceptionClassification.getHostStatus() == OVERLOADED) {
-                addressSelector.markdown(address);
-                overloadedRejects++;
+                failedConnectionAttempts.add(address);
+                if (exceptionClassification.getHostStatus() == OVERLOADED) {
+                    overloadedRejects++;
+                }
             }
 
             // should retry?
@@ -224,9 +258,11 @@ class DriftMethodInvocation<A extends Address>
                 return;
             }
 
-            // A request to down or overloaded server is not counted as an attempt, and retries are not delayed
+            // A request to down or overloaded server is not counted as an attempt
+            // Retries are not delayed based on the invocationAttempts, but may be delayed
+            // based on the failed connection attempts for a selected address
             if (exceptionClassification.getHostStatus() != NORMAL) {
-                nextAttempt();
+                nextAttempt(false);
                 return;
             }
 
@@ -238,22 +274,32 @@ class DriftMethodInvocation<A extends Address>
                     backoffDelay,
                     overloadedRejects,
                     throwable.getMessage());
+            schedule(backoffDelay, () -> nextAttempt(true));
+        }
+        catch (Throwable t) {
+            // this should never happen, but ensure that invocation always finishes
+            unexpectedError(t);
+        }
+    }
 
-            ListenableFuture<?> delay = invoker.delay(backoffDelay);
+    private synchronized void schedule(Duration timeout, Runnable task)
+    {
+        try {
+            ListenableFuture<?> delay = invoker.delay(timeout);
             currentTask = delay;
             Futures.addCallback(delay, new FutureCallback<Object>()
                     {
                         @Override
                         public void onSuccess(Object result)
                         {
-                            nextAttempt();
+                            task.run();
                         }
 
                         @Override
-                        public void onFailure(Throwable throwable)
+                        public void onFailure(Throwable t)
                         {
                             // this should never happen in a delay future
-                            unexpectedError(throwable);
+                            unexpectedError(t);
                         }
                     },
                     directExecutor());
