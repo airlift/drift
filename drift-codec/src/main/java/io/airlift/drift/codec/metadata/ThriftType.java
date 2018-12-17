@@ -210,7 +210,7 @@ public class ThriftType
         requireNonNull(structMetadata, "structMetadata is null");
 
         this.protocolType = ThriftProtocolType.STRUCT;
-        this.javaType = structMetadata.getStructClass();
+        this.javaType = structMetadata.getStructType();
         keyTypeReference = null;
         valueTypeReference = null;
         this.structMetadata = structMetadata;

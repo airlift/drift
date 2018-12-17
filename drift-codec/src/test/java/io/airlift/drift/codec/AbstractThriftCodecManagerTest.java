@@ -57,6 +57,8 @@ import org.testng.annotations.Test;
 import java.lang.reflect.Type;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.OptionalDouble;
 import java.util.OptionalInt;
@@ -467,6 +469,21 @@ public abstract class AbstractThriftCodecManagerTest
         bean.setGenericProperty("genericValue");
 
         testRoundTripSerialize(new TypeToken<GenericThriftStructBean<String>>() {}, bean);
+
+        GenericThriftStructBean<Long> beanForLong = new GenericThriftStructBean<>();
+        beanForLong.setGenericProperty(123L);
+
+        testRoundTripSerialize(new TypeToken<GenericThriftStructBean<Long>>() {}, beanForLong);
+
+        GenericThriftStructBean<List<String>> beanForList = new GenericThriftStructBean<>();
+        beanForList.setGenericProperty(ImmutableList.of("abc", "xyz"));
+
+        testRoundTripSerialize(new TypeToken<GenericThriftStructBean<List<String>>>() {}, beanForList);
+
+        GenericThriftStructBean<Map<String, List<String>>> beanForMap = new GenericThriftStructBean<>();
+        beanForMap.setGenericProperty(ImmutableMap.of("test", ImmutableList.of("abc", "xyz")));
+
+        testRoundTripSerialize(new TypeToken<GenericThriftStructBean<Map<String, List<String>>>>() {}, beanForMap);
     }
 
     @Test
