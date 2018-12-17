@@ -63,6 +63,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -84,6 +85,7 @@ import static io.airlift.bytecode.Access.a;
 import static io.airlift.bytecode.BytecodeUtils.dumpBytecodeTree;
 import static io.airlift.bytecode.ClassGenerator.classGenerator;
 import static io.airlift.bytecode.Parameter.arg;
+import static io.airlift.bytecode.ParameterizedType.getPathName;
 import static io.airlift.bytecode.ParameterizedType.type;
 import static io.airlift.bytecode.ParameterizedType.typeFromPathName;
 import static io.airlift.bytecode.control.SwitchStatement.switchBuilder;
@@ -111,6 +113,7 @@ import static io.airlift.drift.codec.ThriftProtocolType.STRUCT;
 import static io.airlift.drift.codec.metadata.FieldKind.THRIFT_FIELD;
 import static io.airlift.drift.codec.metadata.FieldKind.THRIFT_UNION_ID;
 import static java.lang.String.format;
+import static java.util.stream.Collectors.joining;
 
 @NotThreadSafe
 public class ThriftCodecByteCodeGenerator<T>
@@ -1038,8 +1041,16 @@ public class ThriftCodecByteCodeGenerator<T>
 
     private static ParameterizedType toCodecType(ThriftStructMetadata metadata)
     {
-        String className = type(metadata.getStructClass()).getClassName();
-        return typeFromPathName(PACKAGE + "/" + className + "Codec");
+        String className = getPathName(metadata.getStructClass()) + "Codec";
+
+        Type type = metadata.getStructType();
+        if (type instanceof java.lang.reflect.ParameterizedType) {
+            className += Arrays.stream(((java.lang.reflect.ParameterizedType) type).getActualTypeArguments())
+                    .map(arg -> arg.getTypeName().replaceAll("[^a-zA-Z0-9]+", "_"))
+                    .collect(joining("$", "$$", ""));
+        }
+
+        return typeFromPathName(PACKAGE + "/" + className);
     }
 
     private static boolean isOptionalWrapper(Type javaType)
