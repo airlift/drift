@@ -15,6 +15,7 @@
  */
 package io.airlift.drift.integration.guice;
 
+import com.google.common.util.concurrent.ListenableFuture;
 import io.airlift.drift.TException;
 import io.airlift.drift.annotations.ThriftMethod;
 import io.airlift.drift.annotations.ThriftService;
@@ -34,4 +35,14 @@ public interface ThrowingService
     @ThriftMethod
     byte[] generateTooLargeFrame()
             throws TException;
+
+    @ThriftMethod
+    String acceptBytes(byte[] bytes)
+            throws TException;
+
+    @ThriftMethod
+    ListenableFuture<String> await();
+
+    @ThriftMethod
+    String release();
 }

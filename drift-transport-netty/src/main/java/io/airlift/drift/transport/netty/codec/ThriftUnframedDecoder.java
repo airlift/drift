@@ -15,6 +15,7 @@
  */
 package io.airlift.drift.transport.netty.codec;
 
+import io.airlift.drift.protocol.TMessage;
 import io.airlift.drift.protocol.TProtocolReader;
 import io.airlift.drift.protocol.TProtocolUtil;
 import io.airlift.drift.protocol.TType;
@@ -23,10 +24,11 @@ import io.airlift.units.DataSize;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
-import io.netty.handler.codec.TooLongFrameException;
 
 import java.util.List;
+import java.util.Optional;
 
+import static io.airlift.drift.transport.netty.codec.Transport.UNFRAMED;
 import static java.lang.Math.toIntExact;
 import static java.util.Objects.requireNonNull;
 
@@ -35,11 +37,13 @@ class ThriftUnframedDecoder
 {
     private final Protocol protocol;
     private final int maxFrameSize;
+    private final boolean assumeClientsSupportOutOfOrderResponses;
 
-    public ThriftUnframedDecoder(Protocol protocol, DataSize maxFrameSize)
+    public ThriftUnframedDecoder(Protocol protocol, DataSize maxFrameSize, boolean assumeClientsSupportOutOfOrderResponses)
     {
         this.protocol = requireNonNull(protocol, "protocol is null");
         this.maxFrameSize = toIntExact(requireNonNull(maxFrameSize, "maxFrameSize is null").toBytes());
+        this.assumeClientsSupportOutOfOrderResponses = assumeClientsSupportOutOfOrderResponses;
     }
 
     // This method is an exception to the normal reference counted rules and buffer should not be released
@@ -51,13 +55,17 @@ class ThriftUnframedDecoder
         try {
             TProtocolReader protocolReader = protocol.createProtocol(transport);
 
-            protocolReader.readMessageBegin();
+            TMessage message = protocolReader.readMessageBegin();
             TProtocolUtil.skip(protocolReader, TType.STRUCT);
             protocolReader.readMessageEnd();
 
             int frameLength = buffer.readerIndex() - frameOffset;
             if (frameLength > maxFrameSize) {
-                ctx.fireExceptionCaught(new TooLongFrameException("Response message exceeds max size " + maxFrameSize + ": " + frameLength + " - discarded"));
+                FrameInfo frameInfo = new FrameInfo(message.getName(), message.getType(), message.getSequenceId(), UNFRAMED, protocol, assumeClientsSupportOutOfOrderResponses);
+                ctx.fireExceptionCaught(new FrameTooLargeException(
+                        Optional.of(frameInfo),
+                        frameLength,
+                        maxFrameSize));
             }
 
             out.add(buffer.slice(frameOffset, frameLength).retain());

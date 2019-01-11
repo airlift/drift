@@ -17,7 +17,6 @@ package io.airlift.drift.transport.netty.codec;
 
 import io.airlift.units.DataSize;
 import io.netty.channel.ChannelPipeline;
-import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 import io.netty.handler.codec.LengthFieldPrepender;
 
 import java.util.Optional;
@@ -31,7 +30,7 @@ public enum Transport
         public void addFrameHandlers(ChannelPipeline pipeline, Optional<Protocol> protocol, DataSize maxFrameSize, boolean assumeClientsSupportOutOfOrderResponses)
         {
             Protocol protocolType = protocol.orElseThrow(() -> new IllegalArgumentException("UNFRAMED transport requires a protocol"));
-            pipeline.addLast("thriftUnframedDecoder", new ThriftUnframedDecoder(protocolType, maxFrameSize));
+            pipeline.addLast("thriftUnframedDecoder", new ThriftUnframedDecoder(protocolType, maxFrameSize, assumeClientsSupportOutOfOrderResponses));
             pipeline.addLast(new SimpleFrameCodec(this, protocolType, assumeClientsSupportOutOfOrderResponses));
         }
     },
@@ -41,7 +40,8 @@ public enum Transport
         {
             Protocol protocolType = protocol.orElseThrow(() -> new IllegalArgumentException("FRAMED transport requires a protocol"));
             pipeline.addLast("frameEncoder", new LengthFieldPrepender(Integer.BYTES));
-            pipeline.addLast("frameDecoder", new LengthFieldBasedFrameDecoder(toIntExact(maxFrameSize.toBytes()), 0, Integer.BYTES, 0, Integer.BYTES));
+            FrameInfoDecoder frameInfoDecoder = new SimpleFrameInfoDecoder(FRAMED, protocolType, assumeClientsSupportOutOfOrderResponses);
+            pipeline.addLast("thriftFramedDecoder", new ThriftFramedDecoder(frameInfoDecoder, toIntExact(maxFrameSize.toBytes())));
             pipeline.addLast(new SimpleFrameCodec(this, protocolType, assumeClientsSupportOutOfOrderResponses));
         }
     },
@@ -50,7 +50,7 @@ public enum Transport
         public void addFrameHandlers(ChannelPipeline pipeline, Optional<Protocol> protocol, DataSize maxFrameSize, boolean assumeClientsSupportOutOfOrderResponses)
         {
             pipeline.addLast("frameEncoder", new LengthFieldPrepender(Integer.BYTES));
-            pipeline.addLast("frameDecoder", new LengthFieldBasedFrameDecoder(toIntExact(maxFrameSize.toBytes()), 0, Integer.BYTES, 0, Integer.BYTES));
+            pipeline.addLast("thriftFramedDecoder", new ThriftFramedDecoder(HeaderTransport::tryDecodeFrameInfo, toIntExact(maxFrameSize.toBytes())));
             pipeline.addLast(new HeaderCodec());
         }
     };

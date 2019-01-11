@@ -21,7 +21,9 @@ import io.netty.buffer.Unpooled;
 
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Verify.verify;
 import static io.airlift.drift.transport.netty.codec.Transport.HEADER;
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -37,6 +39,7 @@ public final class HeaderTransport
 
     private static final int FLAGS_NONE = 0;
     private static final int FLAG_SUPPORT_OUT_OF_ORDER = 1;
+    private static final int FLAG_SUPPORT_OUT_OF_ORDER_MASK = 1;
 
     private static final int NORMAL_HEADERS = 1;
     private static final int PERSISTENT_HEADERS = 1;
@@ -239,5 +242,44 @@ public final class HeaderTransport
         }
 
         return result;
+    }
+
+    public static Optional<FrameInfo> tryDecodeFrameInfo(ByteBuf input)
+    {
+        ByteBuf buffer = input.retainedDuplicate();
+        try {
+            if (buffer.readableBytes() < FRAME_HEADER_SIZE) {
+                return Optional.empty();
+            }
+            // skip magic
+            buffer.readShort();
+            short flags = buffer.readShort();
+            boolean outOfOrderResponse = (flags & FLAG_SUPPORT_OUT_OF_ORDER_MASK) == 1;
+            int headerSequenceId = buffer.readInt();
+            int headerSize = buffer.readShort() << 2;
+
+            if (buffer.readableBytes() < headerSize) {
+                return Optional.empty();
+            }
+
+            byte protocolId = buffer.getByte(buffer.readerIndex());
+            Protocol protocol = Protocol.getProtocolByHeaderTransportId(protocolId);
+
+            buffer.skipBytes(headerSize);
+            SimpleFrameInfoDecoder simpleFrameInfoDecoder = new SimpleFrameInfoDecoder(HEADER, protocol, outOfOrderResponse);
+            Optional<FrameInfo> frameInfo = simpleFrameInfoDecoder.tryDecodeFrameInfo(buffer);
+            if (frameInfo.isPresent()) {
+                int messageSequenceId = frameInfo.get().getSequenceId();
+                checkArgument(
+                        headerSequenceId == messageSequenceId,
+                        "Sequence ids don't match. headerSequenceId: %s. messageSequenceId: %s",
+                        headerSequenceId,
+                        messageSequenceId);
+            }
+            return frameInfo;
+        }
+        finally {
+            buffer.release();
+        }
     }
 }
