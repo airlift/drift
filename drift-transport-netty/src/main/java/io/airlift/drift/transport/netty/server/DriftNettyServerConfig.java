@@ -56,7 +56,7 @@ public class DriftNettyServerConfig
     private long sessionCacheSize = 10_000;
     private Duration sessionTimeout = new Duration(1, DAYS);
 
-    private boolean assumeClientsSupportOutOfOrderResponses;
+    private boolean assumeClientsSupportOutOfOrderResponses = true;
 
     @Min(0)
     @Max(65535)
