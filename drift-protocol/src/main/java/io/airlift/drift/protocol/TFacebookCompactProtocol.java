@@ -70,7 +70,7 @@ public class TFacebookCompactProtocol
     private static final byte VERSION = 2;
     private static final byte VERSION_MASK = 0x1f; // 0001 1111
     private static final byte TYPE_MASK = (byte) 0xE0; // 1110 0000
-    private static final byte TYPE_BITS = 0x03; // 0000 0011
+    private static final byte TYPE_BITS = 0b0000_0111;
     private static final int TYPE_SHIFT_AMOUNT = 5;
 
     /**
