@@ -32,6 +32,8 @@ import io.airlift.drift.protocol.TProtocolWriter;
 import io.airlift.drift.protocol.TTransport;
 import io.airlift.drift.transport.MethodMetadata;
 import io.airlift.drift.transport.ParameterMetadata;
+import io.airlift.drift.transport.netty.codec.FrameInfo;
+import io.airlift.drift.transport.netty.codec.FrameTooLargeException;
 import io.airlift.drift.transport.netty.codec.Protocol;
 import io.airlift.drift.transport.netty.codec.ThriftFrame;
 import io.airlift.drift.transport.netty.codec.Transport;
@@ -63,6 +65,7 @@ import static com.google.common.util.concurrent.Futures.immediateFuture;
 import static com.google.common.util.concurrent.MoreExecutors.directExecutor;
 import static io.airlift.drift.TApplicationException.Type.INTERNAL_ERROR;
 import static io.airlift.drift.TApplicationException.Type.INVALID_MESSAGE_TYPE;
+import static io.airlift.drift.TApplicationException.Type.PROTOCOL_ERROR;
 import static io.airlift.drift.TApplicationException.Type.UNKNOWN_METHOD;
 import static io.airlift.drift.protocol.TMessageType.EXCEPTION;
 import static io.airlift.drift.protocol.TMessageType.REPLY;
@@ -100,9 +103,36 @@ public class ThriftServerHandler
     }
 
     @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause)
+    public void exceptionCaught(ChannelHandlerContext context, Throwable cause)
     {
-        ctx.close();
+        // if possible, try to reply with an exception in case of a too large request
+        if (cause instanceof FrameTooLargeException) {
+            FrameTooLargeException e = (FrameTooLargeException) cause;
+            // frame info may be missing in case of a large, but invalid request
+            if (e.getFrameInfo().isPresent()) {
+                FrameInfo frameInfo = e.getFrameInfo().get();
+                try {
+                    context.writeAndFlush(writeApplicationException(
+                            context,
+                            frameInfo.getMethodName(),
+                            frameInfo.getTransport(),
+                            frameInfo.getProtocol(),
+                            frameInfo.getSequenceId(),
+                            frameInfo.isSupportOutOfOrderResponse(),
+                            PROTOCOL_ERROR,
+                            e.getMessage(),
+                            e));
+                }
+                catch (Throwable t) {
+                    context.close();
+                    log.error(t, "Failed to write frame info");
+                }
+                return;
+            }
+        }
+
+        context.close();
+
         // Don't log connection closed exceptions
         if (!isConnectionClosed(cause)) {
             log.error(cause);

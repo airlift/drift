@@ -29,8 +29,10 @@ import io.airlift.drift.protocol.TTransportException;
 import io.airlift.drift.transport.MethodMetadata;
 import io.airlift.drift.transport.ParameterMetadata;
 import io.airlift.drift.transport.client.DriftApplicationException;
-import io.airlift.drift.transport.client.FrameTooLargeException;
+import io.airlift.drift.transport.client.MessageTooLargeException;
 import io.airlift.drift.transport.client.RequestTimeoutException;
+import io.airlift.drift.transport.netty.codec.FrameInfo;
+import io.airlift.drift.transport.netty.codec.FrameTooLargeException;
 import io.airlift.drift.transport.netty.codec.Protocol;
 import io.airlift.drift.transport.netty.codec.ThriftFrame;
 import io.airlift.drift.transport.netty.codec.Transport;
@@ -43,7 +45,6 @@ import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPromise;
-import io.netty.handler.codec.TooLongFrameException;
 import io.netty.util.concurrent.EventExecutor;
 import io.netty.util.concurrent.ScheduledFuture;
 
@@ -57,6 +58,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static io.airlift.drift.TApplicationException.Type.BAD_SEQUENCE_ID;
 import static io.airlift.drift.TApplicationException.Type.INVALID_MESSAGE_TYPE;
 import static io.airlift.drift.TApplicationException.Type.MISSING_RESULT;
@@ -209,12 +211,15 @@ public class ThriftClientHandler
 
     private void onError(ChannelHandlerContext context, Throwable throwable, Optional<RequestHandler> currentRequest)
     {
+        if (throwable instanceof FrameTooLargeException) {
+            checkArgument(!currentRequest.isPresent(), "current request should not be set for FrameTooLargeException");
+            onFrameTooLargeException(context, (FrameTooLargeException) throwable);
+            return;
+        }
+
         TException thriftException;
         if (throwable instanceof TException) {
             thriftException = (TException) throwable;
-        }
-        else if (throwable instanceof TooLongFrameException) {
-            thriftException = new FrameTooLargeException(throwable.getMessage(), throwable);
         }
         else {
             thriftException = new TTransportException(throwable);
@@ -243,6 +248,21 @@ public class ThriftClientHandler
         }
 
         context.close();
+    }
+
+    private void onFrameTooLargeException(ChannelHandlerContext context, FrameTooLargeException frameTooLargeException)
+    {
+        TException thriftException = new MessageTooLargeException(frameTooLargeException.getMessage(), frameTooLargeException);
+        Optional<FrameInfo> frameInfo = frameTooLargeException.getFrameInfo();
+        if (frameInfo.isPresent()) {
+            RequestHandler request = pendingRequests.remove(frameInfo.get().getSequenceId());
+            if (request != null) {
+                request.onChannelError(thriftException);
+                return;
+            }
+        }
+        // if sequence id is missing - fail all requests on a give channel
+        onError(context, new MessageTooLargeException("unexpected too large response happened on communication channel", frameTooLargeException), Optional.empty());
     }
 
     public static class ThriftRequest

@@ -15,11 +15,19 @@
  */
 package io.airlift.drift.integration.guice;
 
+import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.SettableFuture;
+
+import javax.annotation.concurrent.GuardedBy;
+
 import static java.lang.Math.toIntExact;
 
 public class ThrowingServiceHandler
         implements ThrowingService
 {
+    @GuardedBy("this")
+    private SettableFuture<String> awaitFuture;
+
     @Override
     public void fail(String message, boolean retryable)
             throws ExampleException
@@ -31,5 +39,28 @@ public class ThrowingServiceHandler
     public byte[] generateTooLargeFrame()
     {
         return new byte[toIntExact(MAX_FRAME_SIZE.toBytes()) + 1];
+    }
+
+    @Override
+    public String acceptBytes(byte[] bytes)
+    {
+        return "OK";
+    }
+
+    @Override
+    public synchronized ListenableFuture<String> await()
+    {
+        if (awaitFuture == null) {
+            awaitFuture = SettableFuture.create();
+        }
+        return awaitFuture;
+    }
+
+    @Override
+    public synchronized String release()
+    {
+        awaitFuture.set("OK");
+        awaitFuture = null;
+        return "OK";
     }
 }

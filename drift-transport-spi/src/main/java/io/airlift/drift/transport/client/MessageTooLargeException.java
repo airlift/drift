@@ -17,10 +17,10 @@ package io.airlift.drift.transport.client;
 
 import io.airlift.drift.protocol.TTransportException;
 
-public class FrameTooLargeException
+public class MessageTooLargeException
         extends TTransportException
 {
-    public FrameTooLargeException(String message, Throwable cause)
+    public MessageTooLargeException(String message, Throwable cause)
     {
         super(message, cause);
     }

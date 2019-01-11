@@ -15,16 +15,18 @@
  */
 package io.airlift.drift.integration.guice;
 
+import com.google.common.util.concurrent.ListenableFuture;
 import com.google.inject.Injector;
 import io.airlift.bootstrap.Bootstrap;
 import io.airlift.bootstrap.LifeCycleManager;
+import io.airlift.drift.TApplicationException;
 import io.airlift.drift.TException;
 import io.airlift.drift.client.ExceptionClassification;
 import io.airlift.drift.client.RetriesFailedException;
 import io.airlift.drift.integration.guice.EchoService.EmptyOptionalException;
 import io.airlift.drift.integration.guice.EchoService.NullValueException;
 import io.airlift.drift.integration.scribe.drift.DriftLogEntry;
-import io.airlift.drift.transport.client.FrameTooLargeException;
+import io.airlift.drift.transport.client.MessageTooLargeException;
 import io.airlift.drift.transport.netty.buffer.TestingPooledByteBufAllocator;
 import io.airlift.drift.transport.netty.client.DriftNettyClientModule;
 import io.airlift.drift.transport.netty.server.DriftNettyServerModule;
@@ -37,13 +39,17 @@ import java.util.OptionalDouble;
 import java.util.OptionalInt;
 import java.util.OptionalLong;
 
+import static com.google.common.util.concurrent.Futures.getUnchecked;
 import static io.airlift.drift.client.ExceptionClassification.HostStatus.NORMAL;
 import static io.airlift.drift.client.ExceptionClassification.NORMAL_EXCEPTION;
 import static io.airlift.drift.client.address.SimpleAddressSelectorBinder.simpleAddressSelector;
 import static io.airlift.drift.client.guice.DriftClientBinder.driftClientBinder;
+import static io.airlift.drift.integration.guice.ThrowingService.MAX_FRAME_SIZE;
 import static io.airlift.drift.server.guice.DriftServerBinder.driftServerBinder;
+import static java.lang.Math.toIntExact;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Arrays.asList;
+import static java.util.Arrays.fill;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -95,13 +101,14 @@ public class TestGuiceIntegration
         Injector injector = bootstrap
                 .strictConfig()
                 .setRequiredConfigurationProperty("thrift.server.port", String.valueOf(port))
+                .setRequiredConfigurationProperty("thrift.server.max-frame-size", MAX_FRAME_SIZE.toString())
                 .setRequiredConfigurationProperty("thrift.client.connection-pool.enabled", String.valueOf(pooling))
                 .setRequiredConfigurationProperty("echo.thrift.client.addresses", "localhost:" + port)
                 .setRequiredConfigurationProperty("mismatch.thrift.client.addresses", "localhost:" + port)
                 .setRequiredConfigurationProperty("throwing.thrift.client.addresses", "localhost:" + port)
                 .setRequiredConfigurationProperty("throwing.thrift.client.min-backoff-delay", "1ms")
                 .setRequiredConfigurationProperty("throwing.thrift.client.backoff-scale-factor", "1.0")
-                .setRequiredConfigurationProperty("throwing.thrift.client.max-frame-size", ThrowingService.MAX_FRAME_SIZE.toString())
+                .setRequiredConfigurationProperty("throwing.thrift.client.max-frame-size", MAX_FRAME_SIZE.toString())
                 .doNotInitializeLogging()
                 .initialize();
 
@@ -211,20 +218,24 @@ public class TestGuiceIntegration
 
     private static void assertThrowingService(ThrowingService service)
     {
-        try {
-            // make sure requests work after the server sends a frame that is too large
-            service.generateTooLargeFrame();
-            fail("expected exception");
-        }
-        catch (TException e) {
-            assertThat(e).isInstanceOf(FrameTooLargeException.class)
-                    .hasMessageContaining("Adjusted frame length exceeds");
-            assertEquals(e.getSuppressed().length, 1);
-            Throwable t = e.getSuppressed()[0];
-            assertThat(t).isInstanceOf(RetriesFailedException.class)
-                    .hasMessageContaining("Non-retryable exception")
-                    .hasMessageContaining("invocationAttempts: 1,");
-        }
+        // make sure requests work after sending and receiving too large frame
+        receiveTooLargeMessage(service);
+        sendTooLargeMessage(service);
+
+        // test that too large frame failures doesn't cause the failure of other requests on the same channel
+        ListenableFuture<String> awaitFuture = service.await();
+        assertFalse(awaitFuture.isDone());
+        receiveTooLargeMessage(service);
+        assertFalse(awaitFuture.isDone());
+        assertEquals(service.release(), "OK");
+        assertEquals(getUnchecked(awaitFuture), "OK");
+
+        awaitFuture = service.await();
+        assertFalse(awaitFuture.isDone());
+        sendTooLargeMessage(service);
+        assertFalse(awaitFuture.isDone());
+        assertEquals(service.release(), "OK");
+        assertEquals(getUnchecked(awaitFuture), "OK");
 
         try {
             service.fail("no-retry", false);
@@ -252,6 +263,37 @@ public class TestGuiceIntegration
             assertThat(t).isInstanceOf(RetriesFailedException.class)
                     .hasMessageContaining("Max retry attempts (5) exceeded")
                     .hasMessageContaining("invocationAttempts: 6,");
+        }
+    }
+
+    private static void receiveTooLargeMessage(ThrowingService service)
+    {
+        try {
+            service.generateTooLargeFrame();
+            fail("expected exception");
+        }
+        catch (TException e) {
+            assertThat(e).isInstanceOf(MessageTooLargeException.class)
+                    .hasMessageMatching("Frame size .+ exceeded max size .+");
+            assertEquals(e.getSuppressed().length, 1);
+            Throwable t = e.getSuppressed()[0];
+            assertThat(t).isInstanceOf(RetriesFailedException.class)
+                    .hasMessageContaining("Non-retryable exception")
+                    .hasMessageContaining("invocationAttempts: 1,");
+        }
+    }
+
+    private static void sendTooLargeMessage(ThrowingService service)
+    {
+        byte[] data = new byte[toIntExact(MAX_FRAME_SIZE.toBytes()) + 1];
+        fill(data, (byte) 0xAB);
+        try {
+            service.acceptBytes(data);
+            fail("expected exception");
+        }
+        catch (TException e) {
+            assertThat(e).isInstanceOf(TApplicationException.class)
+                    .hasMessageMatching("Frame size .+ exceeded max size .+");
         }
     }
 

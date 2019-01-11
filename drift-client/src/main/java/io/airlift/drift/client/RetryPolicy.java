@@ -18,7 +18,7 @@ package io.airlift.drift.client;
 import io.airlift.drift.protocol.TTransportException;
 import io.airlift.drift.transport.client.ConnectionFailedException;
 import io.airlift.drift.transport.client.DriftClientConfig;
-import io.airlift.drift.transport.client.FrameTooLargeException;
+import io.airlift.drift.transport.client.MessageTooLargeException;
 import io.airlift.drift.transport.client.RequestTimeoutException;
 import io.airlift.units.Duration;
 
@@ -110,7 +110,7 @@ public class RetryPolicy
             return new ExceptionClassification(Optional.of(TRUE), NORMAL);
         }
 
-        if (throwable instanceof FrameTooLargeException) {
+        if (throwable instanceof MessageTooLargeException) {
             return new ExceptionClassification(Optional.of(FALSE), NORMAL);
         }
 
