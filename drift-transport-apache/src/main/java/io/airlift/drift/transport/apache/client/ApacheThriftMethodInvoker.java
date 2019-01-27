@@ -227,7 +227,7 @@ public class ApacheThriftMethodInvoker
         TMessage message = responseProtocol.readMessageBegin();
 
         if (message.type == EXCEPTION) {
-            org.apache.thrift.TApplicationException exception = org.apache.thrift.TApplicationException.read(responseProtocol);
+            org.apache.thrift.TApplicationException exception = org.apache.thrift.TApplicationException.readFrom(responseProtocol);
             responseProtocol.readMessageEnd();
             throw exception;
         }

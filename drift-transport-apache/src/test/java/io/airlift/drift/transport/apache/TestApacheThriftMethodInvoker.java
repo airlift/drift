@@ -33,7 +33,6 @@ import io.airlift.drift.transport.apache.scribe.apache.LogEntry;
 import io.airlift.drift.transport.apache.scribe.apache.ResultCode;
 import io.airlift.drift.transport.apache.scribe.apache.ScribeService;
 import io.airlift.drift.transport.apache.scribe.apache.scribe;
-import io.airlift.drift.transport.apache.scribe.apache.scribe.AsyncClient.Log_call;
 import io.airlift.drift.transport.apache.scribe.drift.DriftLogEntry;
 import io.airlift.drift.transport.apache.scribe.drift.DriftResultCode;
 import io.airlift.drift.transport.client.InvokeRequest;
@@ -162,13 +161,13 @@ public class TestApacheThriftMethodInvoker
                         socket);
 
                 SettableFuture<ResultCode> futureResult = SettableFuture.create();
-                client.Log(messages, new AsyncMethodCallback<Log_call>()
+                client.Log(messages, new AsyncMethodCallback<ResultCode>()
                 {
                     @Override
-                    public void onComplete(Log_call response)
+                    public void onComplete(ResultCode resultCode)
                     {
                         try {
-                            futureResult.set(response.getResult());
+                            futureResult.set(resultCode);
                         }
                         catch (Throwable exception) {
                             futureResult.setException(exception);

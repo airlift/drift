@@ -306,7 +306,7 @@ public class TestDriftNettyServerTransport
     {
         TMessage message = protocol.readMessageBegin();
         if (message.type == TMessageType.EXCEPTION) {
-            throw TApplicationException.read(protocol);
+            throw TApplicationException.readFrom(protocol);
         }
         if (message.type != TMessageType.REPLY) {
             throw new TApplicationException(MISSING_RESULT, "request failed");

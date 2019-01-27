@@ -38,7 +38,6 @@ import io.airlift.drift.transport.netty.scribe.apache.LogEntry;
 import io.airlift.drift.transport.netty.scribe.apache.ResultCode;
 import io.airlift.drift.transport.netty.scribe.apache.ScribeService;
 import io.airlift.drift.transport.netty.scribe.apache.scribe;
-import io.airlift.drift.transport.netty.scribe.apache.scribe.AsyncClient.Log_call;
 import io.airlift.drift.transport.netty.scribe.apache.scribe.Client;
 import io.airlift.drift.transport.netty.scribe.drift.DriftLogEntry;
 import io.airlift.drift.transport.netty.scribe.drift.DriftResultCode;
@@ -239,7 +238,7 @@ public class TestDriftNettyMethodInvoker
                     fail("Expected exception");
                 }
                 catch (org.apache.thrift.TApplicationException e) {
-                    assertEquals(e.getType(), org.apache.thrift.TApplicationException.INTERNAL_ERROR);
+                    assertEquals(e.getType(), org.apache.thrift.TApplicationException.UNSUPPORTED_CLIENT_TYPE);
                 }
             }
             finally {
@@ -260,13 +259,13 @@ public class TestDriftNettyMethodInvoker
                 scribe.AsyncClient client = new scribe.AsyncClient(new TBinaryProtocol.Factory(), asyncClientManager, socket);
 
                 SettableFuture<ResultCode> futureResult = SettableFuture.create();
-                client.Log(messages, new AsyncMethodCallback<Log_call>()
+                client.Log(messages, new AsyncMethodCallback<ResultCode>()
                 {
                     @Override
-                    public void onComplete(Log_call response)
+                    public void onComplete(ResultCode resultCode)
                     {
                         try {
-                            futureResult.set(response.getResult());
+                            futureResult.set(resultCode);
                         }
                         catch (Throwable exception) {
                             futureResult.setException(exception);
@@ -316,7 +315,7 @@ public class TestDriftNettyMethodInvoker
                 Throwable cause = e.getCause();
                 assertInstanceOf(cause, TApplicationException.class);
                 TApplicationException applicationException = (TApplicationException) cause;
-                assertEquals(applicationException.getTypeValue(), TApplicationException.Type.INTERNAL_ERROR.getType());
+                assertEquals(applicationException.getTypeValue(), UNSUPPORTED_CLIENT_TYPE.getType());
             }
             return 1;
         }
@@ -411,7 +410,7 @@ public class TestDriftNettyMethodInvoker
                 Throwable cause = e.getCause();
                 assertInstanceOf(cause, io.airlift.drift.TApplicationException.class);
                 io.airlift.drift.TApplicationException applicationException = (io.airlift.drift.TApplicationException) cause;
-                assertEquals(applicationException.getTypeValue(), io.airlift.drift.TApplicationException.Type.INTERNAL_ERROR.getType());
+                assertEquals(applicationException.getTypeValue(), UNSUPPORTED_CLIENT_TYPE.getType());
             }
             return 1;
         }

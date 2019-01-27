@@ -375,6 +375,10 @@ public class ThriftServerHandler
             }
         }
 
+        TApplicationException.Type type = INTERNAL_ERROR;
+        if (exception instanceof TApplicationException) {
+            type = ((TApplicationException) exception).getType().orElse(INTERNAL_ERROR);
+        }
         return writeApplicationException(
                 context,
                 methodMetadata.getName(),
@@ -382,7 +386,7 @@ public class ThriftServerHandler
                 protocol,
                 sequenceId,
                 supportOutOfOrderResponse,
-                INTERNAL_ERROR,
+                type,
                 "Internal error processing " + methodMetadata.getName() + ": " + exception.getMessage(),
                 exception);
     }
