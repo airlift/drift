@@ -89,7 +89,9 @@ class ConnectionPool
                 }
 
                 // check if connection is failed or closed
-                if (future.getNow().isOpen()) {
+                Channel channel = future.getNow();
+                // channel can be null if the future was canceled
+                if (channel != null && channel.isOpen()) {
                     return future;
                 }
 
