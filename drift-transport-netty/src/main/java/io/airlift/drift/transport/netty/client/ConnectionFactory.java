@@ -67,6 +67,7 @@ class ConnectionFactory
                             connectionParameters.getSslContextParameters().map(sslContextFactory::get)));
 
             Promise<Channel> promise = group.next().newPromise();
+            promise.setUncancellable();
             bootstrap.connect(new InetSocketAddress(address.getHost(), address.getPort()))
                     .addListener((ChannelFutureListener) future -> notifyConnect(future, promise));
             return promise;
