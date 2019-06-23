@@ -119,12 +119,10 @@ public class ThriftClientHandler
         ByteBuf requestBuffer = requestHandler.encodeRequest(context.alloc());
 
         // register request if we are expecting a response
-        if (!thriftRequest.isOneway()) {
-            if (pendingRequests.putIfAbsent(sequenceId, requestHandler) != null) {
-                requestHandler.onChannelError(new TTransportException("Another request with the same sequenceId is already in progress"));
-                requestBuffer.release();
-                return;
-            }
+        if (!thriftRequest.isOneway() && (pendingRequests.putIfAbsent(sequenceId, requestHandler) != null)) {
+            requestHandler.onChannelError(new TTransportException("Another request with the same sequenceId is already in progress"));
+            requestBuffer.release();
+            return;
         }
 
         // if this connection is failed, immediately fail the request
