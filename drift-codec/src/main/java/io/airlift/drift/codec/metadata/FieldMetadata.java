@@ -28,6 +28,7 @@ import java.util.Optional;
 import static com.google.common.base.Preconditions.checkArgument;
 import static io.airlift.drift.annotations.ThriftField.Requiredness;
 import static io.airlift.drift.annotations.ThriftIdlAnnotation.RECURSIVE_REFERENCE_ANNOTATION_KEY;
+import static java.lang.Boolean.FALSE;
 import static java.util.Objects.requireNonNull;
 
 abstract class FieldMetadata
@@ -146,10 +147,8 @@ abstract class FieldMetadata
     public Optional<Boolean> getThriftFieldIsLegacyId()
     {
         Boolean value = isLegacyId();
-        if (getId() == null || getId() == Short.MIN_VALUE) {
-            if ((value != null) && !value) {
-                return Optional.empty();
-            }
+        if ((getId() == null || getId() == Short.MIN_VALUE) && FALSE.equals(value)) {
+            return Optional.empty();
         }
 
         return Optional.ofNullable(value);
