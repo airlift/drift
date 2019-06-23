@@ -47,8 +47,6 @@
     <properties>
         <air.license.header-file>license/apache-copyright-header.txt</air.license.header-file>
 
-        <!-- This actually wants to be fixed -->
-        <air.check.skip-pmd>true</air.check.skip-pmd>
         <air.check.skip-jacoco>true</air.check.skip-jacoco>
 
         <dep.airlift.version>0.188</dep.airlift.version>
