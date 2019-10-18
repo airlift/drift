@@ -29,7 +29,7 @@ public class Bonk
     @ThriftField(2)
     public int type;
 
-    public BonkField()
+    public Bonk()
     {
     }
 }
