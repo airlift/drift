@@ -5,7 +5,7 @@
     <parent>
         <groupId>io.airlift</groupId>
         <artifactId>airbase</artifactId>
-        <version>84</version>
+        <version>94</version>
     </parent>
 
     <groupId>io.airlift.drift</groupId>
@@ -51,7 +51,7 @@
         <air.check.skip-pmd>true</air.check.skip-pmd>
         <air.check.skip-jacoco>true</air.check.skip-jacoco>
 
-        <dep.airlift.version>0.173</dep.airlift.version>
+        <dep.airlift.version>0.188</dep.airlift.version>
         <dep.takari-plugin.version>2.9.1</dep.takari-plugin.version>
         <dep.maven.version>3.5.3</dep.maven.version>
     </properties>
