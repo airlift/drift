@@ -120,8 +120,7 @@ public class ThriftServerHandler
                             frameInfo.getSequenceId(),
                             frameInfo.isSupportOutOfOrderResponse(),
                             PROTOCOL_ERROR,
-                            e.getMessage(),
-                            e));
+                            e.getMessage()));
                 }
                 catch (Throwable t) {
                     context.close();
@@ -204,8 +203,7 @@ public class ThriftServerHandler
                     message.getSequenceId(),
                     supportOutOfOrderResponse,
                     UNKNOWN_METHOD,
-                    "Invalid method name: '" + message.getName() + "'",
-                    null));
+                    "Invalid method name: '" + message.getName() + "'"));
         }
         MethodMetadata method = methodMetadata.get();
 
@@ -218,8 +216,7 @@ public class ThriftServerHandler
                     message.getSequenceId(),
                     supportOutOfOrderResponse,
                     INVALID_MESSAGE_TYPE,
-                    "Invalid method message type: '" + message.getType() + "'",
-                    null));
+                    "Invalid method message type: '" + message.getType() + "'"));
         }
 
         Map<Short, Object> parameters = readArguments(method, protocolReader);
@@ -387,8 +384,7 @@ public class ThriftServerHandler
                 sequenceId,
                 supportOutOfOrderResponse,
                 type,
-                "Internal error processing " + methodMetadata.getName() + ": " + exception.getMessage(),
-                exception);
+                "Internal error processing " + methodMetadata.getName() + ": " + exception.getMessage());
     }
 
     private static ThriftFrame writeApplicationException(
@@ -399,14 +395,10 @@ public class ThriftServerHandler
             int sequenceId,
             boolean supportOutOfOrderResponse,
             TApplicationException.Type errorCode,
-            String errorMessage,
-            Throwable cause)
+            String errorMessage)
             throws Exception
     {
         TApplicationException applicationException = new TApplicationException(errorCode, errorMessage);
-        if (cause != null) {
-            applicationException.initCause(cause);
-        }
 
         TChannelBufferOutputTransport outputTransport = new TChannelBufferOutputTransport(context.alloc());
         try {
