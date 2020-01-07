@@ -69,6 +69,7 @@ import static io.airlift.drift.TApplicationException.Type.PROTOCOL_ERROR;
 import static io.airlift.drift.TApplicationException.Type.UNKNOWN_METHOD;
 import static io.airlift.drift.protocol.TMessageType.EXCEPTION;
 import static io.airlift.drift.protocol.TMessageType.REPLY;
+import static java.lang.String.format;
 import static java.util.Objects.requireNonNull;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.regex.Pattern.CASE_INSENSITIVE;
@@ -372,10 +373,16 @@ public class ThriftServerHandler
             }
         }
 
+        String message = format("Internal error processing method [%s]", methodMetadata.getName());
+
         TApplicationException.Type type = INTERNAL_ERROR;
         if (exception instanceof TApplicationException) {
             type = ((TApplicationException) exception).getType().orElse(INTERNAL_ERROR);
         }
+        else {
+            log.warn(exception, message);
+        }
+
         return writeApplicationException(
                 context,
                 methodMetadata.getName(),
@@ -384,7 +391,7 @@ public class ThriftServerHandler
                 sequenceId,
                 supportOutOfOrderResponse,
                 type,
-                "Internal error processing " + methodMetadata.getName() + ": " + exception.getMessage());
+                message + ": " + exception.getMessage());
     }
 
     private static ThriftFrame writeApplicationException(
