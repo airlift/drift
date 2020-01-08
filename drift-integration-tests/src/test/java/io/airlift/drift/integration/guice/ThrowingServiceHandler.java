@@ -26,6 +26,9 @@ public class ThrowingServiceHandler
         implements ThrowingService
 {
     @GuardedBy("this")
+    private SettableFuture<?> createFuture = SettableFuture.create();
+
+    @GuardedBy("this")
     private SettableFuture<String> awaitFuture;
 
     @Override
@@ -50,6 +53,7 @@ public class ThrowingServiceHandler
     @Override
     public synchronized ListenableFuture<String> await()
     {
+        createFuture.set(null);
         if (awaitFuture == null) {
             awaitFuture = SettableFuture.create();
         }
@@ -59,8 +63,14 @@ public class ThrowingServiceHandler
     @Override
     public synchronized String release()
     {
+        createFuture = SettableFuture.create();
         awaitFuture.set("OK");
         awaitFuture = null;
         return "OK";
+    }
+
+    public synchronized SettableFuture<?> waitForAwait()
+    {
+        return createFuture;
     }
 }

@@ -17,6 +17,7 @@ package io.airlift.drift.integration.guice;
 
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.inject.Injector;
+import com.google.inject.Scopes;
 import io.airlift.bootstrap.Bootstrap;
 import io.airlift.bootstrap.LifeCycleManager;
 import io.airlift.drift.TApplicationException;
@@ -83,6 +84,7 @@ public class TestGuiceIntegration
                 new DriftNettyServerModule(testingAllocator),
                 new DriftNettyClientModule(testingAllocator),
                 binder -> {
+                    binder.bind(ThrowingServiceHandler.class).in(Scopes.SINGLETON);
                     driftServerBinder(binder).bindService(EchoServiceHandler.class);
                     driftServerBinder(binder).bindService(MismatchServiceHandler.class);
                     driftServerBinder(binder).bindService(ThrowingServiceHandler.class);
@@ -116,6 +118,7 @@ public class TestGuiceIntegration
         EchoService echoService = injector.getInstance(EchoService.class);
         MismatchService mismatchService = injector.getInstance(MismatchService.class);
         ThrowingService throwingService = injector.getInstance(ThrowingService.class);
+        ThrowingServiceHandler throwingServiceHandler = injector.getInstance(ThrowingServiceHandler.class);
 
         try {
             assertEchoService(echoService);
@@ -123,7 +126,7 @@ public class TestGuiceIntegration
             assertEquals(mismatchService.extraClientArgs(123, 456), 123);
             assertEquals(mismatchService.extraServerArgs(), 42);
 
-            assertThrowingService(throwingService);
+            assertThrowingService(throwingService, throwingServiceHandler);
         }
         finally {
             lifeCycleManager.stop();
@@ -216,7 +219,7 @@ public class TestGuiceIntegration
         assertThrows(EmptyOptionalException.class, () -> service.echoOptionalListString(null));
     }
 
-    private static void assertThrowingService(ThrowingService service)
+    private static void assertThrowingService(ThrowingService service, ThrowingServiceHandler handler)
     {
         // make sure requests work after sending and receiving too large frame
         receiveTooLargeMessage(service);
@@ -224,6 +227,7 @@ public class TestGuiceIntegration
 
         // test that too large frame failures doesn't cause the failure of other requests on the same channel
         ListenableFuture<String> awaitFuture = service.await();
+        getUnchecked(handler.waitForAwait());
         assertFalse(awaitFuture.isDone());
         receiveTooLargeMessage(service);
         assertFalse(awaitFuture.isDone());
@@ -231,6 +235,7 @@ public class TestGuiceIntegration
         assertEquals(getUnchecked(awaitFuture), "OK");
 
         awaitFuture = service.await();
+        getUnchecked(handler.waitForAwait());
         assertFalse(awaitFuture.isDone());
         sendTooLargeMessage(service);
         assertFalse(awaitFuture.isDone());
