@@ -75,7 +75,8 @@ public class DriftServerBinder
         configBinder(binder).bindConfig(DriftServerConfig.class, annotation, configPrefix);
 
         newSetBinder(binder, DriftService.class).addBinding()
-                .toProvider(new DriftServiceProvider<>(serverInterface, annotation));
+                .toProvider(new DriftServiceProvider<>(serverInterface, annotation))
+                .in(SINGLETON);
 
         if (annotation == DefaultService.class) {
             binder.bind(serverInterface).annotatedWith(DefaultService.class).to(serverInterface);
