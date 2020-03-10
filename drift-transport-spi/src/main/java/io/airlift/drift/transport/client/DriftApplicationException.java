@@ -17,13 +17,23 @@ package io.airlift.drift.transport.client;
 
 import io.airlift.drift.TException;
 
+import java.util.Optional;
+
 import static java.util.Objects.requireNonNull;
 
 public final class DriftApplicationException
         extends TException
 {
-    public DriftApplicationException(Throwable applicationException)
+    private final Optional<Boolean> retryable;
+
+    public DriftApplicationException(Throwable applicationException, Optional<Boolean> retryable)
     {
         super(requireNonNull(applicationException, "applicationException is null"));
+        this.retryable = requireNonNull(retryable, "retryable is null");
+    }
+
+    public Optional<Boolean> isRetryable()
+    {
+        return retryable;
     }
 }

@@ -75,6 +75,7 @@ public class TestDriftMethodInvocation
             ImmutableList.of(),
             (ThriftCodec<Object>) (Object) new ShortThriftCodec(),
             ImmutableMap.of(),
+            ImmutableMap.of(),
             false,
             true);
     private static final Error UNEXPECTED_EXCEPTION = new Error("unexpected exception");
@@ -795,7 +796,7 @@ public class TestDriftMethodInvocation
         {
             Exception exception = new ClassifiedException(new ExceptionClassification(Optional.of(retry), hostStatus));
             if (wrapWithApplicationException) {
-                exception = new DriftApplicationException(exception);
+                exception = new DriftApplicationException(exception, Optional.empty());
             }
             return exception;
         }

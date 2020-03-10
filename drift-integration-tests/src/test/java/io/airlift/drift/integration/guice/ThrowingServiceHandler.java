@@ -39,6 +39,16 @@ public class ThrowingServiceHandler
     }
 
     @Override
+    public void failWithException(boolean retryable)
+            throws RetryableException, NonRetryableException
+    {
+        if (retryable) {
+            throw new RetryableException("RETRY");
+        }
+        throw new NonRetryableException("NO RETRY");
+    }
+
+    @Override
     public byte[] generateTooLargeFrame()
     {
         return new byte[toIntExact(MAX_FRAME_SIZE.toBytes()) + 1];

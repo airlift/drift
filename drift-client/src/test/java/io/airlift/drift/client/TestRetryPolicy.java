@@ -21,8 +21,10 @@ import org.testng.annotations.Test;
 
 import java.util.Optional;
 
+import static io.airlift.drift.client.ExceptionClassification.HostStatus.NORMAL;
 import static io.airlift.drift.client.ExceptionClassification.HostStatus.OVERLOADED;
 import static io.airlift.drift.client.ExceptionClassification.NORMAL_EXCEPTION;
+import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertSame;
 
 public class TestRetryPolicy
@@ -37,8 +39,35 @@ public class TestRetryPolicy
             }
             return NORMAL_EXCEPTION;
         });
-        assertSame(policy.classifyException(new DriftApplicationException(new TestingUserException()), true), overloaded);
+        assertSame(policy.classifyException(new DriftApplicationException(new TestingUserException(), Optional.empty()), true), overloaded);
         assertSame(policy.classifyException(new TestingUserException(), true), overloaded);
+    }
+
+    @Test
+    public void testProvidedResult()
+    {
+        // classifier has precedence over provided result
+        assertEquals(classify(Optional.of(true), Optional.of(false)), Optional.of(true));
+        assertEquals(classify(Optional.of(false), Optional.of(true)), Optional.of(false));
+
+        // both set to same
+        assertEquals(classify(Optional.of(true), Optional.of(true)), Optional.of(true));
+        assertEquals(classify(Optional.of(false), Optional.of(false)), Optional.of(false));
+
+        // only one set
+        assertEquals(classify(Optional.empty(), Optional.of(true)), Optional.of(true));
+        assertEquals(classify(Optional.empty(), Optional.of(false)), Optional.of(false));
+        assertEquals(classify(Optional.of(true), Optional.empty()), Optional.of(true));
+        assertEquals(classify(Optional.of(false), Optional.empty()), Optional.of(false));
+
+        // neither set
+        assertEquals(classify(Optional.empty(), Optional.empty()), Optional.empty());
+    }
+
+    private static Optional<Boolean> classify(Optional<Boolean> classifierResult, Optional<Boolean> providedResult)
+    {
+        return new RetryPolicy(new DriftClientConfig(), classifier -> new ExceptionClassification(classifierResult, NORMAL))
+                .classifyException(new DriftApplicationException(new TestingUserException(), providedResult), true).isRetry();
     }
 
     private static class TestingUserException

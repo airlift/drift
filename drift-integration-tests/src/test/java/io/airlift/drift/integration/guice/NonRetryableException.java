@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012 Facebook, Inc.
+ * Copyright (C) 2020 The Drift Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,28 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.airlift.drift.annotations;
+package io.airlift.drift.integration.guice;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.Retention;
+import io.airlift.drift.annotations.ThriftConstructor;
+import io.airlift.drift.annotations.ThriftField;
+import io.airlift.drift.annotations.ThriftStruct;
 
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
-
-/**
- * Provides mapping for Thrift method exceptions
- */
-@Documented
-@Retention(RUNTIME)
-public @interface ThriftException
+@ThriftStruct
+public class NonRetryableException
+        extends Exception
 {
-    Class<? extends Throwable> type();
-
-    short id();
-
-    Retryable retryable() default Retryable.UNKNOWN;
-
-    enum Retryable
+    @ThriftConstructor
+    public NonRetryableException(String message)
     {
-        UNKNOWN, FALSE, TRUE
+        super(message);
+    }
+
+    @ThriftField(1)
+    @Override
+    public String getMessage()
+    {
+        return super.getMessage();
     }
 }

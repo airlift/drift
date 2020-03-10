@@ -449,12 +449,15 @@ public class ThriftClientHandler
 
                 Object results = null;
                 Exception exception = null;
+                short exceptionId = 0;
+
                 while (reader.nextField()) {
-                    if (reader.getFieldId() == 0) {
+                    exceptionId = reader.getFieldId();
+                    if (exceptionId == 0) {
                         results = reader.readField(method.getResultCodec());
                     }
                     else {
-                        ThriftCodec<Object> exceptionCodec = method.getExceptionCodecs().get(reader.getFieldId());
+                        ThriftCodec<Object> exceptionCodec = method.getExceptionCodecs().get(exceptionId);
                         if (exceptionCodec != null) {
                             exception = (Exception) reader.readField(exceptionCodec);
                         }
@@ -463,11 +466,12 @@ public class ThriftClientHandler
                         }
                     }
                 }
+
                 reader.readStructEnd();
                 protocolReader.readMessageEnd();
 
                 if (exception != null) {
-                    throw new DriftApplicationException(exception);
+                    throw new DriftApplicationException(exception, method.isExceptionRetryable(exceptionId));
                 }
 
                 if (method.getResultCodec().getType() == ThriftType.VOID) {

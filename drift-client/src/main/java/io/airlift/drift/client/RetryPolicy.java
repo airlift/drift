@@ -17,6 +17,7 @@ package io.airlift.drift.client;
 
 import io.airlift.drift.protocol.TTransportException;
 import io.airlift.drift.transport.client.ConnectionFailedException;
+import io.airlift.drift.transport.client.DriftApplicationException;
 import io.airlift.drift.transport.client.DriftClientConfig;
 import io.airlift.drift.transport.client.MessageTooLargeException;
 import io.airlift.drift.transport.client.RequestTimeoutException;
@@ -123,6 +124,14 @@ public class RetryPolicy
         ExceptionClassification result = exceptionClassifier.classifyException(unwrapUserException(throwable));
         if (result.isRetry().isPresent()) {
             return result;
+        }
+
+        // use provided result if available
+        if (throwable instanceof DriftApplicationException) {
+            Optional<Boolean> retryable = ((DriftApplicationException) throwable).isRetryable();
+            if (retryable.isPresent()) {
+                return new ExceptionClassification(retryable, NORMAL);
+            }
         }
 
         if (idempotent && throwable instanceof TTransportException) {

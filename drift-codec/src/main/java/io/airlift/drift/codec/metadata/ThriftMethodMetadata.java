@@ -27,6 +27,7 @@ import io.airlift.drift.annotations.ThriftHeader;
 import io.airlift.drift.annotations.ThriftId;
 import io.airlift.drift.annotations.ThriftIdlAnnotation;
 import io.airlift.drift.annotations.ThriftMethod;
+import io.airlift.drift.annotations.ThriftRetryable;
 import io.airlift.drift.annotations.ThriftStruct;
 
 import javax.annotation.concurrent.Immutable;
@@ -62,7 +63,7 @@ public class ThriftMethodMetadata
     private final List<ThriftFieldMetadata> parameters;
     private final Set<ThriftHeaderParameter> headerParameters;
     private final Method method;
-    private final ImmutableMap<Short, ThriftType> exceptions;
+    private final Map<Short, ExceptionInfo> exceptions;
     private final boolean oneway;
     private final boolean idempotent;
     private final List<String> documentation;
@@ -218,7 +219,7 @@ public class ThriftMethodMetadata
         return headerParameters;
     }
 
-    public Map<Short, ThriftType> getExceptions()
+    public Map<Short, ExceptionInfo> getExceptions()
     {
         return exceptions;
     }
@@ -243,19 +244,21 @@ public class ThriftMethodMetadata
         return documentation;
     }
 
-    private ImmutableMap<Short, ThriftType> buildExceptionMap(ThriftCatalog catalog, ThriftMethod thriftMethod)
+    private Map<Short, ExceptionInfo> buildExceptionMap(ThriftCatalog catalog, ThriftMethod thriftMethod)
     {
         boolean mixedStyle = (thriftMethod.exception().length > 0) &&
                 stream(method.getAnnotatedExceptionTypes()).anyMatch(type -> type.isAnnotationPresent(ThriftId.class));
         checkArgument(!mixedStyle, "ThriftMethod [%s] uses a mix of @ThriftException and @ThriftId", methodName(method));
 
-        Map<Short, ThriftType> exceptions = new HashMap<>();
+        Map<Short, ExceptionInfo> exceptions = new HashMap<>();
         Set<Type> exceptionTypes = new HashSet<>();
 
         for (ThriftException thriftException : thriftMethod.exception()) {
             checkArgument(!exceptions.containsKey(thriftException.id()), "ThriftMethod [%s] exception list contains multiple values for field ID [%s]", methodName(method), thriftException.id());
             checkArgument(!exceptionTypes.contains(thriftException.type()), "ThriftMethod [%s] exception list contains multiple values for type [%s]", methodName(method), thriftException.type().getSimpleName());
-            exceptions.put(thriftException.id(), catalog.getThriftType(thriftException.type()));
+            exceptions.put(thriftException.id(), new ExceptionInfo(
+                    catalog.getThriftType(thriftException.type()),
+                    retryable(thriftException.retryable())));
             exceptionTypes.add(thriftException.type());
         }
 
@@ -264,10 +267,16 @@ public class ThriftMethodMetadata
         for (int i = 0; i < allExceptionClasses.length; i++) {
             Class<?> exception = allExceptionClasses[i];
             ThriftId thriftId = exceptionAnnotations[i].getAnnotation(ThriftId.class);
+            ThriftRetryable thriftRetryable = exceptionAnnotations[i].getAnnotation(ThriftRetryable.class);
+            Optional<Boolean> retryable = Optional.empty();
+            if (thriftRetryable != null) {
+                checkArgument(thriftId != null, "ThriftMethod [%s] exception list contains @ThriftRetryable without @ThriftId", methodName((method)));
+                retryable = Optional.of(thriftRetryable.value());
+            }
             if (thriftId != null) {
                 checkArgument(!exceptions.containsKey(thriftId.value()), "ThriftMethod [%s] exception list contains multiple values for field ID [%s]", methodName(method), thriftId.value());
                 checkArgument(!exceptionTypes.contains(exception), "ThriftMethod [%s] exception list contains multiple values for type [%s]", methodName(method), exception.getSimpleName());
-                exceptions.put(thriftId.value(), catalog.getThriftType(exception));
+                exceptions.put(thriftId.value(), new ExceptionInfo(catalog.getThriftType(exception), retryable));
                 exceptionTypes.add(exception);
             }
         }
@@ -284,7 +293,7 @@ public class ThriftMethodMetadata
                 // there is no ordering guarantee for exception types,
                 // so we can only infer the id if there is a single custom exception
                 checkArgument(exceptionClasses.size() == 1, "ThriftMethod [%s] annotation must declare exception mapping when more than one custom exception is thrown", methodName(method));
-                exceptions.put((short) 1, catalog.getThriftType(exceptionClass));
+                exceptions.put((short) 1, new ExceptionInfo(catalog.getThriftType(exceptionClass), Optional.empty()));
             }
         }
 
@@ -326,5 +335,60 @@ public class ThriftMethodMetadata
     private static String methodName(Method method)
     {
         return method.getDeclaringClass().getName() + "." + method.getName();
+    }
+
+    private static Optional<Boolean> retryable(ThriftException.Retryable retryable)
+    {
+        switch (retryable) {
+            case UNKNOWN:
+                return Optional.empty();
+            case FALSE:
+                return Optional.of(false);
+            case TRUE:
+                return Optional.of(true);
+        }
+        throw new AssertionError("Unhandled value: " + retryable);
+    }
+
+    public static class ExceptionInfo
+    {
+        private final ThriftType thriftType;
+        private final Optional<Boolean> retryable;
+
+        public ExceptionInfo(ThriftType thriftType, Optional<Boolean> retryable)
+        {
+            this.thriftType = requireNonNull(thriftType, "thriftType is null");
+            this.retryable = requireNonNull(retryable, "retryable is null");
+        }
+
+        public ThriftType getThriftType()
+        {
+            return thriftType;
+        }
+
+        public Optional<Boolean> isRetryable()
+        {
+            return retryable;
+        }
+
+        @Override
+        public boolean equals(Object o)
+        {
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
+            ExceptionInfo that = (ExceptionInfo) o;
+            return thriftType.equals(that.thriftType) &&
+                    retryable.equals(that.retryable);
+        }
+
+        @Override
+        public int hashCode()
+        {
+            return Objects.hash(thriftType, retryable);
+        }
     }
 }
