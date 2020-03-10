@@ -108,6 +108,7 @@ public class TestDriftNettyMethodInvoker
                     (ThriftCodec<Object>) CODEC_MANAGER.getCodec(list(CODEC_MANAGER.getCodec(DriftLogEntry.class).getType())))),
             (ThriftCodec<Object>) (Object) CODEC_MANAGER.getCodec(DriftResultCode.class),
             ImmutableMap.of(),
+            ImmutableMap.of(),
             false,
             true);
 
@@ -349,6 +350,7 @@ public class TestDriftNettyMethodInvoker
                         ImmutableList.of(),
                         (ThriftCodec<Object>) (Object) new VoidThriftCodec(),
                         ImmutableMap.of(),
+                        ImmutableMap.of(),
                         false,
                         true),
                 () -> HostAndPort.fromParts("localhost", 1234),
@@ -388,6 +390,7 @@ public class TestDriftNettyMethodInvoker
                     "Log",
                     ImmutableList.of(parameter),
                     (ThriftCodec<Object>) (Object) CODEC_MANAGER.getCodec(DriftResultCode.class),
+                    ImmutableMap.of(),
                     ImmutableMap.of(),
                     false,
                     true);

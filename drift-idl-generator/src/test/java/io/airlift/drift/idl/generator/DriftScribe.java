@@ -19,6 +19,7 @@ import io.airlift.drift.annotations.ThriftDocumentation;
 import io.airlift.drift.annotations.ThriftId;
 import io.airlift.drift.annotations.ThriftMethod;
 import io.airlift.drift.annotations.ThriftOrder;
+import io.airlift.drift.annotations.ThriftRetryable;
 import io.airlift.drift.annotations.ThriftService;
 
 import java.util.List;
@@ -50,9 +51,9 @@ public interface DriftScribe
     @ThriftMethod
     DriftResultCode logFormattedMessage(String format, Map<String, DriftLogEntry> messages, int maxSize)
             throws
-            @ThriftId(1) ScribeDataException,
-            @ThriftId(2) ScribeTransportException,
-            @ThriftId(3) ScribeMessageException;
+            @ThriftId(1) @ThriftRetryable(false) ScribeDataException,
+            @ThriftId(2) @ThriftRetryable(true) ScribeTransportException,
+            @ThriftId(3) @ThriftRetryable(false) ScribeMessageException;
 
     @ThriftDocumentation("Check if service is up")
     @ThriftOrder(3)

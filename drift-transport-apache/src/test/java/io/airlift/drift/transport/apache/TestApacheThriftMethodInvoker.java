@@ -209,6 +209,7 @@ public class TestApacheThriftMethodInvoker
                     ImmutableList.of(parameter),
                     (ThriftCodec<Object>) (Object) codecManager.getCodec(DriftResultCode.class),
                     ImmutableMap.of(),
+                    ImmutableMap.of(),
                     false,
                     true);
 
@@ -239,6 +240,7 @@ public class TestApacheThriftMethodInvoker
                     "Log",
                     ImmutableList.of(parameter),
                     (ThriftCodec<Object>) (Object) codecManager.getCodec(DriftResultCode.class),
+                    ImmutableMap.of(),
                     ImmutableMap.of(),
                     false,
                     true);

@@ -15,13 +15,16 @@
  */
 package io.airlift.drift.codec.metadata;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import io.airlift.drift.TException;
 import io.airlift.drift.annotations.ThriftException;
+import io.airlift.drift.annotations.ThriftException.Retryable;
 import io.airlift.drift.annotations.ThriftField;
 import io.airlift.drift.annotations.ThriftHeader;
 import io.airlift.drift.annotations.ThriftId;
 import io.airlift.drift.annotations.ThriftMethod;
+import io.airlift.drift.annotations.ThriftRetryable;
 import io.airlift.drift.annotations.ThriftStruct;
 import org.testng.annotations.Test;
 
@@ -29,6 +32,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.TreeMap;
 
 import static org.testng.Assert.assertEquals;
@@ -113,20 +117,27 @@ public class TestThriftMethodMetadata
     @Test
     public void testAnnotatedExceptions()
     {
-        assertExceptions("annotatedExceptionsMethod", ExceptionA.class, ExceptionB.class);
-        assertExceptions("annotatedExceptionsThrows", ExceptionA.class, ExceptionB.class);
+        assertExceptions(
+                "annotatedExceptionsMethod",
+                ImmutableList.of(ExceptionA.class, ExceptionB.class, ExceptionC.class),
+                ImmutableList.of(Optional.empty(), Optional.of(true), Optional.of(false)));
+
+        assertExceptions(
+                "annotatedExceptionsThrows",
+                ImmutableList.of(ExceptionA.class, ExceptionB.class, ExceptionC.class),
+                ImmutableList.of(Optional.empty(), Optional.of(true), Optional.of(false)));
     }
 
     @Test
     public void testInferredException()
     {
-        assertExceptions("inferredException", ExceptionA.class);
+        assertExceptions("inferredException", ImmutableList.of(ExceptionA.class), ImmutableList.of(Optional.empty()));
     }
 
     @Test
     public void testInferredExceptionWithTException()
     {
-        assertExceptions("inferredExceptionWithTException", ExceptionA.class);
+        assertExceptions("inferredExceptionWithTException", ImmutableList.of(ExceptionA.class), ImmutableList.of(Optional.empty()));
     }
 
     @Test(expectedExceptions = IllegalArgumentException.class, expectedExceptionsMessageRegExp = "ThriftMethod \\[.*\\.nonThriftException] exception \\[IllegalArgumentException] is not annotated with @ThriftStruct")
@@ -171,26 +182,39 @@ public class TestThriftMethodMetadata
         assertExceptions("testExceptionMixedAnnotationStyle");
     }
 
-    @SafeVarargs
-    private static void assertExceptions(String methodName, Class<? extends Exception>... expectedExceptions)
+    private static void assertExceptions(String methodName)
     {
+        assertExceptions(methodName, ImmutableList.of(), ImmutableList.of());
+    }
+
+    private static void assertExceptions(String methodName, List<Class<? extends Exception>> expectedExceptions, List<Optional<Boolean>> expectedRetryable)
+    {
+        assertEquals(expectedExceptions.size(), expectedRetryable.size());
+
         ThriftMethodMetadata metadata = new ThriftMethodMetadata(getMethod(methodName), new ThriftCatalog());
         Map<Short, Type> actualIdMap = new TreeMap<>();
         Map<Short, Type> expectedIdMap = new TreeMap<>();
+        Map<Short, Optional<Boolean>> actualRetryMap = new TreeMap<>();
+        Map<Short, Optional<Boolean>> expectedRetryMap = new TreeMap<>();
 
-        for (Map.Entry<Short, ThriftType> entry : metadata.getExceptions().entrySet()) {
-            actualIdMap.put(entry.getKey(), entry.getValue().getJavaType());
-        }
+        metadata.getExceptions().forEach((id, info) -> {
+            actualIdMap.put(id, info.getThriftType().getJavaType());
+            actualRetryMap.put(id, info.isRetryable());
+        });
 
         short expectedId = 1;
-        for (Class<? extends Exception> expectedException : expectedExceptions) {
-            expectedIdMap.put(expectedId, expectedException);
+        for (int i = 0; i < expectedExceptions.size(); i++) {
+            expectedIdMap.put(expectedId, expectedExceptions.get(i));
+            expectedRetryMap.put(expectedId, expectedRetryable.get(i));
             expectedId++;
         }
 
         // string comparison produces more useful failure message (and is safe, given the types)
         if (!actualIdMap.equals(expectedIdMap)) {
             assertEquals(actualIdMap.toString(), expectedIdMap.toString());
+        }
+        if (!actualRetryMap.equals(expectedRetryMap)) {
+            assertEquals(actualRetryMap.toString(), expectedRetryMap.toString());
         }
     }
 
@@ -254,13 +278,20 @@ public class TestThriftMethodMetadata
         @ThriftMethod
         void noExceptions();
 
-        @ThriftMethod(exception = {@ThriftException(id = 1, type = ExceptionA.class), @ThriftException(id = 2, type = ExceptionB.class)})
+        @ThriftMethod(exception = {
+                @ThriftException(id = 1, type = ExceptionA.class),
+                @ThriftException(id = 2, type = ExceptionB.class, retryable = Retryable.TRUE),
+                @ThriftException(id = 3, type = ExceptionC.class, retryable = Retryable.FALSE),
+        })
         void annotatedExceptionsMethod()
-                throws ExceptionA, ExceptionB;
+                throws ExceptionA, ExceptionB, ExceptionC;
 
         @ThriftMethod
         void annotatedExceptionsThrows()
-                throws @ThriftId(1) ExceptionA, @ThriftId(2) ExceptionB;
+                throws
+                @ThriftId(1) ExceptionA,
+                @ThriftId(2) @ThriftRetryable(true) ExceptionB,
+                @ThriftId(3) @ThriftRetryable(false) ExceptionC;
 
         @ThriftMethod
         void inferredException()
@@ -313,6 +344,12 @@ public class TestThriftMethodMetadata
 
     @ThriftStruct
     public static final class ExceptionB
+            extends Exception
+    {
+    }
+
+    @ThriftStruct
+    public static final class ExceptionC
             extends Exception
     {
     }

@@ -30,8 +30,8 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.google.common.base.MoreObjects.toStringHelper;
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
-import static com.google.common.collect.Maps.transformEntries;
 import static java.util.Objects.requireNonNull;
 import static java.util.function.Function.identity;
 
@@ -42,6 +42,7 @@ public final class MethodMetadata
     private final Map<Short, ParameterMetadata> parametersById;
     private final ThriftCodec<Object> resultCodec;
     private final Map<Short, ThriftCodec<Object>> exceptionCodecs;
+    private final Map<Short, Optional<Boolean>> exceptionRetryable;
     private final Map<Class<?>, Short> exceptionIdsByType;
     private final boolean oneway;
     private final boolean idempotent;
@@ -57,14 +58,19 @@ public final class MethodMetadata
 
         ThriftCodec<Object> resultCodec = getCodec(codecManager, metadata.getReturnType());
 
-        Map<Short, ThriftCodec<Object>> exceptionCodecs = ImmutableMap.copyOf(
-                transformEntries(metadata.getExceptions(), (key, value) -> getCodec(codecManager, value)));
+        ImmutableMap.Builder<Short, ThriftCodec<Object>> exceptionCodecs = ImmutableMap.builder();
+        ImmutableMap.Builder<Short, Optional<Boolean>> exceptionRetryable = ImmutableMap.builder();
+        metadata.getExceptions().forEach((id, info) -> {
+            exceptionCodecs.put(id, getCodec(codecManager, info.getThriftType()));
+            exceptionRetryable.put(id, info.isRetryable());
+        });
 
         return new MethodMetadata(
                 metadata.getName(),
                 parameters,
                 resultCodec,
-                exceptionCodecs,
+                exceptionCodecs.build(),
+                exceptionRetryable.build(),
                 metadata.getOneway(),
                 metadata.isIdempotent());
     }
@@ -80,6 +86,7 @@ public final class MethodMetadata
             List<ParameterMetadata> parameters,
             ThriftCodec<Object> resultCodec,
             Map<Short, ThriftCodec<Object>> exceptionCodecs,
+            Map<Short, Optional<Boolean>> exceptionRetryable,
             boolean oneway,
             boolean idempotent)
     {
@@ -88,6 +95,7 @@ public final class MethodMetadata
         this.parametersById = parameters.stream().collect(toImmutableMap(ParameterMetadata::getFieldId, identity()));
         this.resultCodec = requireNonNull(resultCodec, "resultCodec is null");
         this.exceptionCodecs = ImmutableMap.copyOf(requireNonNull(exceptionCodecs, "exceptionCodecs is null"));
+        this.exceptionRetryable = ImmutableMap.copyOf(requireNonNull(exceptionRetryable, "exceptionRetryable is null"));
 
         ImmutableMap.Builder<Class<?>, Short> exceptions = ImmutableMap.builder();
         for (Map.Entry<Short, ThriftCodec<Object>> entry : exceptionCodecs.entrySet()) {
@@ -138,6 +146,14 @@ public final class MethodMetadata
         }
 
         return Optional.empty();
+    }
+
+    @SuppressWarnings("OptionalAssignedToNull")
+    public Optional<Boolean> isExceptionRetryable(short exceptionId)
+    {
+        Optional<Boolean> retryable = exceptionRetryable.get(exceptionId);
+        checkArgument(retryable != null, "no such exception ID: %s", exceptionId);
+        return retryable;
     }
 
     public boolean isOneway()

@@ -30,6 +30,7 @@ import io.airlift.drift.codec.metadata.MetadataWarningException;
 import io.airlift.drift.codec.metadata.ThriftCatalog;
 import io.airlift.drift.codec.metadata.ThriftFieldMetadata;
 import io.airlift.drift.codec.metadata.ThriftMethodMetadata;
+import io.airlift.drift.codec.metadata.ThriftMethodMetadata.ExceptionInfo;
 import io.airlift.drift.codec.metadata.ThriftServiceMetadata;
 import io.airlift.drift.codec.metadata.ThriftStructMetadata;
 import io.airlift.drift.codec.metadata.ThriftType;
@@ -284,7 +285,8 @@ public class ThriftIdlGenerator
                 }
             }
 
-            for (ThriftType exception : method.getValue().getExceptions().values()) {
+            for (ExceptionInfo exceptionInfo : method.getValue().getExceptions().values()) {
+                ThriftType exception = exceptionInfo.getThriftType();
                 if (!verifyField(exception)) {
                     ok = false;
                     if (!quiet) {

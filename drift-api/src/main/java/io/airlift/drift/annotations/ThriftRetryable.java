@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012 Facebook, Inc.
+ * Copyright (C) 2020 The Drift Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,24 +17,18 @@ package io.airlift.drift.annotations;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
 
+import static java.lang.annotation.ElementType.TYPE_USE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
- * Provides mapping for Thrift method exceptions
+ * Indicates if an exception thrown by a method is retryable.
  */
 @Documented
 @Retention(RUNTIME)
-public @interface ThriftException
+@Target(TYPE_USE)
+public @interface ThriftRetryable
 {
-    Class<? extends Throwable> type();
-
-    short id();
-
-    Retryable retryable() default Retryable.UNKNOWN;
-
-    enum Retryable
-    {
-        UNKNOWN, FALSE, TRUE
-    }
+    boolean value();
 }

@@ -127,7 +127,9 @@ public class TestGuiceIntegration
             assertEquals(mismatchService.extraClientArgs(123, 456), 123);
             assertEquals(mismatchService.extraServerArgs(), 42);
 
-            assertThrowingService(throwingService);
+            assertExceptionClassifier(throwingService);
+
+            assertAnnotatedException(throwingService);
 
             assertLargeMessage(throwingService, throwingServiceHandler);
         }
@@ -222,7 +224,7 @@ public class TestGuiceIntegration
         assertThrows(EmptyOptionalException.class, () -> service.echoOptionalListString(null));
     }
 
-    private static void assertThrowingService(ThrowingService service)
+    private static void assertExceptionClassifier(ThrowingService service)
     {
         assertThatThrownBy(() -> service.fail("no-retry", false))
                 .hasMessage("no-retry")
@@ -243,6 +245,25 @@ public class TestGuiceIntegration
                                     .hasMessageContaining("Max retry attempts (5) exceeded")
                                     .hasMessageContaining("invocationAttempts: 6,"));
                 });
+    }
+
+    private static void assertAnnotatedException(ThrowingService service)
+    {
+        assertThatThrownBy(() -> service.failWithException(true))
+                .hasMessage("RETRY")
+                .isInstanceOfSatisfying(RetryableException.class, e ->
+                        assertThat(e.getSuppressed()).hasOnlyOneElementSatisfying(s ->
+                                assertThat(s).isInstanceOf(RetriesFailedException.class)
+                                        .hasMessageContaining("Max retry attempts (5) exceeded")
+                                        .hasMessageContaining("invocationAttempts: 6,")));
+
+        assertThatThrownBy(() -> service.failWithException(false))
+                .hasMessage("NO RETRY")
+                .isInstanceOfSatisfying(NonRetryableException.class, e ->
+                        assertThat(e.getSuppressed()).hasOnlyOneElementSatisfying(s ->
+                                assertThat(s).isInstanceOf(RetriesFailedException.class)
+                                        .hasMessageContaining("Non-retryable exception")
+                                        .hasMessageContaining("invocationAttempts: 1,")));
     }
 
     private static void assertLargeMessage(ThrowingService service, ThrowingServiceHandler handler)

@@ -17,7 +17,9 @@ package io.airlift.drift.integration.guice;
 
 import com.google.common.util.concurrent.ListenableFuture;
 import io.airlift.drift.TException;
+import io.airlift.drift.annotations.ThriftId;
 import io.airlift.drift.annotations.ThriftMethod;
+import io.airlift.drift.annotations.ThriftRetryable;
 import io.airlift.drift.annotations.ThriftService;
 import io.airlift.units.DataSize;
 
@@ -27,6 +29,12 @@ import static io.airlift.units.DataSize.Unit.KILOBYTE;
 public interface ThrowingService
 {
     DataSize MAX_FRAME_SIZE = new DataSize(10, KILOBYTE);
+
+    @ThriftMethod
+    void failWithException(boolean retryable)
+            throws
+            @ThriftId(1) @ThriftRetryable(true) RetryableException,
+            @ThriftId(2) @ThriftRetryable(false) NonRetryableException;
 
     @ThriftMethod
     void fail(String message, boolean retryable)
