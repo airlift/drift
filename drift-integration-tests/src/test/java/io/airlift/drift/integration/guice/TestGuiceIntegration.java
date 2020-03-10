@@ -52,6 +52,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Arrays.asList;
 import static java.util.Arrays.fill;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertThrows;
@@ -126,7 +127,9 @@ public class TestGuiceIntegration
             assertEquals(mismatchService.extraClientArgs(123, 456), 123);
             assertEquals(mismatchService.extraServerArgs(), 42);
 
-            assertThrowingService(throwingService, throwingServiceHandler);
+            assertThrowingService(throwingService);
+
+            assertLargeMessage(throwingService, throwingServiceHandler);
         }
         finally {
             lifeCycleManager.stop();
@@ -219,7 +222,30 @@ public class TestGuiceIntegration
         assertThrows(EmptyOptionalException.class, () -> service.echoOptionalListString(null));
     }
 
-    private static void assertThrowingService(ThrowingService service, ThrowingServiceHandler handler)
+    private static void assertThrowingService(ThrowingService service)
+    {
+        assertThatThrownBy(() -> service.fail("no-retry", false))
+                .hasMessage("no-retry")
+                .isInstanceOfSatisfying(ExampleException.class, e -> {
+                    assertThat(e.isRetryable()).isFalse();
+                    assertThat(e.getSuppressed()).hasOnlyOneElementSatisfying(s ->
+                            assertThat(s).isInstanceOf(RetriesFailedException.class)
+                                    .hasMessageContaining("Non-retryable exception")
+                                    .hasMessageContaining("invocationAttempts: 1,"));
+                });
+
+        assertThatThrownBy(() -> service.fail("can-retry", true))
+                .hasMessage("can-retry")
+                .isInstanceOfSatisfying(ExampleException.class, e -> {
+                    assertThat(e.isRetryable()).isTrue();
+                    assertThat(e.getSuppressed()).hasOnlyOneElementSatisfying(s ->
+                            assertThat(s).isInstanceOf(RetriesFailedException.class)
+                                    .hasMessageContaining("Max retry attempts (5) exceeded")
+                                    .hasMessageContaining("invocationAttempts: 6,"));
+                });
+    }
+
+    private static void assertLargeMessage(ThrowingService service, ThrowingServiceHandler handler)
     {
         // make sure requests work after sending and receiving too large frame
         receiveTooLargeMessage(service);
@@ -241,34 +267,6 @@ public class TestGuiceIntegration
         assertFalse(awaitFuture.isDone());
         assertEquals(service.release(), "OK");
         assertEquals(getUnchecked(awaitFuture), "OK");
-
-        try {
-            service.fail("no-retry", false);
-            fail("expected exception");
-        }
-        catch (ExampleException e) {
-            assertEquals(e.getMessage(), "no-retry");
-            assertFalse(e.isRetryable());
-            assertEquals(e.getSuppressed().length, 1);
-            Throwable t = e.getSuppressed()[0];
-            assertThat(t).isInstanceOf(RetriesFailedException.class)
-                    .hasMessageContaining("Non-retryable exception")
-                    .hasMessageContaining("invocationAttempts: 1,");
-        }
-
-        try {
-            service.fail("can-retry", true);
-            fail("expected exception");
-        }
-        catch (ExampleException e) {
-            assertEquals(e.getMessage(), "can-retry");
-            assertTrue(e.isRetryable());
-            assertEquals(e.getSuppressed().length, 1);
-            Throwable t = e.getSuppressed()[0];
-            assertThat(t).isInstanceOf(RetriesFailedException.class)
-                    .hasMessageContaining("Max retry attempts (5) exceeded")
-                    .hasMessageContaining("invocationAttempts: 6,");
-        }
     }
 
     private static void receiveTooLargeMessage(ThrowingService service)
