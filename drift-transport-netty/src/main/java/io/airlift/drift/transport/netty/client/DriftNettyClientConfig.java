@@ -26,6 +26,7 @@ import io.airlift.units.Duration;
 import io.airlift.units.MaxDataSize;
 import io.airlift.units.MinDuration;
 
+import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.NotNull;
 
 import java.io.File;
@@ -224,5 +225,11 @@ public class DriftNettyClientConfig
                 .omitEmptyStrings()
                 .splitToList(requireNonNull(ciphers, "ciphers is null"));
         return this;
+    }
+
+    @AssertTrue(message = "Trust certificate must be provided when SSL is enabled")
+    public boolean isTruststorePathValid()
+    {
+        return !isSslEnabled() || getTrustCertificate() != null;
     }
 }
