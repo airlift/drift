@@ -89,7 +89,6 @@ public class TestSimpleAddressSelectorBinder
         try {
             Injector injector = app
                     .setRequiredConfigurationProperties(configurationProperties)
-                    .strictConfig()
                     .doNotInitializeLogging()
                     .initialize();
             lifeCycleManager = injector.getInstance(LifeCycleManager.class);

@@ -129,7 +129,6 @@ final class ClientTestUtils
                     .build());
 
             Injector injector = app
-                    .strictConfig()
                     .doNotInitializeLogging()
                     .initialize();
 

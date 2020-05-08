@@ -42,7 +42,6 @@ public class TestDriftNettyClientModule
 
         Injector injector = bootstrap
                 .doNotInitializeLogging()
-                .strictConfig()
                 .initialize();
 
         assertNotNull(injector.getInstance(Key.get(new TypeLiteral<MethodInvokerFactory<Annotation>>() {})));
