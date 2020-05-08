@@ -57,12 +57,12 @@ import org.testng.annotations.Test;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.ToIntFunction;
-import java.util.stream.Collectors;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static io.airlift.drift.codec.metadata.ThriftType.list;
 import static io.airlift.drift.codec.metadata.ThriftType.optional;
 import static java.util.Collections.nCopies;
+import static java.util.stream.Collectors.toList;
 import static org.testng.Assert.assertEquals;
 
 public class TestApacheThriftMethodInvoker
@@ -74,7 +74,7 @@ public class TestApacheThriftMethodInvoker
     private static final List<DriftLogEntry> DRIFT_MESSAGES = ImmutableList.copyOf(
             MESSAGES.stream()
                     .map(input -> new DriftLogEntry(input.category, input.message))
-                    .collect(Collectors.toList()));
+                    .collect(toList()));
     private static final DriftResultCode DRIFT_OK = DriftResultCode.OK;
 
     @Test

@@ -102,7 +102,6 @@ public class TestGuiceIntegration
                 });
 
         Injector injector = bootstrap
-                .strictConfig()
                 .setRequiredConfigurationProperty("thrift.server.port", String.valueOf(port))
                 .setRequiredConfigurationProperty("thrift.server.max-frame-size", MAX_FRAME_SIZE.toString())
                 .setRequiredConfigurationProperty("thrift.client.connection-pool.enabled", String.valueOf(pooling))

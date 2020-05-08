@@ -161,7 +161,6 @@ public class TestDriftClient
         LifeCycleManager lifeCycleManager = null;
         try {
             Injector injector = app
-                    .strictConfig()
                     .doNotInitializeLogging()
                     .initialize();
             lifeCycleManager = injector.getInstance(LifeCycleManager.class);
@@ -238,7 +237,6 @@ public class TestDriftClient
         LifeCycleManager lifeCycleManager = null;
         try {
             Injector injector = app
-                    .strictConfig()
                     .doNotInitializeLogging()
                     .initialize();
             lifeCycleManager = injector.getInstance(LifeCycleManager.class);

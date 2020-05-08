@@ -48,6 +48,7 @@ public final class HeaderTransport
 
     /**
      * Encodes the HeaderFrame into a ByteBuf transferring the reference ownership.
+     *
      * @param frame frame to be encoded; reference count ownership is transferred to this method
      * @return the encoded frame data; caller is responsible for releasing this buffer
      */
@@ -142,6 +143,7 @@ public final class HeaderTransport
 
     /**
      * Decodes the ByteBuf into a HeaderFrame transferring the reference ownership.
+     *
      * @param buffer buffer to be decoded; reference count ownership is transferred to this method
      * @return the decoded frame; caller is responsible for releasing this object
      */

@@ -36,11 +36,15 @@
                 <groupId>com.mycila</groupId>
                 <artifactId>license-maven-plugin</artifactId>
                 <configuration>
-                    <excludes combine.children="append">
-                        <exclude>src/main/java/io/airlift/drift/protocol/TBinaryProtocol.java</exclude>
-                        <exclude>src/main/java/io/airlift/drift/protocol/TCompactProtocol.java</exclude>
-                        <exclude>src/main/java/io/airlift/drift/protocol/TFacebookCompactProtocol.java</exclude>
-                    </excludes>
+                    <licenseSets>
+                        <licenseSet>
+                            <excludes combine.children="append">
+                                <exclude>src/main/java/io/airlift/drift/protocol/TBinaryProtocol.java</exclude>
+                                <exclude>src/main/java/io/airlift/drift/protocol/TCompactProtocol.java</exclude>
+                                <exclude>src/main/java/io/airlift/drift/protocol/TFacebookCompactProtocol.java</exclude>
+                            </excludes>
+                        </licenseSet>
+                    </licenseSets>
                 </configuration>
             </plugin>
         </plugins>
