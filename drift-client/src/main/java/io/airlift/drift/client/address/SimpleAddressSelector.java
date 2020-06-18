@@ -91,12 +91,6 @@ public class SimpleAddressSelector
         return Optional.of(address);
     }
 
-    @Override
-    public void markdown(SimpleAddress address)
-    {
-        // TODO: implement some policy for blacklisting
-    }
-
     public static final class SimpleAddress
             implements Address
     {
