@@ -27,7 +27,6 @@ import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.Filer;
 import javax.annotation.processing.RoundEnvironment;
 import javax.annotation.processing.SupportedAnnotationTypes;
-import javax.annotation.processing.SupportedSourceVersion;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.Element;
@@ -60,10 +59,15 @@ import static javax.tools.Diagnostic.Kind.WARNING;
         ThriftAnnotations.THRIFT_ENUM,
         ThriftAnnotations.THRIFT_SERVICE,
         ThriftAnnotations.THRIFT_STRUCT})
-@SupportedSourceVersion(SourceVersion.RELEASE_8)
 public class JavadocProcessor
         extends AbstractProcessor
 {
+    @Override
+    public SourceVersion getSupportedSourceVersion()
+    {
+        return SourceVersion.latest();
+    }
+
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment round)
     {
