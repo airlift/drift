@@ -5,7 +5,7 @@
     <parent>
         <groupId>io.airlift</groupId>
         <artifactId>airbase</artifactId>
-        <version>97</version>
+        <version>101</version>
     </parent>
 
     <groupId>io.airlift.drift</groupId>
@@ -48,6 +48,8 @@
         <air.license.header-file>license/apache-copyright-header.txt</air.license.header-file>
 
         <air.check.skip-jacoco>true</air.check.skip-jacoco>
+
+        <project.build.targetJdk>8</project.build.targetJdk>
 
         <dep.airlift.version>0.193</dep.airlift.version>
         <dep.takari-plugin.version>2.9.1</dep.takari-plugin.version>
