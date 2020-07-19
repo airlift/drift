@@ -18,7 +18,7 @@ package io.airlift.drift.server;
 import com.google.common.util.concurrent.ListenableFuture;
 import io.airlift.drift.transport.server.ServerInvokeRequest;
 
-interface ServerMethodInvoker
+public interface ServerMethodInvoker
 {
     ListenableFuture<Object> invoke(ServerInvokeRequest request);
 }
