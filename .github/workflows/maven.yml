@@ -30,7 +30,9 @@ jobs:
         java-version: ${{ matrix.java_version }}
         distribution: 'temurin'
         cache: maven
-    - name: Build with Maven
+    - name: Maven Install
+      run: mvn install
+    - name: Maven Package
       run: mvn -B package --file pom.xml
 
     # Optional: Uploads the full dependency graph to GitHub to improve the quality of Dependabot alerts this repository can receive
