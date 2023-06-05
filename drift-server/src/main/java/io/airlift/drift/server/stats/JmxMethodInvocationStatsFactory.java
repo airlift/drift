@@ -15,12 +15,11 @@
  */
 package io.airlift.drift.server.stats;
 
+import com.google.inject.Inject;
 import io.airlift.drift.codec.metadata.ThriftServiceMetadata;
 import io.airlift.drift.transport.MethodMetadata;
 import org.weakref.jmx.MBeanExporter;
 import org.weakref.jmx.ObjectNameBuilder;
-
-import javax.inject.Inject;
 
 import java.io.Closeable;
 import java.util.Map;

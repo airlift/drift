@@ -15,12 +15,11 @@
  */
 package io.airlift.drift.transport.netty.server;
 
+import com.google.inject.Inject;
 import io.airlift.drift.transport.server.ServerMethodInvoker;
 import io.airlift.drift.transport.server.ServerTransport;
 import io.airlift.drift.transport.server.ServerTransportFactory;
 import io.netty.buffer.ByteBufAllocator;
-
-import javax.inject.Inject;
 
 import static java.util.Objects.requireNonNull;
 

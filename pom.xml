@@ -293,6 +293,7 @@
                         <exclusions>
                             <exclusion>com/google/common/collect/Iterables.getOnlyElement:(Ljava/lang/Iterable;)Ljava/lang/Object;</exclusion>
                             <exclusion>com/google/common/collect/Iterables.concat:(Ljava/lang/Iterable;)Ljava/lang/Iterable;</exclusion>
+                            <exclusion>com/google/inject/Provider</exclusion>
                         </exclusions>
                     </configuration>
                 </plugin>

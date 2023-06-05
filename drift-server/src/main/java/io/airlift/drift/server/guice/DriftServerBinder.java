@@ -16,9 +16,11 @@
 package io.airlift.drift.server.guice;
 
 import com.google.inject.Binder;
+import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Key;
 import com.google.inject.Module;
+import com.google.inject.Provider;
 import io.airlift.drift.codec.guice.ThriftCodecModule;
 import io.airlift.drift.server.DriftServer;
 import io.airlift.drift.server.DriftService;
@@ -28,9 +30,6 @@ import io.airlift.drift.server.stats.MethodInvocationStatsFactory;
 import io.airlift.drift.server.stats.NullMethodInvocationStatsFactory;
 import io.airlift.drift.transport.server.DriftServerConfig;
 import org.weakref.jmx.MBeanExporter;
-
-import javax.inject.Inject;
-import javax.inject.Provider;
 
 import java.lang.annotation.Annotation;
 import java.util.Optional;

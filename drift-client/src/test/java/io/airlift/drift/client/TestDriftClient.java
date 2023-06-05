@@ -18,6 +18,7 @@ package io.airlift.drift.client;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.util.concurrent.ListenableFuture;
+import com.google.inject.BindingAnnotation;
 import com.google.inject.Injector;
 import com.google.inject.Key;
 import com.google.inject.TypeLiteral;
@@ -39,8 +40,6 @@ import io.airlift.drift.transport.client.DriftClientConfig;
 import io.airlift.drift.transport.client.InvokeRequest;
 import io.airlift.drift.transport.client.MethodInvokerFactory;
 import org.testng.annotations.Test;
-
-import javax.inject.Qualifier;
 
 import java.lang.annotation.Annotation;
 import java.lang.annotation.Retention;
@@ -502,7 +501,7 @@ public class TestDriftClient
 
     @Target({FIELD, PARAMETER, METHOD})
     @Retention(RUNTIME)
-    @Qualifier
+    @BindingAnnotation
     private @interface CustomClient {}
 
     @ThriftStruct

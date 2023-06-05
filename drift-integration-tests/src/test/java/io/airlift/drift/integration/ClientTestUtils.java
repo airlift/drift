@@ -18,6 +18,8 @@ package io.airlift.drift.integration;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.net.HostAndPort;
+import com.google.inject.BindingAnnotation;
+import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Module;
 import com.google.inject.Scopes;
@@ -36,8 +38,6 @@ import io.airlift.drift.transport.netty.codec.Transport;
 import io.airlift.jmx.testing.TestingJmxModule;
 import org.weakref.jmx.guice.MBeanModule;
 
-import javax.inject.Inject;
-import javax.inject.Qualifier;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManagerFactory;
@@ -209,7 +209,7 @@ final class ClientTestUtils
 
     @Target({FIELD, PARAMETER, METHOD})
     @Retention(RUNTIME)
-    @Qualifier
+    @BindingAnnotation
     private @interface CustomClient {}
 
     private static class ScribeUser

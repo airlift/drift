@@ -18,6 +18,7 @@ package io.airlift.drift.transport.apache.client;
 import com.google.common.net.HostAndPort;
 import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.ListeningScheduledExecutorService;
+import com.google.inject.Inject;
 import io.airlift.drift.transport.client.MethodInvoker;
 import io.airlift.drift.transport.client.MethodInvokerFactory;
 import io.airlift.security.pem.PemReader;
@@ -28,7 +29,6 @@ import org.apache.thrift.transport.TFramedTransport;
 import org.apache.thrift.transport.TTransportFactory;
 
 import javax.annotation.PreDestroy;
-import javax.inject.Inject;
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;

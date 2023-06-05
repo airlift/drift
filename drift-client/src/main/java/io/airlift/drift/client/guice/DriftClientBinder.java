@@ -19,11 +19,14 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.reflect.TypeParameter;
 import com.google.common.reflect.TypeToken;
 import com.google.inject.Binder;
+import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Key;
 import com.google.inject.Module;
+import com.google.inject.Provider;
 import com.google.inject.Provides;
 import com.google.inject.Scopes;
+import com.google.inject.Singleton;
 import com.google.inject.TypeLiteral;
 import io.airlift.configuration.ConfigDefaults;
 import io.airlift.drift.client.DriftClient;
@@ -40,10 +43,6 @@ import io.airlift.drift.codec.guice.ThriftCodecModule;
 import io.airlift.drift.transport.client.DriftClientConfig;
 import io.airlift.drift.transport.client.MethodInvokerFactory;
 import org.weakref.jmx.MBeanExporter;
-
-import javax.inject.Inject;
-import javax.inject.Provider;
-import javax.inject.Singleton;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;

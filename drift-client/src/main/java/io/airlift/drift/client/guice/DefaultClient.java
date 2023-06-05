@@ -15,7 +15,7 @@
  */
 package io.airlift.drift.client.guice;
 
-import javax.inject.Qualifier;
+import com.google.inject.BindingAnnotation;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
@@ -27,7 +27,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 @Target({FIELD, PARAMETER, METHOD})
 @Retention(RUNTIME)
-@Qualifier
+@BindingAnnotation
 public @interface DefaultClient
 {
 }
