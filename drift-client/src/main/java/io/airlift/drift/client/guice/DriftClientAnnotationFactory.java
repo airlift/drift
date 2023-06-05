@@ -15,7 +15,7 @@
  */
 package io.airlift.drift.client.guice;
 
-import javax.inject.Qualifier;
+import com.google.inject.BindingAnnotation;
 
 import java.lang.annotation.Annotation;
 import java.lang.annotation.Retention;
@@ -53,7 +53,7 @@ public final class DriftClientAnnotationFactory
 
     @Target({FIELD, PARAMETER, METHOD})
     @Retention(RUNTIME)
-    @Qualifier
+    @BindingAnnotation
     @interface DriftClientAnnotation
     {
         Class<?> value();

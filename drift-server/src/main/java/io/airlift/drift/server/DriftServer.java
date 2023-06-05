@@ -16,6 +16,7 @@
 package io.airlift.drift.server;
 
 import com.google.common.collect.ImmutableList;
+import com.google.inject.Inject;
 import io.airlift.drift.codec.ThriftCodecManager;
 import io.airlift.drift.server.stats.MethodInvocationStatsFactory;
 import io.airlift.drift.transport.server.ServerTransport;
@@ -23,7 +24,6 @@ import io.airlift.drift.transport.server.ServerTransportFactory;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-import javax.inject.Inject;
 
 import java.util.Set;
 

@@ -15,10 +15,9 @@
  */
 package io.airlift.drift.client.guice;
 
+import com.google.inject.Inject;
 import com.google.inject.Injector;
-
-import javax.inject.Inject;
-import javax.inject.Provider;
+import com.google.inject.Provider;
 
 import java.lang.annotation.Annotation;
 import java.util.Objects;
