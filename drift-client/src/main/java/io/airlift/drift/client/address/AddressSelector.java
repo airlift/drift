@@ -22,13 +22,7 @@ import java.util.Set;
 
 public interface AddressSelector<A extends Address>
 {
-    @Deprecated
-    Optional<A> selectAddress(Optional<String> addressSelectionContext);
-
-    default Optional<A> selectAddress(Optional<String> addressSelectionContext, Set<A> attempted)
-    {
-        return selectAddress(addressSelectionContext);
-    }
+    Optional<A> selectAddress(Optional<String> addressSelectionContext, Set<A> attempted);
 
     default void markdown(A address) {}
 }

@@ -73,7 +73,7 @@ final class ApacheThriftTesterUtil
             return 0;
         }
 
-        AddressSelector<?> addressSelector = context -> Optional.of(() -> address);
+        AddressSelector<?> addressSelector = (context, attempted) -> Optional.of(() -> address);
         ApacheThriftClientConfig config = new ApacheThriftClientConfig()
                 .setTransport(toApacheThriftTransport(transport))
                 .setProtocol(toApacheThriftProtocol(protocol))
@@ -107,7 +107,7 @@ final class ApacheThriftTesterUtil
             return 0;
         }
 
-        AddressSelector<?> addressSelector = context -> Optional.of(() -> address);
+        AddressSelector<?> addressSelector = (context, attempted) -> Optional.of(() -> address);
         ApacheThriftClientConfig config = new ApacheThriftClientConfig()
                 .setTransport(toApacheThriftTransport(transport))
                 .setProtocol(toApacheThriftProtocol(protocol))
@@ -140,7 +140,7 @@ final class ApacheThriftTesterUtil
             return 0;
         }
 
-        AddressSelector<?> addressSelector = context -> Optional.of(() -> address);
+        AddressSelector<?> addressSelector = (context, attempted) -> Optional.of(() -> address);
         ApacheThriftClientConfig config = new ApacheThriftClientConfig()
                 .setTransport(toApacheThriftTransport(transport))
                 .setProtocol(toApacheThriftProtocol(protocol))

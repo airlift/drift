@@ -21,6 +21,7 @@ import io.airlift.drift.transport.client.Address;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class MockAddressSelector
@@ -40,7 +41,7 @@ public class MockAddressSelector
     }
 
     @Override
-    public Optional<Address> selectAddress(Optional<String> addressSelectionContext)
+    public Optional<Address> selectAddress(Optional<String> addressSelectionContext, Set<Address> attempted)
     {
         return address.map(hostAndPort -> () -> hostAndPort);
     }

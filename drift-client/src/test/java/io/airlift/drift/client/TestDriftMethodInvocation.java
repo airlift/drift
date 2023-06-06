@@ -845,12 +845,6 @@ public class TestDriftMethodInvocation
         }
 
         @Override
-        public synchronized Optional<Address> selectAddress(Optional<String> addressSelectionContext)
-        {
-            return selectAddress(addressSelectionContext, ImmutableSet.of());
-        }
-
-        @Override
         public synchronized Optional<Address> selectAddress(Optional<String> addressSelectionContext, Set<Address> attempted)
         {
             lastAttemptedSet = ImmutableSet.copyOf(attempted);

@@ -74,7 +74,7 @@ final class DriftNettyTesterUtil
             return 0;
         }
 
-        AddressSelector<?> addressSelector = context -> Optional.of(() -> address);
+        AddressSelector<?> addressSelector = (context, attempted) -> Optional.of(() -> address);
         DriftNettyClientConfig config = new DriftNettyClientConfig()
                 .setTransport(transport)
                 .setProtocol(protocol)
@@ -112,7 +112,7 @@ final class DriftNettyTesterUtil
             return 0;
         }
 
-        AddressSelector<?> addressSelector = context -> Optional.of(() -> address);
+        AddressSelector<?> addressSelector = (context, attempted) -> Optional.of(() -> address);
         DriftNettyClientConfig config = new DriftNettyClientConfig()
                 .setTransport(transport)
                 .setProtocol(protocol)
@@ -146,7 +146,7 @@ final class DriftNettyTesterUtil
             return 0;
         }
 
-        AddressSelector<?> addressSelector = context -> Optional.of(() -> address);
+        AddressSelector<?> addressSelector = (context, attempted) -> Optional.of(() -> address);
         DriftNettyClientConfig config = new DriftNettyClientConfig()
                 .setTransport(transport)
                 .setProtocol(protocol)

@@ -59,13 +59,6 @@ public class SimpleAddressSelector
         return addresses;
     }
 
-    @Deprecated
-    @Override
-    public Optional<SimpleAddress> selectAddress(Optional<String> addressSelectionContext)
-    {
-        return selectAddress(addressSelectionContext, ImmutableSet.of());
-    }
-
     @Override
     public Optional<SimpleAddress> selectAddress(Optional<String> addressSelectionContext, Set<SimpleAddress> attempted)
     {
