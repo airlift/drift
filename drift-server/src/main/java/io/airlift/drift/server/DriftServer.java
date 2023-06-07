@@ -21,9 +21,8 @@ import io.airlift.drift.codec.ThriftCodecManager;
 import io.airlift.drift.server.stats.MethodInvocationStatsFactory;
 import io.airlift.drift.transport.server.ServerTransport;
 import io.airlift.drift.transport.server.ServerTransportFactory;
-
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
 
 import java.util.Set;
 

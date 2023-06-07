@@ -27,8 +27,7 @@ import com.google.inject.TypeLiteral;
 import io.airlift.drift.transport.client.DriftClientConfig;
 import io.airlift.drift.transport.client.MethodInvokerFactory;
 import io.netty.buffer.ByteBufAllocator;
-
-import javax.annotation.PreDestroy;
+import jakarta.annotation.PreDestroy;
 
 import java.lang.annotation.Annotation;
 

@@ -25,8 +25,7 @@ import io.airlift.drift.transport.netty.ssl.SslContextFactory.SslContextParamete
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
-
-import javax.annotation.PreDestroy;
+import jakarta.annotation.PreDestroy;
 
 import java.io.Closeable;
 import java.util.Optional;
