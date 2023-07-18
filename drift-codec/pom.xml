@@ -35,11 +35,6 @@
 
         <dependency>
             <groupId>io.airlift</groupId>
-            <artifactId>parameternames</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>io.airlift</groupId>
             <artifactId>bytecode</artifactId>
         </dependency>
 
