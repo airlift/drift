@@ -22,7 +22,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.reflect.TypeToken;
 import io.airlift.drift.annotations.ThriftField;
-import io.airlift.parameternames.ParameterNames;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
@@ -32,7 +31,6 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -44,6 +42,7 @@ import java.util.concurrent.Future;
 import static com.google.common.base.Strings.emptyToNull;
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static java.lang.reflect.Modifier.isStatic;
+import static java.util.Arrays.stream;
 import static java.util.Collections.emptyList;
 import static java.util.Objects.requireNonNull;
 
@@ -273,7 +272,7 @@ public final class ReflectionHelper
         }
 
         // first try to get the parameter names from the ThriftField annotations
-        List<Optional<String>> parameterNamesFromThriftField = Arrays.stream(executable.getParameters())
+        List<Optional<String>> parameterNamesFromThriftField = stream(executable.getParameters())
                 .map(ReflectionHelper::getThriftFieldParameterName)
                 .collect(toImmutableList());
         if (parameterNamesFromThriftField.stream().allMatch(Optional::isPresent)) {
@@ -283,7 +282,9 @@ public final class ReflectionHelper
         }
 
         // otherwise get the parameter names from the class, but use any ThriftField annotations as overrides
-        List<String> parameterNamesFromClass = ParameterNames.getParameterNames(executable);
+        List<String> parameterNamesFromClass = stream(executable.getParameters())
+                .map(Parameter::getName)
+                .toList();
         ImmutableList.Builder<String> parameterNames = ImmutableList.builder();
         for (int i = 0; i < parameterNamesFromThriftField.size(); i++) {
             parameterNames.add(parameterNamesFromThriftField.get(i).orElse(parameterNamesFromClass.get(i)));
@@ -324,7 +325,7 @@ public final class ReflectionHelper
 
     public static Type[] resolveFieldTypes(Type structType, Type[] genericTypes)
     {
-        return Arrays.stream(genericTypes)
+        return stream(genericTypes)
                 .map(type -> resolveFieldType(structType, type))
                 .toArray(Type[]::new);
     }
