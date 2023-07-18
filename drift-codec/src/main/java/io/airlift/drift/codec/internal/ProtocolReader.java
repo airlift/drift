@@ -25,8 +25,6 @@ import io.airlift.drift.protocol.TProtocolUtil;
 import io.airlift.drift.protocol.TSet;
 import io.airlift.drift.protocol.TType;
 
-import javax.annotation.concurrent.NotThreadSafe;
-
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -39,7 +37,7 @@ import java.util.Set;
 import static com.google.common.base.MoreObjects.toStringHelper;
 import static com.google.common.base.Preconditions.checkState;
 
-@NotThreadSafe
+// This class is not thread safe
 public class ProtocolReader
 {
     private final TProtocolReader protocol;

@@ -17,9 +17,8 @@ package io.airlift.drift.codec.metadata;
 
 import com.google.common.reflect.TypeParameter;
 import com.google.common.reflect.TypeToken;
+import com.google.errorprone.annotations.Immutable;
 import io.airlift.drift.codec.ThriftProtocolType;
-
-import javax.annotation.concurrent.Immutable;
 
 import java.lang.reflect.Type;
 import java.nio.ByteBuffer;

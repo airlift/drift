@@ -15,13 +15,12 @@
  */
 package io.airlift.drift.codec.internal.coercion;
 
+import com.google.errorprone.annotations.Immutable;
 import io.airlift.drift.codec.ThriftCodec;
 import io.airlift.drift.codec.metadata.ThriftType;
 import io.airlift.drift.codec.metadata.TypeCoercion;
 import io.airlift.drift.protocol.TProtocolReader;
 import io.airlift.drift.protocol.TProtocolWriter;
-
-import javax.annotation.concurrent.Immutable;
 
 /**
  * CoercionThriftCodec encapsulates a ThriftCodec and coerces the values to another type using

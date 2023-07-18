@@ -18,8 +18,7 @@ package io.airlift.drift.codec.metadata;
 import com.google.common.collect.ImmutableMap;
 import io.airlift.drift.annotations.ThriftField;
 import io.airlift.drift.annotations.ThriftIdlAnnotation;
-
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 
 import java.lang.reflect.Type;
 import java.util.Map;

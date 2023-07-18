@@ -15,17 +15,13 @@
  */
 package io.airlift.drift.transport.netty.ssl;
 
+import com.google.errorprone.annotations.CheckReturnValue;
 import io.airlift.drift.protocol.TTransport;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.util.ReferenceCounted;
 
-import javax.annotation.CheckReturnValue;
-import javax.annotation.concurrent.NotThreadSafe;
-
-import static javax.annotation.meta.When.UNKNOWN;
-
-@NotThreadSafe
+// This class is not thread safe
 public class TChannelBufferOutputTransport
         implements TTransport, ReferenceCounted
 {
@@ -92,7 +88,7 @@ public class TChannelBufferOutputTransport
         return this;
     }
 
-    @CheckReturnValue(when = UNKNOWN)
+    @CheckReturnValue
     @Override
     public boolean release()
     {

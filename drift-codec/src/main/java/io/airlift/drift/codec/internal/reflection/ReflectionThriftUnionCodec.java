@@ -16,6 +16,7 @@
 package io.airlift.drift.codec.internal.reflection;
 
 import com.google.common.collect.Maps;
+import com.google.errorprone.annotations.Immutable;
 import io.airlift.drift.codec.ThriftCodec;
 import io.airlift.drift.codec.ThriftCodecManager;
 import io.airlift.drift.codec.internal.ProtocolReader;
@@ -29,8 +30,6 @@ import io.airlift.drift.codec.metadata.ThriftMethodInjection;
 import io.airlift.drift.codec.metadata.ThriftStructMetadata;
 import io.airlift.drift.protocol.TProtocolReader;
 import io.airlift.drift.protocol.TProtocolWriter;
-
-import javax.annotation.concurrent.Immutable;
 
 import java.util.Map;
 

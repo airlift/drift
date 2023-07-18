@@ -15,12 +15,11 @@
  */
 package io.airlift.drift.codec.internal.builtin;
 
+import com.google.errorprone.annotations.Immutable;
 import io.airlift.drift.codec.ThriftCodec;
 import io.airlift.drift.codec.metadata.ThriftType;
 import io.airlift.drift.protocol.TProtocolReader;
 import io.airlift.drift.protocol.TProtocolWriter;
-
-import javax.annotation.concurrent.Immutable;
 
 import static java.util.Objects.requireNonNull;
 

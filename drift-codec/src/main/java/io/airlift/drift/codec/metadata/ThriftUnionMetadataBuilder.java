@@ -22,8 +22,6 @@ import io.airlift.drift.annotations.ThriftUnion;
 import io.airlift.drift.annotations.ThriftUnionId;
 import io.airlift.drift.codec.metadata.ThriftStructMetadata.MetadataType;
 
-import javax.annotation.concurrent.NotThreadSafe;
-
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -37,7 +35,7 @@ import static io.airlift.drift.annotations.ThriftField.Requiredness;
 import static io.airlift.drift.codec.metadata.FieldKind.THRIFT_UNION_ID;
 import static io.airlift.drift.codec.metadata.ReflectionHelper.findAnnotatedMethods;
 
-@NotThreadSafe
+// This class is not thread safe
 public class ThriftUnionMetadataBuilder
         extends AbstractThriftMetadataBuilder
 {

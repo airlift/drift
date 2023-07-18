@@ -15,6 +15,7 @@
  */
 package io.airlift.drift.codec.internal.compiler;
 
+import com.google.errorprone.annotations.Immutable;
 import com.google.inject.Inject;
 import io.airlift.bytecode.DynamicClassLoader;
 import io.airlift.drift.codec.ThriftCodec;
@@ -22,8 +23,6 @@ import io.airlift.drift.codec.ThriftCodecManager;
 import io.airlift.drift.codec.internal.ForCompiler;
 import io.airlift.drift.codec.internal.ThriftCodecFactory;
 import io.airlift.drift.codec.metadata.ThriftStructMetadata;
-
-import javax.annotation.concurrent.Immutable;
 
 import java.security.AccessController;
 import java.security.PrivilegedAction;

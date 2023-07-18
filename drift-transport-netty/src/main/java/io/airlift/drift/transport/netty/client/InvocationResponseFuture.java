@@ -18,6 +18,7 @@ package io.airlift.drift.transport.netty.client;
 import com.google.common.util.concurrent.AbstractFuture;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
+import com.google.errorprone.annotations.concurrent.GuardedBy;
 import io.airlift.drift.TException;
 import io.airlift.drift.protocol.TTransportException;
 import io.airlift.drift.transport.client.ConnectionFailedException;
@@ -27,8 +28,6 @@ import io.airlift.drift.transport.netty.client.ThriftClientHandler.ThriftRequest
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.util.concurrent.Future;
-
-import javax.annotation.concurrent.GuardedBy;
 
 import java.io.IOException;
 

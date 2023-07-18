@@ -17,10 +17,9 @@ package io.airlift.drift.codec.metadata;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.errorprone.annotations.Immutable;
 import io.airlift.drift.annotations.ThriftEnumUnknownValue;
 import io.airlift.drift.annotations.ThriftEnumValue;
-
-import javax.annotation.concurrent.Immutable;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;

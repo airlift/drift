@@ -25,8 +25,6 @@ import com.google.inject.internal.MoreTypes;
 import io.airlift.drift.annotations.ThriftConstructor;
 import io.airlift.drift.annotations.ThriftField;
 
-import javax.annotation.concurrent.NotThreadSafe;
-
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -59,7 +57,7 @@ import static java.util.stream.Collectors.toCollection;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 
-@NotThreadSafe
+// This class is not thread safe
 public abstract class AbstractThriftMetadataBuilder
 {
     protected final String structName;

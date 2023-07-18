@@ -17,11 +17,9 @@ package io.airlift.drift.codec.metadata;
 
 import io.airlift.drift.annotations.ThriftEnum;
 
-import javax.annotation.concurrent.NotThreadSafe;
-
 import static com.google.common.base.Preconditions.checkArgument;
 
-@NotThreadSafe
+// This class is not thread safe
 public class ThriftEnumMetadataBuilder<T extends Enum<T>>
 {
     private final Class<T> enumClass;

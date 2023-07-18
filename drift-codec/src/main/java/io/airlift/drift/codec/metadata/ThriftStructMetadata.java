@@ -18,8 +18,7 @@ package io.airlift.drift.codec.metadata;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSortedMap;
 import com.google.common.reflect.TypeToken;
-
-import javax.annotation.concurrent.Immutable;
+import com.google.errorprone.annotations.Immutable;
 
 import java.lang.reflect.Type;
 import java.util.Collection;
