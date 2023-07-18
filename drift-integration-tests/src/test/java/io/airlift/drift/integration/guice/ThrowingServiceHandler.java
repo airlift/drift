@@ -17,8 +17,7 @@ package io.airlift.drift.integration.guice;
 
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.SettableFuture;
-
-import javax.annotation.concurrent.GuardedBy;
+import com.google.errorprone.annotations.concurrent.GuardedBy;
 
 import static java.lang.Math.toIntExact;
 

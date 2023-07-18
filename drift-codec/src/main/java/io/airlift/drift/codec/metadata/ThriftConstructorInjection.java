@@ -17,8 +17,7 @@ package io.airlift.drift.codec.metadata;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
-
-import javax.annotation.concurrent.Immutable;
+import com.google.errorprone.annotations.Immutable;
 
 import java.lang.reflect.Constructor;
 import java.util.List;

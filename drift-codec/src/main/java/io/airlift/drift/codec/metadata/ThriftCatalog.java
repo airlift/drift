@@ -20,6 +20,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Sets;
 import com.google.common.reflect.TypeToken;
 import com.google.common.util.concurrent.ListenableFuture;
+import com.google.errorprone.annotations.ThreadSafe;
 import io.airlift.drift.annotations.ThriftDocumentation;
 import io.airlift.drift.annotations.ThriftOrder;
 import io.airlift.drift.annotations.ThriftStruct;
@@ -32,8 +33,6 @@ import io.airlift.drift.codec.internal.coercion.DefaultJavaCoercions;
 import io.airlift.drift.codec.internal.coercion.FromThrift;
 import io.airlift.drift.codec.internal.coercion.ToThrift;
 import io.airlift.drift.codec.metadata.MetadataErrors.Monitor;
-
-import javax.annotation.concurrent.ThreadSafe;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;

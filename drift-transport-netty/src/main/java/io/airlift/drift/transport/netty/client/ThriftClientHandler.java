@@ -16,6 +16,7 @@
 package io.airlift.drift.transport.netty.client;
 
 import com.google.common.util.concurrent.AbstractFuture;
+import com.google.errorprone.annotations.ThreadSafe;
 import io.airlift.drift.TApplicationException;
 import io.airlift.drift.TException;
 import io.airlift.drift.codec.ThriftCodec;
@@ -47,8 +48,6 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPromise;
 import io.netty.util.concurrent.EventExecutor;
 import io.netty.util.concurrent.ScheduledFuture;
-
-import javax.annotation.concurrent.ThreadSafe;
 
 import java.util.List;
 import java.util.Map;

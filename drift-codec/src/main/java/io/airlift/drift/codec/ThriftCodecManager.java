@@ -20,6 +20,7 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.reflect.TypeToken;
+import com.google.errorprone.annotations.ThreadSafe;
 import com.google.inject.Inject;
 import io.airlift.drift.codec.internal.EnumThriftCodec;
 import io.airlift.drift.codec.internal.ThriftCodecFactory;
@@ -53,8 +54,6 @@ import io.airlift.drift.codec.metadata.ThriftTypeReference;
 import io.airlift.drift.codec.metadata.TypeCoercion;
 import io.airlift.drift.protocol.TProtocolReader;
 import io.airlift.drift.protocol.TProtocolWriter;
-
-import javax.annotation.concurrent.ThreadSafe;
 
 import java.lang.reflect.Type;
 import java.util.ArrayDeque;

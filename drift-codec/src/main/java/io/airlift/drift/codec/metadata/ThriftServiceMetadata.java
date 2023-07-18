@@ -18,10 +18,9 @@ package io.airlift.drift.codec.metadata;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Ordering;
 import com.google.common.collect.TreeMultimap;
+import com.google.errorprone.annotations.Immutable;
 import io.airlift.drift.annotations.ThriftMethod;
 import io.airlift.drift.annotations.ThriftService;
-
-import javax.annotation.concurrent.Immutable;
 
 import java.lang.reflect.Method;
 import java.util.List;

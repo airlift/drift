@@ -25,14 +25,12 @@ import io.airlift.drift.protocol.TSet;
 import io.airlift.drift.protocol.TStruct;
 import io.airlift.drift.protocol.TType;
 
-import javax.annotation.concurrent.NotThreadSafe;
-
 import java.nio.ByteBuffer;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-@NotThreadSafe
+// This class is not thread safe
 public class ProtocolWriter
 {
     private final TProtocolWriter protocol;

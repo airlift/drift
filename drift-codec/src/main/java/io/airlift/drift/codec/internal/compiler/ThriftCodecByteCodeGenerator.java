@@ -55,8 +55,6 @@ import io.airlift.drift.codec.metadata.ThriftTypeReference;
 import io.airlift.drift.protocol.TProtocolReader;
 import io.airlift.drift.protocol.TProtocolWriter;
 
-import javax.annotation.concurrent.NotThreadSafe;
-
 import java.io.PrintWriter;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
@@ -115,7 +113,7 @@ import static io.airlift.drift.codec.metadata.FieldKind.THRIFT_UNION_ID;
 import static java.lang.String.format;
 import static java.util.stream.Collectors.joining;
 
-@NotThreadSafe
+// This class is not thread safe
 public class ThriftCodecByteCodeGenerator<T>
 {
     private static final String PACKAGE = "$drift";

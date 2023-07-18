@@ -18,13 +18,12 @@ package io.airlift.drift.transport.netty.client;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.net.HostAndPort;
+import com.google.errorprone.annotations.concurrent.GuardedBy;
 import io.airlift.drift.protocol.TTransportException;
 import io.airlift.units.Duration;
 import io.netty.channel.Channel;
 import io.netty.channel.EventLoopGroup;
 import io.netty.util.concurrent.Future;
-
-import javax.annotation.concurrent.GuardedBy;
 
 import java.util.Objects;
 import java.util.concurrent.ExecutionException;

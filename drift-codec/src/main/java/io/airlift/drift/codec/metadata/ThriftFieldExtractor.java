@@ -16,8 +16,7 @@
 package io.airlift.drift.codec.metadata;
 
 import com.google.common.reflect.TypeToken;
-
-import javax.annotation.concurrent.Immutable;
+import com.google.errorprone.annotations.Immutable;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;

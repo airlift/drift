@@ -22,6 +22,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.net.HostAndPort;
 import com.google.common.util.concurrent.AbstractFuture;
 import com.google.common.util.concurrent.ListenableFuture;
+import com.google.errorprone.annotations.concurrent.GuardedBy;
 import io.airlift.drift.TException;
 import io.airlift.drift.client.ExceptionClassification.HostStatus;
 import io.airlift.drift.client.address.AddressSelector;
@@ -37,8 +38,6 @@ import io.airlift.drift.transport.client.DriftClientConfig;
 import io.airlift.testing.TestingTicker;
 import io.airlift.units.Duration;
 import org.testng.annotations.Test;
-
-import javax.annotation.concurrent.GuardedBy;
 
 import java.util.HashSet;
 import java.util.List;
