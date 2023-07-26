@@ -26,8 +26,8 @@ import jakarta.annotation.PreDestroy;
 import org.apache.thrift.protocol.TBinaryProtocol;
 import org.apache.thrift.protocol.TCompactProtocol;
 import org.apache.thrift.protocol.TProtocolFactory;
-import org.apache.thrift.transport.TFramedTransport;
 import org.apache.thrift.transport.TTransportFactory;
+import org.apache.thrift.transport.layered.TFramedTransport;
 
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.KeyManagerFactory;
