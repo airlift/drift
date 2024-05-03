@@ -42,7 +42,8 @@ import static java.nio.file.Files.createDirectories;
 
 @Mojo(name = "generate-thrift-idl",
         defaultPhase = LifecyclePhase.PROCESS_CLASSES,
-        requiresDependencyResolution = ResolutionScope.COMPILE_PLUS_RUNTIME)
+        requiresDependencyResolution = ResolutionScope.COMPILE_PLUS_RUNTIME,
+        threadSafe = true)
 public class IdlGeneratorMojo
         extends AbstractMojo
 {
