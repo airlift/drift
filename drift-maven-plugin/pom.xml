@@ -9,8 +9,8 @@
     </parent>
 
     <artifactId>drift-maven-plugin</artifactId>
-    <description>Maven plugin for Drift</description>
     <packaging>maven-plugin</packaging>
+    <description>Maven plugin for Drift</description>
 
     <properties>
         <air.main.basedir>${project.parent.basedir}</air.main.basedir>
@@ -22,16 +22,16 @@
             <artifactId>drift-idl-generator</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>org.apache.maven</groupId>
+            <artifactId>maven-artifact</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
         <!-- Maven -->
         <dependency>
             <groupId>org.apache.maven</groupId>
             <artifactId>maven-core</artifactId>
-            <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.maven</groupId>
-            <artifactId>maven-artifact</artifactId>
             <scope>provided</scope>
         </dependency>
 
@@ -54,17 +54,17 @@
             <scope>runtime</scope>
         </dependency>
 
-        <!-- for testing -->
-        <dependency>
-            <groupId>io.takari.maven.plugins</groupId>
-            <artifactId>takari-plugin-testing</artifactId>
-            <scope>test</scope>
-        </dependency>
-
         <dependency>
             <groupId>io.takari.maven.plugins</groupId>
             <artifactId>takari-plugin-integration-testing</artifactId>
             <type>pom</type>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- for testing -->
+        <dependency>
+            <groupId>io.takari.maven.plugins</groupId>
+            <artifactId>takari-plugin-testing</artifactId>
             <scope>test</scope>
         </dependency>
 
@@ -76,6 +76,16 @@
     </dependencies>
 
     <build>
+
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+            </resource>
+            <resource>
+                <filtering>true</filtering>
+                <directory>src/main/resources-filtered</directory>
+            </resource>
+        </resources>
         <plugins>
             <plugin>
                 <groupId>io.takari.maven.plugins</groupId>
@@ -84,10 +94,10 @@
                 <executions>
                     <execution>
                         <id>testProperties</id>
-                        <phase>process-test-resources</phase>
                         <goals>
                             <goal>testProperties</goal>
                         </goals>
+                        <phase>process-test-resources</phase>
                     </execution>
                 </executions>
             </plugin>
@@ -106,15 +116,5 @@
                 </configuration>
             </plugin>
         </plugins>
-
-        <resources>
-            <resource>
-                <directory>src/main/resources</directory>
-            </resource>
-            <resource>
-                <directory>src/main/resources-filtered</directory>
-                <filtering>true</filtering>
-            </resource>
-        </resources>
     </build>
 </project>

@@ -9,8 +9,8 @@
     </parent>
 
     <artifactId>drift-protocol</artifactId>
-    <description>Core classes for Drift</description>
     <packaging>jar</packaging>
+    <description>Core classes for Drift</description>
 
     <properties>
         <air.main.basedir>${project.parent.basedir}</air.main.basedir>

@@ -9,8 +9,8 @@
     </parent>
 
     <artifactId>drift-api</artifactId>
-    <description>Drift annotations and exceptions for use in Thrift interfaces and types</description>
     <packaging>jar</packaging>
+    <description>Drift annotations and exceptions for use in Thrift interfaces and types</description>
 
     <properties>
         <air.main.basedir>${project.parent.basedir}</air.main.basedir>

@@ -9,14 +9,25 @@
     </parent>
 
     <artifactId>drift-idl-generator</artifactId>
-    <description>Generate Thrift IDL from Drift annotated classes</description>
     <packaging>jar</packaging>
+    <description>Generate Thrift IDL from Drift annotated classes</description>
 
     <properties>
         <air.main.basedir>${project.parent.basedir}</air.main.basedir>
     </properties>
 
     <dependencies>
+
+        <dependency>
+            <groupId>com.github.spotbugs</groupId>
+            <artifactId>spotbugs-annotations</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+        </dependency>
         <dependency>
             <groupId>io.airlift.drift</groupId>
             <artifactId>drift-api</artifactId>
@@ -25,17 +36,6 @@
         <dependency>
             <groupId>io.airlift.drift</groupId>
             <artifactId>drift-codec</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>com.github.spotbugs</groupId>
-            <artifactId>spotbugs-annotations</artifactId>
-            <optional>true</optional>
         </dependency>
 
         <!-- for testing -->

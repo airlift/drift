@@ -5,7 +5,7 @@
     <parent>
         <groupId>io.airlift</groupId>
         <artifactId>airbase</artifactId>
-        <version>143</version>
+        <version>156</version>
     </parent>
 
     <groupId>io.airlift.drift</groupId>
@@ -17,32 +17,32 @@
     <description>Annotation based Thrift implementation</description>
     <url>https://github.com/airlift/drift</url>
 
-    <scm>
-        <connection>scm:git:git://github.com/airlift/drift.git</connection>
-        <url>https://github.com/airlift/drift</url>
-        <tag>HEAD</tag>
-    </scm>
+    <inceptionYear>2012</inceptionYear>
+
+    <developers>
+        <!-- see git log -->
+    </developers>
 
     <modules>
         <module>drift-api</module>
-        <module>drift-protocol</module>
-        <module>drift-codec</module>
         <module>drift-client</module>
+        <module>drift-codec</module>
         <module>drift-idl-generator</module>
         <module>drift-integration-tests</module>
         <module>drift-javadoc</module>
         <module>drift-maven-plugin</module>
+        <module>drift-protocol</module>
         <module>drift-server</module>
         <module>drift-transport-apache</module>
         <module>drift-transport-netty</module>
         <module>drift-transport-spi</module>
     </modules>
 
-    <inceptionYear>2012</inceptionYear>
-
-    <developers>
-        <!-- see git log -->
-    </developers>
+    <scm>
+        <connection>scm:git:git://github.com/airlift/drift.git</connection>
+        <tag>HEAD</tag>
+        <url>https://github.com/airlift/drift</url>
+    </scm>
 
     <properties>
         <air.license.header-file>license/apache-copyright-header.txt</air.license.header-file>
@@ -50,16 +50,85 @@
         <air.check.skip-jacoco>true</air.check.skip-jacoco>
         <air.check.skip-spotbugs>true</air.check.skip-spotbugs>
 
-        <project.build.targetJdk>17</project.build.targetJdk>
+        <project.build.targetJdk>21</project.build.targetJdk>
         <air.modernizer.java-version>8</air.modernizer.java-version>
 
-        <dep.airlift.version>234</dep.airlift.version>
+        <dep.airlift.version>246</dep.airlift.version>
         <dep.takari-plugin.version>3.0.2</dep.takari-plugin.version>
         <dep.maven.version>3.9.6</dep.maven.version>
+
+        <air.check.skip-pmd>true</air.check.skip-pmd>
     </properties>
 
     <dependencyManagement>
         <dependencies>
+
+            <dependency>
+                <groupId>com.squareup</groupId>
+                <artifactId>javapoet</artifactId>
+                <version>1.9.0</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.airlift</groupId>
+                <artifactId>bootstrap</artifactId>
+                <version>${dep.airlift.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.airlift</groupId>
+                <artifactId>bytecode</artifactId>
+                <version>1.1</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.airlift</groupId>
+                <artifactId>concurrent</artifactId>
+                <version>${dep.airlift.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.airlift</groupId>
+                <artifactId>configuration</artifactId>
+                <version>${dep.airlift.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.airlift</groupId>
+                <artifactId>jmx</artifactId>
+                <version>${dep.airlift.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.airlift</groupId>
+                <artifactId>log</artifactId>
+                <version>${dep.airlift.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.airlift</groupId>
+                <artifactId>security</artifactId>
+                <version>${dep.airlift.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.airlift</groupId>
+                <artifactId>stats</artifactId>
+                <version>${dep.airlift.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.airlift</groupId>
+                <artifactId>testing</artifactId>
+                <version>${dep.airlift.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.airlift</groupId>
+                <artifactId>units</artifactId>
+                <version>1.10</version>
+            </dependency>
+
             <dependency>
                 <groupId>io.airlift.drift</groupId>
                 <artifactId>drift-api</artifactId>
@@ -68,13 +137,13 @@
 
             <dependency>
                 <groupId>io.airlift.drift</groupId>
-                <artifactId>drift-codec</artifactId>
+                <artifactId>drift-client</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>io.airlift.drift</groupId>
-                <artifactId>drift-client</artifactId>
+                <artifactId>drift-codec</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
@@ -115,97 +184,9 @@
             </dependency>
 
             <dependency>
-                <groupId>io.airlift</groupId>
-                <artifactId>bootstrap</artifactId>
-                <version>${dep.airlift.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>io.airlift</groupId>
-                <artifactId>configuration</artifactId>
-                <version>${dep.airlift.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>io.airlift</groupId>
-                <artifactId>concurrent</artifactId>
-                <version>${dep.airlift.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>io.airlift</groupId>
-                <artifactId>jmx</artifactId>
-                <version>${dep.airlift.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>io.airlift</groupId>
-                <artifactId>log</artifactId>
-                <version>${dep.airlift.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>io.airlift</groupId>
-                <artifactId>bytecode</artifactId>
-                <version>1.1</version>
-            </dependency>
-
-            <dependency>
-                <groupId>io.airlift</groupId>
-                <artifactId>security</artifactId>
-                <version>${dep.airlift.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>io.airlift</groupId>
-                <artifactId>stats</artifactId>
-                <version>${dep.airlift.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>io.airlift</groupId>
-                <artifactId>testing</artifactId>
-                <version>${dep.airlift.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>io.airlift</groupId>
-                <artifactId>units</artifactId>
-                <version>1.3</version>
-            </dependency>
-
-            <dependency>
                 <groupId>io.netty</groupId>
                 <artifactId>netty-all</artifactId>
                 <version>4.1.29.Final</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.apache.thrift</groupId>
-                <artifactId>libthrift</artifactId>
-                <version>0.12.0</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.apache.httpcomponents</groupId>
-                        <artifactId>httpcore</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.apache.httpcomponents</groupId>
-                        <artifactId>httpclient</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-
-            <dependency>
-                <groupId>com.squareup</groupId>
-                <artifactId>javapoet</artifactId>
-                <version>1.9.0</version>
-            </dependency>
-
-            <dependency>
-                <groupId>io.takari.maven.plugins</groupId>
-                <artifactId>takari-plugin-testing</artifactId>
-                <version>${dep.takari-plugin.version}</version>
             </dependency>
 
             <dependency>
@@ -216,14 +197,26 @@
             </dependency>
 
             <dependency>
-                <groupId>org.apache.maven</groupId>
-                <artifactId>maven-core</artifactId>
-                <version>${dep.maven.version}</version>
+                <groupId>io.takari.maven.plugins</groupId>
+                <artifactId>takari-plugin-testing</artifactId>
+                <version>${dep.takari-plugin.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <version>4.13.2</version>
             </dependency>
 
             <dependency>
                 <groupId>org.apache.maven</groupId>
                 <artifactId>maven-artifact</artifactId>
+                <version>${dep.maven.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.maven</groupId>
+                <artifactId>maven-core</artifactId>
                 <version>${dep.maven.version}</version>
             </dependency>
 
@@ -240,9 +233,19 @@
             </dependency>
 
             <dependency>
-                <groupId>junit</groupId>
-                <artifactId>junit</artifactId>
-                <version>4.13.2</version>
+                <groupId>org.apache.thrift</groupId>
+                <artifactId>libthrift</artifactId>
+                <version>0.12.0</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.apache.httpcomponents</groupId>
+                        <artifactId>httpclient</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.apache.httpcomponents</groupId>
+                        <artifactId>httpcore</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
         </dependencies>
     </dependencyManagement>
