@@ -10,7 +10,7 @@ jobs:
       - uses: actions/setup-java@v3
         with:
           distribution: temurin
-          java-version: 17
+          java-version: 21
       - name: Maven Install
         run: mvn install -B -V -DskipTests -Dair.check.skip-all
       - name: Maven Tests

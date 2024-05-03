@@ -9,28 +9,27 @@
     </parent>
 
     <artifactId>drift-javadoc</artifactId>
-    <description>Annotation processor to store the Javadoc of Drift classes</description>
     <packaging>jar</packaging>
+    <description>Annotation processor to store the Javadoc of Drift classes</description>
 
     <properties>
         <air.main.basedir>${project.parent.basedir}</air.main.basedir>
     </properties>
 
     <dependencies>
+
+        <dependency>
+            <groupId>com.squareup</groupId>
+            <artifactId>javapoet</artifactId>
+        </dependency>
         <dependency>
             <groupId>io.airlift.drift</groupId>
             <artifactId>drift-api</artifactId>
         </dependency>
 
         <dependency>
-            <groupId>com.squareup</groupId>
-            <artifactId>javapoet</artifactId>
-        </dependency>
-
-        <!-- for testing -->
-        <dependency>
-            <groupId>io.takari.maven.plugins</groupId>
-            <artifactId>takari-plugin-testing</artifactId>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
             <scope>test</scope>
         </dependency>
 
@@ -38,6 +37,13 @@
             <groupId>io.takari.maven.plugins</groupId>
             <artifactId>takari-plugin-integration-testing</artifactId>
             <type>pom</type>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- for testing -->
+        <dependency>
+            <groupId>io.takari.maven.plugins</groupId>
+            <artifactId>takari-plugin-testing</artifactId>
             <scope>test</scope>
         </dependency>
 
@@ -50,12 +56,6 @@
         <dependency>
             <groupId>org.assertj</groupId>
             <artifactId>assertj-core</artifactId>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -78,10 +78,10 @@
                 <executions>
                     <execution>
                         <id>testProperties</id>
-                        <phase>process-test-resources</phase>
                         <goals>
                             <goal>testProperties</goal>
                         </goals>
+                        <phase>process-test-resources</phase>
                     </execution>
                 </executions>
             </plugin>
