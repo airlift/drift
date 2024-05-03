@@ -64,11 +64,11 @@ import org.apache.thrift.protocol.TProtocolFactory;
 import org.apache.thrift.server.TServer;
 import org.apache.thrift.server.TServer.Args;
 import org.apache.thrift.server.TSimpleServer;
-import org.apache.thrift.transport.TFramedTransport;
 import org.apache.thrift.transport.TNonblockingSocket;
 import org.apache.thrift.transport.TServerSocket;
 import org.apache.thrift.transport.TSocket;
 import org.apache.thrift.transport.TTransportFactory;
+import org.apache.thrift.transport.layered.TFramedTransport;
 import org.testng.annotations.Test;
 
 import java.util.List;

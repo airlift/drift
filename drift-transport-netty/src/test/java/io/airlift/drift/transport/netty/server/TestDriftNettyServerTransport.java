@@ -43,9 +43,9 @@ import org.apache.thrift.protocol.TMessage;
 import org.apache.thrift.protocol.TMessageType;
 import org.apache.thrift.protocol.TProtocol;
 import org.apache.thrift.protocol.TProtocolFactory;
-import org.apache.thrift.transport.TFramedTransport;
 import org.apache.thrift.transport.TSocket;
 import org.apache.thrift.transport.TTransportFactory;
+import org.apache.thrift.transport.layered.TFramedTransport;
 import org.testng.annotations.Test;
 
 import java.util.List;
