@@ -54,7 +54,7 @@
         <air.modernizer.java-version>8</air.modernizer.java-version>
 
         <dep.airlift.version>234</dep.airlift.version>
-        <dep.takari-plugin.version>3.0.1</dep.takari-plugin.version>
+        <dep.takari-plugin.version>3.0.2</dep.takari-plugin.version>
         <dep.maven.version>3.9.6</dep.maven.version>
     </properties>
 
