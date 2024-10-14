@@ -100,10 +100,18 @@ public class IdlGeneratorMojo
     @Parameter
     private boolean quiet;
 
+    @Parameter(property = "drift.skip", defaultValue = "false")
+    private boolean skip;
+
     @Override
     public void execute()
             throws MojoExecutionException
     {
+        if (skip) {
+            getLog().info("Drift IDL generation is skipped.");
+            return;
+        }
+
         ClassLoader classLoader = createClassLoaderFromCompileTimeDependencies();
 
         ThriftIdlGeneratorConfig config = ThriftIdlGeneratorConfig.builder()
