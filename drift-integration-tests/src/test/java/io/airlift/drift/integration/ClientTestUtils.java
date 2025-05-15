@@ -47,6 +47,7 @@ import java.io.IOException;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 import java.net.URL;
+import java.nio.file.Paths;
 import java.security.GeneralSecurityException;
 import java.util.List;
 import java.util.Optional;
@@ -204,7 +205,7 @@ final class ClientTestUtils
         if (resource == null) {
             throw new IllegalArgumentException("Resource not found " + name);
         }
-        return new File(resource.getFile());
+        return Paths.get(resource.getFile()).toFile();
     }
 
     @Target({FIELD, PARAMETER, METHOD})
