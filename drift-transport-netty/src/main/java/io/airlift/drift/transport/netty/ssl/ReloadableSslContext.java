@@ -111,7 +111,8 @@ public final class ReloadableSslContext
 
                 SslContextBuilder sslContextBuilder;
                 if (forClient) {
-                    sslContextBuilder = SslContextBuilder.forClient().keyManager(privateKey, certificateChain);
+                    sslContextBuilder = SslContextBuilder.forClient().keyManager(privateKey, certificateChain)
+                            .endpointIdentificationAlgorithm(null);
                 }
                 else {
                     sslContextBuilder = SslContextBuilder.forServer(privateKey, certificateChain);
