@@ -21,9 +21,11 @@ import io.airlift.drift.transport.server.ServerMethodInvoker;
 import io.airlift.drift.transport.server.ServerTransport;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.ByteBufAllocator;
+import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.Channel;
 import io.netty.channel.EventLoopGroup;
-import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.MultiThreadIoEventLoopGroup;
+import io.netty.channel.nio.NioIoHandler;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.ssl.SslContext;
 import io.netty.util.concurrent.Future;
@@ -56,7 +58,7 @@ public class DriftNettyServerTransport
 
     public DriftNettyServerTransport(ServerMethodInvoker methodInvoker, DriftNettyServerConfig config)
     {
-        this(methodInvoker, config, ByteBufAllocator.DEFAULT);
+        this(methodInvoker, config, PooledByteBufAllocator.DEFAULT);
     }
 
     @VisibleForTesting
@@ -66,9 +68,9 @@ public class DriftNettyServerTransport
         requireNonNull(config, "config is null");
         this.port = config.getPort();
 
-        ioGroup = new NioEventLoopGroup(config.getIoThreadCount(), threadsNamed("drift-server-io-%s"));
+        ioGroup = new MultiThreadIoEventLoopGroup(config.getIoThreadCount(), threadsNamed("drift-server-io-%s"), NioIoHandler.newFactory());
 
-        workerGroup = new NioEventLoopGroup(config.getWorkerThreadCount(), threadsNamed("drift-server-worker-%s"));
+        workerGroup = new MultiThreadIoEventLoopGroup(config.getWorkerThreadCount(), threadsNamed("drift-server-worker-%s"), NioIoHandler.newFactory());
 
         Optional<Supplier<SslContext>> sslContext = Optional.empty();
         if (config.isSslEnabled()) {
@@ -101,6 +103,7 @@ public class DriftNettyServerTransport
                 .childHandler(serverInitializer)
                 .option(SO_BACKLOG, config.getAcceptBacklog())
                 .option(ALLOCATOR, allocator)
+                .childOption(ALLOCATOR, allocator)
                 .childOption(SO_KEEPALIVE, true)
                 .validate();
     }

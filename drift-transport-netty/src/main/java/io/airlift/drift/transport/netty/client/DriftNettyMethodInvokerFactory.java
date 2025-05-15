@@ -23,8 +23,10 @@ import io.airlift.drift.transport.netty.client.ConnectionManager.ConnectionParam
 import io.airlift.drift.transport.netty.ssl.SslContextFactory;
 import io.airlift.drift.transport.netty.ssl.SslContextFactory.SslContextParameters;
 import io.netty.buffer.ByteBufAllocator;
+import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.EventLoopGroup;
-import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.MultiThreadIoEventLoopGroup;
+import io.netty.channel.nio.NioIoHandler;
 import jakarta.annotation.PreDestroy;
 
 import java.io.Closeable;
@@ -50,7 +52,7 @@ public class DriftNettyMethodInvokerFactory<I>
 
     public static DriftNettyMethodInvokerFactory<?> createStaticDriftNettyMethodInvokerFactory(DriftNettyClientConfig clientConfig)
     {
-        return createStaticDriftNettyMethodInvokerFactory(clientConfig, ByteBufAllocator.DEFAULT);
+        return createStaticDriftNettyMethodInvokerFactory(clientConfig, PooledByteBufAllocator.DEFAULT);
     }
 
     @VisibleForTesting
@@ -63,7 +65,7 @@ public class DriftNettyMethodInvokerFactory<I>
             DriftNettyConnectionFactoryConfig factoryConfig,
             Function<I, DriftNettyClientConfig> clientConfigurationProvider)
     {
-        this(factoryConfig, clientConfigurationProvider, ByteBufAllocator.DEFAULT);
+        this(factoryConfig, clientConfigurationProvider, PooledByteBufAllocator.DEFAULT);
     }
 
     @VisibleForTesting
@@ -74,7 +76,7 @@ public class DriftNettyMethodInvokerFactory<I>
     {
         requireNonNull(factoryConfig, "factoryConfig is null");
 
-        group = new NioEventLoopGroup(factoryConfig.getThreadCount(), daemonThreadsNamed("drift-client-%s"));
+        group = new MultiThreadIoEventLoopGroup(factoryConfig.getThreadCount(), daemonThreadsNamed("drift-client-%s"), NioIoHandler.newFactory());
 
         this.clientConfigurationProvider = requireNonNull(clientConfigurationProvider, "clientConfigurationProvider is null");
         this.sslContextFactory = createSslContextFactory(true, factoryConfig.getSslContextRefreshTime(), group);

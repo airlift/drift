@@ -20,6 +20,7 @@ import io.airlift.drift.transport.server.ServerMethodInvoker;
 import io.airlift.drift.transport.server.ServerTransport;
 import io.airlift.drift.transport.server.ServerTransportFactory;
 import io.netty.buffer.ByteBufAllocator;
+import io.netty.buffer.PooledByteBufAllocator;
 
 import static java.util.Objects.requireNonNull;
 
@@ -31,7 +32,7 @@ public class DriftNettyServerTransportFactory
 
     public DriftNettyServerTransportFactory(DriftNettyServerConfig config)
     {
-        this(config, ByteBufAllocator.DEFAULT);
+        this(config, PooledByteBufAllocator.DEFAULT);
     }
 
     @Inject
