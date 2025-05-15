@@ -72,8 +72,9 @@ public class TestJavdocIntegration
         URL expected = getResource(format("basic/%s.txt", name));
 
         name += META_SUFFIX;
-        assertThat(new File(basedir, format("target/classes/its/%s.class", name))).isFile();
-        assertThat(new File(basedir, format("target/generated-sources/annotations/its/%s.java", name)))
-                .usingCharset(UTF_8).hasContent(asCharSource(expected, UTF_8).read());
+        assertThat(basedir.toPath().resolve(format("target/classes/its/%s.class", name))).isRegularFile();
+        assertThat(basedir.toPath().resolve(format("target/generated-sources/annotations/its/%s.java", name)))
+                .usingCharset(UTF_8)
+                .hasContent(asCharSource(expected, UTF_8).read());
     }
 }

@@ -72,7 +72,7 @@ public class TestIdlGeneratorIntegration
                 .assertErrorFreeLog();
 
         String expected = Resources.toString(getResource(format("expected/%s.txt", testName)), UTF_8);
-        String actual = Files.asCharSource(new File(basedir, "target/test.thrift"), UTF_8).read();
+        String actual = Files.asCharSource(basedir.toPath().resolve("target/test.thrift").toFile(), UTF_8).read();
         assertEquals(expected, actual);
     }
 }
