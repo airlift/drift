@@ -34,8 +34,7 @@ import java.util.Map;
 
 import static io.airlift.drift.client.address.SimpleAddressSelectorBinder.simpleAddressSelector;
 import static io.airlift.drift.client.guice.DriftClientAnnotationFactory.getDriftClientAnnotation;
-import static io.airlift.testing.Assertions.assertInstanceOf;
-import static org.testng.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class TestSimpleAddressSelectorBinder
 {
@@ -94,9 +93,9 @@ public class TestSimpleAddressSelectorBinder
             lifeCycleManager = injector.getInstance(LifeCycleManager.class);
 
             AddressSelector<?> addressSelector = injector.getInstance(Key.get(AddressSelector.class, THRIFT_SERVICE_ANNOTATION));
-            assertInstanceOf(addressSelector, SimpleAddressSelector.class);
+            assertThat(addressSelector).isInstanceOf(SimpleAddressSelector.class);
             SimpleAddressSelector simpleAddressSelector = (SimpleAddressSelector) addressSelector;
-            assertEquals(simpleAddressSelector.getAddresses(), expected);
+            assertThat(simpleAddressSelector.getAddresses()).containsAll(expected);
         }
         finally {
             if (lifeCycleManager != null) {
