@@ -5,7 +5,7 @@
     <parent>
         <groupId>io.airlift</groupId>
         <artifactId>airbase</artifactId>
-        <version>259</version>
+        <version>297</version>
     </parent>
 
     <groupId>io.airlift.drift</groupId>
@@ -50,10 +50,10 @@
         <air.check.skip-jacoco>true</air.check.skip-jacoco>
         <air.check.skip-spotbugs>true</air.check.skip-spotbugs>
 
-        <project.build.targetJdk>21</project.build.targetJdk>
+        <project.build.targetJdk>22</project.build.targetJdk>
         <air.modernizer.java-version>8</air.modernizer.java-version>
 
-        <dep.airlift.version>246</dep.airlift.version>
+        <dep.airlift.version>354</dep.airlift.version>
         <dep.takari-plugin.version>3.0.2</dep.takari-plugin.version>
         <dep.maven.version>3.9.6</dep.maven.version>
 
@@ -97,6 +97,12 @@
             <dependency>
                 <groupId>io.airlift</groupId>
                 <artifactId>configuration</artifactId>
+                <version>${dep.airlift.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.airlift</groupId>
+                <artifactId>configuration-testing</artifactId>
                 <version>${dep.airlift.version}</version>
             </dependency>
 
@@ -247,7 +253,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-plugin-plugin</artifactId>
-                    <version>3.9.0</version>
+                    <version>3.15.1</version>
                     <executions>
                         <execution>
                             <id>help-mojo</id>

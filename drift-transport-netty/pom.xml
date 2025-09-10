@@ -13,6 +13,7 @@
     <artifactId>drift-transport-netty</artifactId>
     <packaging>jar</packaging>
     <name>${project.artifactId}</name>
+    <description>Drift Netty Transport</description>
 
     <properties>
         <air.main.basedir>${project.parent.basedir}</air.main.basedir>
@@ -40,6 +41,7 @@
         <dependency>
             <groupId>com.google.inject</groupId>
             <artifactId>guice</artifactId>
+            <classifier>classes</classifier>
             <optional>true</optional>
         </dependency>
 
@@ -132,6 +134,12 @@
         <dependency>
             <groupId>io.airlift</groupId>
             <artifactId>bootstrap</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>io.airlift</groupId>
+            <artifactId>configuration-testing</artifactId>
             <scope>test</scope>
         </dependency>
 

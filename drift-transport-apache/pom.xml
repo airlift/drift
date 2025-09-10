@@ -13,6 +13,7 @@
     <artifactId>drift-transport-apache</artifactId>
     <packaging>jar</packaging>
     <name>${project.artifactId}</name>
+    <description>Drift Apache Transport</description>
 
     <properties>
         <air.main.basedir>${project.parent.basedir}</air.main.basedir>
@@ -28,6 +29,7 @@
         <dependency>
             <groupId>com.google.inject</groupId>
             <artifactId>guice</artifactId>
+            <classifier>classes</classifier>
             <optional>true</optional>
         </dependency>
 
@@ -86,13 +88,19 @@
             <artifactId>libthrift</artifactId>
         </dependency>
 
+        <!-- for testing -->
+        <dependency>
+            <groupId>io.airlift</groupId>
+            <artifactId>configuration-testing</artifactId>
+            <scope>test</scope>
+        </dependency>
+
         <dependency>
             <groupId>io.airlift</groupId>
             <artifactId>jmx</artifactId>
             <scope>test</scope>
         </dependency>
 
-        <!-- for testing -->
         <dependency>
             <groupId>io.airlift</groupId>
             <artifactId>testing</artifactId>

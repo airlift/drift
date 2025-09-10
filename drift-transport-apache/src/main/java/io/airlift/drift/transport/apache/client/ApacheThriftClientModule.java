@@ -42,8 +42,8 @@ public class ApacheThriftClientModule
 
     private static void bindApacheThriftClientConfig(ConfigurationBinding<?> binding, ConfigBinder configBinder)
     {
-        if (binding.getConfigClass().equals(DriftClientConfig.class)) {
-            configBinder.bindConfig(ApacheThriftClientConfig.class, binding.getKey().getAnnotation(), binding.getPrefix().orElse(null));
+        if (binding.configClass().equals(DriftClientConfig.class)) {
+            configBinder.bindConfig(ApacheThriftClientConfig.class, binding.key().getAnnotation(), binding.prefix().orElse(null));
         }
     }
 

@@ -13,6 +13,7 @@
     <artifactId>drift-server</artifactId>
     <packaging>jar</packaging>
     <name>${project.artifactId}</name>
+    <description>Drift Server</description>
 
     <properties>
         <air.main.basedir>${project.parent.basedir}</air.main.basedir>
@@ -28,6 +29,7 @@
         <dependency>
             <groupId>com.google.inject</groupId>
             <artifactId>guice</artifactId>
+            <classifier>classes</classifier>
             <optional>true</optional>
         </dependency>
 
@@ -86,6 +88,12 @@
         <dependency>
             <groupId>io.airlift</groupId>
             <artifactId>testing</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
             <scope>test</scope>
         </dependency>
 

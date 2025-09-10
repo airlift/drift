@@ -89,10 +89,10 @@ import static io.airlift.drift.codec.metadata.ThriftType.list;
 import static io.airlift.drift.codec.metadata.ThriftType.optional;
 import static io.airlift.drift.transport.netty.codec.Protocol.BINARY;
 import static io.airlift.drift.transport.netty.codec.Transport.FRAMED;
-import static io.airlift.testing.Assertions.assertInstanceOf;
 import static java.util.Collections.nCopies;
 import static java.util.concurrent.Executors.newSingleThreadScheduledExecutor;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.fail;
 
@@ -314,7 +314,7 @@ public class TestDriftNettyMethodInvoker
             }
             catch (ExecutionException e) {
                 Throwable cause = e.getCause();
-                assertInstanceOf(cause, TApplicationException.class);
+                assertThat(cause).isInstanceOf(TApplicationException.class);
                 TApplicationException applicationException = (TApplicationException) cause;
                 assertEquals(applicationException.getTypeValue(), UNSUPPORTED_CLIENT_TYPE.getType());
             }
@@ -362,7 +362,7 @@ public class TestDriftNettyMethodInvoker
             fail("expected exception");
         }
         catch (ExecutionException e) {
-            assertInstanceOf(e.getCause(), io.airlift.drift.TException.class);
+            assertThat(e.getCause()).isInstanceOf(io.airlift.drift.TException.class);
             assertEquals(e.getCause().getMessage(), "Invocation response future did not complete after 41.00ms");
         }
         finally {
@@ -411,7 +411,7 @@ public class TestDriftNettyMethodInvoker
             }
             catch (ExecutionException e) {
                 Throwable cause = e.getCause();
-                assertInstanceOf(cause, io.airlift.drift.TApplicationException.class);
+                assertThat(cause).isInstanceOf(io.airlift.drift.TApplicationException.class);
                 io.airlift.drift.TApplicationException applicationException = (io.airlift.drift.TApplicationException) cause;
                 assertEquals(applicationException.getTypeValue(), UNSUPPORTED_CLIENT_TYPE.getType());
             }

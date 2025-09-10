@@ -57,8 +57,8 @@ public class DriftNettyClientModule
     {
         configBinder(binder).bindConfig(DriftNettyConnectionFactoryConfig.class);
         configBinder(binder).bindConfigurationBindingListener((binding, configBinder) -> {
-            if (binding.getConfigClass().equals(DriftClientConfig.class)) {
-                configBinder.bindConfig(DriftNettyClientConfig.class, binding.getKey().getAnnotation(), binding.getPrefix().orElse(null));
+            if (binding.configClass().equals(DriftClientConfig.class)) {
+                configBinder.bindConfig(DriftNettyClientConfig.class, binding.key().getAnnotation(), binding.prefix().orElse(null));
             }
         });
 

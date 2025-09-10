@@ -13,6 +13,7 @@
     <artifactId>drift-integration-tests</artifactId>
     <packaging>jar</packaging>
     <name>${project.artifactId}</name>
+    <description>Drift Integration Tests</description>
 
     <properties>
         <air.main.basedir>${project.parent.basedir}</air.main.basedir>
@@ -42,6 +43,7 @@
         <dependency>
             <groupId>com.google.inject</groupId>
             <artifactId>guice</artifactId>
+            <classifier>classes</classifier>
             <scope>test</scope>
         </dependency>
 

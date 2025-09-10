@@ -13,6 +13,7 @@
     <artifactId>drift-transport-spi</artifactId>
     <packaging>jar</packaging>
     <name>${project.artifactId}</name>
+    <description>Thrift Transport SPI</description>
 
     <properties>
         <air.main.basedir>${project.parent.basedir}</air.main.basedir>
@@ -58,6 +59,12 @@
         </dependency>
 
         <!-- for testing -->
+        <dependency>
+            <groupId>io.airlift</groupId>
+            <artifactId>configuration-testing</artifactId>
+            <scope>test</scope>
+        </dependency>
+
         <dependency>
             <groupId>io.airlift</groupId>
             <artifactId>testing</artifactId>

@@ -22,9 +22,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
 import static com.google.common.util.concurrent.MoreExecutors.directExecutor;
-import static io.airlift.testing.Assertions.assertGreaterThan;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertNotEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class TestingMethodInvocationStat
         implements MethodInvocationStat
@@ -44,18 +42,18 @@ public class TestingMethodInvocationStat
 
     public void assertSuccess()
     {
-        assertGreaterThan(invocations.get(), 0);
-        assertGreaterThan(successes.get(), 0);
-        assertEquals(failures.get(), 0);
-        assertNotEquals(lastStartTime.get(), 0);
+        assertThat(invocations.get()).isGreaterThan(0);
+        assertThat(successes.get()).isGreaterThan(0);
+        assertThat(failures.get()).isZero();
+        assertThat(lastStartTime.get()).isNotZero();
     }
 
     public void assertFailure()
     {
-        assertGreaterThan(invocations.get(), 0);
-        assertEquals(successes.get(), 0);
-        assertGreaterThan(failures.get(), 0);
-        assertNotEquals(lastStartTime.get(), 0);
+        assertThat(invocations.get()).isGreaterThan(0);
+        assertThat(successes.get()).isZero();
+        assertThat(failures.get()).isGreaterThan(0);
+        assertThat(lastStartTime.get()).isNotZero();
     }
 
     @Override
