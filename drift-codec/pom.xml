@@ -10,6 +10,7 @@
 
     <artifactId>drift-codec</artifactId>
     <packaging>jar</packaging>
+    <name>${project.artifactId}</name>
     <description>Annotation based encoder and decoder for Thrift</description>
 
     <properties>

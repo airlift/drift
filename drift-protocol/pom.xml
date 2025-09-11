@@ -10,6 +10,7 @@
 
     <artifactId>drift-protocol</artifactId>
     <packaging>jar</packaging>
+    <name>${project.artifactId}</name>
     <description>Core classes for Drift</description>
 
     <properties>

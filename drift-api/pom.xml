@@ -10,6 +10,7 @@
 
     <artifactId>drift-api</artifactId>
     <packaging>jar</packaging>
+    <name>${project.artifactId}</name>
     <description>Drift annotations and exceptions for use in Thrift interfaces and types</description>
 
     <properties>
