@@ -10,6 +10,7 @@
 
     <artifactId>drift-maven-plugin</artifactId>
     <packaging>maven-plugin</packaging>
+    <name>${project.artifactId}</name>
     <description>Maven plugin for Drift</description>
 
     <properties>

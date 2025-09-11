@@ -10,6 +10,7 @@
 
     <artifactId>drift-javadoc</artifactId>
     <packaging>jar</packaging>
+    <name>${project.artifactId}</name>
     <description>Annotation processor to store the Javadoc of Drift classes</description>
 
     <properties>
