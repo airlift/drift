@@ -27,7 +27,6 @@ import com.google.inject.TypeLiteral;
 import io.airlift.drift.transport.client.DriftClientConfig;
 import io.airlift.drift.transport.client.MethodInvokerFactory;
 import io.netty.buffer.ByteBufAllocator;
-import io.netty.buffer.PooledByteBufAllocator;
 import jakarta.annotation.PreDestroy;
 
 import java.lang.annotation.Annotation;
@@ -43,7 +42,7 @@ public class DriftNettyClientModule
 
     public DriftNettyClientModule()
     {
-        this(PooledByteBufAllocator.DEFAULT);
+        this(ByteBufAllocator.DEFAULT);
     }
 
     @VisibleForTesting
