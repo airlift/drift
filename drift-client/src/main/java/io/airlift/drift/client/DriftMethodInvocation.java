@@ -188,7 +188,9 @@ class DriftMethodInvocation<A extends Address>
             stat.recordResult(invocationStartTime, result);
             currentTask = result;
 
-            Futures.addCallback(result, new FutureCallback<Object>()
+            Futures.addCallback(
+                    result,
+                    new FutureCallback<Object>()
                     {
                         @Override
                         public void onSuccess(Object result)
@@ -267,7 +269,8 @@ class DriftMethodInvocation<A extends Address>
 
             // backoff before next invocation
             Duration backoffDelay = retryPolicy.getBackoffDelay(invocationAttempts);
-            log.debug("Failed invocation of %s with attempt %s, will retry in %s (overloadedRejects: %s). Exception: %s",
+            log.debug(
+                    "Failed invocation of %s with attempt %s, will retry in %s (overloadedRejects: %s). Exception: %s",
                     metadata.getName(),
                     invocationAttempts,
                     backoffDelay,
@@ -286,7 +289,9 @@ class DriftMethodInvocation<A extends Address>
         try {
             ListenableFuture<?> delay = invoker.delay(timeout);
             currentTask = delay;
-            Futures.addCallback(delay, new FutureCallback<Object>()
+            Futures.addCallback(
+                    delay,
+                    new FutureCallback<Object>()
                     {
                         @Override
                         public void onSuccess(Object result)

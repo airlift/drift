@@ -130,9 +130,13 @@ public class LogEntry
 
     static {
         Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<>(_Fields.class);
-        tmpMap.put(_Fields.CATEGORY, new org.apache.thrift.meta_data.FieldMetaData("category", org.apache.thrift.TFieldRequirementType.DEFAULT,
+        tmpMap.put(_Fields.CATEGORY, new org.apache.thrift.meta_data.FieldMetaData(
+                "category",
+                org.apache.thrift.TFieldRequirementType.DEFAULT,
                 new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
-        tmpMap.put(_Fields.MESSAGE, new org.apache.thrift.meta_data.FieldMetaData("message", org.apache.thrift.TFieldRequirementType.DEFAULT,
+        tmpMap.put(_Fields.MESSAGE, new org.apache.thrift.meta_data.FieldMetaData(
+                "message",
+                org.apache.thrift.TFieldRequirementType.DEFAULT,
                 new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
         metaDataMap = Collections.unmodifiableMap(tmpMap);
         org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(LogEntry.class, metaDataMap);

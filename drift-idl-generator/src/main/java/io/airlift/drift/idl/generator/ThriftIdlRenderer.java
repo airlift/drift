@@ -233,7 +233,8 @@ public final class ThriftIdlRenderer
         builder.append(renderParameters(methodStart, parameters));
 
         if (!method.getExceptions().isEmpty()) {
-            List<String> exceptions = mapWithIndex(method.getExceptions().entrySet().stream(),
+            List<String> exceptions = mapWithIndex(
+                    method.getExceptions().entrySet().stream(),
                     (entry, index) -> "%s: %s ex%s".formatted(
                             entry.getKey(),
                             typeName(entry.getValue().getThriftType()),

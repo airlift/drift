@@ -888,12 +888,10 @@ public abstract class AbstractThriftCodecManagerTest
                                 "2: other", new BonkField("other", 11))));
 
         one.aMapOfListToSet = ImmutableMap.of(
-                ImmutableList.of("a", "b"),
-                ImmutableSet.of(
+                ImmutableList.of("a", "b"), ImmutableSet.of(
                         new BonkField("1: message", 42),
                         new BonkField("1: other", 11)),
-                ImmutableList.of("c", "d"),
-                ImmutableSet.of(
+                ImmutableList.of("c", "d"), ImmutableSet.of(
                         new BonkField("2: message", 42),
                         new BonkField("2: other", 11)));
 
@@ -902,11 +900,13 @@ public abstract class AbstractThriftCodecManagerTest
         one.aUnionSet = ImmutableSet.of(new UnionField("Hello, World"), new UnionField(123456L), new UnionField(Fruit.CHERRY));
         one.aUnionList = ImmutableList.of(new UnionField("Hello, World"), new UnionField(123456L), new UnionField(Fruit.CHERRY));
 
-        one.aUnionKeyMap = ImmutableMap.of(new UnionField("Hello, World"), "Eins",
+        one.aUnionKeyMap = ImmutableMap.of(
+                new UnionField("Hello, World"), "Eins",
                 new UnionField(123456L), "Zwei",
                 new UnionField(Fruit.CHERRY), "Drei");
 
-        one.aUnionValueMap = ImmutableMap.of("Eins", new UnionField("Hello, World"),
+        one.aUnionValueMap = ImmutableMap.of(
+                "Eins", new UnionField("Hello, World"),
                 "Zwei", new UnionField(123456L),
                 "Drei", new UnionField(Fruit.CHERRY));
 
