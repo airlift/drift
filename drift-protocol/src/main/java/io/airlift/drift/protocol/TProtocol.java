@@ -16,5 +16,4 @@
 package io.airlift.drift.protocol;
 
 public interface TProtocol
-        extends TProtocolReader, TProtocolWriter
-{}
+        extends TProtocolReader, TProtocolWriter {}

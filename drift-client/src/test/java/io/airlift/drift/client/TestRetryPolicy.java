@@ -71,6 +71,5 @@ public class TestRetryPolicy
     }
 
     private static class TestingUserException
-            extends Exception
-    {}
+            extends Exception {}
 }

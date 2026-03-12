@@ -331,9 +331,7 @@ public class scribe
             org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(Log_args.class, metaDataMap);
         }
 
-        public Log_args()
-        {
-        }
+        public Log_args() {}
 
         public Log_args(
                 List<LogEntry> messages)
@@ -826,9 +824,7 @@ public class scribe
             org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(Log_result.class, metaDataMap);
         }
 
-        public Log_result()
-        {
-        }
+        public Log_result() {}
 
         public Log_result(
                 ResultCode success)

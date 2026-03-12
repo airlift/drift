@@ -33,9 +33,7 @@ public class UnionConstructorDuplicateTypes
     private String name;
 
     @ThriftConstructor
-    public UnionConstructorDuplicateTypes()
-    {
-    }
+    public UnionConstructorDuplicateTypes() {}
 
     @ThriftField
     public void setFirstIntValue(int firstIntValue)

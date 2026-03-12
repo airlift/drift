@@ -37,9 +37,7 @@ public final class CoercionBean
     private float primitiveFloat;
     private List<Float> floatList;
 
-    public CoercionBean()
-    {
-    }
+    public CoercionBean() {}
 
     public CoercionBean(
             Boolean booleanValue,

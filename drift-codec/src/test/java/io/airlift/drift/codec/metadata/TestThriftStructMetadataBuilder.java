@@ -59,9 +59,7 @@ public class TestThriftStructMetadataBuilder
         }
 
         @ThriftField
-        public void setField1(String value)
-        {
-        }
+        public void setField1(String value) {}
     }
 
     @Test
@@ -88,14 +86,10 @@ public class TestThriftStructMetadataBuilder
     public static final class MultipleIds
     {
         @ThriftField(name = "foo", value = 1)
-        public void setField1(String value)
-        {
-        }
+        public void setField1(String value) {}
 
         @ThriftField(name = "foo", value = 2)
-        public void setField2(String value)
-        {
-        }
+        public void setField2(String value) {}
 
         @ThriftField(name = "foo")
         public String getField1()
@@ -140,9 +134,7 @@ public class TestThriftStructMetadataBuilder
         }
 
         @ThriftField(value = 1, name = "bar")
-        public void setFoo(String value)
-        {
-        }
+        public void setFoo(String value) {}
     }
 
     @Test
@@ -202,9 +194,7 @@ public class TestThriftStructMetadataBuilder
         }
 
         @ThriftField
-        public void setFoo(short value)
-        {
-        }
+        public void setFoo(short value) {}
     }
 
     @Test
@@ -261,9 +251,7 @@ public class TestThriftStructMetadataBuilder
     @ThriftStruct(builder = NonGenericStruct.GenericBuilder.class)
     public static class NonGenericStruct
     {
-        private NonGenericStruct()
-        {
-        }
+        private NonGenericStruct() {}
 
         public static class GenericBuilder<T>
         {
@@ -305,9 +293,7 @@ public class TestThriftStructMetadataBuilder
         }
 
         @ThriftField(value = 1, requiredness = Requiredness.NONE)
-        public void setFoo(int value)
-        {
-        }
+        public void setFoo(int value) {}
     }
 
     @Test
@@ -329,9 +315,7 @@ public class TestThriftStructMetadataBuilder
         }
 
         @ThriftField
-        public void setFoo(int value)
-        {
-        }
+        public void setFoo(int value) {}
     }
 
     @Test
@@ -342,7 +326,5 @@ public class TestThriftStructMetadataBuilder
     }
 
     @ThriftStruct
-    public static class NotFinalStruct
-    {
-    }
+    public static class NotFinalStruct {}
 }

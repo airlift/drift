@@ -115,9 +115,7 @@ class ConnectionPool
     }
 
     @Override
-    public void returnConnection(Channel connection)
-    {
-    }
+    public void returnConnection(Channel connection) {}
 
     @Override
     public synchronized void close()

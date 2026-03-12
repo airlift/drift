@@ -506,14 +506,10 @@ public class TestDriftClient
 
     @ThriftStruct
     public static class ClientException
-            extends Exception
-    {
-    }
+            extends Exception {}
 
     private static class UnknownException
-            extends Exception
-    {
-    }
+            extends Exception {}
 
     private static class TestingExceptionClassifier
             implements ExceptionClassifier

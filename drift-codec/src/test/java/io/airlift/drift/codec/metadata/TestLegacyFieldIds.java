@@ -112,9 +112,7 @@ public class TestLegacyFieldIds
         }
 
         @ThriftField
-        public void setLegacyIdOnGetterOnly(boolean value)
-        {
-        }
+        public void setLegacyIdOnGetterOnly(boolean value) {}
 
         @ThriftField
         public boolean getLegacyIdOnSetterOnly()
@@ -123,9 +121,7 @@ public class TestLegacyFieldIds
         }
 
         @ThriftField(value = -3, isLegacyId = true)
-        public void setLegacyIdOnSetterOnly(boolean value)
-        {
-        }
+        public void setLegacyIdOnSetterOnly(boolean value) {}
 
         @ThriftField(value = -4, isLegacyId = true)
         public boolean getLegacyIdOnBoth()
@@ -134,9 +130,7 @@ public class TestLegacyFieldIds
         }
 
         @ThriftField(value = -4, isLegacyId = true)
-        public void setLegacyIdOnBoth(boolean value)
-        {
-        }
+        public void setLegacyIdOnBoth(boolean value) {}
     }
 
     @Test
@@ -225,9 +219,7 @@ public class TestLegacyFieldIds
         }
 
         @ThriftField(-4)
-        public void setField(boolean value)
-        {
-        }
+        public void setField(boolean value) {}
     }
 
     /* legacy, setter correct, getter wrong */
@@ -241,9 +233,7 @@ public class TestLegacyFieldIds
         }
 
         @ThriftField(value = -4, isLegacyId = true)
-        public void setField(boolean value)
-        {
-        }
+        public void setField(boolean value) {}
     }
 
     /* not legacy, setter correct, getter wrong */
@@ -257,9 +247,7 @@ public class TestLegacyFieldIds
         }
 
         @ThriftField(4)
-        public void setField(boolean value)
-        {
-        }
+        public void setField(boolean value) {}
     }
 
     /* not legacy, getter correct, setter wrong */
@@ -273,9 +261,7 @@ public class TestLegacyFieldIds
         }
 
         @ThriftField(value = 4, isLegacyId = true)
-        public void setField(boolean value)
-        {
-        }
+        public void setField(boolean value) {}
     }
 
     @Test
@@ -380,9 +366,7 @@ public class TestLegacyFieldIds
         }
 
         @ThriftField
-        public void setLegacyIdOnGetterOnly(boolean value)
-        {
-        }
+        public void setLegacyIdOnGetterOnly(boolean value) {}
 
         @ThriftField
         public boolean getLegacyIdOnSetterOnly()
@@ -391,9 +375,7 @@ public class TestLegacyFieldIds
         }
 
         @ThriftField(value = -3, isLegacyId = true)
-        public void setLegacyIdOnSetterOnly(boolean value)
-        {
-        }
+        public void setLegacyIdOnSetterOnly(boolean value) {}
 
         @ThriftField(value = -4, isLegacyId = true)
         public boolean getLegacyIdOnBoth()
@@ -402,8 +384,6 @@ public class TestLegacyFieldIds
         }
 
         @ThriftField(value = -4, isLegacyId = true)
-        public void setLegacyIdOnBoth(boolean value)
-        {
-        }
+        public void setLegacyIdOnBoth(boolean value) {}
     }
 }

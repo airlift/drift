@@ -48,9 +48,7 @@ import static java.util.Objects.requireNonNull;
 
 public final class ReflectionHelper
 {
-    private ReflectionHelper()
-    {
-    }
+    private ReflectionHelper() {}
 
     private static final Type MAP_KEY_TYPE;
     private static final Type MAP_VALUE_TYPE;
