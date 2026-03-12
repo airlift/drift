@@ -30,7 +30,10 @@ import java.util.Map;
 
 @SuppressWarnings(value = {"ALL", "all"})
 public class LogEntry
-        implements org.apache.thrift.TBase<LogEntry, LogEntry._Fields>, java.io.Serializable, Cloneable, Comparable<LogEntry>
+        implements Cloneable,
+                   Comparable<LogEntry>,
+                   java.io.Serializable,
+                   org.apache.thrift.TBase<LogEntry, LogEntry._Fields>
 {
     private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("LogEntry");
 

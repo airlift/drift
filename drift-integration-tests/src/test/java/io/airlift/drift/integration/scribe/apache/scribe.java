@@ -234,7 +234,10 @@ public class scribe
     }
 
     public static class Log_args
-            implements org.apache.thrift.TBase<Log_args, Log_args._Fields>, java.io.Serializable, Cloneable, Comparable<Log_args>
+            implements Cloneable,
+                       Comparable<Log_args>,
+                       java.io.Serializable,
+                       org.apache.thrift.TBase<Log_args, Log_args._Fields>
     {
         private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("Log_args");
 
@@ -723,7 +726,10 @@ public class scribe
     }
 
     public static class Log_result
-            implements org.apache.thrift.TBase<Log_result, Log_result._Fields>, java.io.Serializable, Cloneable, Comparable<Log_result>
+            implements Cloneable,
+                       Comparable<Log_result>,
+                       java.io.Serializable,
+                       org.apache.thrift.TBase<Log_result, Log_result._Fields>
     {
         private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("Log_result");
 
