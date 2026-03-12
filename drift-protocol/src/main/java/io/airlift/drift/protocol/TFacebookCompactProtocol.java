@@ -68,7 +68,7 @@ public class TFacebookCompactProtocol
 
     private static final byte PROTOCOL_ID = (byte) 0x82;
     private static final byte VERSION = 2;
-    private static final byte VERSION_MASK = 0x1f; // 0001 1111
+    private static final byte VERSION_MASK = 0x1F; // 0001 1111
     private static final byte TYPE_MASK = (byte) 0xE0; // 1110 0000
     private static final byte TYPE_BITS = 0b0000_0111;
     private static final int TYPE_SHIFT_AMOUNT = 5;
@@ -411,7 +411,7 @@ public class TFacebookCompactProtocol
             writeByteDirect(size << 4 | getCompactType(elemType));
         }
         else {
-            writeByteDirect(0xf0 | getCompactType(elemType));
+            writeByteDirect(0xF0 | getCompactType(elemType));
             writeVarint32(size);
         }
     }
@@ -481,14 +481,14 @@ public class TFacebookCompactProtocol
      */
     private static void fixedLongToBytes(long n, byte[] buf)
     {
-        buf[0] = (byte) ((n >> 56) & 0xff);
-        buf[1] = (byte) ((n >> 48) & 0xff);
-        buf[2] = (byte) ((n >> 40) & 0xff);
-        buf[3] = (byte) ((n >> 32) & 0xff);
-        buf[4] = (byte) ((n >> 24) & 0xff);
-        buf[5] = (byte) ((n >> 16) & 0xff);
-        buf[6] = (byte) ((n >> 8) & 0xff);
-        buf[7] = (byte) (n & 0xff);
+        buf[0] = (byte) ((n >> 56) & 0xFF);
+        buf[1] = (byte) ((n >> 48) & 0xFF);
+        buf[2] = (byte) ((n >> 40) & 0xFF);
+        buf[3] = (byte) ((n >> 32) & 0xFF);
+        buf[4] = (byte) ((n >> 24) & 0xFF);
+        buf[5] = (byte) ((n >> 16) & 0xFF);
+        buf[6] = (byte) ((n >> 8) & 0xFF);
+        buf[7] = (byte) (n & 0xFF);
     }
 
     /**
@@ -496,10 +496,10 @@ public class TFacebookCompactProtocol
      */
     private static void fixedIntToBytes(int n, byte[] buf)
     {
-        buf[0] = (byte) ((n >> 24) & 0xff);
-        buf[1] = (byte) ((n >> 16) & 0xff);
-        buf[2] = (byte) ((n >> 8) & 0xff);
-        buf[3] = (byte) (n & 0xff);
+        buf[0] = (byte) ((n >> 24) & 0xFF);
+        buf[1] = (byte) ((n >> 16) & 0xFF);
+        buf[2] = (byte) ((n >> 8) & 0xFF);
+        buf[3] = (byte) (n & 0xFF);
     }
 
     private final byte[] byteDirectBuffer = new byte[1];
@@ -590,7 +590,7 @@ public class TFacebookCompactProtocol
         short fieldId;
 
         // mask off the 4 MSB of the type header. it could contain a field id delta.
-        short modifier = (short) ((type & 0xf0) >> 4);
+        short modifier = (short) ((type & 0xF0) >> 4);
         if (modifier == 0) {
             // not a delta. look ahead for the zigzag varint field id.
             fieldId = readI16();
@@ -600,12 +600,12 @@ public class TFacebookCompactProtocol
             fieldId = (short) (lastFieldId + modifier);
         }
 
-        TField field = new TField("", getTType((byte) (type & 0x0f)), fieldId);
+        TField field = new TField("", getTType((byte) (type & 0x0F)), fieldId);
 
         // if this happens to be a boolean field, the value is encoded in the type
         if (isBoolType(type)) {
             // save the boolean value in a special instance variable.
-            booleanValue = (byte) (type & 0x0f) == Types.BOOLEAN_TRUE ? Boolean.TRUE : Boolean.FALSE;
+            booleanValue = (byte) (type & 0x0F) == Types.BOOLEAN_TRUE ? Boolean.TRUE : Boolean.FALSE;
         }
 
         // push the new field onto the field stack so we can keep the deltas going.
@@ -624,7 +624,7 @@ public class TFacebookCompactProtocol
     {
         int size = checkSize(readVarint32());
         byte keyAndValueType = size == 0 ? 0 : readByte();
-        return new TMap(getTType((byte) (keyAndValueType >> 4)), getTType((byte) (keyAndValueType & 0xf)), size);
+        return new TMap(getTType((byte) (keyAndValueType >> 4)), getTType((byte) (keyAndValueType & 0xF)), size);
     }
 
     /**
@@ -638,7 +638,7 @@ public class TFacebookCompactProtocol
             throws TException
     {
         byte sizeAndType = readByte();
-        int size = (sizeAndType >> 4) & 0x0f;
+        int size = (sizeAndType >> 4) & 0x0F;
         if (size == 15) {
             size = readVarint32();
         }
@@ -835,7 +835,7 @@ public class TFacebookCompactProtocol
         int shift = 0;
         while (true) {
             byte b = readByte();
-            result |= (b & 0x7f) << shift;
+            result |= (b & 0x7F) << shift;
             if ((b & 0x80) != 0x80) {
                 break;
             }
@@ -855,7 +855,7 @@ public class TFacebookCompactProtocol
         long result = 0;
         while (true) {
             byte b = readByte();
-            result |= (long) (b & 0x7f) << shift;
+            result |= (long) (b & 0x7F) << shift;
             if ((b & 0x80) != 0x80) {
                 break;
             }
@@ -891,22 +891,22 @@ public class TFacebookCompactProtocol
      */
     private static long bytesToLong(byte[] bytes)
     {
-        return ((bytes[0] & 0xffL) << 56) |
-                ((bytes[1] & 0xffL) << 48) |
-                ((bytes[2] & 0xffL) << 40) |
-                ((bytes[3] & 0xffL) << 32) |
-                ((bytes[4] & 0xffL) << 24) |
-                ((bytes[5] & 0xffL) << 16) |
-                ((bytes[6] & 0xffL) << 8) |
-                (bytes[7] & 0xffL);
+        return ((bytes[0] & 0xFFL) << 56) |
+                ((bytes[1] & 0xFFL) << 48) |
+                ((bytes[2] & 0xFFL) << 40) |
+                ((bytes[3] & 0xFFL) << 32) |
+                ((bytes[4] & 0xFFL) << 24) |
+                ((bytes[5] & 0xFFL) << 16) |
+                ((bytes[6] & 0xFFL) << 8) |
+                (bytes[7] & 0xFFL);
     }
 
     private static int bytesToInt(byte[] bytes)
     {
-        return ((bytes[0] & 0xff) << 24) |
-                ((bytes[1] & 0xff) << 16) |
-                ((bytes[2] & 0xff) << 8) |
-                ((bytes[3] & 0xff));
+        return ((bytes[0] & 0xFF) << 24) |
+                ((bytes[1] & 0xFF) << 16) |
+                ((bytes[2] & 0xFF) << 8) |
+                ((bytes[3] & 0xFF));
     }
 
     //
@@ -915,7 +915,7 @@ public class TFacebookCompactProtocol
 
     private static boolean isBoolType(byte b)
     {
-        int lowerNibble = b & 0x0f;
+        int lowerNibble = b & 0x0F;
         return lowerNibble == Types.BOOLEAN_TRUE || lowerNibble == Types.BOOLEAN_FALSE;
     }
 
@@ -926,7 +926,7 @@ public class TFacebookCompactProtocol
     private static byte getTType(byte type)
             throws TProtocolException
     {
-        switch ((byte) (type & 0x0f)) {
+        switch ((byte) (type & 0x0F)) {
             case TType.STOP:
                 return TType.STOP;
             case Types.BOOLEAN_FALSE:
@@ -955,7 +955,7 @@ public class TFacebookCompactProtocol
             case Types.STRUCT:
                 return TType.STRUCT;
             default:
-                throw new TProtocolException("don't know what type: " + (byte) (type & 0x0f));
+                throw new TProtocolException("don't know what type: " + (byte) (type & 0x0F));
         }
     }
 
