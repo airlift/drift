@@ -111,7 +111,8 @@ public class SslContextFactory
                 Optional<File> privateKeyFile,
                 Optional<String> privateKeyPassword,
                 long sessionCacheSize,
-                Duration sessionTimeout, List<String> ciphers)
+                Duration sessionTimeout,
+                List<String> ciphers)
         {
             this.trustCertificatesFile = requireNonNull(trustCertificatesFile, "trustCertificatesFile is null");
             this.clientCertificatesFile = requireNonNull(clientCertificatesFile, "clientCertificatesFile is null");

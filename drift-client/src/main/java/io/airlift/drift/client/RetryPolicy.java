@@ -66,7 +66,8 @@ public class RetryPolicy
                 exceptionClassifier);
     }
 
-    public RetryPolicy(int maxRetries,
+    public RetryPolicy(
+            int maxRetries,
             Duration minBackoffDelay,
             Duration maxBackoffDelay,
             double backoffScaleFactor,

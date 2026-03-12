@@ -125,7 +125,8 @@ public class scribe
             }
         }
 
-        public AsyncClient(org.apache.thrift.protocol.TProtocolFactory protocolFactory,
+        public AsyncClient(
+                org.apache.thrift.protocol.TProtocolFactory protocolFactory,
                 org.apache.thrift.async.TAsyncClientManager clientManager,
                 org.apache.thrift.transport.TNonblockingTransport transport)
         {
@@ -146,7 +147,8 @@ public class scribe
         {
             private List<LogEntry> messages;
 
-            public Log_call(List<LogEntry> messages,
+            public Log_call(
+                    List<LogEntry> messages,
                     org.apache.thrift.async.AsyncMethodCallback<ResultCode> resultHandler,
                     org.apache.thrift.async.TAsyncClient client,
                     org.apache.thrift.protocol.TProtocolFactory protocolFactory,

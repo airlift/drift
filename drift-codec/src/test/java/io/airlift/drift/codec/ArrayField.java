@@ -79,7 +79,8 @@ public final class ArrayField
         this.byteArray = byteArray;
     }
 
-    public ArrayField(boolean[] booleanArray,
+    public ArrayField(
+            boolean[] booleanArray,
             short[] shortArray,
             int[] intArray,
             long[] longArray,

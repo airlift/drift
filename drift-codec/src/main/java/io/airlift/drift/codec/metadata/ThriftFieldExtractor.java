@@ -36,7 +36,11 @@ public class ThriftFieldExtractor
     private final Class<?> type;
 
     public ThriftFieldExtractor(
-            short fieldId, String fieldName, FieldKind fieldKind, Field field, Type fieldType)
+            short fieldId,
+            String fieldName,
+            FieldKind fieldKind,
+            Field field,
+            Type fieldType)
     {
         this.name = requireNonNull(fieldName, "name is null");
         this.field = requireNonNull(field, "field is null");

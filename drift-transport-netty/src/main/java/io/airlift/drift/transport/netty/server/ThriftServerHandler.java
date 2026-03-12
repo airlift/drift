@@ -336,7 +336,8 @@ public class ThriftServerHandler
         }
     }
 
-    private static ThriftFrame writeExceptionResponse(ChannelHandlerContext context,
+    private static ThriftFrame writeExceptionResponse(
+            ChannelHandlerContext context,
             MethodMetadata methodMetadata,
             Transport transport,
             Protocol protocol,
