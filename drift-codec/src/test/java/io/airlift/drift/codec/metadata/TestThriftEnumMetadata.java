@@ -96,7 +96,7 @@ public class TestThriftEnumMetadata
     @ThriftEnum
     public enum MissingValueMethod
     {
-        FOO
+        FOO,
     }
 
     @ThriftEnum
