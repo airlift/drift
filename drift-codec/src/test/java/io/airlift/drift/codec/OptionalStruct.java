@@ -89,6 +89,7 @@ public class OptionalStruct
 
     @ThriftConstructor
     public OptionalStruct(
+            // optional
             Optional<Boolean> aBooleanOptional,
             Optional<Byte> aByteOptional,
             Optional<Short> aShortOptional,
@@ -99,11 +100,11 @@ public class OptionalStruct
             Optional<BonkField> aStructOptional,
             Optional<Fruit> aEnumOptional,
             Optional<Letter> aCustomEnumOptional,
-
+            // specialized optional
             OptionalDouble aOptionalDouble,
             OptionalInt aOptionalInt,
             OptionalLong aOptionalLong,
-
+            // optional of list
             Optional<List<Boolean>> aListBooleanOptional,
             Optional<List<Byte>> aListByteOptional,
             Optional<List<Short>> aListShortOptional,

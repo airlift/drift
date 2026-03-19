@@ -338,6 +338,7 @@ public abstract class AbstractThriftCodecManagerTest
             throws Exception
     {
         OptionalStruct optionalStruct = new OptionalStruct(
+                // optional
                 Optional.of(true),
                 Optional.of(Byte.MIN_VALUE),
                 Optional.of(Short.MIN_VALUE),
@@ -348,11 +349,11 @@ public abstract class AbstractThriftCodecManagerTest
                 Optional.of(new BonkField("message", 42)),
                 Optional.of(Fruit.BANANA),
                 Optional.of(Letter.C),
-
+                // specialized optional
                 OptionalDouble.of(87.6d),
                 OptionalInt.of(Integer.MAX_VALUE - 10),
                 OptionalLong.of(Long.MAX_VALUE - 20),
-
+                // optional of list
                 Optional.of(ImmutableList.of(true)),
                 Optional.of(ImmutableList.of(Byte.MAX_VALUE)),
                 Optional.of(ImmutableList.of(Short.MAX_VALUE)),
