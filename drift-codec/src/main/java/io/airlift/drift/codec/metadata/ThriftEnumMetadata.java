@@ -55,6 +55,9 @@ public class ThriftEnumMetadata<T extends Enum<T>>
 
         Method enumValueMethod = null;
         for (Method method : enumClass.getMethods()) {
+            if (method.isSynthetic()) {
+                continue;
+            }
             if (method.isAnnotationPresent(ThriftEnumValue.class)) {
                 checkArgument(
                         Modifier.isPublic(method.getModifiers()),
