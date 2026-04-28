@@ -95,7 +95,7 @@ final class ClientTestUtils
             return 0;
         }
 
-        AddressSelector<?> addressSelector = (context, attempted) -> Optional.of(() -> address);
+        AddressSelector<?> addressSelector = (_, _) -> Optional.of(() -> address);
 
         Bootstrap app = new Bootstrap(
                 new MBeanModule(),

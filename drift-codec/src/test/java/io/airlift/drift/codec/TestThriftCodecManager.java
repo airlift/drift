@@ -58,7 +58,7 @@ public class TestThriftCodecManager
     @BeforeMethod
     protected void setUp()
     {
-        codecManager = new ThriftCodecManager((codecManager, metadata) -> {
+        codecManager = new ThriftCodecManager((_, _) -> {
             throw new UnsupportedOperationException();
         });
         ThriftCatalog catalog = codecManager.getCatalog();

@@ -142,7 +142,7 @@ public class ThriftClientHandler
                     true);
 
             ChannelFuture sendFuture = context.write(thriftFrame, promise);
-            sendFuture.addListener(future -> messageSent(context, sendFuture, requestHandler));
+            sendFuture.addListener(_ -> messageSent(context, sendFuture, requestHandler));
         }
         catch (Throwable t) {
             onError(context, t, Optional.of(requestHandler));
