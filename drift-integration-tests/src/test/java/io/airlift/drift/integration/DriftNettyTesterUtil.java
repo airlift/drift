@@ -74,7 +74,7 @@ final class DriftNettyTesterUtil
             return 0;
         }
 
-        AddressSelector<?> addressSelector = (context, attempted) -> Optional.of(() -> address);
+        AddressSelector<?> addressSelector = (_, _) -> Optional.of(() -> address);
         DriftNettyClientConfig config = new DriftNettyClientConfig()
                 .setTransport(transport)
                 .setProtocol(protocol)
@@ -84,7 +84,7 @@ final class DriftNettyTesterUtil
         try (TestingPooledByteBufAllocator testingAllocator = new TestingPooledByteBufAllocator();
                 DriftNettyMethodInvokerFactory<String> methodInvokerFactory = new DriftNettyMethodInvokerFactory<>(
                         new DriftNettyConnectionFactoryConfig(),
-                        clientIdentity -> config,
+                        _ -> config,
                         testingAllocator)) {
             DriftClientFactoryManager<String> clientFactoryManager = new DriftClientFactoryManager<>(CODEC_MANAGER, methodInvokerFactory);
             DriftClientFactory proxyFactory = clientFactoryManager.createDriftClientFactory("clientIdentity", addressSelector, NORMAL_RESULT);
@@ -112,7 +112,7 @@ final class DriftNettyTesterUtil
             return 0;
         }
 
-        AddressSelector<?> addressSelector = (context, attempted) -> Optional.of(() -> address);
+        AddressSelector<?> addressSelector = (_, _) -> Optional.of(() -> address);
         DriftNettyClientConfig config = new DriftNettyClientConfig()
                 .setTransport(transport)
                 .setProtocol(protocol)
@@ -146,7 +146,7 @@ final class DriftNettyTesterUtil
             return 0;
         }
 
-        AddressSelector<?> addressSelector = (context, attempted) -> Optional.of(() -> address);
+        AddressSelector<?> addressSelector = (_, _) -> Optional.of(() -> address);
         DriftNettyClientConfig config = new DriftNettyClientConfig()
                 .setTransport(transport)
                 .setProtocol(protocol)
@@ -156,7 +156,7 @@ final class DriftNettyTesterUtil
         try (TestingPooledByteBufAllocator testingAllocator = new TestingPooledByteBufAllocator();
                 DriftNettyMethodInvokerFactory<String> methodInvokerFactory = new DriftNettyMethodInvokerFactory<>(
                         new DriftNettyConnectionFactoryConfig(),
-                        clientIdentity -> config,
+                        _ -> config,
                         testingAllocator)) {
             DriftClientFactoryManager<String> proxyFactoryManager = new DriftClientFactoryManager<>(CODEC_MANAGER, methodInvokerFactory);
             DriftClientFactory proxyFactory = proxyFactoryManager.createDriftClientFactory("myFactory", addressSelector, NORMAL_RESULT);

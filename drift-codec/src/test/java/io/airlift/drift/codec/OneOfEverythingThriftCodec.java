@@ -29,7 +29,8 @@ public class OneOfEverythingThriftCodec
     private final ThriftCodec<UnionField> aUnionCodec;
     private final ThriftCodec<Fruit> aFruitCodec;
 
-    public OneOfEverythingThriftCodec(ThriftType type,
+    public OneOfEverythingThriftCodec(
+            ThriftType type,
             ThriftCodec<BonkField> aStructCodec,
             ThriftCodec<UnionField> aUnionCodec,
             ThriftCodec<Fruit> aFruitCodec)

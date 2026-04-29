@@ -28,9 +28,7 @@ public final class BonkBean
     private String message;
     private int type;
 
-    public BonkBean()
-    {
-    }
+    public BonkBean() {}
 
     public BonkBean(String message, int type)
     {

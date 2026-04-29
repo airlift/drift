@@ -125,7 +125,8 @@ public class scribe
             }
         }
 
-        public AsyncClient(org.apache.thrift.protocol.TProtocolFactory protocolFactory,
+        public AsyncClient(
+                org.apache.thrift.protocol.TProtocolFactory protocolFactory,
                 org.apache.thrift.async.TAsyncClientManager clientManager,
                 org.apache.thrift.transport.TNonblockingTransport transport)
         {
@@ -146,7 +147,8 @@ public class scribe
         {
             private List<LogEntry> messages;
 
-            public Log_call(List<LogEntry> messages,
+            public Log_call(
+                    List<LogEntry> messages,
                     org.apache.thrift.async.AsyncMethodCallback<ResultCode> resultHandler,
                     org.apache.thrift.async.TAsyncClient client,
                     org.apache.thrift.protocol.TProtocolFactory protocolFactory,
@@ -234,7 +236,10 @@ public class scribe
     }
 
     public static class Log_args
-            implements org.apache.thrift.TBase<Log_args, Log_args._Fields>, java.io.Serializable, Cloneable, Comparable<Log_args>
+            implements Cloneable,
+                       Comparable<Log_args>,
+                       java.io.Serializable,
+                       org.apache.thrift.TBase<Log_args, Log_args._Fields>
     {
         private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("Log_args");
 
@@ -331,9 +336,7 @@ public class scribe
             org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(Log_args.class, metaDataMap);
         }
 
-        public Log_args()
-        {
-        }
+        public Log_args() {}
 
         public Log_args(
                 List<LogEntry> messages)
@@ -725,7 +728,10 @@ public class scribe
     }
 
     public static class Log_result
-            implements org.apache.thrift.TBase<Log_result, Log_result._Fields>, java.io.Serializable, Cloneable, Comparable<Log_result>
+            implements Cloneable,
+                       Comparable<Log_result>,
+                       java.io.Serializable,
+                       org.apache.thrift.TBase<Log_result, Log_result._Fields>
     {
         private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("Log_result");
 
@@ -820,15 +826,15 @@ public class scribe
 
         static {
             Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<>(_Fields.class);
-            tmpMap.put(_Fields.SUCCESS, new org.apache.thrift.meta_data.FieldMetaData("success", org.apache.thrift.TFieldRequirementType.DEFAULT,
+            tmpMap.put(_Fields.SUCCESS, new org.apache.thrift.meta_data.FieldMetaData(
+                    "success",
+                    org.apache.thrift.TFieldRequirementType.DEFAULT,
                     new org.apache.thrift.meta_data.EnumMetaData(org.apache.thrift.protocol.TType.ENUM, ResultCode.class)));
             metaDataMap = Collections.unmodifiableMap(tmpMap);
             org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(Log_result.class, metaDataMap);
         }
 
-        public Log_result()
-        {
-        }
+        public Log_result() {}
 
         public Log_result(
                 ResultCode success)

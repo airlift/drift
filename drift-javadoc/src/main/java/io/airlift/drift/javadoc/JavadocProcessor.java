@@ -58,7 +58,8 @@ import static javax.tools.Diagnostic.Kind.WARNING;
 @SupportedAnnotationTypes({
         ThriftAnnotations.THRIFT_ENUM,
         ThriftAnnotations.THRIFT_SERVICE,
-        ThriftAnnotations.THRIFT_STRUCT})
+        ThriftAnnotations.THRIFT_STRUCT,
+})
 public class JavadocProcessor
         extends AbstractProcessor
 {

@@ -73,14 +73,14 @@ final class ApacheThriftTesterUtil
             return 0;
         }
 
-        AddressSelector<?> addressSelector = (context, attempted) -> Optional.of(() -> address);
+        AddressSelector<?> addressSelector = (_, _) -> Optional.of(() -> address);
         ApacheThriftClientConfig config = new ApacheThriftClientConfig()
                 .setTransport(toApacheThriftTransport(transport))
                 .setProtocol(toApacheThriftProtocol(protocol))
                 .setTrustCertificate(ClientTestUtils.getCertificateChainFile())
                 .setSslEnabled(secure);
         ApacheThriftConnectionFactoryConfig factoryConfig = new ApacheThriftConnectionFactoryConfig();
-        try (ApacheThriftMethodInvokerFactory<String> methodInvokerFactory = new ApacheThriftMethodInvokerFactory<>(factoryConfig, clientIdentity -> config)) {
+        try (ApacheThriftMethodInvokerFactory<String> methodInvokerFactory = new ApacheThriftMethodInvokerFactory<>(factoryConfig, _ -> config)) {
             DriftClientFactoryManager<String> clientFactoryManager = new DriftClientFactoryManager<>(CODEC_MANAGER, methodInvokerFactory);
             DriftClientFactory proxyFactory = clientFactoryManager.createDriftClientFactory("clientIdentity", addressSelector, NORMAL_RESULT);
 
@@ -107,7 +107,7 @@ final class ApacheThriftTesterUtil
             return 0;
         }
 
-        AddressSelector<?> addressSelector = (context, attempted) -> Optional.of(() -> address);
+        AddressSelector<?> addressSelector = (_, _) -> Optional.of(() -> address);
         ApacheThriftClientConfig config = new ApacheThriftClientConfig()
                 .setTransport(toApacheThriftTransport(transport))
                 .setProtocol(toApacheThriftProtocol(protocol))
@@ -140,14 +140,14 @@ final class ApacheThriftTesterUtil
             return 0;
         }
 
-        AddressSelector<?> addressSelector = (context, attempted) -> Optional.of(() -> address);
+        AddressSelector<?> addressSelector = (_, _) -> Optional.of(() -> address);
         ApacheThriftClientConfig config = new ApacheThriftClientConfig()
                 .setTransport(toApacheThriftTransport(transport))
                 .setProtocol(toApacheThriftProtocol(protocol))
                 .setTrustCertificate(ClientTestUtils.getCertificateChainFile())
                 .setSslEnabled(secure);
         ApacheThriftConnectionFactoryConfig factoryConfig = new ApacheThriftConnectionFactoryConfig();
-        try (ApacheThriftMethodInvokerFactory<String> methodInvokerFactory = new ApacheThriftMethodInvokerFactory<>(factoryConfig, clientIdentity -> config)) {
+        try (ApacheThriftMethodInvokerFactory<String> methodInvokerFactory = new ApacheThriftMethodInvokerFactory<>(factoryConfig, _ -> config)) {
             DriftClientFactoryManager<String> proxyFactoryManager = new DriftClientFactoryManager<>(CODEC_MANAGER, methodInvokerFactory);
             DriftClientFactory proxyFactory = proxyFactoryManager.createDriftClientFactory("myFactory", addressSelector, NORMAL_RESULT);
 

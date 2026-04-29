@@ -27,7 +27,8 @@ public class ExceptionWithIdlAnnotations
     private final int type;
 
     @ThriftConstructor
-    public ExceptionWithIdlAnnotations(@ThriftField(1) String message,
+    public ExceptionWithIdlAnnotations(
+            @ThriftField(1) String message,
             @ThriftField(2) int type)
     {
         super(message);

@@ -35,7 +35,6 @@ import java.util.Set;
 
 import static com.google.common.base.Strings.emptyToNull;
 import static com.google.common.collect.Streams.mapWithIndex;
-import static java.lang.String.format;
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
@@ -92,7 +91,7 @@ public final class ThriftIdlRenderer
             return null;
         }
         return namespaces.entrySet().stream()
-                .map(entry -> format("namespace %s %s", entry.getKey(), entry.getValue()))
+                .map(entry -> "namespace %s %s".formatted(entry.getKey(), entry.getValue()))
                 .collect(joining("\n")) + "\n";
     }
 
@@ -102,7 +101,7 @@ public final class ThriftIdlRenderer
             return null;
         }
         return includes.stream()
-                .map(include -> format("include \"%s\"", include))
+                .map("include \"%s\""::formatted)
                 .collect(joining("\n")) + "\n";
     }
 
@@ -116,7 +115,7 @@ public final class ThriftIdlRenderer
     private static String renderEnum(ThriftEnumMetadata<?> metadata)
     {
         return documentation(metadata.getDocumentation(), "") +
-                format("enum %s {\n%s}\n", metadata.getEnumName(), renderEnumElements(metadata));
+                "enum %s {\n%s}\n".formatted(metadata.getEnumName(), renderEnumElements(metadata));
     }
 
     private static <T extends Enum<T>> String renderEnumElements(ThriftEnumMetadata<T> metadata)
@@ -153,7 +152,7 @@ public final class ThriftIdlRenderer
     {
         StringBuilder builder = new StringBuilder()
                 .append(documentation(struct.getDocumentation(), ""))
-                .append(format("%s %s {\n", structKind(struct), struct.getStructName()));
+                .append("%s %s {\n".formatted(structKind(struct), struct.getStructName()));
 
         LineSeparator separator = new LineSeparator();
         for (ThriftFieldMetadata field : struct.getFields()) {
@@ -162,7 +161,7 @@ public final class ThriftIdlRenderer
             }
             builder.append(separator.getAndUpdate(!field.getDocumentation().isEmpty()))
                     .append(documentation(field.getDocumentation(), "  "))
-                    .append(format("  %s: %s%s %s;\n",
+                    .append("  %s: %s%s %s;\n".formatted(
                             field.getId(),
                             requiredness(field.getRequiredness()),
                             typeName(field.getThriftType()),
@@ -207,7 +206,7 @@ public final class ThriftIdlRenderer
     private String renderService(ThriftServiceMetadata service)
     {
         return documentation(service.getDocumentation(), "") +
-                format("service %s {\n", service.getIdlName()) +
+                "service %s {\n".formatted(service.getIdlName()) +
                 service.getMethods().values().stream()
                         .map(this::renderMethod)
                         .collect(joining("\n")) +
@@ -219,13 +218,13 @@ public final class ThriftIdlRenderer
         StringBuilder builder = new StringBuilder()
                 .append(documentation(method.getDocumentation(), "  "));
 
-        String methodStart = format("  %s%s %s(",
+        String methodStart = "  %s%s %s(".formatted(
                 method.getOneway() ? "oneway " : "",
                 typeName(method.getReturnType()),
                 method.getName());
 
         List<String> parameters = method.getParameters().stream()
-                .map(parameter -> format("%s: %s %s",
+                .map(parameter -> "%s: %s %s".formatted(
                         parameter.getId(),
                         typeName(parameter.getThriftType()),
                         parameter.getName()))
@@ -234,8 +233,9 @@ public final class ThriftIdlRenderer
         builder.append(renderParameters(methodStart, parameters));
 
         if (!method.getExceptions().isEmpty()) {
-            List<String> exceptions = mapWithIndex(method.getExceptions().entrySet().stream(),
-                    (entry, index) -> format("%s: %s ex%s",
+            List<String> exceptions = mapWithIndex(
+                    method.getExceptions().entrySet().stream(),
+                    (entry, index) -> "%s: %s ex%s".formatted(
                             entry.getKey(),
                             typeName(entry.getValue().getThriftType()),
                             index + 1))

@@ -71,7 +71,7 @@ public class ApacheThriftMethodInvokerFactory<I>
             ApacheThriftConnectionFactoryConfig factoryConfig)
     {
         requireNonNull(clientConfig, "clientConfig is null");
-        return new ApacheThriftMethodInvokerFactory<>(factoryConfig, clientIdentity -> clientConfig);
+        return new ApacheThriftMethodInvokerFactory<>(factoryConfig, _ -> clientConfig);
     }
 
     @Inject

@@ -236,7 +236,7 @@ public final class HeaderTransport
 
         while (true) {
             byte b = messageHeader.readByte();
-            result |= (b & 0x7f) << shift;
+            result |= (b & 0x7F) << shift;
             if ((b & 0x80) != 0x80) {
                 break;
             }

@@ -67,9 +67,7 @@ public final class ArrayField
     @ThriftField(15)
     public Map<Short, double[]> mapDoubleArray;
 
-    public ArrayField()
-    {
-    }
+    public ArrayField() {}
 
     public ArrayField(boolean[] booleanArray, short[] shortArray, int[] intArray, long[] longArray, double[] doubleArray, byte[] byteArray)
     {
@@ -81,7 +79,8 @@ public final class ArrayField
         this.byteArray = byteArray;
     }
 
-    public ArrayField(boolean[] booleanArray,
+    public ArrayField(
+            boolean[] booleanArray,
             short[] shortArray,
             int[] intArray,
             long[] longArray,

@@ -46,14 +46,10 @@ public class MetadataErrors
             implements MetadataErrors.Monitor
     {
         @Override
-        public void onError(MetadataErrorException unused)
-        {
-        }
+        public void onError(MetadataErrorException unused) {}
 
         @Override
-        public void onWarning(MetadataWarningException unused)
-        {
-        }
+        public void onWarning(MetadataWarningException unused) {}
     }
 
     public MetadataErrors()

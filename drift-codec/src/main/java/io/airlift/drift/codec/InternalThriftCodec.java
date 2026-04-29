@@ -29,6 +29,4 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Target({METHOD, CONSTRUCTOR, FIELD, PARAMETER})
 @Retention(RUNTIME)
 @BindingAnnotation
-public @interface InternalThriftCodec
-{
-}
+public @interface InternalThriftCodec {}

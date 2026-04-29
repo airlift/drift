@@ -338,6 +338,7 @@ public abstract class AbstractThriftCodecManagerTest
             throws Exception
     {
         OptionalStruct optionalStruct = new OptionalStruct(
+                // optional
                 Optional.of(true),
                 Optional.of(Byte.MIN_VALUE),
                 Optional.of(Short.MIN_VALUE),
@@ -348,11 +349,11 @@ public abstract class AbstractThriftCodecManagerTest
                 Optional.of(new BonkField("message", 42)),
                 Optional.of(Fruit.BANANA),
                 Optional.of(Letter.C),
-
+                // specialized optional
                 OptionalDouble.of(87.6d),
                 OptionalInt.of(Integer.MAX_VALUE - 10),
                 OptionalLong.of(Long.MAX_VALUE - 20),
-
+                // optional of list
                 Optional.of(ImmutableList.of(true)),
                 Optional.of(ImmutableList.of(Byte.MAX_VALUE)),
                 Optional.of(ImmutableList.of(Short.MAX_VALUE)),
@@ -725,7 +726,7 @@ public abstract class AbstractThriftCodecManagerTest
     private <T> void testRoundTripSerialize(T value)
             throws Exception
     {
-        testRoundTripSerialize(value, x -> {});
+        testRoundTripSerialize(value, _ -> {});
     }
 
     private <T> void testRoundTripSerialize(T value, Consumer<T> consumer)
@@ -888,12 +889,10 @@ public abstract class AbstractThriftCodecManagerTest
                                 "2: other", new BonkField("other", 11))));
 
         one.aMapOfListToSet = ImmutableMap.of(
-                ImmutableList.of("a", "b"),
-                ImmutableSet.of(
+                ImmutableList.of("a", "b"), ImmutableSet.of(
                         new BonkField("1: message", 42),
                         new BonkField("1: other", 11)),
-                ImmutableList.of("c", "d"),
-                ImmutableSet.of(
+                ImmutableList.of("c", "d"), ImmutableSet.of(
                         new BonkField("2: message", 42),
                         new BonkField("2: other", 11)));
 
@@ -902,11 +901,13 @@ public abstract class AbstractThriftCodecManagerTest
         one.aUnionSet = ImmutableSet.of(new UnionField("Hello, World"), new UnionField(123456L), new UnionField(Fruit.CHERRY));
         one.aUnionList = ImmutableList.of(new UnionField("Hello, World"), new UnionField(123456L), new UnionField(Fruit.CHERRY));
 
-        one.aUnionKeyMap = ImmutableMap.of(new UnionField("Hello, World"), "Eins",
+        one.aUnionKeyMap = ImmutableMap.of(
+                new UnionField("Hello, World"), "Eins",
                 new UnionField(123456L), "Zwei",
                 new UnionField(Fruit.CHERRY), "Drei");
 
-        one.aUnionValueMap = ImmutableMap.of("Eins", new UnionField("Hello, World"),
+        one.aUnionValueMap = ImmutableMap.of(
+                "Eins", new UnionField("Hello, World"),
                 "Zwei", new UnionField(123456L),
                 "Drei", new UnionField(Fruit.CHERRY));
 

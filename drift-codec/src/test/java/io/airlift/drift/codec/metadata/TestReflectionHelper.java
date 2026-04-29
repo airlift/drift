@@ -33,9 +33,7 @@ public class TestReflectionHelper
                 ImmutableList.of("a", "b", "c"));
     }
 
-    private static void noAnnotations(String a, String b, String c)
-    {
-    }
+    private static void noAnnotations(String a, String b, String c) {}
 
     @Test
     public void testExtractParameterNamesThriftFieldAnnotation()
@@ -50,8 +48,7 @@ public class TestReflectionHelper
             @ThriftField(name = "a") String arg0,
             @ThriftField(name = "b") String arg1,
             @ThriftField(name = "c") String arg2)
-    {
-    }
+    {}
 
     @Test
     public void testExtractParameterNamesMixedThriftFieldAnnotation()
@@ -66,6 +63,5 @@ public class TestReflectionHelper
             @ThriftField(name = "a") String arg0,
             String b,
             @ThriftField(name = "c") String arg2)
-    {
-    }
+    {}
 }

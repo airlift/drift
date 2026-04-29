@@ -38,9 +38,7 @@ public final class UnionField
     @ThriftUnionId
     public short id;
 
-    public UnionField()
-    {
-    }
+    public UnionField() {}
 
     public UnionField(String stringValue)
     {

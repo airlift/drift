@@ -75,8 +75,7 @@ public class DriftClientFactory
             AddressSelector<? extends Address> addressSelector,
             ExceptionClassifier exceptionClassifier)
     {
-        this(
-                codecManager,
+        this(codecManager,
                 () -> invokerFactory.createMethodInvoker(null),
                 addressSelector,
                 exceptionClassifier,

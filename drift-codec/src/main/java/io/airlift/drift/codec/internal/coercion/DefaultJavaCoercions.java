@@ -22,9 +22,7 @@ import java.nio.ByteBuffer;
 @Immutable
 public final class DefaultJavaCoercions
 {
-    private DefaultJavaCoercions()
-    {
-    }
+    private DefaultJavaCoercions() {}
 
     @FromThrift
     public static Boolean booleanToBoxedBoolean(boolean value)

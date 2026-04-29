@@ -356,7 +356,5 @@ public class TestDriftServer
 
     @ThriftStruct("testService")
     public static class TestServiceException
-            extends Exception
-    {
-    }
+            extends Exception {}
 }

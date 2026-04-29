@@ -81,9 +81,9 @@ public class TestClientsWithDriftNettyServer
                 for (Transport transport : ImmutableList.of(HEADER)) {
                     for (Protocol protocol : Protocol.values()) {
                         int count = Streams.concat(
-                                legacyApacheThriftTestClients(filters, transport, protocol, secure).stream(),
-                                driftNettyTestClients(filters, transport, protocol, secure).stream(),
-                                apacheThriftTestClients(filters, transport, protocol, secure).stream())
+                                        legacyApacheThriftTestClients(filters, transport, protocol, secure).stream(),
+                                        driftNettyTestClients(filters, transport, protocol, secure).stream(),
+                                        apacheThriftTestClients(filters, transport, protocol, secure).stream())
                                 .mapToInt(client -> client.applyAsInt(address))
                                 .sum();
                         invocationCount.addAndGet(count);

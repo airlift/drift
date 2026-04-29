@@ -103,7 +103,9 @@ class InvocationResponseFuture
 
         try {
             invocationFuture = new ThriftRequest(request.getMethod(), request.getParameters(), request.getHeaders());
-            Futures.addCallback(invocationFuture, new FutureCallback<Object>()
+            Futures.addCallback(
+                    invocationFuture,
+                    new FutureCallback<Object>()
                     {
                         @Override
                         public void onSuccess(Object result)

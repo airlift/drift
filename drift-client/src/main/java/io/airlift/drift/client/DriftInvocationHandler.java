@@ -149,7 +149,9 @@ class DriftInvocationHandler
     private static ListenableFuture<Object> unwrapUserException(ListenableFuture<Object> future)
     {
         SettableFuture<Object> result = SettableFuture.create();
-        Futures.addCallback(future, new FutureCallback<Object>()
+        Futures.addCallback(
+                future,
+                new FutureCallback<Object>()
                 {
                     @Override
                     public void onSuccess(Object value)

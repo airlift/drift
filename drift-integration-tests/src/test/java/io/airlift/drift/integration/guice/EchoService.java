@@ -104,11 +104,9 @@ public interface EchoService
 
     @ThriftStruct
     class NullValueException
-            extends Exception
-    {}
+            extends Exception {}
 
     @ThriftStruct
     class EmptyOptionalException
-            extends Exception
-    {}
+            extends Exception {}
 }

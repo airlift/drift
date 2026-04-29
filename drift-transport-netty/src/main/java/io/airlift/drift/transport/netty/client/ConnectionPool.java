@@ -105,9 +105,9 @@ class ConnectionPool
         Future<Channel> future = connectionFactory.getConnection(key.getConnectionParameters(), key.getAddress());
 
         // remove connection from cache when it is closed
-        future.addListener(channelFuture -> {
+        future.addListener(_ -> {
             if (future.isSuccess()) {
-                future.getNow().closeFuture().addListener(closeFuture -> cachedConnections.asMap().remove(key, future));
+                future.getNow().closeFuture().addListener(_ -> cachedConnections.asMap().remove(key, future));
             }
         });
 
@@ -115,9 +115,7 @@ class ConnectionPool
     }
 
     @Override
-    public void returnConnection(Channel connection)
-    {
-    }
+    public void returnConnection(Channel connection) {}
 
     @Override
     public synchronized void close()
@@ -137,7 +135,7 @@ class ConnectionPool
 
     private static void closeConnection(Future<Channel> future)
     {
-        future.addListener(ignored -> {
+        future.addListener(_ -> {
             if (future.isSuccess()) {
                 Channel channel = future.getNow();
                 channel.close();

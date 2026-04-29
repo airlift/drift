@@ -19,6 +19,4 @@ import io.airlift.drift.annotations.ThriftStruct;
 
 @ThriftStruct
 public final class GenericThriftStructField<T>
-        extends GenericThriftStructFieldBase<T>
-{
-}
+        extends GenericThriftStructFieldBase<T> {}

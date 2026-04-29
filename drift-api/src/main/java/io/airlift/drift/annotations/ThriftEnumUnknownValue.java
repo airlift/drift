@@ -29,6 +29,4 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Documented
 @Retention(RUNTIME)
 @Target(FIELD)
-public @interface ThriftEnumUnknownValue
-{
-}
+public @interface ThriftEnumUnknownValue {}
