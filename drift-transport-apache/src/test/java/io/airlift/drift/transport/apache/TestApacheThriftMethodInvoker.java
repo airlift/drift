@@ -54,6 +54,7 @@ import org.apache.thrift.transport.TTransportFactory;
 import org.apache.thrift.transport.layered.TFramedTransport;
 import org.testng.annotations.Test;
 
+import java.net.InetSocketAddress;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.ToIntFunction;
@@ -61,6 +62,7 @@ import java.util.function.ToIntFunction;
 import static com.google.common.collect.Lists.newArrayList;
 import static io.airlift.drift.codec.metadata.ThriftType.list;
 import static io.airlift.drift.codec.metadata.ThriftType.optional;
+import static java.net.InetAddress.getLoopbackAddress;
 import static java.util.Collections.nCopies;
 import static java.util.stream.Collectors.toList;
 import static org.testng.Assert.assertEquals;
@@ -103,7 +105,7 @@ public class TestApacheThriftMethodInvoker
     private static int testProcessor(TProcessor processor, List<ToIntFunction<HostAndPort>> clients)
             throws Exception
     {
-        try (TServerSocket serverTransport = new TServerSocket(0)) {
+        try (TServerSocket serverTransport = new TServerSocket(new InetSocketAddress(getLoopbackAddress(), 0))) {
             TProtocolFactory protocolFactory = new Factory();
             TTransportFactory transportFactory = new TFramedTransport.Factory();
             TServer server = new TSimpleServer(new Args(serverTransport)
@@ -115,8 +117,9 @@ public class TestApacheThriftMethodInvoker
             try {
                 serverThread.start();
 
-                int localPort = serverTransport.getServerSocket().getLocalPort();
-                HostAndPort address = HostAndPort.fromParts("localhost", localPort);
+                String host = serverTransport.getServerSocket().getInetAddress().getHostAddress();
+                int port = serverTransport.getServerSocket().getLocalPort();
+                HostAndPort address = HostAndPort.fromParts(host, port);
 
                 int sum = 0;
                 for (ToIntFunction<HostAndPort> client : clients) {

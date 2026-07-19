@@ -38,6 +38,7 @@ import org.testng.annotations.Test;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLServerSocket;
 
+import java.net.InetSocketAddress;
 import java.util.List;
 import java.util.function.ToIntFunction;
 
@@ -49,6 +50,7 @@ import static io.airlift.drift.integration.DriftNettyTesterUtil.driftNettyTestCl
 import static io.airlift.drift.integration.LegacyApacheThriftTesterUtil.legacyApacheThriftTestClients;
 import static io.airlift.drift.transport.netty.codec.Protocol.FB_COMPACT;
 import static io.airlift.drift.transport.netty.codec.Transport.HEADER;
+import static java.net.InetAddress.getLoopbackAddress;
 import static java.util.Collections.nCopies;
 import static org.testng.Assert.assertEquals;
 
@@ -140,8 +142,9 @@ public class TestClientsWithApacheServer
             try {
                 serverThread.start();
 
-                int localPort = serverSocket.getServerSocket().getLocalPort();
-                HostAndPort address = HostAndPort.fromParts("localhost", localPort);
+                String host = serverSocket.getServerSocket().getInetAddress().getHostAddress();
+                int port = serverSocket.getServerSocket().getLocalPort();
+                HostAndPort address = HostAndPort.fromParts(host, port);
 
                 int sum = 0;
                 for (ToIntFunction<HostAndPort> client : clients) {
@@ -160,12 +163,13 @@ public class TestClientsWithApacheServer
             throws TTransportException
     {
         if (!secure) {
-            return new TServerSocket(0);
+            return new TServerSocket(new InetSocketAddress(getLoopbackAddress(), 0));
         }
 
         try {
             SSLContext serverSslContext = ClientTestUtils.getServerSslContext();
-            SSLServerSocket serverSocket = (SSLServerSocket) serverSslContext.getServerSocketFactory().createServerSocket(0);
+            SSLServerSocket serverSocket = (SSLServerSocket) serverSslContext.getServerSocketFactory().createServerSocket();
+            serverSocket.bind(new InetSocketAddress(getLoopbackAddress(), 0));
             return new TServerSocket(serverSocket);
         }
         catch (Exception e) {

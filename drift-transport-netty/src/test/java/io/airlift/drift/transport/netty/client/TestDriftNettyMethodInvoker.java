@@ -71,6 +71,7 @@ import org.apache.thrift.transport.TTransportFactory;
 import org.apache.thrift.transport.layered.TFramedTransport;
 import org.testng.annotations.Test;
 
+import java.net.InetSocketAddress;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -89,6 +90,7 @@ import static io.airlift.drift.codec.metadata.ThriftType.list;
 import static io.airlift.drift.codec.metadata.ThriftType.optional;
 import static io.airlift.drift.transport.netty.codec.Protocol.BINARY;
 import static io.airlift.drift.transport.netty.codec.Transport.FRAMED;
+import static java.net.InetAddress.getLoopbackAddress;
 import static java.util.Collections.nCopies;
 import static java.util.concurrent.Executors.newSingleThreadScheduledExecutor;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
@@ -147,7 +149,7 @@ public class TestDriftNettyMethodInvoker
     private static int testProcessor(TProcessor processor, List<ToIntFunction<HostAndPort>> clients)
             throws Exception
     {
-        try (TServerSocket serverTransport = new TServerSocket(0)) {
+        try (TServerSocket serverTransport = new TServerSocket(new InetSocketAddress(getLoopbackAddress(), 0))) {
             TProtocolFactory protocolFactory = new TBinaryProtocol.Factory();
             TTransportFactory transportFactory = new TFramedTransport.Factory();
             TServer server = new TSimpleServer(new Args(serverTransport)
@@ -159,8 +161,9 @@ public class TestDriftNettyMethodInvoker
             try {
                 serverThread.start();
 
-                int localPort = serverTransport.getServerSocket().getLocalPort();
-                HostAndPort address = HostAndPort.fromParts("localhost", localPort);
+                String host = serverTransport.getServerSocket().getInetAddress().getHostAddress();
+                int port = serverTransport.getServerSocket().getLocalPort();
+                HostAndPort address = HostAndPort.fromParts(host, port);
 
                 int sum = 0;
                 for (ToIntFunction<HostAndPort> client : clients) {
