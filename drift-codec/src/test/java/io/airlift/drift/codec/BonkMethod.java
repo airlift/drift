@@ -28,9 +28,7 @@ public final class BonkMethod
     private String message;
     private int type;
 
-    public BonkMethod()
-    {
-    }
+    public BonkMethod() {}
 
     public BonkMethod(String message, int type)
     {

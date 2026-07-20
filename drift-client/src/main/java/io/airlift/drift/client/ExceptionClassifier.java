@@ -25,7 +25,7 @@ import static java.util.Objects.requireNonNull;
 
 public interface ExceptionClassifier
 {
-    ExceptionClassifier NORMAL_RESULT = throwable -> NORMAL_EXCEPTION;
+    ExceptionClassifier NORMAL_RESULT = _ -> NORMAL_EXCEPTION;
 
     static ExceptionClassifier mergeExceptionClassifiers(Iterable<? extends ExceptionClassifier> classifiers)
     {

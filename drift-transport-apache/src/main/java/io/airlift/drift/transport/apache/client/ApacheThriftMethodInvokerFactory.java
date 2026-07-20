@@ -71,7 +71,7 @@ public class ApacheThriftMethodInvokerFactory<I>
             ApacheThriftConnectionFactoryConfig factoryConfig)
     {
         requireNonNull(clientConfig, "clientConfig is null");
-        return new ApacheThriftMethodInvokerFactory<>(factoryConfig, clientIdentity -> clientConfig);
+        return new ApacheThriftMethodInvokerFactory<>(factoryConfig, _ -> clientConfig);
     }
 
     @Inject
@@ -100,29 +100,16 @@ public class ApacheThriftMethodInvokerFactory<I>
             config.setSocksProxy(defaultSocksProxy);
         }
 
-        TTransportFactory transportFactory;
-        switch (config.getTransport()) {
-            case UNFRAMED:
-                transportFactory = new TTransportFactory();
-                break;
-            case FRAMED:
-                transportFactory = new TFramedTransport.Factory(toIntExact(config.getMaxFrameSize().toBytes()));
-                break;
-            default:
-                throw new IllegalArgumentException("Unknown transport: " + config.getTransport());
-        }
+        TTransportFactory transportFactory = switch (config.getTransport()) {
+            case UNFRAMED -> new TTransportFactory();
+            case FRAMED -> new TFramedTransport.Factory(toIntExact(config.getMaxFrameSize().toBytes()));
+            case HEADER -> throw new IllegalArgumentException("Unsupported transport: HEADER");
+        };
 
-        TProtocolFactory protocolFactory;
-        switch (config.getProtocol()) {
-            case BINARY:
-                protocolFactory = new TBinaryProtocol.Factory();
-                break;
-            case COMPACT:
-                protocolFactory = new TCompactProtocol.Factory();
-                break;
-            default:
-                throw new IllegalArgumentException("Unknown protocol: " + config.getProtocol());
-        }
+        TProtocolFactory protocolFactory = switch (config.getProtocol()) {
+            case BINARY -> new TBinaryProtocol.Factory();
+            case COMPACT -> new TCompactProtocol.Factory();
+        };
 
         Optional<SSLContext> sslContext = Optional.empty();
         if (config.isSslEnabled()) {

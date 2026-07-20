@@ -56,26 +56,13 @@ public class ArrayFieldThriftCodec
 
         while (reader.nextField()) {
             switch (reader.getFieldId()) {
-                case 1:
-                    booleanArray = reader.readBoolArrayField();
-                    break;
-                case 2:
-                    shortArray = reader.readI16ArrayField();
-                    break;
-                case 3:
-                    intArray = reader.readI32ArrayField();
-                    break;
-                case 4:
-                    longArray = reader.readI64ArrayField();
-                    break;
-                case 5:
-                    doubleArray = reader.readDoubleArrayField();
-                    break;
-                case 6:
-                    byteArray = reader.readBinaryField().array();
-                    break;
-                default:
-                    reader.skipFieldData();
+                case 1 -> booleanArray = reader.readBoolArrayField();
+                case 2 -> shortArray = reader.readI16ArrayField();
+                case 3 -> intArray = reader.readI32ArrayField();
+                case 4 -> longArray = reader.readI64ArrayField();
+                case 5 -> doubleArray = reader.readDoubleArrayField();
+                case 6 -> byteArray = reader.readBinaryField().array();
+                default -> reader.skipFieldData();
             }
         }
         reader.readStructEnd();

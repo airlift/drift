@@ -45,7 +45,7 @@ abstract class FieldMetadata
         this.type = type;
 
         switch (type) {
-            case THRIFT_FIELD:
+            case THRIFT_FIELD -> {
                 if (annotation != null) {
                     if (annotation.value() != Short.MIN_VALUE) {
                         id = annotation.value();
@@ -61,32 +61,20 @@ abstract class FieldMetadata
                         annotationMapBuilder.put(idlAnnotation.key(), idlAnnotation.value());
                     }
                     idlAnnotations = annotationMapBuilder.build();
-
-                    if (annotation.isRecursive() != ThriftField.Recursiveness.UNSPECIFIED) {
-                        switch (annotation.isRecursive()) {
-                            case TRUE:
-                                isRecursiveReference = true;
-                                break;
-                            case FALSE:
-                                isRecursiveReference = false;
-                                break;
-                            default:
-                                throw new IllegalStateException("Unexpected get for isRecursive field");
-                        }
-                    }
-                    else if (idlAnnotations.containsKey(RECURSIVE_REFERENCE_ANNOTATION_KEY)) {
-                        isRecursiveReference = "true".equalsIgnoreCase(idlAnnotations.getOrDefault(RECURSIVE_REFERENCE_ANNOTATION_KEY, "false"));
-                    }
+                    isRecursiveReference = switch (annotation.isRecursive()) {
+                        case TRUE -> true;
+                        case FALSE -> false;
+                        case UNSPECIFIED -> "true".equalsIgnoreCase(idlAnnotations.getOrDefault(RECURSIVE_REFERENCE_ANNOTATION_KEY, "false"));
+                    };
                 }
-                break;
-            case THRIFT_UNION_ID:
+            }
+            case THRIFT_UNION_ID -> {
                 checkArgument(annotation == null, "ThriftStruct annotation not allowed in union");
                 id = Short.MIN_VALUE;
                 isLegacyId = true; // preserve `negative field ID <=> isLegacyId`
                 name = "_union_id";
-                break;
-            default:
-                throw new IllegalArgumentException("Encountered field metadata type " + type);
+            }
+            default -> throw new IllegalArgumentException("Encountered field metadata type " + type);
         }
     }
 

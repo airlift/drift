@@ -49,7 +49,7 @@ public class JmxMethodInvocationStatsFactory
         objectNameBuilder.withProperty("method", metadata.getName());
         String objectName = objectNameBuilder.build();
 
-        return stats.computeIfAbsent(objectName, name -> {
+        return stats.computeIfAbsent(objectName, _ -> {
             JmxMethodInvocationStat stat = new JmxMethodInvocationStat(metadata.getName());
             exporter.export(objectName, stat);
             return stat;

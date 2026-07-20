@@ -28,6 +28,4 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Target({FIELD, PARAMETER, METHOD})
 @Retention(RUNTIME)
 @BindingAnnotation
-public @interface DefaultClient
-{
-}
+public @interface DefaultClient {}

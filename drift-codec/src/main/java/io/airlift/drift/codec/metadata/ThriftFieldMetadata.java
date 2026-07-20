@@ -79,18 +79,18 @@ public class ThriftFieldMetadata
         this.coercion = requireNonNull(coercion, "coercion is null");
 
         switch (fieldKind) {
-            case THRIFT_FIELD:
+            case THRIFT_FIELD -> {
                 if (isLegacyId) {
                     checkArgument(id < 0, "isLegacyId should only be specified on fields with negative IDs");
                 }
                 else {
                     checkArgument(id >= 0, "isLegacyId must be specified on fields with negative IDs");
                 }
-                break;
-            case THRIFT_UNION_ID:
+            }
+            case THRIFT_UNION_ID -> {
                 checkArgument(isLegacyId, "isLegacyId should be implicitly set on ThriftUnionId fields");
                 checkArgument(id == Short.MIN_VALUE, "thrift union id must be Short.MIN_VALUE");
-                break;
+            }
         }
 
         checkArgument(!injections.isEmpty()
@@ -170,16 +170,13 @@ public class ThriftFieldMetadata
 
     public boolean isInternal()
     {
-        switch (getType()) {
-            // These are normal thrift fields (i.e. they should be emitted by the drift2thrift generator)
-            case THRIFT_FIELD:
-                return false;
+        return switch (getType()) {
+            // These are normal thrift fields (i.e. they should be emitted by the IDL generator)
+            case THRIFT_FIELD -> false;
 
-            // Other fields types are used internally in drift, but do not make up part of the external
-            // thrift interface
-            default:
-                return true;
-        }
+            // Other field types are used internally, but are not part of the external thrift interface
+            case THRIFT_UNION_ID -> true;
+        };
     }
 
     public boolean isReadOnly()

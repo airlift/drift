@@ -168,16 +168,15 @@ public class ThriftCodecByteCodeGenerator<T>
         defineGetTypeMethod();
 
         switch (metadata.getMetadataType()) {
-            case STRUCT:
+            case STRUCT -> {
                 defineReadStructMethod();
                 defineWriteStructMethod();
-                break;
-            case UNION:
+            }
+            case UNION -> {
                 defineReadUnionMethod();
                 defineWriteUnionMethod();
-                break;
-            default:
-                throw new IllegalStateException(format("encountered type %s", metadata.getMetadataType()));
+            }
+            default -> throw new IllegalStateException(format("encountered type %s", metadata.getMetadataType()));
         }
 
         // add the non-generic bridge read and write methods
@@ -1103,27 +1102,13 @@ public class ThriftCodecByteCodeGenerator<T>
             return type(Optional.class, toParameterizedType(typeRef.get().getValueTypeReference()));
         }
 
-        switch (typeRef.getProtocolType()) {
-            case BOOL:
-            case BYTE:
-            case DOUBLE:
-            case I16:
-            case I32:
-            case I64:
-            case STRING:
-            case BINARY:
-            case STRUCT:
-            case ENUM:
-                return type((Class<?>) typeRef.getJavaType());
-            case MAP:
-                return type(Map.class, toParameterizedType(typeRef.get().getKeyTypeReference()), toParameterizedType(typeRef.get().getValueTypeReference()));
-            case SET:
-                return type(Set.class, toParameterizedType(typeRef.get().getValueTypeReference()));
-            case LIST:
-                return type(List.class, toParameterizedType(typeRef.get().getValueTypeReference()));
-            default:
-                throw new IllegalArgumentException("Unsupported thrift field type " + typeRef.getJavaType());
-        }
+        return switch (typeRef.getProtocolType()) {
+            case BOOL, BYTE, DOUBLE, I16, I32, I64, STRING, BINARY, STRUCT, ENUM -> type((Class<?>) typeRef.getJavaType());
+            case MAP -> type(Map.class, toParameterizedType(typeRef.get().getKeyTypeReference()), toParameterizedType(typeRef.get().getValueTypeReference()));
+            case SET -> type(Set.class, toParameterizedType(typeRef.get().getValueTypeReference()));
+            case LIST -> type(List.class, toParameterizedType(typeRef.get().getValueTypeReference()));
+            default -> throw new IllegalArgumentException("Unsupported thrift field type " + typeRef.getJavaType());
+        };
     }
 
     private Method getWriteMethod(ThriftType thriftType)

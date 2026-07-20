@@ -60,16 +60,12 @@ final class LegacyApacheThriftTesterUtil
 
         TTransportFactory transportFactory;
         switch (transportType) {
-            case UNFRAMED:
-                transportFactory = new TTransportFactory();
-                break;
-            case FRAMED:
-                transportFactory = new TFramedTransport.Factory();
-                break;
-            case HEADER:
+            case UNFRAMED -> transportFactory = new TTransportFactory();
+            case FRAMED -> transportFactory = new TFramedTransport.Factory();
+            case HEADER -> {
                 return 0;
-            default:
-                throw new IllegalArgumentException("Unsupported transport " + transportType);
+            }
+            default -> throw new IllegalArgumentException("Unsupported transport " + transportType);
         }
 
         try (TSocket socket = createClientSocket(secure, address)) {
@@ -79,16 +75,12 @@ final class LegacyApacheThriftTesterUtil
             TTransport transport = transportFactory.getTransport(socket);
             TProtocol protocol;
             switch (protocolType) {
-                case BINARY:
-                    protocol = new TBinaryProtocol(transport);
-                    break;
-                case COMPACT:
-                    protocol = new TCompactProtocol(transport);
-                    break;
-                case FB_COMPACT:
+                case BINARY -> protocol = new TBinaryProtocol(transport);
+                case COMPACT -> protocol = new TCompactProtocol(transport);
+                case FB_COMPACT -> {
                     return 0;
-                default:
-                    throw new IllegalArgumentException("Unsupported protocol " + protocolType);
+                }
+                default -> throw new IllegalArgumentException("Unsupported protocol " + protocolType);
             }
 
             assertEquals(new scribe.Client(protocol).Log(messages), ResultCode.OK);

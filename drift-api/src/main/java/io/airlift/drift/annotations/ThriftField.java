@@ -95,6 +95,6 @@ public @interface ThriftField
          * when this happens). As such, primitive types should be replaced with boxed types, so that
          * null is always a possibility.
          */
-        OPTIONAL
+        OPTIONAL,
     }
 }

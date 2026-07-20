@@ -58,7 +58,8 @@ import static javax.tools.Diagnostic.Kind.WARNING;
 @SupportedAnnotationTypes({
         ThriftAnnotations.THRIFT_ENUM,
         ThriftAnnotations.THRIFT_SERVICE,
-        ThriftAnnotations.THRIFT_STRUCT})
+        ThriftAnnotations.THRIFT_STRUCT,
+})
 public class JavadocProcessor
         extends AbstractProcessor
 {
@@ -89,13 +90,11 @@ public class JavadocProcessor
         }
 
         switch (typeElement.getKind()) {
-            case CLASS:
-            case INTERFACE:
-            case ENUM:
-                break;
-            default:
+            case CLASS, INTERFACE, ENUM -> {}
+            default -> {
                 log(WARNING, format("Non-class was annotated: %s %s", typeElement.getKind(), typeElement));
                 return;
+            }
         }
 
         List<String> serviceDocumentation = getComment(typeElement);

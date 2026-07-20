@@ -338,19 +338,13 @@ public class TestThriftMethodMetadata
 
     @ThriftStruct
     public static final class ExceptionA
-            extends Exception
-    {
-    }
+            extends Exception {}
 
     @ThriftStruct
     public static final class ExceptionB
-            extends Exception
-    {
-    }
+            extends Exception {}
 
     @ThriftStruct
     public static final class ExceptionC
-            extends Exception
-    {
-    }
+            extends Exception {}
 }

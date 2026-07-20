@@ -196,7 +196,7 @@ public class TestApacheThriftMethodInvoker
     {
         ApacheThriftClientConfig config = new ApacheThriftClientConfig();
         ApacheThriftConnectionFactoryConfig factoryConfig = new ApacheThriftConnectionFactoryConfig();
-        try (ApacheThriftMethodInvokerFactory<Void> methodInvokerFactory = new ApacheThriftMethodInvokerFactory<>(factoryConfig, clientIdentity -> config)) {
+        try (ApacheThriftMethodInvokerFactory<Void> methodInvokerFactory = new ApacheThriftMethodInvokerFactory<>(factoryConfig, _ -> config)) {
             MethodInvoker methodInvoker = methodInvokerFactory.createMethodInvoker(null);
 
             ParameterMetadata parameter = new ParameterMetadata(
@@ -227,7 +227,7 @@ public class TestApacheThriftMethodInvoker
     {
         ApacheThriftClientConfig config = new ApacheThriftClientConfig();
         ApacheThriftConnectionFactoryConfig factoryConfig = new ApacheThriftConnectionFactoryConfig();
-        try (ApacheThriftMethodInvokerFactory<Void> methodInvokerFactory = new ApacheThriftMethodInvokerFactory<>(factoryConfig, clientIdentity -> config)) {
+        try (ApacheThriftMethodInvokerFactory<Void> methodInvokerFactory = new ApacheThriftMethodInvokerFactory<>(factoryConfig, _ -> config)) {
             MethodInvoker methodInvoker = methodInvokerFactory.createMethodInvoker(null);
 
             ThriftType optionalType = optional(list(codecManager.getCatalog().getThriftType(DriftLogEntry.class)));

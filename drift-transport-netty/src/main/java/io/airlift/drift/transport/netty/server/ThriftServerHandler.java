@@ -150,7 +150,9 @@ public class ThriftServerHandler
                     frame.getProtocol(),
                     frame.getHeaders(),
                     frame.isSupportOutOfOrderResponse());
-            Futures.addCallback(response, new FutureCallback<ThriftFrame>()
+            Futures.addCallback(
+                    response,
+                    new FutureCallback<ThriftFrame>()
                     {
                         @Override
                         public void onSuccess(ThriftFrame result)
@@ -336,7 +338,8 @@ public class ThriftServerHandler
         }
     }
 
-    private static ThriftFrame writeExceptionResponse(ChannelHandlerContext context,
+    private static ThriftFrame writeExceptionResponse(
+            ChannelHandlerContext context,
             MethodMetadata methodMetadata,
             Transport transport,
             Protocol protocol,

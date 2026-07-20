@@ -56,7 +56,7 @@ public class MockMethodInvoker
 
     public MockMethodInvoker(Supplier<ListenableFuture<Object>> resultsSupplier, TestingTicker ticker)
     {
-        this(request -> resultsSupplier.get(), ticker);
+        this(_ -> resultsSupplier.get(), ticker);
     }
 
     private MockMethodInvoker(Function<InvokeRequest, ListenableFuture<Object>> resultsSupplier, TestingTicker ticker)

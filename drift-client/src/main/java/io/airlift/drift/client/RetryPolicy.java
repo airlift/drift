@@ -57,8 +57,7 @@ public class RetryPolicy
 
     public RetryPolicy(DriftClientConfig config, ExceptionClassifier exceptionClassifier)
     {
-        this(
-                config.getMaxRetries(),
+        this(config.getMaxRetries(),
                 config.getMinBackoffDelay(),
                 config.getMaxBackoffDelay(),
                 config.getBackoffScaleFactor(),
@@ -66,7 +65,8 @@ public class RetryPolicy
                 exceptionClassifier);
     }
 
-    public RetryPolicy(int maxRetries,
+    public RetryPolicy(
+            int maxRetries,
             Duration minBackoffDelay,
             Duration maxBackoffDelay,
             double backoffScaleFactor,

@@ -19,7 +19,6 @@ import com.google.common.collect.HashBiMap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Lists;
 import com.google.common.reflect.TypeToken;
 import io.airlift.drift.codec.generics.ConcreteDerivedFromGeneric;
 import io.airlift.drift.codec.generics.ConcreteDerivedFromGenericBean;
@@ -594,9 +593,9 @@ public abstract class AbstractThriftCodecManagerTest
     {
         ViaListElementType recursiveObject = new ViaListElementType();
         recursiveObject.data = "parent";
-        recursiveObject.children = Lists.newArrayList(new ViaListElementType());
+        recursiveObject.children = List.of(new ViaListElementType());
         recursiveObject.children.get(0).data = "child";
-        recursiveObject.children.get(0).children = Lists.newArrayList(new ViaListElementType());
+        recursiveObject.children.get(0).children = List.of(new ViaListElementType());
         recursiveObject.children.get(0).children.get(0).data = "grandchild";
         testRoundTripSerialize(recursiveObject);
     }
@@ -673,7 +672,7 @@ public abstract class AbstractThriftCodecManagerTest
             recursiveNode.child = recursiveLeaf;
             CoRecursiveTree recursiveRoot = new CoRecursiveTree();
             recursiveRoot.data = "root";
-            recursiveRoot.children = Lists.newArrayList(recursiveNode);
+            recursiveRoot.children = List.of(recursiveNode);
             testRoundTripSerialize(recursiveRoot);
         }
 
@@ -682,7 +681,7 @@ public abstract class AbstractThriftCodecManagerTest
             recursiveLeaf.data = "grandchild";
             CoRecursiveTree recursiveNode = new CoRecursiveTree();
             recursiveNode.data = "child";
-            recursiveNode.children = Lists.newArrayList(recursiveLeaf);
+            recursiveNode.children = List.of(recursiveLeaf);
             CoRecursiveTreeHelper recursiveRoot = new CoRecursiveTreeHelper();
             recursiveRoot.data = "root";
             recursiveRoot.child = recursiveNode;
@@ -725,7 +724,7 @@ public abstract class AbstractThriftCodecManagerTest
     private <T> void testRoundTripSerialize(T value)
             throws Exception
     {
-        testRoundTripSerialize(value, x -> {});
+        testRoundTripSerialize(value, _ -> {});
     }
 
     private <T> void testRoundTripSerialize(T value, Consumer<T> consumer)
@@ -888,12 +887,10 @@ public abstract class AbstractThriftCodecManagerTest
                                 "2: other", new BonkField("other", 11))));
 
         one.aMapOfListToSet = ImmutableMap.of(
-                ImmutableList.of("a", "b"),
-                ImmutableSet.of(
+                ImmutableList.of("a", "b"), ImmutableSet.of(
                         new BonkField("1: message", 42),
                         new BonkField("1: other", 11)),
-                ImmutableList.of("c", "d"),
-                ImmutableSet.of(
+                ImmutableList.of("c", "d"), ImmutableSet.of(
                         new BonkField("2: message", 42),
                         new BonkField("2: other", 11)));
 
@@ -902,11 +899,13 @@ public abstract class AbstractThriftCodecManagerTest
         one.aUnionSet = ImmutableSet.of(new UnionField("Hello, World"), new UnionField(123456L), new UnionField(Fruit.CHERRY));
         one.aUnionList = ImmutableList.of(new UnionField("Hello, World"), new UnionField(123456L), new UnionField(Fruit.CHERRY));
 
-        one.aUnionKeyMap = ImmutableMap.of(new UnionField("Hello, World"), "Eins",
+        one.aUnionKeyMap = ImmutableMap.of(
+                new UnionField("Hello, World"), "Eins",
                 new UnionField(123456L), "Zwei",
                 new UnionField(Fruit.CHERRY), "Drei");
 
-        one.aUnionValueMap = ImmutableMap.of("Eins", new UnionField("Hello, World"),
+        one.aUnionValueMap = ImmutableMap.of(
+                "Eins", new UnionField("Hello, World"),
                 "Zwei", new UnionField(123456L),
                 "Drei", new UnionField(Fruit.CHERRY));
 

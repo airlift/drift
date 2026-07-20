@@ -107,28 +107,16 @@ public class TestClientsWithApacheServer
             return 0;
         }
 
-        TTransportFactory transportFactory;
-        switch (transport) {
-            case UNFRAMED:
-                transportFactory = new TTransportFactory();
-                break;
-            case FRAMED:
-                transportFactory = new TFramedTransport.Factory();
-                break;
-            default:
-                throw new IllegalArgumentException("Unsupported transport " + transport);
-        }
-        TProtocolFactory protocolFactory;
-        switch (protocol) {
-            case BINARY:
-                protocolFactory = new TBinaryProtocol.Factory();
-                break;
-            case COMPACT:
-                protocolFactory = new TCompactProtocol.Factory();
-                break;
-            default:
-                throw new IllegalArgumentException("Unsupported protocol " + protocol);
-        }
+        TTransportFactory transportFactory = switch (transport) {
+            case UNFRAMED -> new TTransportFactory();
+            case FRAMED -> new TFramedTransport.Factory();
+            case HEADER -> throw new IllegalArgumentException("Unsupported transport: " + transport);
+        };
+        TProtocolFactory protocolFactory = switch (protocol) {
+            case BINARY -> new TBinaryProtocol.Factory();
+            case COMPACT -> new TCompactProtocol.Factory();
+            case FB_COMPACT -> throw new IllegalArgumentException("Unsupported protocol: " + protocol);
+        };
 
         try (TServerSocket serverSocket = createServerTransport(secure)) {
             TServer server = new TSimpleServer(new Args(serverSocket)

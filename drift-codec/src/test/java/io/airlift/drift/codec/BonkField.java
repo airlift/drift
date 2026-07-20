@@ -31,9 +31,7 @@ public final class BonkField
     @ThriftField(2)
     public int type;
 
-    public BonkField()
-    {
-    }
+    public BonkField() {}
 
     public BonkField(String message, int type)
     {

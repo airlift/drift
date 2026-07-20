@@ -300,7 +300,7 @@ public class TestDriftNettyMethodInvoker
         try (TestingPooledByteBufAllocator testingAllocator = new TestingPooledByteBufAllocator();
                 DriftNettyMethodInvokerFactory<Void> methodInvokerFactory = new DriftNettyMethodInvokerFactory<>(
                         new DriftNettyConnectionFactoryConfig(),
-                        clientIdentity -> config,
+                        _ -> config,
                         testingAllocator)) {
             MethodInvoker methodInvoker = methodInvokerFactory.createMethodInvoker(null);
 
@@ -376,7 +376,7 @@ public class TestDriftNettyMethodInvoker
         try (TestingPooledByteBufAllocator testingAllocator = new TestingPooledByteBufAllocator();
                 DriftNettyMethodInvokerFactory<Void> methodInvokerFactory = new DriftNettyMethodInvokerFactory<>(
                         new DriftNettyConnectionFactoryConfig(),
-                        clientIdentity -> config,
+                        _ -> config,
                         testingAllocator)) {
             MethodInvoker methodInvoker = methodInvokerFactory.createMethodInvoker(null);
 

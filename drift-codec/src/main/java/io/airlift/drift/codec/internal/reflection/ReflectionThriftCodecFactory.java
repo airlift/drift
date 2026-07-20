@@ -21,8 +21,6 @@ import io.airlift.drift.codec.ThriftCodecManager;
 import io.airlift.drift.codec.internal.ThriftCodecFactory;
 import io.airlift.drift.codec.metadata.ThriftStructMetadata;
 
-import static java.lang.String.format;
-
 /**
  * Creates reflection based thrift codecs.
  */
@@ -33,13 +31,9 @@ public class ReflectionThriftCodecFactory
     @Override
     public ThriftCodec<?> generateThriftTypeCodec(ThriftCodecManager codecManager, ThriftStructMetadata metadata)
     {
-        switch (metadata.getMetadataType()) {
-            case STRUCT:
-                return new ReflectionThriftStructCodec<>(codecManager, metadata);
-            case UNION:
-                return new ReflectionThriftUnionCodec<>(codecManager, metadata);
-            default:
-                throw new IllegalStateException(format("encountered type %s", metadata.getMetadataType()));
-        }
+        return switch (metadata.getMetadataType()) {
+            case STRUCT -> new ReflectionThriftStructCodec<>(codecManager, metadata);
+            case UNION -> new ReflectionThriftUnionCodec<>(codecManager, metadata);
+        };
     }
 }

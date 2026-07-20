@@ -29,7 +29,8 @@ public class OneOfEverythingThriftCodec
     private final ThriftCodec<UnionField> aUnionCodec;
     private final ThriftCodec<Fruit> aFruitCodec;
 
-    public OneOfEverythingThriftCodec(ThriftType type,
+    public OneOfEverythingThriftCodec(
+            ThriftType type,
             ThriftCodec<BonkField> aStructCodec,
             ThriftCodec<UnionField> aUnionCodec,
             ThriftCodec<Fruit> aFruitCodec)
@@ -67,38 +68,17 @@ public class OneOfEverythingThriftCodec
 
         while (reader.nextField()) {
             switch (reader.getFieldId()) {
-                case 1:
-                    aBoolean = reader.readBoolField();
-                    break;
-                case 2:
-                    aByte = reader.readByteField();
-                    break;
-                case 3:
-                    aShort = reader.readI16Field();
-                    break;
-                case 4:
-                    aInt = reader.readI32Field();
-                    break;
-                case 5:
-                    aLong = reader.readI64Field();
-                    break;
-                case 6:
-                    aDouble = reader.readDoubleField();
-                    break;
-                case 7:
-                    aString = reader.readStringField();
-                    break;
-                case 8:
-                    aStruct = reader.readStructField(aStructCodec);
-                    break;
-                case 9:
-                    aEnum = reader.readEnumField(aFruitCodec);
-                    break;
-                case 60:
-                    aUnion = reader.readStructField(aUnionCodec);
-                    break;
-                default:
-                    reader.skipFieldData();
+                case 1 -> aBoolean = reader.readBoolField();
+                case 2 -> aByte = reader.readByteField();
+                case 3 -> aShort = reader.readI16Field();
+                case 4 -> aInt = reader.readI32Field();
+                case 5 -> aLong = reader.readI64Field();
+                case 6 -> aDouble = reader.readDoubleField();
+                case 7 -> aString = reader.readStringField();
+                case 8 -> aStruct = reader.readStructField(aStructCodec);
+                case 9 -> aEnum = reader.readEnumField(aFruitCodec);
+                case 60 -> aUnion = reader.readStructField(aUnionCodec);
+                default -> reader.skipFieldData();
             }
         }
         reader.readStructEnd();

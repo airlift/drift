@@ -338,15 +338,11 @@ public class ThriftMethodMetadata
 
     private static Optional<Boolean> retryable(ThriftException.Retryable retryable)
     {
-        switch (retryable) {
-            case UNKNOWN:
-                return Optional.empty();
-            case FALSE:
-                return Optional.of(false);
-            case TRUE:
-                return Optional.of(true);
-        }
-        throw new AssertionError("Unhandled value: " + retryable);
+        return switch (retryable) {
+            case UNKNOWN -> Optional.empty();
+            case FALSE -> Optional.of(false);
+            case TRUE -> Optional.of(true);
+        };
     }
 
     public static class ExceptionInfo

@@ -39,12 +39,8 @@ public class ThriftFieldInjection
         this.fieldKind = requireNonNull(fieldKind, "fieldKind is null");
 
         switch (fieldKind) {
-            case THRIFT_FIELD:
-                // Nothing to check
-                break;
-            case THRIFT_UNION_ID:
-                checkArgument(id == Short.MIN_VALUE, "fieldId must be Short.MIN_VALUE for thrift_union_id");
-                break;
+            case THRIFT_FIELD -> {}
+            case THRIFT_UNION_ID -> checkArgument(id == Short.MIN_VALUE, "fieldId must be Short.MIN_VALUE for thrift_union_id");
         }
 
         this.id = id;

@@ -36,7 +36,11 @@ public class ThriftFieldExtractor
     private final Class<?> type;
 
     public ThriftFieldExtractor(
-            short fieldId, String fieldName, FieldKind fieldKind, Field field, Type fieldType)
+            short fieldId,
+            String fieldName,
+            FieldKind fieldKind,
+            Field field,
+            Type fieldType)
     {
         this.name = requireNonNull(fieldName, "name is null");
         this.field = requireNonNull(field, "field is null");
@@ -44,12 +48,8 @@ public class ThriftFieldExtractor
         this.type = TypeToken.of(requireNonNull(fieldType, "structType is null")).getRawType();
 
         switch (fieldKind) {
-            case THRIFT_FIELD:
-                // nothing to check
-                break;
-            case THRIFT_UNION_ID:
-                checkArgument(fieldId == Short.MIN_VALUE, "fieldId must be Short.MIN_VALUE for thrift_union_id");
-                break;
+            case THRIFT_FIELD -> {}
+            case THRIFT_UNION_ID -> checkArgument(fieldId == Short.MIN_VALUE, "fieldId must be Short.MIN_VALUE for thrift_union_id");
         }
 
         this.id = fieldId;

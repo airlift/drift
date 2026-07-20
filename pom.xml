@@ -5,7 +5,7 @@
     <parent>
         <groupId>io.airlift</groupId>
         <artifactId>airbase</artifactId>
-        <version>297</version>
+        <version>395</version>
     </parent>
 
     <groupId>io.airlift.drift</groupId>
@@ -50,12 +50,12 @@
         <air.check.skip-jacoco>true</air.check.skip-jacoco>
         <air.check.skip-spotbugs>true</air.check.skip-spotbugs>
 
-        <project.build.targetJdk>22</project.build.targetJdk>
+        <project.build.targetJdk>25</project.build.targetJdk>
         <air.modernizer.java-version>8</air.modernizer.java-version>
 
-        <dep.airlift.version>354</dep.airlift.version>
-        <dep.takari-plugin.version>3.0.2</dep.takari-plugin.version>
-        <dep.maven.version>3.9.6</dep.maven.version>
+        <dep.airlift.version>440</dep.airlift.version>
+        <dep.takari-plugin.version>3.1.1</dep.takari-plugin.version>
+        <dep.maven.version>3.9.16</dep.maven.version>
 
         <air.check.skip-pmd>true</air.check.skip-pmd>
     </properties>
@@ -65,7 +65,7 @@
             <dependency>
                 <groupId>io.netty</groupId>
                 <artifactId>netty-bom</artifactId>
-                <version>4.2.6.Final</version>
+                <version>4.2.16.Final</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -73,7 +73,7 @@
             <dependency>
                 <groupId>com.squareup</groupId>
                 <artifactId>javapoet</artifactId>
-                <version>1.9.0</version>
+                <version>1.13.0</version>
             </dependency>
 
             <dependency>
@@ -85,7 +85,7 @@
             <dependency>
                 <groupId>io.airlift</groupId>
                 <artifactId>bytecode</artifactId>
-                <version>1.1</version>
+                <version>1.6</version>
             </dependency>
 
             <dependency>
@@ -139,7 +139,7 @@
             <dependency>
                 <groupId>io.airlift</groupId>
                 <artifactId>units</artifactId>
-                <version>1.10</version>
+                <version>1.13</version>
             </dependency>
 
             <dependency>
@@ -242,7 +242,7 @@
             <dependency>
                 <groupId>org.apache.thrift</groupId>
                 <artifactId>libthrift</artifactId>
-                <version>0.20.0</version>
+                <version>0.24.0</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -251,9 +251,46 @@
         <pluginManagement>
             <plugins>
                 <plugin>
+                    <groupId>com.mycila</groupId>
+                    <artifactId>license-maven-plugin</artifactId>
+                    <configuration>
+                        <licenseSets>
+                            <licenseSet>
+                                <excludes combine.children="append">
+                                    <exclude>src/test/resources/scribe.thrift</exclude>
+                                    <exclude>src/test/java/**/scribe/apache/LogEntry.java</exclude>
+                                    <exclude>src/test/java/**/scribe/apache/ResultCode.java</exclude>
+                                    <exclude>src/test/java/**/scribe/apache/scribe.java</exclude>
+                                </excludes>
+                            </licenseSet>
+                        </licenseSets>
+                    </configuration>
+                </plugin>
+
+                <plugin>
+                    <groupId>io.airlift</groupId>
+                    <artifactId>airstyle-maven-plugin</artifactId>
+                    <configuration>
+                        <excludes>
+                            <exclude>**/scribe/apache/LogEntry.java</exclude>
+                            <exclude>**/scribe/apache/ResultCode.java</exclude>
+                            <exclude>**/scribe/apache/scribe.java</exclude>
+                        </excludes>
+                    </configuration>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-checkstyle-plugin</artifactId>
+                    <configuration>
+                        <excludes>**/scribe/apache/LogEntry.java,**/scribe/apache/ResultCode.java,**/scribe/apache/scribe.java</excludes>
+                    </configuration>
+                </plugin>
+
+                <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-plugin-plugin</artifactId>
-                    <version>3.15.1</version>
+                    <version>3.15.2</version>
                     <executions>
                         <execution>
                             <id>help-mojo</id>
@@ -267,7 +304,7 @@
                 <plugin>
                     <groupId>io.takari.maven.plugins</groupId>
                     <artifactId>takari-lifecycle-plugin</artifactId>
-                    <version>1.13.10</version>
+                    <version>2.3.4</version>
                 </plugin>
 
                 <plugin>

@@ -31,9 +31,7 @@ public final class UnionMethod
     @ThriftUnionId
     public int type;
 
-    public UnionMethod()
-    {
-    }
+    public UnionMethod() {}
 
     @ThriftField
     public void setData(String stringValue, Long longValue, Fruit fruitValue)

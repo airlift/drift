@@ -34,7 +34,8 @@ public class DriftClientFactoryManager<I>
         this(codecManager, methodInvokerFactory, new NullMethodInvocationStatsFactory());
     }
 
-    public DriftClientFactoryManager(ThriftCodecManager codecManager,
+    public DriftClientFactoryManager(
+            ThriftCodecManager codecManager,
             MethodInvokerFactory<I> methodInvokerFactory,
             MethodInvocationStatsFactory methodInvocationStatsFactory)
     {

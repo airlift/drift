@@ -37,7 +37,7 @@ public class TBinaryProtocol
 {
     private static final TStruct ANONYMOUS_STRUCT = new TStruct("");
 
-    protected static final int VERSION_MASK = 0xffff0000;
+    protected static final int VERSION_MASK = 0xFFFF0000;
     protected static final int VERSION_1 = 0x80010000;
 
     private final TTransport transport;
@@ -143,8 +143,8 @@ public class TBinaryProtocol
     public void writeI16(short value)
             throws TException
     {
-        i16out[0] = (byte) (0xff & (value >> 8));
-        i16out[1] = (byte) (0xff & (value));
+        i16out[0] = (byte) (0xFF & (value >> 8));
+        i16out[1] = (byte) (0xFF & (value));
         transport.write(i16out, 0, 2);
     }
 
@@ -154,10 +154,10 @@ public class TBinaryProtocol
     public void writeI32(int value)
             throws TException
     {
-        i32out[0] = (byte) (0xff & (value >> 24));
-        i32out[1] = (byte) (0xff & (value >> 16));
-        i32out[2] = (byte) (0xff & (value >> 8));
-        i32out[3] = (byte) (0xff & (value));
+        i32out[0] = (byte) (0xFF & (value >> 24));
+        i32out[1] = (byte) (0xFF & (value >> 16));
+        i32out[2] = (byte) (0xFF & (value >> 8));
+        i32out[3] = (byte) (0xFF & (value));
         transport.write(i32out, 0, 4);
     }
 
@@ -167,14 +167,14 @@ public class TBinaryProtocol
     public void writeI64(long value)
             throws TException
     {
-        i64out[0] = (byte) (0xff & (value >> 56));
-        i64out[1] = (byte) (0xff & (value >> 48));
-        i64out[2] = (byte) (0xff & (value >> 40));
-        i64out[3] = (byte) (0xff & (value >> 32));
-        i64out[4] = (byte) (0xff & (value >> 24));
-        i64out[5] = (byte) (0xff & (value >> 16));
-        i64out[6] = (byte) (0xff & (value >> 8));
-        i64out[7] = (byte) (0xff & (value));
+        i64out[0] = (byte) (0xFF & (value >> 56));
+        i64out[1] = (byte) (0xFF & (value >> 48));
+        i64out[2] = (byte) (0xFF & (value >> 40));
+        i64out[3] = (byte) (0xFF & (value >> 32));
+        i64out[4] = (byte) (0xFF & (value >> 24));
+        i64out[5] = (byte) (0xFF & (value >> 16));
+        i64out[6] = (byte) (0xFF & (value >> 8));
+        i64out[7] = (byte) (0xFF & (value));
         transport.write(i64out, 0, 8);
     }
 
@@ -224,7 +224,7 @@ public class TBinaryProtocol
             if (version != VERSION_1) {
                 throw new TProtocolException("Bad version in readMessageBegin: " + version);
             }
-            return new TMessage(readString(), (byte) (size & 0x000000ff), readI32());
+            return new TMessage(readString(), (byte) (size & 0x000000FF), readI32());
         }
 
         // throw new TProtocolException("Missing version in readMessageBegin (old client?)");
@@ -317,7 +317,7 @@ public class TBinaryProtocol
         byte[] buf = i16rd;
         int off = 0;
         readAll(i16rd, 2);
-        return (short) (((buf[off] & 0xff) << 8) | ((buf[off + 1] & 0xff)));
+        return (short) (((buf[off] & 0xFF) << 8) | ((buf[off + 1] & 0xFF)));
     }
 
     private final byte[] i32rd = new byte[4];
@@ -329,10 +329,10 @@ public class TBinaryProtocol
         byte[] buf = i32rd;
         int off = 0;
         readAll(i32rd, 4);
-        return ((buf[off] & 0xff) << 24) |
-                ((buf[off + 1] & 0xff) << 16) |
-                ((buf[off + 2] & 0xff) << 8) |
-                ((buf[off + 3] & 0xff));
+        return ((buf[off] & 0xFF) << 24) |
+                ((buf[off + 1] & 0xFF) << 16) |
+                ((buf[off + 2] & 0xFF) << 8) |
+                ((buf[off + 3] & 0xFF));
     }
 
     private final byte[] i64rd = new byte[8];
@@ -344,14 +344,14 @@ public class TBinaryProtocol
         byte[] buf = i64rd;
         int off = 0;
         readAll(i64rd, 8);
-        return ((long) (buf[off] & 0xff) << 56) |
-                ((long) (buf[off + 1] & 0xff) << 48) |
-                ((long) (buf[off + 2] & 0xff) << 40) |
-                ((long) (buf[off + 3] & 0xff) << 32) |
-                ((long) (buf[off + 4] & 0xff) << 24) |
-                ((long) (buf[off + 5] & 0xff) << 16) |
-                ((long) (buf[off + 6] & 0xff) << 8) |
-                ((long) (buf[off + 7] & 0xff));
+        return ((long) (buf[off] & 0xFF) << 56) |
+                ((long) (buf[off + 1] & 0xFF) << 48) |
+                ((long) (buf[off + 2] & 0xFF) << 40) |
+                ((long) (buf[off + 3] & 0xFF) << 32) |
+                ((long) (buf[off + 4] & 0xFF) << 24) |
+                ((long) (buf[off + 5] & 0xFF) << 16) |
+                ((long) (buf[off + 6] & 0xFF) << 8) |
+                ((long) (buf[off + 7] & 0xFF));
     }
 
     @Override

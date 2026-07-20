@@ -50,14 +50,9 @@ public class BonkFieldThriftCodec
 
         while (reader.nextField()) {
             switch (reader.getFieldId()) {
-                case 1:
-                    message = reader.readStringField();
-                    break;
-                case 2:
-                    type = reader.readI32Field();
-                    break;
-                default:
-                    reader.skipFieldData();
+                case 1 -> message = reader.readStringField();
+                case 2 -> type = reader.readI32Field();
+                default -> reader.skipFieldData();
             }
         }
         reader.readStructEnd();

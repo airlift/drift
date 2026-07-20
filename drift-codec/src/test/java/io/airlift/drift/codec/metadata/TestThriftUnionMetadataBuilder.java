@@ -59,9 +59,7 @@ public class TestThriftUnionMetadataBuilder
         }
 
         @ThriftField
-        public void setField1(String value)
-        {
-        }
+        public void setField1(String value) {}
     }
 
     @Test
@@ -88,19 +86,13 @@ public class TestThriftUnionMetadataBuilder
     public static final class MultipleIds
     {
         @ThriftUnionId
-        public void setId(short id)
-        {
-        }
+        public void setId(short id) {}
 
         @ThriftField(name = "foo", value = 1)
-        public void setField1(String value)
-        {
-        }
+        public void setField1(String value) {}
 
         @ThriftField(name = "foo", value = 2)
-        public void setField2(String value)
-        {
-        }
+        public void setField2(String value) {}
 
         @ThriftField(name = "foo")
         public String getField1()
@@ -139,9 +131,7 @@ public class TestThriftUnionMetadataBuilder
     public static final class MultipleNames
     {
         @ThriftUnionId
-        public void setId(short id)
-        {
-        }
+        public void setId(short id) {}
 
         @ThriftField(value = 1, name = "foo")
         public String getFoo()
@@ -150,9 +140,7 @@ public class TestThriftUnionMetadataBuilder
         }
 
         @ThriftField(value = 1, name = "bar")
-        public void setFoo(String value)
-        {
-        }
+        public void setFoo(String value) {}
     }
 
     @Test
@@ -179,9 +167,7 @@ public class TestThriftUnionMetadataBuilder
     public static final class UnsupportedJavaType
     {
         @ThriftUnionId
-        public void setId(short id)
-        {
-        }
+        public void setId(short id) {}
 
         @ThriftField(1)
         public Lock unsupportedJavaType;
@@ -211,9 +197,7 @@ public class TestThriftUnionMetadataBuilder
     public static final class MultipleTypes
     {
         @ThriftUnionId
-        public void setId(short id)
-        {
-        }
+        public void setId(short id) {}
 
         @ThriftField(1)
         public int getFoo()
@@ -222,9 +206,7 @@ public class TestThriftUnionMetadataBuilder
         }
 
         @ThriftField
-        public void setFoo(short value)
-        {
-        }
+        public void setFoo(short value) {}
     }
 
     @Test

@@ -136,25 +136,21 @@ public final class ThriftCodecManager
                         return new OptionalThriftCodec<>(type, getElementCodec(type.getValueTypeReference()));
                     }
 
-                    switch (type.getProtocolType()) {
-                        case STRUCT:
-                            return factory.generateThriftTypeCodec(ThriftCodecManager.this, type.getStructMetadata());
-                        case MAP:
-                            return new MapThriftCodec<>(type, getElementCodec(type.getKeyTypeReference()), getElementCodec(type.getValueTypeReference()));
-                        case SET:
-                            return new SetThriftCodec<>(type, getElementCodec(type.getValueTypeReference()));
-                        case LIST:
-                            return new ListThriftCodec<>(type, getElementCodec(type.getValueTypeReference()));
-                        case ENUM:
-                            return new EnumThriftCodec<>(type);
-                        default:
+                    return switch (type.getProtocolType()) {
+                        case STRUCT -> factory.generateThriftTypeCodec(ThriftCodecManager.this, type.getStructMetadata());
+                        case MAP -> new MapThriftCodec<>(type, getElementCodec(type.getKeyTypeReference()), getElementCodec(type.getValueTypeReference()));
+                        case SET -> new SetThriftCodec<>(type, getElementCodec(type.getValueTypeReference()));
+                        case LIST -> new ListThriftCodec<>(type, getElementCodec(type.getValueTypeReference()));
+                        case ENUM -> new EnumThriftCodec<>(type);
+                        default -> {
                             if (type.isCoerced()) {
                                 ThriftCodec<?> codec = getCodec(type.getUncoercedType());
                                 TypeCoercion coercion = catalog.getDefaultCoercion(type.getJavaType());
-                                return new CoercionThriftCodec<>(codec, coercion);
+                                yield new CoercionThriftCodec<>(codec, coercion);
                             }
                             throw new IllegalArgumentException("Unsupported Thrift type " + type);
-                    }
+                        }
+                    };
                 }
                 finally {
                     ThriftType top = stack.get().pop();

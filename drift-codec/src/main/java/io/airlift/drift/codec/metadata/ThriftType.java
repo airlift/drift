@@ -71,7 +71,8 @@ public class ThriftType
         return map(new DefaultThriftTypeReference(keyType), new DefaultThriftTypeReference(valueType));
     }
 
-    public static <K, V> ThriftType map(ThriftTypeReference keyTypeReference,
+    public static <K, V> ThriftType map(
+            ThriftTypeReference keyTypeReference,
             ThriftTypeReference valueTypeReference)
     {
         requireNonNull(keyTypeReference, "keyTypeReference is null");
@@ -184,7 +185,8 @@ public class ThriftType
         nullValue = null;
     }
 
-    private ThriftType(ThriftProtocolType protocolType,
+    private ThriftType(
+            ThriftProtocolType protocolType,
             Type javaType,
             ThriftTypeReference keyTypeReference,
             ThriftTypeReference valueTypeReference,
@@ -305,7 +307,8 @@ public class ThriftType
                         protocolType != ThriftProtocolType.SET &&
                         protocolType != ThriftProtocolType.LIST &&
                         protocolType != ThriftProtocolType.MAP,
-                "Coercion is not supported for %s", protocolType);
+                "Coercion is not supported for %s",
+                protocolType);
 
         return new ThriftType(this, javaType);
     }

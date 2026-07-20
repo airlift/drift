@@ -66,11 +66,10 @@ public class TestRetryPolicy
 
     private static Optional<Boolean> classify(Optional<Boolean> classifierResult, Optional<Boolean> providedResult)
     {
-        return new RetryPolicy(new DriftClientConfig(), classifier -> new ExceptionClassification(classifierResult, NORMAL))
+        return new RetryPolicy(new DriftClientConfig(), _ -> new ExceptionClassification(classifierResult, NORMAL))
                 .classifyException(new DriftApplicationException(new TestingUserException(), providedResult), true).isRetry();
     }
 
     private static class TestingUserException
-            extends Exception
-    {}
+            extends Exception {}
 }

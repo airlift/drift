@@ -155,17 +155,11 @@ public final class HeaderTransport
             short magic = buffer.readShort();
             verify(magic == HEADER_MAGIC, "Invalid header magic");
             short flags = buffer.readShort();
-            boolean outOfOrderResponse;
-            switch (flags) {
-                case FLAGS_NONE:
-                    outOfOrderResponse = false;
-                    break;
-                case FLAG_SUPPORT_OUT_OF_ORDER:
-                    outOfOrderResponse = true;
-                    break;
-                default:
-                    throw new IllegalArgumentException("Unsupported header flags: " + flags);
-            }
+            boolean outOfOrderResponse = switch (flags) {
+                case FLAGS_NONE -> false;
+                case FLAG_SUPPORT_OUT_OF_ORDER -> true;
+                default -> throw new IllegalArgumentException("Unsupported header flags: " + flags);
+            };
             int frameSequenceId = buffer.readInt();
             int headerSize = buffer.readShort() << 2;
             messageHeader = buffer.readBytes(headerSize);
@@ -236,7 +230,7 @@ public final class HeaderTransport
 
         while (true) {
             byte b = messageHeader.readByte();
-            result |= (b & 0x7f) << shift;
+            result |= (b & 0x7F) << shift;
             if ((b & 0x80) != 0x80) {
                 break;
             }

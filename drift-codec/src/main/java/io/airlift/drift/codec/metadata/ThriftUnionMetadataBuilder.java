@@ -239,13 +239,8 @@ public class ThriftUnionMetadataBuilder
             thriftTypeReference = catalog.getFieldThriftTypeReference(fieldMetadata);
 
             switch (requiredness) {
-                case REQUIRED:
-                case OPTIONAL:
-                    metadataErrors.addError("Thrift union '%s' field '%s(%s)' should not be marked required or optional", structName, name, id);
-                    break;
-
-                default:
-                    break;
+                case REQUIRED, OPTIONAL -> metadataErrors.addError("Thrift union '%s' field '%s(%s)' should not be marked required or optional", structName, name, id);
+                case UNSPECIFIED, NONE -> {}
             }
 
             if (fieldMetadata instanceof FieldInjection) {

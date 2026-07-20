@@ -39,7 +39,7 @@ public class TestingMethodInvocationStatsFactory
     @Override
     public TestingMethodInvocationStat getStat(ThriftServiceMetadata serviceMetadata, Optional<String> qualifier, MethodMetadata metadata)
     {
-        return stats.computeIfAbsent(new Key(serviceMetadata.getName(), qualifier, metadata.getName()), key -> new TestingMethodInvocationStat());
+        return stats.computeIfAbsent(new Key(serviceMetadata.getName(), qualifier, metadata.getName()), _ -> new TestingMethodInvocationStat());
     }
 
     private static class Key

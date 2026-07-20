@@ -167,7 +167,8 @@ public class TestDriftClient
             DriftClient<Client> driftClient = injector.getInstance(DEFAULT_CLIENT_KEY);
             assertSame(injector.getInstance(DEFAULT_CLIENT_KEY), driftClient);
             Client client = driftClient.get(ADDRESS_SELECTION_CONTEXT, HEADERS);
-            testClient(resultsSupplier,
+            testClient(
+                    resultsSupplier,
                     ImmutableList.of(invokerFactory.getMethodInvoker()),
                     ImmutableList.of(globalClassifierOne, globalClassifierTwo, clientClassifier),
                     statsFactory,
@@ -178,7 +179,8 @@ public class TestDriftClient
             assertSame(injector.getInstance(CUSTOM_CLIENT_KEY), customDriftClient);
             assertNotSame(driftClient, customDriftClient);
             Client customClient = customDriftClient.get(ADDRESS_SELECTION_CONTEXT, HEADERS);
-            testClient(resultsSupplier,
+            testClient(
+                    resultsSupplier,
                     ImmutableList.of(invokerFactory.getMethodInvoker()),
                     ImmutableList.of(globalClassifierOne, globalClassifierTwo, customClientClassifier),
                     statsFactory,
@@ -243,7 +245,8 @@ public class TestDriftClient
             DriftClient<Client> driftClient = injector.getInstance(DEFAULT_CLIENT_KEY);
             assertSame(injector.getInstance(DEFAULT_CLIENT_KEY), driftClient);
             Client client = driftClient.get(ADDRESS_SELECTION_CONTEXT, HEADERS);
-            testClient(resultsSupplier,
+            testClient(
+                    resultsSupplier,
                     ImmutableList.of(passThroughFilter, shortCircuitFilter),
                     ImmutableList.of(globalClassifierOne, globalClassifierTwo, clientClassifier),
                     statsFactory,
@@ -254,7 +257,8 @@ public class TestDriftClient
             assertSame(injector.getInstance(CUSTOM_CLIENT_KEY), customDriftClient);
             assertNotSame(driftClient, customDriftClient);
             Client customClient = customDriftClient.get(ADDRESS_SELECTION_CONTEXT, HEADERS);
-            testClient(resultsSupplier,
+            testClient(
+                    resultsSupplier,
                     ImmutableList.of(passThroughFilter, shortCircuitFilter),
                     ImmutableList.of(globalClassifierOne, globalClassifierTwo, customClientClassifier),
                     statsFactory,
@@ -506,14 +510,10 @@ public class TestDriftClient
 
     @ThriftStruct
     public static class ClientException
-            extends Exception
-    {
-    }
+            extends Exception {}
 
     private static class UnknownException
-            extends Exception
-    {
-    }
+            extends Exception {}
 
     private static class TestingExceptionClassifier
             implements ExceptionClassifier

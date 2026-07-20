@@ -31,36 +31,23 @@ public class ThriftTypeRenderer
 
     public String toString(ThriftType type)
     {
-        switch (type.getProtocolType()) {
-            case BOOL:
-                return "bool";
-            case BYTE:
-                return "byte";
-            case DOUBLE:
-                return "double";
-            case I16:
-                return "i16";
-            case I32:
-                return "i32";
-            case I64:
-                return "i64";
-            case ENUM:
-                return prefix(type) + type.getEnumMetadata().getEnumName();
-            case MAP:
-                return String.format("map<%s, %s>", toString(type.getKeyTypeReference().get()), toString(type.getValueTypeReference().get()));
-            case SET:
-                return String.format("set<%s>", toString(type.getValueTypeReference().get()));
-            case LIST:
-                return String.format("list<%s>", toString(type.getValueTypeReference().get()));
-            case STRUCT:
-                // VOID is encoded as a struct
-                return type.equals(ThriftType.VOID) ? "void" : prefix(type) + type.getStructMetadata().getStructName();
-            case STRING:
-                return "string";
-            case BINARY:
-                return "binary";
-        }
-        throw new IllegalStateException("Bad protocol type: " + type.getProtocolType());
+        return switch (type.getProtocolType()) {
+            case BOOL -> "bool";
+            case BYTE -> "byte";
+            case DOUBLE -> "double";
+            case I16 -> "i16";
+            case I32 -> "i32";
+            case I64 -> "i64";
+            case ENUM -> prefix(type) + type.getEnumMetadata().getEnumName();
+            case MAP -> String.format("map<%s, %s>", toString(type.getKeyTypeReference().get()), toString(type.getValueTypeReference().get()));
+            case SET -> String.format("set<%s>", toString(type.getValueTypeReference().get()));
+            case LIST -> String.format("list<%s>", toString(type.getValueTypeReference().get()));
+            // VOID is encoded as a struct
+            case STRUCT -> type.equals(ThriftType.VOID) ? "void" : prefix(type) + type.getStructMetadata().getStructName();
+            case STRING -> "string";
+            case BINARY -> "binary";
+            case UNKNOWN -> throw new IllegalArgumentException("Bad protocol type: UNKNOWN");
+        };
     }
 
     private String prefix(ThriftType type)

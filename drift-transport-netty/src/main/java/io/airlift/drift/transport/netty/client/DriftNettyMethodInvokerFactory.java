@@ -58,7 +58,7 @@ public class DriftNettyMethodInvokerFactory<I>
     @VisibleForTesting
     public static DriftNettyMethodInvokerFactory<?> createStaticDriftNettyMethodInvokerFactory(DriftNettyClientConfig clientConfig, ByteBufAllocator allocator)
     {
-        return new DriftNettyMethodInvokerFactory<>(new DriftNettyConnectionFactoryConfig(), clientIdentity -> clientConfig, allocator);
+        return new DriftNettyMethodInvokerFactory<>(new DriftNettyConnectionFactoryConfig(), _ -> clientConfig, allocator);
     }
 
     public DriftNettyMethodInvokerFactory(

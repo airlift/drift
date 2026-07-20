@@ -33,7 +33,7 @@ public interface MethodInvocationFilterBinder
 
     static MethodInvocationFilterBinder staticFilterBinder(List<MethodInvocationFilter> filters)
     {
-        return (filterMultibinder, binder, annotation, prefix) -> {
+        return (filterMultibinder, _, _, _) -> {
             for (MethodInvocationFilter filter : filters) {
                 filterMultibinder.addBinding().toInstance(filter);
             }

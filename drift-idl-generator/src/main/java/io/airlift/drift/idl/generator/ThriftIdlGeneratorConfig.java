@@ -45,9 +45,9 @@ public class ThriftIdlGeneratorConfig
         this.namespaces = ImmutableMap.copyOf(firstNonNull(namespaces, ImmutableMap.of()));
         this.includes = ImmutableMap.copyOf(firstNonNull(includes, ImmutableMap.of()));
         this.recursive = recursive;
-        this.errorLogger = firstNonNull(errorLogger, ignored -> {});
-        this.warningLogger = firstNonNull(warningLogger, ignored -> {});
-        this.verboseLogger = firstNonNull(verboseLogger, ignored -> {});
+        this.errorLogger = firstNonNull(errorLogger, _ -> {});
+        this.warningLogger = firstNonNull(warningLogger, _ -> {});
+        this.verboseLogger = firstNonNull(verboseLogger, _ -> {});
     }
 
     public static Builder builder()

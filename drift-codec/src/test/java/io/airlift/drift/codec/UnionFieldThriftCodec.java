@@ -56,21 +56,22 @@ public class UnionFieldThriftCodec
 
             field.id = reader.getFieldId();
             switch (field.id) {
-                case 1:
+                case 1 -> {
                     field.stringValue = reader.readStringField();
                     consumed = true;
-                    break;
-                case 2:
+                }
+                case 2 -> {
                     field.longValue = reader.readI64Field();
                     consumed = true;
-                    break;
-                case 3:
+                }
+                case 3 -> {
                     field.fruitValue = reader.readEnumField(fruitCodec);
                     consumed = true;
-                    break;
-                default:
+                }
+                default -> {
                     field.id = -1;
                     reader.skipFieldData();
+                }
             }
         }
         reader.readStructEnd();
@@ -87,15 +88,9 @@ public class UnionFieldThriftCodec
         writer.writeStructBegin("union");
 
         switch (value.id) {
-            case 1:
-                writer.writeStringField("stringValue", (short) 1, value.stringValue);
-                break;
-            case 2:
-                writer.writeI64Field("longValue", (short) 2, value.longValue);
-                break;
-            case 3:
-                writer.writeEnumField("fruitValue", (short) 3, fruitCodec, value.fruitValue);
-                break;
+            case 1 -> writer.writeStringField("stringValue", (short) 1, value.stringValue);
+            case 2 -> writer.writeI64Field("longValue", (short) 2, value.longValue);
+            case 3 -> writer.writeEnumField("fruitValue", (short) 3, fruitCodec, value.fruitValue);
         }
         writer.writeStructEnd();
     }

@@ -402,7 +402,7 @@ public class TestDriftMethodInvocation
             }
         }
 
-        MockMethodInvoker invoker = new MockMethodInvoker(request -> immediateFailedFuture(createClassifiedException(true, overloaded ? OVERLOADED : DOWN)));
+        MockMethodInvoker invoker = new MockMethodInvoker(_ -> immediateFailedFuture(createClassifiedException(true, overloaded ? OVERLOADED : DOWN)));
         DriftMethodInvocation<?> methodInvocation = createDriftMethodInvocation(
                 new RetryPolicy(new DriftClientConfig(), new TestingExceptionClassifier()),
                 new TestingMethodInvocationStat(),

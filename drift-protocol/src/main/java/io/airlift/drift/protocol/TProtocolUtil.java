@@ -25,34 +25,16 @@ public final class TProtocolUtil
             throws TException
     {
         switch (type) {
-            case TType.STOP:
-                return;
-            case TType.BOOL:
-                protocol.readBool();
-                return;
-            case TType.BYTE:
-                protocol.readByte();
-                return;
-            case TType.I16:
-                protocol.readI16();
-                return;
-            case TType.I32:
-                protocol.readI32();
-                return;
-            case TType.I64:
-                protocol.readI64();
-                return;
-            case TType.FLOAT:
-                protocol.readFloat();
-                return;
-            case TType.DOUBLE:
-                protocol.readDouble();
-                return;
-            case TType.STRING:
-                protocol.readBinary();
-                return;
-
-            case TType.STRUCT:
+            case TType.STOP -> {}
+            case TType.BOOL -> protocol.readBool();
+            case TType.BYTE -> protocol.readByte();
+            case TType.I16 -> protocol.readI16();
+            case TType.I32 -> protocol.readI32();
+            case TType.I64 -> protocol.readI64();
+            case TType.FLOAT -> protocol.readFloat();
+            case TType.DOUBLE -> protocol.readDouble();
+            case TType.STRING -> protocol.readBinary();
+            case TType.STRUCT -> {
                 protocol.readStructBegin();
                 while (true) {
                     TField field = protocol.readFieldBegin();
@@ -63,35 +45,30 @@ public final class TProtocolUtil
                     protocol.readFieldEnd();
                 }
                 protocol.readStructEnd();
-                return;
-
-            case TType.MAP:
+            }
+            case TType.MAP -> {
                 TMap map = protocol.readMapBegin();
                 for (int i = 0; i < map.getSize(); i++) {
                     skip(protocol, map.getKeyType());
                     skip(protocol, map.getValueType());
                 }
                 protocol.readMapEnd();
-                return;
-
-            case TType.SET:
+            }
+            case TType.SET -> {
                 TSet set = protocol.readSetBegin();
                 for (int i = 0; i < set.getSize(); i++) {
                     skip(protocol, set.getType());
                 }
                 protocol.readSetEnd();
-                return;
-
-            case TType.LIST:
+            }
+            case TType.LIST -> {
                 TList list = protocol.readListBegin();
                 for (int i = 0; i < list.getSize(); i++) {
                     skip(protocol, list.getType());
                 }
                 protocol.readListEnd();
-                return;
-
-            default:
-                throw new TProtocolException("Unknown type: " + type);
+            }
+            default -> throw new TProtocolException("Unknown type: " + type);
         }
     }
 }
